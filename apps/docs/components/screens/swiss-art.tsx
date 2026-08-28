@@ -88,6 +88,17 @@ function materialTone(material: string): Tone {
   return { ground: 'transparent', text: ink, palette: ['transparent', ink, SIGNAL] }
 }
 
+/**
+ * What to set on a bar painted in the tone's own ink - the jacket's and the
+ * sleeve's type band.
+ *
+ * Not `tone.ground`, which is what it used to be and is wrong the moment the
+ * ground is the object itself: a material tone's ground is `transparent`, so
+ * the band came out as a cream bar with invisible type on it. The band is
+ * opaque and painted in `text`, so what reads on it is simply the other ink.
+ */
+const onInk = (tone: Tone): string => (tone.text === INK ? PAPER : INK)
+
 /* ------------------------------------------------------------------ */
 /*  Pieces                                                             */
 /* ------------------------------------------------------------------ */
@@ -334,7 +345,7 @@ export function SwissFrame({
         style={{
           flex: 'none',
           background: t.text,
-          color: t.ground,
+          color: onInk(t),
           padding: '6cqmin',
           display: 'flex',
           flexDirection: 'column',
@@ -520,11 +531,11 @@ export const SwissRhythm = () => (
   />
 )
 
-export const SwissJacket = () => (
+export const SwissJacket = ({ material }: { material: string }) => (
   <SwissFrame
     pattern={bauhaus}
     seed="book-jacket"
-    tone="paper"
+    material={material}
     grid="4x6"
     index="09"
     kicker="Edition"
@@ -586,10 +597,11 @@ export const SwissLid = ({ material }: { material: string }) => (
 )
 
 /*
- * The bag and the shipping box print onto their own board rather than onto a
- * sheet: `material` is the finish the carousel currently has selected, so the
- * kraft, the charcoal and the olive all show through the artwork and the
- * swatches above the stage change the panel instead of being painted over.
+ * The jacket, the bag and the shipping box print onto their own material
+ * rather than onto a sheet: `material` is the finish the carousel currently
+ * has selected, so the navy cloth, the kraft and the charcoal all show through
+ * the artwork and the swatches above the stage change the panel instead of
+ * being painted over.
  */
 export const SwissBag = ({ material }: { material: string }) => (
   <SwissStack

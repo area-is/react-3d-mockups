@@ -86,7 +86,7 @@ a {
 
 code {
   font-family: var(--font-mono);
-  /* 1em, not 0.9: every size on this page has an 18px floor, and a chip set as
+  /* 1em, not 0.9: every size on this page has a 16px floor, and a chip set as
      a fraction of its parent slips under it. */
   font-size: 1em;
   background: rgba(49, 211, 34, 0.1);
@@ -148,7 +148,7 @@ code {
   align-items: center;
   gap: 10px;
   font-weight: 650;
-  font-size: 18px;
+  font-size: 16px;
   letter-spacing: -0.015em;
   white-space: nowrap;
 }
@@ -162,7 +162,7 @@ code {
   display: flex;
   align-items: center;
   gap: clamp(14px, 2.5vw, 28px);
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 500;
 }
 
@@ -228,7 +228,7 @@ code {
 
 .nav-sheet-link {
   padding: 13px 2px;
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 600;
   color: var(--text);
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
@@ -267,7 +267,7 @@ code {
   border: 0;
   padding: 10px 0;
   font-family: inherit;
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 500;
   letter-spacing: inherit;
   color: var(--muted);
@@ -281,7 +281,7 @@ code {
 }
 
 .nav-menu-caret {
-  font-size: 18px;
+  font-size: 16px;
   color: var(--muted);
 }
 
@@ -312,14 +312,14 @@ code {
 
 .nav-menu-item-title {
   display: block;
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 600;
   color: var(--text);
 }
 
 .nav-menu-item-desc {
   display: block;
-  font-size: 18px;
+  font-size: 16px;
   color: var(--muted);
   font-weight: 400;
   line-height: 1.45;
@@ -330,7 +330,7 @@ code {
   margin: 6px 12px 6px;
   padding: 8px 0 4px;
   border-top: 1px solid var(--border);
-  font-size: 18px;
+  font-size: 16px;
   color: var(--text-low);
 }
 
@@ -346,12 +346,12 @@ code {
   flex-wrap: wrap;
   padding: 20px clamp(16px, 4vw, 48px) 32px;
   color: var(--text-low);
-  font-size: 18px;
+  font-size: 16px;
 }
 
 .footer-inner a {
   font-family: var(--font-mono);
-  font-size: 18px;
+  font-size: 16px;
   color: var(--text-low);
 }
 
@@ -369,7 +369,7 @@ code {
   gap: 8px;
   padding: 13px 26px;
   border-radius: 999px;
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 650;
   letter-spacing: -0.01em;
   white-space: nowrap;
@@ -401,7 +401,7 @@ code {
   display: inline-flex;
   align-items: center;
   padding: 11px 4px;
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 600;
   letter-spacing: -0.01em;
   color: var(--muted);
@@ -413,7 +413,7 @@ code {
 }
 
 .accent-link {
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 600;
   color: var(--accent);
 }
@@ -421,7 +421,7 @@ code {
 .eyebrow {
   text-transform: uppercase;
   letter-spacing: 0.2em;
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 500;
   color: var(--text-low);
   margin: 0 0 18px;
@@ -709,7 +709,7 @@ code {
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
   font-family: var(--font-mono);
-  font-size: 18px;
+  font-size: 16px;
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--accent-2);
@@ -787,7 +787,7 @@ code {
 
 .carousel-hint {
   font-family: var(--font-mono);
-  font-size: 18px;
+  font-size: 16px;
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--text-low);
@@ -816,7 +816,7 @@ code {
   align-items: center;
   justify-content: center;
   color: var(--muted);
-  font-size: 18px;
+  font-size: 16px;
   animation: pulse 1.6s ease-in-out infinite;
 }
 
@@ -894,7 +894,7 @@ code {
   /* Inter, like the rest of the page: the readout sits under the headline now,
      so it reads as a sentence about the object rather than a spec sticker. */
   font-family: var(--font-sans);
-  font-size: clamp(18px, 1.6vw, 20px);
+  font-size: clamp(16px, 1.6vw, 18px);
   /* Explicit rather than dropped: `body` tightens the whole page by -0.015em. */
   letter-spacing: 0;
   color: var(--muted);
@@ -934,7 +934,7 @@ code {
  */
 .carousel-finish-name {
   font-family: var(--font-sans);
-  font-size: 18px;
+  font-size: 16px;
   letter-spacing: 0;
   color: var(--muted);
   min-width: 96px;
@@ -1002,7 +1002,7 @@ code {
 .feature-index {
   display: block;
   font-family: var(--font-mono);
-  font-size: 18px;
+  font-size: 16px;
   letter-spacing: 0.16em;
   color: var(--accent);
   font-variant-numeric: tabular-nums;
@@ -1017,7 +1017,7 @@ code {
 
 .features p {
   color: var(--muted);
-  font-size: clamp(18px, 1.35vw, 21px);
+  font-size: clamp(16px, 1.35vw, 19px);
   line-height: 1.6;
   margin: 0;
   max-width: 62ch;
@@ -1044,7 +1044,7 @@ code {
 
 .quickstart-copy p {
   color: var(--muted);
-  font-size: 18px;
+  font-size: 16px;
   max-width: 44ch;
   margin: 0 0 20px;
   text-wrap: pretty;
@@ -1061,7 +1061,7 @@ code {
   padding: 15px 18px;
   overflow-x: auto;
   font-family: var(--font-mono);
-  font-size: 18px;
+  font-size: 16px;
   line-height: 1.65;
   color: var(--text-code);
   background: rgba(255, 255, 255, 0.035);
@@ -1210,7 +1210,7 @@ code {
   padding: 24px;
   text-align: center;
   color: var(--muted);
-  font-size: 18px;
+  font-size: 16px;
   line-height: 1.6;
   border: 1px dashed var(--border);
   border-radius: 14px;
@@ -1219,7 +1219,7 @@ code {
 .scene-fallback strong {
   color: var(--text-high, #fff);
   font-weight: 600;
-  font-size: 18px;
+  font-size: 16px;
 }
 
 /* ------------------------------------------------------------------ */

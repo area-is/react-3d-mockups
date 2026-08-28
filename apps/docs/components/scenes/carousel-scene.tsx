@@ -441,7 +441,8 @@ const OBJECTS: Entry[] = [
       ['oxblood', 'Oxblood', '#5b2230'],
       ['bone', 'Bone', '#e3dbcc']
     ),
-    content: () => <SwissJacket />,
+    material: true,
+    content: (color) => <SwissJacket material={color} />,
     render: ({ color, screen, surface, surfaceStyle }) => (
       <Book color={color} surfaceBackground={surface} surfaceStyle={surfaceStyle}>
         {screen}
