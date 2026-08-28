@@ -6,10 +6,12 @@ any angle, videos play, iframes load, React state and effects keep running. Mock
 decorative: you rotate and zoom them, and the hardware masks the screen pixel for pixel
 ([why](#screens-are-display-only)).
 
-- **Twenty-two devices** - the Galaxy S26 line (S26, S26 Ultra), the Galaxy Z Fold 7 and
-  Z Flip 7 foldables, the full iPhone 17 family (17, 17 Air, 17 Pro, 17 Pro Max), MacBook
+- **Twenty-seven devices** - the Galaxy S26 line (S26, S26 Ultra), two foldable
+  generations (Z Fold 7, the wide Z Fold 8, Z Fold 8 Ultra, Z Flip 7, Z Flip 8), the
+  full iPhone 17 family (17, 17 Air, 17 Pro, 17 Pro Max), MacBook
   Air 13"/15" and MacBook Pro 14"/16" (M5), iPad Pro 13"/11" (M5), iPad Air 13"/11" (M4),
-  iPad (A16), Galaxy Tab S11 / S11 Ultra, an Apple Watch Series 11 and Galaxy Watch 8 on
+  iPad (A16), Galaxy Tab S11 / S11 Ultra, an Apple Watch Series 11 and the Galaxy
+  Watch 8, Watch 9 and Watch Ultra 2 on
   full wristbands, and a Studio Display-style 27" monitor, all procedurally generated
   at runtime. No GLB files, no
   hosting, no pop-in - importing one mockup costs 7.4–48.8 KB gzipped (the whole
@@ -188,7 +190,10 @@ Every variant's screen defaults to the real device's logical resolution (CSS px)
 | Galaxy S26 | `s26` | 360×780 | 780×360 | 2340×1080 panel at ⅓ (3x) |
 | Galaxy S26 Ultra | `s26ultra` | 384×833 | 833×384 | One UI default FHD+ render @ 450 dpi |
 | Galaxy Z Fold 7 (open / folded) | `fold7` | 820×910 / 360×835 | swapped | inner 2184×1968, cover 2520×1080 |
+| Galaxy Z Fold 8 (open / folded) | `fold8` | 1020×770 / 480×758 | swapped | inner 2448×1848 (natively landscape), cover 1248×1972 |
+| Galaxy Z Fold 8 Ultra (open / folded) | `fold8ultra` | 820×910 / 360×835 | swapped | inner 2504×2256 on the Fold 7 grid, cover 2520×1080 |
 | Galaxy Z Flip 7 (open / folded) | `flip7` | 360×838 / 316×349 | swapped | main 2520×1080, cover 948×1048 |
+| Galaxy Z Flip 8 (open / folded) | `flip8` | 360×840 / 316×349 | swapped | main 2520×1080 at 6.9", cover 948×1048 |
 | iPhone 17 | `17` | 402×874 | 874×402 | 2622×1206 @ 3x point grid |
 | iPhone 17 Air | `air` | 420×912 | 912×420 | 2736×1260 @ 3x point grid |
 | iPhone 17 Pro | `pro` | 402×874 | 874×402 | 2622×1206 @ 3x point grid |
@@ -206,6 +211,8 @@ Every variant's screen defaults to the real device's logical resolution (CSS px)
 | Galaxy Tab S11 Ultra | `tabs11ultra` | 924×1480 | 1480×924 | 2960×1848 panel at ½ (xhdpi) |
 | Apple Watch Series 11 46mm | `series11` | 208×248 | - | 416×496 @ 2x point grid |
 | Galaxy Watch 8 44mm | `watch8` | 240×240 | - | 480×480 round panel at ½ |
+| Galaxy Watch 9 44mm | `watch9` | 240×240 | - | 480×480 round panel at ½ |
+| Galaxy Watch Ultra 2 47mm | `watchultra2` | 249×249 | - | 498×498 round panel at ½ |
 | Studio Display 27" | - | - | 2560×1440 | 5120×2880 @ 2x point grid |
 
 ### `<IPad>` / `<GalaxyTab>` - the iPad lineup / Galaxy Tab S11 family
@@ -225,9 +232,10 @@ the backs; landscape-edge front cameras, USB-C and machined edge buttons on all.
 Both watches add `bandColor` and skip orientation. Every device draws its front camera unconditionally - a punch hole, Dynamic Island or notch is hardware, and it obstructs your layout here exactly as it would on the real panel. `<AppleWatch>` is the Series 11:
 squircle case, knurled Digital Crown, flush side button, sensor back, worn on the
 seamless Solo Loop - which has no closure, so it takes no `bandOpen`.
-`<GalaxyWatch>` is the Watch 8: cushion case, round display on its dial puck, two
-flat keys, BioActive puck, worn on a buckled two-strap band that `bandOpen` lays
-out flat. The monitor puts the
+`<GalaxyWatch>` is the Galaxy Watch family (`'watch8' | 'watch9' | 'watchultra2'`):
+cushion case, round display on its dial puck, flat keys (the 47 mm titanium
+Ultra 2 adds its orange Quick Button), BioActive puck, worn on a buckled
+two-strap band that `bandOpen` lays out flat. The monitor puts the
 2026 Studio Display's 27" 5K panel on its tilt stand - uniform bezel, centered
 camera, the tight rear 2× Thunderbolt 5 + 2× USB-C slot cluster, the captive power
 cord's circular recess framed by the stand's cable hole and, faithfully, no power

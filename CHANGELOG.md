@@ -5,6 +5,22 @@ Notable changes to `area-3d-mockups`. This project follows
 
 ## Unreleased
 
+### Added
+
+- **The 2026 Samsung generation: five new devices.** `FoldMockup` gains
+  `variant="fold8"` - the generation's new *wide* form factor, folding open
+  around the same vertical hinge into a landscape 4:3 tablet (1020×770
+  logical, the one display in the catalog whose unrotated pose is wider than
+  tall) - and `variant="fold8ultra"`, the Fold 7's chassis carrying the
+  sharper 2504×2256 inner panel on the same 820×910 grid. `FlipMockup` gains
+  `variant="flip8"` (6.9" main panel on the same grid, unchanged cover).
+  `GalaxyWatchMockup` gains `variant="watch9"` (the Watch 8's case, new
+  internals) and `variant="watchultra2"` - the 47 mm titanium cushion
+  squircle with its 1.52" 498×498 dial, wider strap and the orange Quick
+  Button, which stays orange whatever the case finish because on the
+  hardware it is. Each variant ships its retail colorways, and every body
+  and panel figure is the published hardware dimension.
+
 ### Changed (breaking)
 
 - **`open` is now `openAngle` on `FoldMockup`/`FlipMockup`** (and `Fold`/`Flip`,

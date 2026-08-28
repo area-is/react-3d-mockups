@@ -1,7 +1,8 @@
 /**
- * Watch device dimensions - Apple Watch Series 11 and Samsung Galaxy Watch 8.
+ * Watch device dimensions - the Apple Watch Series 11 and the Samsung Galaxy
+ * Watch 8, Watch 9 and Watch Ultra 2.
  *
- * Both variants share one world scale (~17.7 mm per unit) so they keep true
+ * All variants share one world scale (~17.7 mm per unit) so they keep true
  * relative sizes side by side:
  *
  * - Apple Watch Series 11, 46 mm: 46 x 39 x 9.7 mm squircle case, ~1.96"
@@ -57,11 +58,13 @@ export interface WatchSpec {
   crown?: { y: number; radius: number; thickness: number; proud: number; teeth: number; toothDepth: number }
   /**
    * Keys on the right edge: Apple's flush side button (tiny `proud`, reads as
-   * a pill outline in a recess), Galaxy's two raised chamfered keys. `length`
-   * runs along the edge (y), `width` across the case depth (z), `proud` is
-   * the protrusion past the case wall.
+   * a pill outline in a recess), Galaxy's two raised chamfered keys, the
+   * Watch Ultra 2's three-key run. `length` runs along the edge (y), `width`
+   * across the case depth (z), `proud` is the protrusion past the case wall.
+   * `color` is for a key with its own finish whatever the case colorway -
+   * the Ultra 2's orange Quick Button is hardware, not a colorway.
    */
-  buttons: { y: number; length: number; width: number; proud: number }[]
+  buttons: { y: number; length: number; width: number; proud: number; color?: string }[]
   /** Microphone hole drilled into the right edge. */
   mic?: { y: number; radius: number; z?: number }
   /** Machined speaker slots in the left edge (Apple: one long; Galaxy: two short). */
@@ -271,9 +274,77 @@ export const APPLE_WATCH_VARIANTS: Record<'series11', WatchSpec> = {
   series11: SERIES_11,
 }
 
+/**
+ * Galaxy Watch 9, 44 mm. The generation is internal (chip, battery, Wear OS
+ * 7): the published case - 46.0 x 43.7 x 8.6 mm - and the 1.47" 480x480 dial
+ * are the Watch 8's to the tenth of a millimetre, so the cushion geometry is
+ * the Watch 8 scan's, carried over deliberately rather than remeasured.
+ */
+const GALAXY_WATCH_9: WatchSpec = {
+  ...GALAXY_WATCH_8,
+}
+
+/**
+ * Galaxy Watch Ultra 2, 47 mm: a grade-4 titanium cushion squircle -
+ * 47.4 x 47.1 x 10.7 mm, two millimetres deeper than the Watch 9 - carrying
+ * the same raised-round-dial architecture with a 1.52" 498x498 sAMOLED
+ * (249 dp grid, the panel at half scale). Right edge, top to bottom: two
+ * pill keys, then the wider orange Quick Button standing proudest of the
+ * three. Case and dial proportions are read off Samsung's official product
+ * renders scaled to the published width; the band reuses the Galaxy buckle
+ * rig at the Ultra's wider strap width.
+ */
+const GALAXY_WATCH_ULTRA_2: WatchSpec = {
+  style: 'galaxy',
+  body: { width: 2.661, height: 2.678, depth: 0.605, radius: 1.0, bevel: 0.13 },
+  glass: { width: 2.28, height: 2.28, radius: 1.14 },
+  dial: { radius: 1.14, height: 0.06 },
+  display: { width: 2.1, height: 2.1, radius: 1.05 },
+  resolution: 249,
+  // The three-key run: the two standard keys with the Quick Button seated
+  // between them - wider, prouder, and orange whatever the case finish.
+  buttons: [
+    { y: 0.42, length: 0.34, width: 0.185, proud: 0.05 },
+    { y: 0, length: 0.44, width: 0.26, proud: 0.075, color: '#e05d2b' },
+    { y: -0.42, length: 0.34, width: 0.185, proud: 0.05 },
+  ],
+  // Back: the BioActive puck raised from the titanium, as on the cushion case.
+  back: {
+    radius: 0.65,
+    raise: 0.05,
+    hubRadius: 0.14,
+    leds: { count: 4, ring: 0.3, radius: 0.068 },
+    electrode: { inner: 0.44, outer: 0.56 },
+  },
+  speaker: [
+    { y: 0.26, length: 0.37, height: 0.05 },
+    { y: -0.26, length: 0.37, height: 0.05 },
+  ],
+  // The Ultra strap: the Galaxy buckle rig widened from the 20 mm Dynamic Lug
+  // band toward the Ultra's ~24 mm sport strap, on the same wrist loop.
+  band: {
+    closure: 'buckle',
+    lugWidth: 1.92,
+    width: 1.36,
+    tipWidth: 1.1,
+    thickness: 0.15,
+    crown: 0.04,
+    pinStrapEnd: 198,
+    tailEnd: 98,
+    holes: [0.465, 0.527, 0.588, 0.649, 0.711, 0.772],
+    holeRadius: 0.058,
+    holeLength: 0.185,
+    closureHole: 2,
+    keeperT: 0.72,
+    loop: { ryFront: 1.72, ryBack: 1.46, rz: 1.22, centerZ: -0.98, startAngle: 34 },
+  },
+}
+
 /** The Galaxy Watch family, worn on a buckled two-strap band. */
-export const GALAXY_WATCH_VARIANTS: Record<'watch8', WatchSpec> = {
+export const GALAXY_WATCH_VARIANTS: Record<'watch8' | 'watch9' | 'watchultra2', WatchSpec> = {
   watch8: GALAXY_WATCH_8,
+  watch9: GALAXY_WATCH_9,
+  watchultra2: GALAXY_WATCH_ULTRA_2,
 }
 
 export type AppleWatchVariant = keyof typeof APPLE_WATCH_VARIANTS

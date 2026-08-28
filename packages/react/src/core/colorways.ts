@@ -78,6 +78,22 @@ export const FOLD_COLORWAYS: Record<FoldVariant, Colorway[]> = {
     { id: 'silvershadow', name: 'Silver Shadow', color: '#c9ccce', frameColor: '#b9bcbe' },
     { id: 'mint', name: 'Mint', color: '#cfe0d2', frameColor: '#b4c9b8' },
   ],
+  // The 2026 foldable generation's finishes are eyeballed from Samsung's
+  // launch imagery rather than measured off four-view renders - replace with
+  // measured swatches when those publish. Pistachio and Green Shadow are the
+  // samsung.com exclusives.
+  fold8: [
+    { id: 'lavender', name: 'Lavender', color: '#c9c2d9', frameColor: '#b3abc6' },
+    { id: 'cream', name: 'Cream', color: '#ece5d8', frameColor: '#d6cec0' },
+    { id: 'graphite', name: 'Graphite', color: '#45474c', frameColor: '#5b5d63' },
+    { id: 'pistachio', name: 'Pistachio', color: '#d4dfc0', frameColor: '#bcc9a8' },
+  ],
+  fold8ultra: [
+    { id: 'violetshadow', name: 'Violet Shadow', color: '#5c5670', frameColor: '#6e6883' },
+    { id: 'cream', name: 'Cream', color: '#ece5d8', frameColor: '#d6cec0' },
+    { id: 'graphite', name: 'Graphite', color: '#45474c', frameColor: '#5b5d63' },
+    { id: 'greenshadow', name: 'Green Shadow', color: '#4a5a50', frameColor: '#5d6e63' },
+  ],
 }
 
 export const FLIP_COLORWAYS: Record<FlipVariant, Colorway[]> = {
@@ -85,6 +101,13 @@ export const FLIP_COLORWAYS: Record<FlipVariant, Colorway[]> = {
     { id: 'blueshadow', name: 'Blue Shadow', color: '#47536b', frameColor: '#5a6579' },
     { id: 'jetblack', name: 'Jet Black', color: '#17181c', frameColor: '#33363c' },
     { id: 'coralred', name: 'Coral Red', color: '#e5502e', frameColor: '#f06a45' },
+    { id: 'mint', name: 'Mint', color: '#cfe0d2', frameColor: '#b4c9b8' },
+  ],
+  // Eyeballed from launch imagery, as above; Mint is the samsung.com exclusive.
+  flip8: [
+    { id: 'pink', name: 'Pink', color: '#f2c6d3', frameColor: '#dcb0bf' },
+    { id: 'cream', name: 'Cream', color: '#ece5d8', frameColor: '#d6cec0' },
+    { id: 'graphite', name: 'Graphite', color: '#45474c', frameColor: '#5b5d63' },
     { id: 'mint', name: 'Mint', color: '#cfe0d2', frameColor: '#b4c9b8' },
   ],
 }
@@ -156,6 +179,15 @@ export const GALAXY_WATCH_COLORWAYS: Record<GalaxyWatchVariant, Colorway[]> = {
   watch8: [
     { id: 'graphite', name: 'Graphite', color: '#33363c' },
     { id: 'silver', name: 'Silver', color: '#d9dbde' },
+  ],
+  // The 44 mm Watch 9 ships the same two aluminium finishes.
+  watch9: [
+    { id: 'graphite', name: 'Graphite', color: '#33363c' },
+    { id: 'silver', name: 'Silver', color: '#d9dbde' },
+  ],
+  watchultra2: [
+    { id: 'titaniumsilver', name: 'Titanium Silver', color: '#ccced3' },
+    { id: 'titaniumgray', name: 'Titanium Gray', color: '#8b8e94' },
   ],
 }
 
