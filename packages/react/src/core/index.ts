@@ -88,6 +88,21 @@ export {
 } from './screen/surface'
 export { type BackfaceCuller, createBackfaceCuller } from './screen/backface'
 export {
+  type StatusBarPlatform,
+  type StatusBarFormFactor,
+  type StatusBarCutout,
+  type StatusBarMetrics,
+  type StatusBarLayoutOptions,
+  type StatusBarLayout,
+  type StatusBarBattery,
+  type StatusBarContent,
+  type ResolvedStatusBarContent,
+  STATUS_BAR_DEFAULTS,
+  statusBarMetrics,
+  statusBarLayout,
+  resolveStatusBarContent,
+} from './screen/status-bar'
+export {
   LED_TEXT_COLOR,
   LED_TEXT_BACKGROUND,
   LED_MARQUEE_SPEED,

@@ -14,6 +14,7 @@ import {
   roundedRectShape,
 } from '../../core'
 import { DeviceScreen } from '../../screen/device-screen'
+import { renderStatusBar, type StatusBarOption } from '../../screen/status-bar'
 import { createLogoGeometry } from '../logos'
 import {
   SideKey,
@@ -65,6 +66,13 @@ export interface FoldProps extends Omit<GroupProps, 'children' | 'color'>, Surfa
    */
   orientation?: 'portrait' | 'landscape'
   /**
+   * Draw the system status bar across the top of the screen: `true` for the
+   * platform's defaults, or an object to set the clock, the meters and the
+   * ink. It is placed from this device's own punch hole - including the inner
+   * display's off-centre one - so it clears the camera on every face.
+   */
+  statusBar?: StatusBarOption
+  /**
    * Back panel color, and the whole finish: the metal frame, buttons, hinge
    * and camera rings follow from it. A retail colorway id from
    * `FOLD_COLORWAYS` gets that model's measured rail; any other CSS color gets
@@ -114,6 +122,7 @@ function FoldImpl({
   surfaceBackground = '#000000',
   resolution,
   surfaceStyle,
+  statusBar,
   ...groupProps
 }: FoldProps) {
   const screenSlot = collectSlots(children, SCREEN_REGIONS).screen
@@ -452,6 +461,20 @@ function FoldImpl({
       }}
     />
   )
+  /*
+   * One UI on both faces, but the inner display is a tablet and the cover is a
+   * phone, and Samsung sets them at different sizes. The hole is off-centre on
+   * the inner display, so its signed offset is passed through and the bar
+   * clears it rather than assuming a centred camera.
+   */
+  const statusBarOverlay = renderStatusBar(statusBar, {
+    platform: 'oneui',
+    formFactor: isOpenFace ? 'tablet' : 'phone',
+    width: res,
+    cutout: landscape
+      ? undefined
+      : { halfWidth: px(holeR), centerY: px(holeOffsetY), offsetX: px(holeX) },
+  })
   const punchHoleOverlay = (
     <div
       aria-hidden
@@ -495,6 +518,7 @@ function FoldImpl({
         <>
           {mode === 'open' && creaseOverlay}
           {punchHoleOverlay}
+          {statusBarOverlay}
         </>
       }
     >
@@ -593,6 +617,7 @@ function FoldImpl({
             {screenSlot?.children}
             {creaseOverlay}
             {punchHoleOverlay}
+            {statusBarOverlay}
           </div>
         </DeviceScreen>
       )

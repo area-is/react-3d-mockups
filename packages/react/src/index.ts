@@ -64,6 +64,19 @@ export {
   type SurfaceInfo,
 } from './screen/use-surface'
 export {
+  StatusBar,
+  renderStatusBar,
+  type StatusBarProps,
+  type StatusBarOption,
+} from './screen/status-bar'
+export {
+  type StatusBarContent,
+  type StatusBarPlatform,
+  type StatusBarFormFactor,
+  type StatusBarBattery,
+  STATUS_BAR_DEFAULTS,
+} from './core'
+export {
   createSlot,
   createSlots,
   collectSlots,

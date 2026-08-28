@@ -13,6 +13,7 @@ import {
   roundedRectShape,
 } from '../../core'
 import { DeviceScreen } from '../../screen/device-screen'
+import { renderStatusBar, type StatusBarOption } from '../../screen/status-bar'
 import { createLogoGeometry } from '../logos'
 import {
   SideKey,
@@ -49,6 +50,13 @@ export interface IPhoneProps extends Omit<GroupProps, 'children' | 'color'>, Sur
    */
   orientation?: 'portrait' | 'landscape'
   /**
+   * Draw the system status bar across the top of the screen: `true` for the
+   * platform's defaults, or an object to set the clock, the meters and the
+   * ink. It is placed from this device's own camera cutout and logical grid,
+   * so it lines up with the hardware on every variant.
+   */
+  statusBar?: StatusBarOption
+  /**
    * Back glass color, and the whole finish: the chassis rail, buttons and
    * camera rings follow from it. A retail colorway id from `IPHONE_COLORWAYS`
    * (`'black'`, `'mistblue'`, `'cosmicorange'`…) gets that model's measured
@@ -83,6 +91,7 @@ function IPhoneImpl({
   surfaceBackground = '#000000',
   resolution,
   surfaceStyle,
+  statusBar,
   ...groupProps
 }: IPhoneProps) {
   const screen = collectSlots(children, SCREEN_REGIONS).screen
@@ -463,6 +472,22 @@ function IPhoneImpl({
           // it eats the same strip of your layout here that it eats on the real
           // panel, which is most of the point of looking at a mockup.
           overlay={
+            <>
+            {/* Landscape gets no cutout: the island is off to the side there,
+                so iOS sets a plain strip along the top instead of splitting the
+                bar around it. */}
+            {renderStatusBar(statusBar, {
+              platform: 'ios',
+              formFactor: 'phone',
+              width: res,
+              cutout: landscape
+                ? undefined
+                : {
+                    halfWidth: px(island.width) / 2,
+                    centerY: px(island.offsetY),
+                    offsetX: 0,
+                  },
+            })}
             <div
               aria-hidden
               style={{
@@ -506,6 +531,7 @@ function IPhoneImpl({
                 }}
               />
             </div>
+            </>
           }
         >
           {screen?.children}

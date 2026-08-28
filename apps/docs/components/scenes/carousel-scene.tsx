@@ -205,6 +205,12 @@ interface Entry {
   lift: number
   colorways: Colorway[]
   /**
+   * Ink for the system status bar, set against the artwork behind it the way
+   * an app picks its status-bar style. Absent on everything that is not a
+   * phone or a tablet - a milk carton has no status bar.
+   */
+  statusBarInk?: string
+  /**
    * What the staged model carries on its primary surface. It is handed the
    * finish currently selected, which the printed faces use as their ground.
    */
@@ -224,6 +230,12 @@ interface Entry {
     screen: ReactNode
     surface?: string
     surfaceStyle?: Record<string, unknown>
+    /**
+     * The system status bar, on the staged models only. The picker row is
+     * seventeen per cent scale - a clock and three meters there would be four
+     * illegible specks per thumbnail, on seven extra DOM layers.
+     */
+    statusBar?: { color: string } | false
   }) => ReactNode
 }
 
@@ -277,56 +289,60 @@ const AFRAME_FIT = fitFor(A_FRAME_SIGN_FRAMING as MockupFraming<never>)
 const DEVICES: Entry[] = [
   {
     id: 'galaxy-s26',
+    statusBarInk: '#141414',
     name: 'Galaxy S26',
     res: pxRes('galaxy', { variant: 's26' }),
     fit: PHONE_FIT,
     lift: 0,
     colorways: GALAXY_COLORWAYS.s26,
     content: () => <SwissRotation />,
-    render: ({ color, screen, surface, surfaceStyle }) => (
-      <Galaxy variant="s26" color={color} surfaceBackground={surface} surfaceStyle={surfaceStyle}>
+    render: ({ color, screen, surface, surfaceStyle, statusBar }) => (
+      <Galaxy variant="s26" color={color} surfaceBackground={surface} surfaceStyle={surfaceStyle} statusBar={statusBar}>
         {screen}
       </Galaxy>
     ),
   },
   {
     id: 'iphone-17-pro',
+    statusBarInk: '#efede6',
     name: 'iPhone 17 Pro',
     res: pxRes('iphone', { variant: 'pro' }),
     fit: IPHONE_FIT,
     lift: 0,
     colorways: IPHONE_COLORWAYS.pro,
     content: () => <SwissRaster />,
-    render: ({ color, screen, surface, surfaceStyle }) => (
-      <IPhone variant="pro" color={color} surfaceBackground={surface} surfaceStyle={surfaceStyle}>
+    render: ({ color, screen, surface, surfaceStyle, statusBar }) => (
+      <IPhone variant="pro" color={color} surfaceBackground={surface} surfaceStyle={surfaceStyle} statusBar={statusBar}>
         {screen}
       </IPhone>
     ),
   },
   {
     id: 'galaxy-z-fold7',
+    statusBarInk: '#141414',
     name: 'Galaxy Z Fold 7',
     res: pxRes('fold', { openAngle: CAROUSEL_OPEN_ANGLE }),
     fit: FOLD_FIT,
     lift: 0,
     colorways: FOLD_COLORWAYS.fold7,
     content: () => <SwissConstruction />,
-    render: ({ color, screen, surface, surfaceStyle }) => (
-      <Fold openAngle={CAROUSEL_OPEN_ANGLE} color={color} surfaceBackground={surface} surfaceStyle={surfaceStyle}>
+    render: ({ color, screen, surface, surfaceStyle, statusBar }) => (
+      <Fold openAngle={CAROUSEL_OPEN_ANGLE} color={color} surfaceBackground={surface} surfaceStyle={surfaceStyle} statusBar={statusBar}>
         {screen}
       </Fold>
     ),
   },
   {
     id: 'galaxy-z-flip7',
+    statusBarInk: '#efede6',
     name: 'Galaxy Z Flip 7',
     res: pxRes('flip', { openAngle: CAROUSEL_OPEN_ANGLE }),
     fit: FLIP_FIT,
     lift: 0,
     colorways: FLIP_COLORWAYS.flip7,
     content: () => <SwissField />,
-    render: ({ color, screen, surface, surfaceStyle }) => (
-      <Flip openAngle={CAROUSEL_OPEN_ANGLE} color={color} surfaceBackground={surface} surfaceStyle={surfaceStyle}>
+    render: ({ color, screen, surface, surfaceStyle, statusBar }) => (
+      <Flip openAngle={CAROUSEL_OPEN_ANGLE} color={color} surfaceBackground={surface} surfaceStyle={surfaceStyle} statusBar={statusBar}>
         {screen}
       </Flip>
     ),
@@ -347,28 +363,30 @@ const DEVICES: Entry[] = [
   },
   {
     id: 'ipad-pro-13',
+    statusBarInk: '#efede6',
     name: 'iPad Pro 13\u2033',
     res: pxRes('ipad', { variant: 'ipadpro13' }),
     fit: TABLET_FIT,
     lift: 0,
     colorways: IPAD_COLORWAYS.ipadpro13,
     content: () => <SwissEpicentre />,
-    render: ({ color, screen, surface, surfaceStyle }) => (
-      <IPad variant="ipadpro13" color={color} surfaceBackground={surface} surfaceStyle={surfaceStyle}>
+    render: ({ color, screen, surface, surfaceStyle, statusBar }) => (
+      <IPad variant="ipadpro13" color={color} surfaceBackground={surface} surfaceStyle={surfaceStyle} statusBar={statusBar}>
         {screen}
       </IPad>
     ),
   },
   {
     id: 'galaxy-tab-s11',
+    statusBarInk: '#141414',
     name: 'Galaxy Tab S11',
     res: pxRes('galaxyTab', { variant: 'tabs11' }),
     fit: TABLET_FIT,
     lift: 0,
     colorways: GALAXY_TAB_COLORWAYS.tabs11,
     content: () => <SwissChecker />,
-    render: ({ color, screen, surface, surfaceStyle }) => (
-      <GalaxyTab variant="tabs11" color={color} surfaceBackground={surface} surfaceStyle={surfaceStyle}>
+    render: ({ color, screen, surface, surfaceStyle, statusBar }) => (
+      <GalaxyTab variant="tabs11" color={color} surfaceBackground={surface} surfaceStyle={surfaceStyle} statusBar={statusBar}>
         {screen}
       </GalaxyTab>
     ),
@@ -709,6 +727,7 @@ function StageSlot({
         color,
         // The finish doubles as the panel behind a printed face (see `material`).
         surface: entry.material ? color : undefined,
+        statusBar: entry.statusBarInk ? { color: entry.statusBarInk } : false,
         /*
          * Every staged slot carries its surface for as long as it exists -
          * including the two waiting off-stage. Mounting them as a model

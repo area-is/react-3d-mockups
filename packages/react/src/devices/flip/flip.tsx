@@ -15,6 +15,7 @@ import {
   roundedRectShape,
 } from '../../core'
 import { DeviceScreen } from '../../screen/device-screen'
+import { renderStatusBar, type StatusBarOption } from '../../screen/status-bar'
 import { createLogoGeometry } from '../logos'
 import {
   SideKey,
@@ -65,6 +66,13 @@ export interface FlipProps extends Omit<GroupProps, 'children' | 'color'>, Surfa
    * H×W with upright content - exactly like rotating the real device.
    */
   orientation?: 'portrait' | 'landscape'
+  /**
+   * Draw the system status bar across the top of the main display: `true` for
+   * the platform's defaults, or an object to set the clock, the meters and the
+   * ink. The cover screen does not get one - a 4.1" flap runs One UI's cover
+   * face, which has a clock of its own and no status bar.
+   */
+  statusBar?: StatusBarOption
   /**
    * Back glass / cover color, and the whole finish: the metal frame, buttons,
    * hinge band and camera rings follow from it. A retail colorway id from
@@ -128,6 +136,7 @@ function FlipImpl({
   surfaceBackground = '#000000',
   resolution,
   surfaceStyle,
+  statusBar,
   ...groupProps
 }: FlipProps) {
   const screenSlot = collectSlots(children, SCREEN_REGIONS).screen
@@ -487,6 +496,22 @@ function FlipImpl({
     />
   )
 
+  // The main display only. Folded, the front is the cover screen, which runs
+  // One UI's cover face - a clock widget, no status bar - so there is nothing
+  // to draw there.
+  const statusBarOverlay = renderStatusBar(statusBar, {
+    platform: 'oneui',
+    formFactor: 'phone',
+    width: res,
+    cutout: landscape
+      ? undefined
+      : {
+          halfWidth: px(spec.open.punchHole.radius),
+          centerY: px(spec.open.punchHole.offsetY),
+          offsetX: 0,
+        },
+  })
+
   const screen = (
     <DeviceScreen
       width={landscape ? display.height : display.width}
@@ -501,7 +526,10 @@ function FlipImpl({
       })}
       overlay={
         mode === 'open' ? (
-          punchHoleOverlay
+          <>
+            {punchHoleOverlay}
+            {statusBarOverlay}
+          </>
         ) : mode === 'closed' ? (
           // The two lens rings + flash live ON the cover screen - rendered as
           // a DOM overlay so they sit above your live content, like a cutout.
@@ -609,6 +637,7 @@ function FlipImpl({
           overlay={
             <>
               {upper ? punchHoleOverlay : null}
+              {upper ? statusBarOverlay : null}
               <div
                 aria-hidden
                 style={{
