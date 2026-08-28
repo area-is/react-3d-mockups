@@ -1,5 +1,5 @@
 /* ------------------------------------------------------------------ */
-/*  area-3d-mockups site: global styles (Showroom design)             */
+/*  react-3d-mockups site: global styles (Showroom design)             */
 /* ------------------------------------------------------------------ */
 
 :root {
@@ -86,7 +86,9 @@ a {
 
 code {
   font-family: var(--font-mono);
-  font-size: 0.9em;
+  /* 1em, not 0.9: every size on this page has an 18px floor, and a chip set as
+     a fraction of its parent slips under it. */
+  font-size: 1em;
   background: rgba(49, 211, 34, 0.1);
   color: #5fe251;
   border-radius: 6px;
@@ -146,7 +148,7 @@ code {
   align-items: center;
   gap: 10px;
   font-weight: 650;
-  font-size: 15.5px;
+  font-size: 18px;
   letter-spacing: -0.015em;
   white-space: nowrap;
 }
@@ -160,7 +162,7 @@ code {
   display: flex;
   align-items: center;
   gap: clamp(14px, 2.5vw, 28px);
-  font-size: 14.5px;
+  font-size: 18px;
   font-weight: 500;
 }
 
@@ -226,7 +228,7 @@ code {
 
 .nav-sheet-link {
   padding: 13px 2px;
-  font-size: 16px;
+  font-size: 18px;
   font-weight: 600;
   color: var(--text);
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
@@ -265,7 +267,7 @@ code {
   border: 0;
   padding: 10px 0;
   font-family: inherit;
-  font-size: 14.5px;
+  font-size: 18px;
   font-weight: 500;
   letter-spacing: inherit;
   color: var(--muted);
@@ -279,7 +281,7 @@ code {
 }
 
 .nav-menu-caret {
-  font-size: 9px;
+  font-size: 18px;
   color: var(--muted);
 }
 
@@ -310,14 +312,14 @@ code {
 
 .nav-menu-item-title {
   display: block;
-  font-size: 14px;
+  font-size: 18px;
   font-weight: 600;
   color: var(--text);
 }
 
 .nav-menu-item-desc {
   display: block;
-  font-size: 12px;
+  font-size: 18px;
   color: var(--muted);
   font-weight: 400;
   line-height: 1.45;
@@ -328,7 +330,7 @@ code {
   margin: 6px 12px 6px;
   padding: 8px 0 4px;
   border-top: 1px solid var(--border);
-  font-size: 11.5px;
+  font-size: 18px;
   color: var(--text-low);
 }
 
@@ -344,12 +346,12 @@ code {
   flex-wrap: wrap;
   padding: 20px clamp(16px, 4vw, 48px) 32px;
   color: var(--text-low);
-  font-size: 13px;
+  font-size: 18px;
 }
 
 .footer-inner a {
   font-family: var(--font-mono);
-  font-size: 12px;
+  font-size: 18px;
   color: var(--text-low);
 }
 
@@ -367,7 +369,7 @@ code {
   gap: 8px;
   padding: 13px 26px;
   border-radius: 999px;
-  font-size: 15px;
+  font-size: 18px;
   font-weight: 650;
   letter-spacing: -0.01em;
   white-space: nowrap;
@@ -399,7 +401,7 @@ code {
   display: inline-flex;
   align-items: center;
   padding: 11px 4px;
-  font-size: 14.5px;
+  font-size: 18px;
   font-weight: 600;
   letter-spacing: -0.01em;
   color: var(--muted);
@@ -411,7 +413,7 @@ code {
 }
 
 .accent-link {
-  font-size: 14.5px;
+  font-size: 18px;
   font-weight: 600;
   color: var(--accent);
 }
@@ -419,7 +421,7 @@ code {
 .eyebrow {
   text-transform: uppercase;
   letter-spacing: 0.2em;
-  font-size: 11.5px;
+  font-size: 18px;
   font-weight: 500;
   color: var(--text-low);
   margin: 0 0 18px;
@@ -707,7 +709,7 @@ code {
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
   font-family: var(--font-mono);
-  font-size: 10.5px;
+  font-size: 18px;
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--accent-2);
@@ -785,7 +787,7 @@ code {
 
 .carousel-hint {
   font-family: var(--font-mono);
-  font-size: 10.5px;
+  font-size: 18px;
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--text-low);
@@ -814,7 +816,7 @@ code {
   align-items: center;
   justify-content: center;
   color: var(--muted);
-  font-size: 14px;
+  font-size: 18px;
   animation: pulse 1.6s ease-in-out infinite;
 }
 
@@ -892,7 +894,7 @@ code {
   /* Inter, like the rest of the page: the readout sits under the headline now,
      so it reads as a sentence about the object rather than a spec sticker. */
   font-family: var(--font-sans);
-  font-size: clamp(11.5px, 1.8vw, 13.5px);
+  font-size: clamp(18px, 1.6vw, 20px);
   /* Explicit rather than dropped: `body` tightens the whole page by -0.015em. */
   letter-spacing: 0;
   color: var(--muted);
@@ -917,13 +919,6 @@ code {
   justify-content: center;
 }
 
-/* Set with the readout above them, so the whole bar is one voice. */
-.carousel-finish-name {
-  font-family: var(--font-sans);
-  font-size: 13.5px;
-  letter-spacing: 0;
-}
-
 /* The palette glyph. Sized to the swatches it introduces and dimmed to the
    same level the word it replaced was set at. */
 .carousel-finish-label {
@@ -932,9 +927,15 @@ code {
   color: var(--text-low);
 }
 
-/* A floor, not a width: it keeps the swatches from sliding about as the
-   selected finish's name changes length. */
+/*
+ * Set with the readout above it, so the whole bar is one voice. The min-width
+ * is a floor, not a width: it keeps the swatches from sliding about as the
+ * selected finish's name changes length.
+ */
 .carousel-finish-name {
+  font-family: var(--font-sans);
+  font-size: 18px;
+  letter-spacing: 0;
   color: var(--muted);
   min-width: 96px;
 }
@@ -977,18 +978,23 @@ code {
 /* ------------------------------------------------------------------ */
 
 /*
- * Four claims, on the page's own grid and nothing else - no rules, no cards,
- * no boxes. The gutters do the separating: at this size a border around a
- * paragraph adds a second, competing rectangle to a page that is already one
- * big rectangle of hardware.
+ * Four claims, stacked - no rules, no cards, no boxes. The space between them
+ * does the separating: a border around a paragraph adds a second, competing
+ * rectangle to a page that is already one big rectangle of hardware.
+ *
+ * One column rather than four. Four made each claim a caption you skim past;
+ * down the page they are paragraphs, and they can be set large enough to be
+ * read. The measure is capped rather than the column: a claim runs to about
+ * sixty characters and stops, leaving the rest of the width empty, which is
+ * what keeps a full-bleed section from becoming a full-bleed line of text.
  */
 .features {
   max-width: 1200px;
   margin: 0 auto;
   padding: clamp(40px, 6vw, 76px) clamp(16px, 4vw, 48px) 0;
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
-  gap: clamp(28px, 3.5vw, 44px) clamp(24px, 3vw, 40px);
+  display: flex;
+  flex-direction: column;
+  gap: clamp(30px, 4vw, 48px);
 }
 
 /* The index is the only ornament: it numbers the set without drawing a line
@@ -996,24 +1002,25 @@ code {
 .feature-index {
   display: block;
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 18px;
   letter-spacing: 0.16em;
   color: var(--accent);
   font-variant-numeric: tabular-nums;
 }
 
 .features h2 {
-  font-size: 17px;
+  font-size: clamp(21px, 2.2vw, 27px);
   font-weight: 650;
-  letter-spacing: -0.02em;
-  margin: 12px 0 8px;
+  letter-spacing: -0.025em;
+  margin: 10px 0 10px;
 }
 
 .features p {
   color: var(--muted);
-  font-size: 14.5px;
-  line-height: 1.65;
+  font-size: clamp(18px, 1.35vw, 21px);
+  line-height: 1.6;
   margin: 0;
+  max-width: 62ch;
   text-wrap: pretty;
 }
 
@@ -1037,7 +1044,7 @@ code {
 
 .quickstart-copy p {
   color: var(--muted);
-  font-size: 15.5px;
+  font-size: 18px;
   max-width: 44ch;
   margin: 0 0 20px;
   text-wrap: pretty;
@@ -1054,7 +1061,7 @@ code {
   padding: 15px 18px;
   overflow-x: auto;
   font-family: var(--font-mono);
-  font-size: 13px;
+  font-size: 18px;
   line-height: 1.65;
   color: var(--text-code);
   background: rgba(255, 255, 255, 0.035);
@@ -1080,24 +1087,6 @@ code {
 .quickstart-install pre code::before {
   content: '$ ';
   color: var(--accent);
-}
-
-/* ------------------------------------------------------------------ */
-/*  Generic pages                                                      */
-/* ------------------------------------------------------------------ */
-
-.page {
-  padding-top: 56px;
-}
-
-.page-header {
-  max-width: 68ch;
-  margin-bottom: 44px;
-}
-
-.page-header p {
-  color: var(--muted);
-  font-size: 16.5px;
 }
 
 /* ------------------------------------------------------------------ */
@@ -1221,7 +1210,7 @@ code {
   padding: 24px;
   text-align: center;
   color: var(--muted);
-  font-size: 13.5px;
+  font-size: 18px;
   line-height: 1.6;
   border: 1px dashed var(--border);
   border-radius: 14px;
@@ -1230,7 +1219,7 @@ code {
 .scene-fallback strong {
   color: var(--text-high, #fff);
   font-weight: 600;
-  font-size: 14px;
+  font-size: 18px;
 }
 
 /* ------------------------------------------------------------------ */

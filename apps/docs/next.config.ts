@@ -4,7 +4,7 @@ import { initOpenNextCloudflareForDev } from '@opennextjs/cloudflare'
 
 const nextConfig: NextConfig = {
   // Compile the workspace package (and keep HMR working against its dist output).
-  transpilePackages: ['area-3d-mockups'],
+  transpilePackages: ['react-3d-mockups'],
 }
 
 const withMDX = createMDX()

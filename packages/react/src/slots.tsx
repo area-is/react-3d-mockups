@@ -21,7 +21,7 @@ import type { RegionSpec } from './core'
 
 // Symbol.for - not a local symbol - so slot detection survives two copies of
 // the library on one page (each binding bundles its own core by design).
-const REGION = Symbol.for('area-3d-mockups.region')
+const REGION = Symbol.for('react-3d-mockups.region')
 
 /**
  * Settings for a live surface, spelled the same wherever you set them: on a
@@ -92,7 +92,7 @@ declare const process: { env: { NODE_ENV?: string } }
 function warnDev(message: string): void {
   if (process.env.NODE_ENV !== 'production') {
     // eslint-disable-next-line no-console
-    console.warn(`[area-3d-mockups] ${message}`)
+    console.warn(`[react-3d-mockups] ${message}`)
   }
 }
 

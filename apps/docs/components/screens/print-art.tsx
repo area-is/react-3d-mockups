@@ -342,7 +342,7 @@ export function BillboardAdArt() {
           whiteSpace: 'nowrap',
         }}
       >
-        area-3d-mockups
+        react-3d-mockups
       </div>
     </div>
   )
@@ -799,6 +799,50 @@ export function ChalkMenuArt() {
         </div>
       ))}
       <div style={{ marginTop: 'auto', fontSize: 14, color: '#b9c4b4' }}>open till dusk ☀</div>
+    </div>
+  )
+}
+
+/**
+ * The other side of the sandwich board.
+ *
+ * A sidewalk sign is seen from both directions, and the back of a real one is
+ * never blank - it carries the hours for whoever is walking the other way. It
+ * is the same board and the same chalk as the menu, set as a week rather than
+ * a price list so the two faces do not read as a duplicate when the sign turns.
+ */
+export function ChalkHoursArt() {
+  return (
+    <div
+      style={{
+        width: '100%',
+        height: '100%',
+        boxSizing: 'border-box',
+        padding: 24,
+        background: '#232823',
+        color: '#f0ede4',
+        display: 'flex',
+        flexDirection: 'column',
+        textAlign: 'center',
+        fontFamily: serif,
+      }}
+    >
+      <div style={{ fontSize: 26, fontStyle: 'italic' }}>Open</div>
+      <svg viewBox="0 0 100 8" style={{ width: '80%', margin: '8px auto 14px' }} aria-hidden>
+        <path d="M2 4 Q 28 7, 52 3 T 98 5" fill="none" stroke="#e8b64c" strokeWidth="1.6" strokeLinecap="round" />
+      </svg>
+      {[
+        ['mon – thu', '7 – 4'],
+        ['fri', '7 – 6'],
+        ['sat', '8 – 6'],
+        ['sun', '8 – 2'],
+      ].map(([days, hours]) => (
+        <div key={days} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 17, padding: '7px 8px', borderBottom: '1px dashed rgba(240,237,228,0.25)' }}>
+          <span>{days}</span>
+          <span style={{ color: '#e8b64c' }}>{hours}</span>
+        </div>
+      ))}
+      <div style={{ marginTop: 'auto', fontSize: 14, color: '#b9c4b4' }}>dogs welcome ❧</div>
     </div>
   )
 }

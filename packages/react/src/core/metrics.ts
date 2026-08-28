@@ -207,7 +207,7 @@ export function mockupRegions(kind: MockupKind): readonly RegionSpec[] {
   const entry = REGISTRY[kind]
   if (!entry) {
     throw new Error(
-      `[area-3d-mockups] mockupRegions: unknown mockup kind "${String(kind)}". Known kinds: ${MOCKUP_KINDS.join(', ')}.`
+      `[react-3d-mockups] mockupRegions: unknown mockup kind "${String(kind)}". Known kinds: ${MOCKUP_KINDS.join(', ')}.`
     )
   }
   return entry.regions
@@ -234,7 +234,7 @@ export function mockupInfo<K extends MockupKind>(
   const entry = REGISTRY[kind]
   if (!entry) {
     throw new Error(
-      `[area-3d-mockups] mockupInfo: unknown mockup kind "${String(kind)}". Known kinds: ${MOCKUP_KINDS.join(', ')}.`
+      `[react-3d-mockups] mockupInfo: unknown mockup kind "${String(kind)}". Known kinds: ${MOCKUP_KINDS.join(', ')}.`
     )
   }
   return describeMockup({ kind, regions: entry.regions, metrics: entry.metrics }, props)

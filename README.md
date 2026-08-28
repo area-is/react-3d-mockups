@@ -1,11 +1,11 @@
 <p align="center">
-  <img src="assets/area-a-dual-slant-green.svg" alt="area-3d-mockups" width="128" height="128" />
+  <img src="assets/area-a-dual-slant-green.svg" alt="react-3d-mockups" width="128" height="128" />
 </p>
 
-<h1 align="center">area-3d-mockups</h1>
+<h1 align="center">react-3d-mockups</h1>
 
 <p align="center">
-  <a href="https://www.npmjs.com/package/area-3d-mockups"><img src="https://img.shields.io/npm/v/area-3d-mockups.svg" alt="npm version" /></a>
+  <a href="https://www.npmjs.com/package/react-3d-mockups"><img src="https://img.shields.io/npm/v/react-3d-mockups.svg" alt="npm version" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="MIT license" /></a>
   <a href="https://github.com/area-is/3d-mockups/actions/workflows/ci.yml"><img src="https://github.com/area-is/3d-mockups/actions/workflows/ci.yml/badge.svg" alt="CI status" /></a>
 </p>
@@ -36,7 +36,7 @@ bus, cargo van, 53 ft semi trailer).
 ```tsx
 'use client'
 
-import { GalaxyMockup } from 'area-3d-mockups'
+import { GalaxyMockup } from 'react-3d-mockups'
 
 export function Hero() {
   return (
@@ -54,7 +54,7 @@ Every device and object has its own page with a live prop explorer.
 
 | Path | npm name | What it is |
 | --- | --- | --- |
-| [`packages/react`](packages/react) | `area-3d-mockups` | The published npm package - the whole library |
+| [`packages/react`](packages/react) | `react-3d-mockups` | The published npm package - the whole library |
 | [`apps/docs`](apps/docs) | - | Next.js docs & live demos site |
 
 Inside the package, `src/core` holds the specs, geometry math and screen/stage
@@ -86,7 +86,7 @@ less than they look.
 Releases go out from CI, triggered by a tag:
 
 ```bash
-npm version patch -w area-3d-mockups   # or minor / major
+npm version patch -w react-3d-mockups   # or minor / major
 git push origin main --follow-tags
 ```
 
@@ -104,7 +104,7 @@ npm publish --access public
 
 Then attach the publisher once. The command and its caveats are documented at the top
 of `release.yml`. The `prepare` script builds `dist/` automatically before publish,
-and the core is bundled into `area-3d-mockups`, so it is not published separately.
+and the core is bundled into `react-3d-mockups`, so it is not published separately.
 
 ## Deploying the docs
 

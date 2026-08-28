@@ -72,6 +72,6 @@ export async function generateMetadata(props: PageParams): Promise<Metadata> {
     // Every docs page is reachable at exactly one URL; saying so keeps the
     // per-variant mockup pages from reading as near-duplicates of each other.
     alternates: { canonical: page.url },
-    ...socialMetadata({ title: `${title} | area-3d-mockups`, description }),
+    ...socialMetadata({ title: `${title} | React 3D Mockups`, description }),
   }
 }

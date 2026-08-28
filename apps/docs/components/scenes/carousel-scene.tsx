@@ -46,7 +46,7 @@ import {
   usePrefersReducedMotion,
   type Colorway,
   type MockupKind,
-} from 'area-3d-mockups'
+} from 'react-3d-mockups'
 import {
   DEFAULT_CAMERA_FOV,
   DEFAULT_CAMERA_POSITION,
@@ -68,8 +68,8 @@ import {
   SHOPPING_BAG_FRAMING,
   VINYL_RECORD_FRAMING,
   type MockupFraming,
-} from 'area-3d-mockups/core'
-import { ChalkMenuArt } from '../screens/print-art'
+} from 'react-3d-mockups/core'
+import { ChalkHoursArt, ChalkMenuArt } from '../screens/print-art'
 import {
   SwissBag,
   SwissBill,
@@ -204,8 +204,17 @@ interface Entry {
   /** Nudge for objects whose origin is not their visual centre (laptops). */
   lift: number
   colorways: Colorway[]
-  /** What the staged model carries on its primary surface. */
-  content: () => ReactNode
+  /**
+   * What the staged model carries on its primary surface. It is handed the
+   * finish currently selected, which the printed faces use as their ground.
+   */
+  content: (color: string) => ReactNode
+  /**
+   * Paint the object's finish behind the live surface instead of the library's
+   * default white. Set on the faces whose artwork prints onto the material -
+   * without it a transparent sheet would sit on a white panel, not on kraft.
+   */
+  material?: boolean
   /**
    * The bare object. `screen` is live DOM for the staged models; the picker
    * row passes `surface` instead - a painted screen costs no DOM layer.
@@ -488,7 +497,8 @@ const OBJECTS: Entry[] = [
       ['white', 'Bleached white', '#e8e4dd'],
       ['slate', 'Slate', '#5c6672']
     ),
-    content: () => <SwissLid />,
+    material: true,
+    content: (color) => <SwissLid material={color} />,
     render: ({ color, screen, surface, surfaceStyle }) => (
       <MailerBox color={color} surfaceBackground={surface} surfaceStyle={surfaceStyle}>
         {screen}
@@ -507,7 +517,8 @@ const OBJECTS: Entry[] = [
       ['charcoal', 'Charcoal', '#33373d'],
       ['olive', 'Olive', '#7d8a5c']
     ),
-    content: () => <SwissBag />,
+    material: true,
+    content: (color) => <SwissBag material={color} />,
     render: ({ color, screen, surface, surfaceStyle }) => (
       <ShoppingBag color={color} surfaceBackground={surface} surfaceStyle={surfaceStyle}>
         {screen}
@@ -544,7 +555,18 @@ const OBJECTS: Entry[] = [
       ['black', 'Black', '#2a2c30'],
       ['birch', 'Birch', '#c8a97a']
     ),
-    content: () => <ChalkMenuArt />,
+    // A sandwich board is read from both directions, so both panels are set.
+    // Bare children would fill the front and leave the back blank.
+    content: () => (
+      <>
+        <AFrameSign.Front>
+          <ChalkMenuArt />
+        </AFrameSign.Front>
+        <AFrameSign.Back>
+          <ChalkHoursArt />
+        </AFrameSign.Back>
+      </>
+    ),
     render: ({ color, screen, surface, surfaceStyle }) => (
       <AFrameSign color={color} surfaceBackground={surface} surfaceStyle={surfaceStyle}>
         {screen}
@@ -685,6 +707,8 @@ function StageSlot({
     >
       {entry.render({
         color,
+        // The finish doubles as the panel behind a printed face (see `material`).
+        surface: entry.material ? color : undefined,
         /*
          * Every staged slot carries its surface for as long as it exists -
          * including the two waiting off-stage. Mounting them as a model
@@ -692,7 +716,7 @@ function StageSlot({
          * stream of screens arriving and leaving; now the DOM is created out
          * past the fade and simply travels with its model.
          */
-        screen: entry.content(),
+        screen: entry.content(color),
         /*
          * No fill mode. The animation ends on opacity 1, which is where the
          * screen sits anyway, so filling buys nothing - and a filled animation

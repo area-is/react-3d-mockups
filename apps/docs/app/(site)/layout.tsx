@@ -7,13 +7,13 @@ import { SITE_URL, socialMetadata } from '@/lib/site'
 import '../globals.css'
 import '../screens.css'
 
-const SITE_TITLE = 'area-3d-mockups: 3D device mockups for React'
+const SITE_TITLE = 'React 3D Mockups: 3D device mockups for React'
 const SITE_DESCRIPTION =
   'GPU-accelerated 3D device mockups for React, built on three.js. Drop any content onto the screen of a 3D device and it renders live - real DOM, not a texture.'
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
-  title: { default: SITE_TITLE, template: '%s | area-3d-mockups' },
+  title: { default: SITE_TITLE, template: '%s | React 3D Mockups' },
   description: SITE_DESCRIPTION,
   ...socialMetadata({ title: SITE_TITLE, description: SITE_DESCRIPTION }),
 }
@@ -30,7 +30,7 @@ export default function SiteLayout({ children }: { children: React.ReactNode }) 
             <div className="container header-inner">
               <Link href="/" className="brand">
                 <Logo size={28} className="brand-logo" />
-                area-3d-mockups
+                React 3D Mockups
               </Link>
               <SiteNav />
             </div>

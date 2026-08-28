@@ -1,6 +1,6 @@
 'use client'
 
-import { GalaxyMockup } from 'area-3d-mockups'
+import { GalaxyMockup } from 'react-3d-mockups'
 import { StrideApp } from '@/components/screens/stride-app'
 
 /**

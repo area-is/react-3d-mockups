@@ -1,6 +1,6 @@
 # Architecture
 
-area-3d-mockups is one npm package for React, built in **two layers**: a
+react-3d-mockups is one npm package for React, built in **two layers**: a
 renderer-agnostic core that describes devices, objects and behaviors as data and
 math, and the React components that render it. The layers are directories in one
 package, not separate packages - the split is about what may import React, not
@@ -21,8 +21,8 @@ about shipping.
 
 | Path | What it is |
 | --- | --- |
-| [`packages/react`](packages/react) | `area-3d-mockups` - the published package, the whole library. |
-| `packages/react/src/core` | Specs, geometry math, screen & stage behaviors. Imports `three` at most, never React. Published as the `area-3d-mockups/core` subpath. |
+| [`packages/react`](packages/react) | `react-3d-mockups` - the published package, the whole library. |
+| `packages/react/src/core` | Specs, geometry math, screen & stage behaviors. Imports `three` at most, never React. Published as the `react-3d-mockups/core` subpath. |
 | `packages/react/src` (the rest) | react-three-fiber scene components, canvas, drei `<Html>` screen bridge. |
 | [`apps/docs`](apps/docs) | Next.js docs & live demos site. |
 
@@ -133,13 +133,13 @@ trails the WebGL body.
 
 ## How the core is built
 
-`src/core` is not a separate package. It is a directory inside `area-3d-mockups`
+`src/core` is not a separate package. It is a directory inside `react-3d-mockups`
 with its own entry point (`src/core/index.ts`), built as a **second tsup entry**
 so it can be imported two ways:
 
-- `import { GalaxyMockup } from 'area-3d-mockups'` - the components, which
+- `import { GalaxyMockup } from 'react-3d-mockups'` - the components, which
   re-export the core symbols they expose;
-- `import { GALAXY_VARIANTS } from 'area-3d-mockups/core'` - the specs alone,
+- `import { GALAXY_VARIANTS } from 'react-3d-mockups/core'` - the specs alone,
   with no components pulled in.
 
 That second entry makes the subpath's **RSC boundary** part of the package
@@ -151,7 +151,7 @@ configs and stamps the directive on the components entry only - read the
 comments in `packages/react/tsup.config.ts` before merging them back together.
 
 The library was previously split across two workspace packages
-(`@area-3d-mockups/core` + `area-3d-mockups`), with the core bundled into the
+(`@react-3d-mockups/core` + `react-3d-mockups`), with the core bundled into the
 binding at build time by an esbuild alias. Only one package was ever published,
 so the split bought an enforced import boundary at the cost of two manifests,
 two tsconfigs, two build configs, and an alias whose whole job was to undo the

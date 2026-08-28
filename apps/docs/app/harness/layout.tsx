@@ -3,7 +3,7 @@ import { inter, jetbrainsMono } from '@/lib/fonts'
 import '../globals.css'
 
 export const metadata: Metadata = {
-  title: 'Screenshot harness | area-3d-mockups',
+  title: 'Screenshot harness | React 3D Mockups',
   robots: { index: false },
 }
 

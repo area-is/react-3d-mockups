@@ -52,7 +52,7 @@ import {
   STUDIO_DISPLAY_COLORWAYS,
   type Colorway,
   type MockupKind,
-} from 'area-3d-mockups'
+} from 'react-3d-mockups'
 
 /**
  * What the prop explorer needs to know about one mockup, over and above what

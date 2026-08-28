@@ -138,7 +138,7 @@ export function describeMockup<P>({ kind, regions, metrics }: MeasurableMockup<P
      * unreachable from TypeScript; this is what JS callers see instead.
      */
     throw new Error(
-      `[area-3d-mockups] describeMockup: "${String(kind)}" could not be measured from these props. ` +
+      `[react-3d-mockups] describeMockup: "${String(kind)}" could not be measured from these props. ` +
         `Kinds with a required \`size\` (e.g. customPanel, customBox) must be given one.`,
       { cause }
     )
@@ -162,7 +162,7 @@ export function describeMockup<P>({ kind, regions, metrics }: MeasurableMockup<P
 
   const primary = list[0]
   if (!primary) {
-    throw new Error(`[area-3d-mockups] describeMockup: "${String(kind)}" resolved no regions.`)
+    throw new Error(`[react-3d-mockups] describeMockup: "${String(kind)}" resolved no regions.`)
   }
   return { kind, mmPerUnit, primary, regions: byName, list }
 }

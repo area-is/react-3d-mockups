@@ -48,7 +48,7 @@ import {
   APPLE_WATCH_COLORWAYS,
   GALAXY_WATCH_COLORWAYS,
   type Colorway,
-} from 'area-3d-mockups'
+} from 'react-3d-mockups'
 
 /**
  * Every live preview on this docs site is a playground: the mockup gets zoom +

@@ -1,5 +1,5 @@
 {
-  "name": "area-3d-mockups",
+  "name": "react-3d-mockups",
   "version": "0.1.0",
   "description": "Interactive, GPU-accelerated 3D device mockups for React. Drop any content onto the screen of a 3D phone and it stays fully live.",
   "keywords": [

@@ -1,11 +1,10 @@
 import Link from 'next/link'
 import { highlight } from 'fumadocs-core/highlight'
 import { HeroCarousel } from '@/components/hero-carousel'
-import { HeroRotator } from '@/components/hero-rotator'
 
-const installSnippet = `npm install area-3d-mockups`
+const installSnippet = `npm install react-3d-mockups`
 
-const importSnippet = `import { GalaxyMockup } from 'area-3d-mockups'
+const importSnippet = `import { GalaxyMockup } from 'react-3d-mockups'
 
 <GalaxyMockup autoRotate float>
   <YourApp />
@@ -14,8 +13,10 @@ const importSnippet = `import { GalaxyMockup } from 'area-3d-mockups'
 /**
  * What the library is, in four claims.
  *
- * No rules between them: the grid's own gutters are the separation, and a
+ * No rules between them: the space down the page is the separation, and a
  * border around a paragraph of prose only ever reads as a box to escape from.
+ * Each claim is one sentence and a qualifier - set at reading size in a single
+ * column, anything longer stops being a claim and becomes documentation.
  */
 const FEATURES = [
   {
@@ -23,8 +24,8 @@ const FEATURES = [
     body: (
       <>
         WebGL through three.js and react-three-fiber: physically-based materials, studio
-        lighting and soft contact shadows at 60 fps, with device-pixel-ratio clamping so a
-        hi-dpi screen costs what a laptop does.
+        lighting and soft contact shadows at 60 fps, with device-pixel-ratio clamping to
+        keep hi-dpi screens cheap.
       </>
     ),
   },
@@ -33,8 +34,8 @@ const FEATURES = [
     body: (
       <>
         The display is a real DOM layer, CSS3D-transformed onto the glass. Pass React
-        components, an <code>&lt;iframe&gt;</code> or any element as children and it stays
-        live - text selects, buttons click, video plays.
+        components, an <code>&lt;iframe&gt;</code> or any element as children - text
+        selects, buttons click, video plays.
       </>
     ),
   },
@@ -43,8 +44,7 @@ const FEATURES = [
     body: (
       <>
         Every phone, laptop, carton and billboard is built from geometry at runtime: no GLB
-        to download, nothing to host, no loading pop-in and no asset pipeline to keep in
-        step with your app.
+        to download, nothing to host, no loading pop-in.
       </>
     ),
   },
@@ -54,7 +54,7 @@ const FEATURES = [
       <>
         Take the one-liner <code>&lt;GalaxyMockup&gt;</code>, or compose{' '}
         <code>&lt;MockupCanvas&gt;</code> and <code>&lt;Galaxy&gt;</code> into a three.js
-        scene you already have. Same objects, either way in.
+        scene you already have.
       </>
     ),
   },
@@ -86,13 +86,7 @@ export default function HomePage() {
           and the carousel says what you are looking at. */}
       <section className="hero">
         <p className="eyebrow">GPU-accelerated mockups for React</p>
-        {/* The break only exists on a narrow screen: the headline is set on one
-            unwrappable line so the rotating noun cannot throw "In 3D." onto a
-            second line and back again mid-word, and below ~700px the longest
-            noun stops fitting on one. */}
-        <h1>
-          Your <HeroRotator />.<br className="hero-break" /> In 3D.
-        </h1>
+        <h1>Your Component in 3D</h1>
       </section>
 
       <HeroCarousel />

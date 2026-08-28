@@ -54,6 +54,40 @@ const TONES: Record<'paper' | 'ink', Tone> = {
   ink: { ground: INK, text: PAPER, palette: [INK, PAPER, SIGNAL] },
 }
 
+/** sRGB relative luminance, 0 (black) to 1 (white). */
+function luminance(hex: string): number {
+  const h = hex.replace('#', '')
+  const n =
+    h.length === 3
+      ? [...h].map((c) => Number.parseInt(c + c, 16))
+      : [0, 2, 4].map((i) => Number.parseInt(h.slice(i, i + 2), 16))
+  const [r, g, b] = n.map((v) => {
+    const c = v / 255
+    return c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4
+  }) as [number, number, number]
+  return 0.2126 * r + 0.7152 * g + 0.0722 * b
+}
+
+/**
+ * Ink on the object's own material, rather than a sheet laid over it.
+ *
+ * A solid ground works on a screen, which is its own surface, but on a bag or
+ * a shipping box it paints out the thing it is printed on: the carousel's
+ * finish swatches move kraft to charcoal to olive and the printed panel stays
+ * the same rectangle of ink, which is exactly backwards - the finish is the
+ * material the artwork sits on. Leaving the ground transparent lets the board
+ * through, and the ink flips with the material's luminance the way a real job
+ * does: dark ink on kraft, white ink on charcoal.
+ *
+ * The threshold is 0.35 rather than 0.5 because the marks are large flat
+ * shapes: mid-tone boards (olive, slate) carry white better than the contrast
+ * ratio alone suggests.
+ */
+function materialTone(material: string): Tone {
+  const ink = luminance(material) < 0.35 ? PAPER : INK
+  return { ground: 'transparent', text: ink, palette: ['transparent', ink, SIGNAL] }
+}
+
 /* ------------------------------------------------------------------ */
 /*  Pieces                                                             */
 /* ------------------------------------------------------------------ */
@@ -185,6 +219,12 @@ export interface SwissProps {
   /** A screen: repaints on a timer instead of holding one composition. */
   live?: boolean
   tone?: 'paper' | 'ink'
+  /**
+   * Print straight onto the object instead of onto a sheet: the ground goes
+   * transparent so this colour - the object's own finish - shows through, and
+   * the ink is chosen to sit on it. Wins over `tone`.
+   */
+  material?: string
   /** Coarse on a small face, finer on a large one - see each caller. */
   grid?: string
   index: string
@@ -203,13 +243,14 @@ export function SwissStack({
   seed,
   live,
   tone = 'paper',
+  material,
   grid = '4x6',
   index,
   kicker,
   title,
   meta,
 }: SwissProps) {
-  const t = TONES[tone]
+  const t = material ? materialTone(material) : TONES[tone]
   return (
     <div style={{ ...sheet(t), flexDirection: 'column', padding: '7cqmin', gap: '4cqmin' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
@@ -235,13 +276,14 @@ export function SwissSplit({
   seed,
   live,
   tone = 'paper',
+  material,
   grid = '4x6',
   index,
   kicker,
   title,
   meta,
 }: SwissProps) {
-  const t = TONES[tone]
+  const t = material ? materialTone(material) : TONES[tone]
   return (
     <div style={{ ...sheet(t), flexDirection: 'row' }}>
       <div
@@ -275,13 +317,14 @@ export function SwissFrame({
   seed,
   live,
   tone = 'paper',
+  material,
   grid = '4x6',
   index,
   kicker,
   title,
   meta,
 }: SwissProps) {
-  const t = TONES[tone]
+  const t = material ? materialTone(material) : TONES[tone]
   return (
     <div style={{ ...sheet(t), flexDirection: 'column' }}>
       <div style={{ flex: 1, minHeight: 0, position: 'relative' }}>
@@ -319,11 +362,12 @@ export function SwissDial({
   seed,
   live,
   tone = 'ink',
+  material,
   grid = '2x3',
   kicker,
   title,
 }: Omit<SwissProps, 'index' | 'meta'> & { index?: string; meta?: string }) {
-  const t = TONES[tone]
+  const t = material ? materialTone(material) : TONES[tone]
   return (
     <div style={{ ...sheet(t), position: 'relative', alignItems: 'flex-end' }}>
       <div style={{ position: 'absolute', inset: 0 }}>
@@ -528,11 +572,11 @@ export const SwissBox = () => (
   />
 )
 
-export const SwissLid = () => (
+export const SwissLid = ({ material }: { material: string }) => (
   <SwissSplit
     pattern={ortho}
     seed="mailer-lid"
-    tone="paper"
+    material={material}
     grid="4x6"
     index="13"
     kicker="Versand"
@@ -541,11 +585,17 @@ export const SwissLid = () => (
   />
 )
 
-export const SwissBag = () => (
+/*
+ * The bag and the shipping box print onto their own board rather than onto a
+ * sheet: `material` is the finish the carousel currently has selected, so the
+ * kraft, the charcoal and the olive all show through the artwork and the
+ * swatches above the stage change the panel instead of being painted over.
+ */
+export const SwissBag = ({ material }: { material: string }) => (
   <SwissStack
     pattern={epicentre}
     seed="bag-epicentre"
-    tone="ink"
+    material={material}
     grid="4x6"
     index="14"
     kicker="Boutique"

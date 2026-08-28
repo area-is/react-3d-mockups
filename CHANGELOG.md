@@ -1,6 +1,6 @@
 # Changelog
 
-Notable changes to `area-3d-mockups`. This project follows
+Notable changes to `react-3d-mockups`. This project follows
 [semantic versioning](https://semver.org/); dates are ISO-8601.
 
 ## Unreleased
