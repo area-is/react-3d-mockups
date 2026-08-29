@@ -22,6 +22,12 @@ orientations.
 | Samsung Galaxy Z Fold 7 (folded) | `fold7` · `openAngle={false}` | 158.4×72.8×8.9 | 6.5" 2520×1080 | 360×835 | 835×360 |
 | Samsung Galaxy Z Flip 7 (open) | `flip7` · `openAngle` | 166.7×75.2×6.5 | 6.85" 2520×1080 | 360×838 | 838×360 |
 | Samsung Galaxy Z Flip 7 (folded) | `flip7` · `openAngle={false}` | 85.5×75.2×13.7 | 4.1" 948×1048 | 316×349 | 349×316 |
+| Samsung Galaxy Z Fold 8 (open) | `fold8` · `openAngle` | 123.9×161.4×4.5 | 7.6" 2448×1848 | 1020×770 | 770×1020 |
+| Samsung Galaxy Z Fold 8 (folded) | `fold8` · `openAngle={false}` | 123.9×81.9×9.7 | 5.5" 1248×1972 | 480×758 | 758×480 |
+| Samsung Galaxy Z Fold 8 Ultra (open) | `fold8ultra` · `openAngle` | 158.4×143.2×4.1 | 8.0" 2504×2256 | 820×910 | 910×820 |
+| Samsung Galaxy Z Fold 8 Ultra (folded) | `fold8ultra` · `openAngle={false}` | 158.4×72.8×8.9 | 6.5" 2520×1080 | 360×835 | 835×360 |
+| Samsung Galaxy Z Flip 8 (open) | `flip8` · `openAngle` | 166.9×75.4×6.1 | 6.9" 2520×1080 | 360×840 | 840×360 |
+| Samsung Galaxy Z Flip 8 (folded) | `flip8` · `openAngle={false}` | 85.7×75.4×13.1 | 4.1" 948×1048 | 316×349 | 349×316 |
 | Apple iPhone 17 | `17` | 149.6×71.5×7.95 | 6.3" 2622×1206 | 402×874 | 874×402 |
 | Apple iPhone 17 Air | `air` | 156.2×74.7×5.64 | 6.5" 2736×1260 | 420×912 | 912×420 |
 | Apple iPhone 17 Pro | `pro` | 150.0×71.9×8.75 | 6.3" 2622×1206 | 402×874 | 874×402 |
@@ -39,11 +45,16 @@ orientations.
 | Samsung Galaxy Tab S11 Ultra | `tabs11ultra` | 326.3×208.5×5.1 | 14.6" 2960×1848 | 924×1480 | 1480×924 |
 | Apple Watch Series 11 (46mm) | `series11` | 46×39×9.7 | 1.96" 416×496 | 208×248 | - |
 | Samsung Galaxy Watch 8 (44mm) | `watch8` | 46×43.7×8.6 | 1.47" 480×480 round | 240×240 | - |
+| Samsung Galaxy Watch 9 (44mm) | `watch9` | 46×43.7×8.6 | 1.47" 480×480 round | 240×240 | - |
+| Samsung Galaxy Watch Ultra 2 (47mm) | `watchultra2` | 47.4×47.1×10.7 | 1.52" 498×498 round | 249×249 | - |
 | Apple Studio Display (27", 2026) | - | 623×478×168 | 27" 5120×2880 | - | 2560×1440 |
 
 **Resolution basis.** The Galaxy S26 (and the foldables' FHD+ panels) are
 their panels at one-third scale. The QHD+ S26 Ultra uses One UI's default FHD+
-render at 450 dpi. Galaxy Tabs use their xhdpi dp grid (panel at half scale,
+render at 450 dpi. The Fold 8's 1248×1972 cover is its panel at 1/2.6 (the
+density bucket nearest its true 163 dp/in), its 2448×1848 inner panel divides
+by the Fold 7 inner's own 2.4, and the Fold 8 Ultra's sharper inner panel
+keeps the Fold 7's 910×820 grid outright (2504/910 = 2256/820 = 2.75). Galaxy Tabs use their xhdpi dp grid (panel at half scale,
 an estimate since Samsung does not publish logical grids). iPhones, iPads, the
 Watch, the MacBooks, and the Studio Display use their exact point grids
 (2x or 3x).
@@ -52,7 +63,14 @@ Watch, the MacBooks, and the Studio Display use their exact point grids
 
 Pass `orientation="landscape"` on any phone or tablet to lay the device on its
 side. The virtual viewport swaps to the landscape resolution and your content
-renders upright, exactly like rotating the real device. Hardware details ride
+renders upright, exactly like rotating the real device.
+
+One device runs the other way: the open Galaxy Z Fold 8 is wider than it is
+tall, and its unrotated pose already shows the 1020×770 landscape grid - that
+is what the Portrait column above holds, since the columns describe the
+unrotated and rotated poses rather than the shape of the panel.
+`orientation="landscape"` stands it upright into 770×1020, exactly like
+turning the real tablet onto its short edge. Hardware details ride
 along: the Tab S11 Ultra's droplet notch, for example, sits on the right edge
 in portrait and top center in landscape, matching the physical device.
 
@@ -66,8 +84,8 @@ Tree-shaken cost of importing each family, minified, with `three`,
 | --- | --- | --- |
 | `GalaxyMockup` (Galaxy family) | 140.1 KB | 46.1 KB |
 | `IPhoneMockup` (iPhone family) | 143.4 KB | 46.9 KB |
-| `FoldMockup` (Galaxy Z Fold 7) | 147.3 KB | 47.5 KB |
-| `FlipMockup` (Galaxy Z Flip 7) | 145.3 KB | 47.3 KB |
+| `FoldMockup` (Galaxy Z Fold family) | 147.3 KB | 47.5 KB |
+| `FlipMockup` (Galaxy Z Flip family) | 145.3 KB | 47.3 KB |
 | `LaptopMockup` (MacBook Air + Pro) | 147.8 KB | 48.8 KB |
 | `IPadMockup` (iPad family) | 145.0 KB | 47.2 KB |
 | `GalaxyTabMockup` (Galaxy Tab family) | 145.3 KB | 47.3 KB |
@@ -98,7 +116,7 @@ Tree-shaken cost of importing each family, minified, with `three`,
 | `ShoppingBagMockup` (kraft carrier) | 21.9 KB | 8.5 KB |
 | `CustomPanelMockup` (any-size sheet) | 18.9 KB | 7.5 KB |
 | `CustomBoxMockup` (any-size box) | 19.5 KB | 7.6 KB |
-| Whole library (22 devices + 24 objects) | 368.3 KB | 105.8 KB |
+| Whole library (27 devices + 24 objects) | 368.3 KB | 105.8 KB |
 
 Every device family bundles a small CSG engine
 ([`three-bvh-csg`](https://github.com/gkjohnson/three-bvh-csg)) that machines

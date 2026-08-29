@@ -1,5 +1,5 @@
 /**
- * Galaxy Z Flip-style device dimensions - the Galaxy Z Flip 7.
+ * Galaxy Z Flip-style device dimensions - the Galaxy Z Flip 7 and Z Flip 8.
  *
  * A clamshell foldable has two form factors, and this spec carries both:
  *
@@ -16,6 +16,8 @@
  *
  * Real Galaxy Z Flip 7: unfolded 166.7 x 75.2 x 6.5 mm (6.85" 2520x1080 main);
  * folded 85.5 x 75.2 x 13.7 mm (4.1" 948x1048 cover wrapping the cameras).
+ * Real Galaxy Z Flip 8: unfolded 166.9 x 75.4 x 6.1 mm (6.9" 2520x1080 main);
+ * folded 85.7 x 75.4 x 13.1 mm (the same 4.1" 948x1048 cover).
  */
 
 import type { Orientation } from '../../orientation'
@@ -133,8 +135,45 @@ const FLIP7: FlipSpec = {
   endSeamInset: 0.445,
 }
 
-export const FLIP_VARIANTS: Record<'flip7', FlipSpec> = {
+/**
+ * Galaxy Z Flip 8 - the Flip 7 design a hair bigger and thinner: unfolded
+ * 166.9 x 75.4 x 6.1 mm with the main panel grown to 6.9" on the same
+ * 2520x1080 grid, folded 85.7 x 75.4 x 13.1 mm. The 4.1" 948x1048 cover
+ * panel carries over unchanged, and the whole cover-screen geometry with it.
+ * Detail geometry (buttons, lens rings, hinge band, ports, seams) is the
+ * Flip 7 scan's, carried over pending a scan of the retail Flip 8 - the
+ * published body deltas are two tenths of a millimetre where they apply.
+ */
+const FLIP8: FlipSpec = {
+  open: {
+    // 166.9 x 75.4 x 6.1 mm - 0.4 mm thinner than the Flip 7.
+    body: { width: 2.057, height: 4.553, depth: 0.166, radius: 0.201, bevel: 0.014 },
+    // 69.04 x 161.10 mm panel (6.9", 2520x1080), the same slim bezel.
+    display: { width: 1.883, height: 4.394, radius: 0.116 },
+    punchHole: { radius: 0.057, offsetY: 0.102 },
+    resolution: 360,
+  },
+  closed: {
+    body: { width: 2.057, height: 2.277, depth: 0.166, radius: 0.201, bevel: 0.014 },
+    // 13.1 mm folded over two 6.1 mm halves leaves 0.9 mm of crevice.
+    gap: 0.024,
+    // The Flip 7's cover panel, unchanged: 4.1", 948x1048.
+    display: { width: 1.909, height: 2.11, radius: 0.13 },
+    resolution: 316,
+  },
+  rearCamera: FLIP7.rearCamera,
+  coverGlass: FLIP7.coverGlass,
+  buttons: FLIP7.buttons,
+  buttonProfile: FLIP7.buttonProfile,
+  sim: FLIP7.sim,
+  bottomEdge: FLIP7.bottomEdge,
+  hinge: FLIP7.hinge,
+  endSeamInset: FLIP7.endSeamInset,
+}
+
+export const FLIP_VARIANTS: Record<'flip7' | 'flip8', FlipSpec> = {
   flip7: FLIP7,
+  flip8: FLIP8,
 }
 
 export type FlipVariant = keyof typeof FLIP_VARIANTS

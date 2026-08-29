@@ -22,9 +22,11 @@ hardware masks the screen pixel for pixel.
 Built on [three.js](https://threejs.org) and
 [react-three-fiber](https://github.com/pmndrs/react-three-fiber). Every model is
 generated procedurally at runtime - **no 3D asset files to load or host**. The device
-lineup is 22 strong: the Galaxy S26 line, the Z Fold 7 and Z Flip 7 foldables, the
+lineup is 27 strong: the Galaxy S26 line, two foldable generations (Z Fold 7 and
+Z Flip 7, the wide Z Fold 8, the Z Fold 8 Ultra and Z Flip 8), the
 iPhone 17 family, MacBook Air and Pro, the iPad and Galaxy Tab families, an Apple
-Watch and a Galaxy Watch on full wristbands, and a 27" desktop display. Beyond devices,
+Watch and three Galaxy Watches (8, 9 and the titanium Ultra 2) on full wristbands,
+and a 27" desktop display. Beyond devices,
 the same live-surface API covers everyday objects - books, magazines,
 brochures, cards, packaging (product box, mailer box, gable-top milk carton,
 shopping bag),

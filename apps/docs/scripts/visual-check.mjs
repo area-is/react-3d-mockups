@@ -92,7 +92,17 @@ const CASES = [
   ['fold-flex', 'device=fold&openAngle=110&ry=22'],
   ['flip-flex', 'device=flip&openAngle=100&ry=22'],
   ['flip-closed', 'device=flip&open=0&ry=22'],
+  // the 2026 foldable generation: the wide fold8's landscape inner panel and
+  // short cover, the fold8ultra sharing the fold7 chassis, the flip8 refresh
+  ['fold8-open', 'device=fold&fvariant=fold8&ry=22'],
+  ['fold8-closed', 'device=fold&fvariant=fold8&open=0&ry=22'],
+  ['fold8-flex', 'device=fold&fvariant=fold8&openAngle=110&ry=22'],
+  ['fold8ultra-open', 'device=fold&fvariant=fold8ultra&ry=22'],
+  ['flip8-open', 'device=flip&flvariant=flip8&ry=22'],
   ['watch', 'device=watch&ry=18'],
+  // the Ultra 2's titanium squircle and three-key run (the watch9 shares the
+  // watch8 case, which the galaxy-watch harness pose already defends)
+  ['watch-ultra2', 'device=watch&wvariant=watchultra2&ry=18'],
   ['shelter', 'device=shelter&ry=26'],
   ['tv', 'device=tv&ry=20'],
   // the picture-frame set's rear: One Connect recess, groove, nub, wordmark

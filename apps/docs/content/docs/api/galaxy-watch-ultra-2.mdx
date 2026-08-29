@@ -1,12 +1,12 @@
 ---
-title: Galaxy Watch 8
-description: The Galaxy Watch 8 in WebGL, with a live prop explorer and the full GalaxyWatchMockup reference.
+title: Galaxy Watch Ultra 2
+description: The Galaxy Watch Ultra 2 in WebGL, with a live prop explorer and the full GalaxyWatchMockup reference.
 ---
 
 Drive every prop from the inspector; the `demo.tsx` panel rewrites itself to
-exactly what is being passed. The explorer is pinned to `variant="watch8"`; everything below applies to the whole family.
+exactly what is being passed. The explorer is pinned to `variant="watchultra2"`; everything below applies to the whole family.
 
-<MockupExplorer component="GalaxyWatchMockup" variant="watch8" />
+<MockupExplorer component="GalaxyWatchMockup" variant="watchultra2" />
 
 `<GalaxyWatch>` and `<GalaxyWatchMockup>` render a Samsung Galaxy Watch - the
 Watch 8, the Watch 9 or the Watch Ultra 2, chosen with `variant` - wearing a
@@ -68,15 +68,16 @@ There is no `orientation` prop.
 
 ## The models
 
-### Galaxy Watch 8
+### Galaxy Watch Ultra 2
 
-The 44 mm aluminium cushion with the 1.47″ 480×480 dial (240×240 logical).
-Retail finishes: `graphite`, `silver`.
+The 47 mm grade-4 titanium squircle: two millimetres deeper, a 1.52″ 498×498
+dial (249×249 logical), and the three-key run with the orange Quick Button.
+Retail finishes: `titaniumsilver`, `titaniumgray`.
 
 <MockupExplorer
   component="GalaxyWatchMockup"
-  variant="watch8"
-  props={{ color: 'graphite', bandColor: '#23252a', rotation: [0, 0.3, 0] }}
+  variant="watchultra2"
+  props={{ color: 'titaniumgray', bandColor: '#2f3136', rotation: [0, 0.3, 0] }}
 />
 
 ## Mockup-able areas
@@ -85,7 +86,7 @@ Every live surface filled with chroma green, labeled with the prop that
 feeds it - the fastest way to see exactly where your content lands and
 what stays 3D hardware.
 
-<MockupExplorer component="GalaxyWatchMockup" variant="watch8" screen="chroma" />
+<MockupExplorer component="GalaxyWatchMockup" variant="watchultra2" screen="chroma" />
 
 ## More examples
 
@@ -99,7 +100,7 @@ off-wrist. The mockup backs the camera off to frame the full length.
 
 <MockupExplorer
   component="GalaxyWatchMockup"
-  variant="watch8"
+  variant="watchultra2"
   props={{ bandOpen: true, color: '#33363c', bandColor: '#23252a', rotation: [0, 3.14, 0] }}
 />
 
