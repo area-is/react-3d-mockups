@@ -1,3 +1,13 @@
+---
+title: Galaxy Watch Ultra 2
+description: The Galaxy Watch Ultra 2 in WebGL, with a live prop explorer and the full GalaxyWatchMockup reference.
+---
+
+Drive every prop from the inspector; the `demo.tsx` panel rewrites itself to
+exactly what is being passed. The explorer is pinned to `variant="watchultra2"`; everything below applies to the whole family.
+
+<MockupExplorer component="GalaxyWatchMockup" variant="watchultra2" />
+
 `<GalaxyWatch>` and `<GalaxyWatchMockup>` render a Samsung Galaxy Watch - the
 Watch 8, the Watch 9 or the Watch Ultra 2, chosen with `variant` - wearing a
 real wristband on an invisible wrist directly behind the case: two domed,
@@ -19,11 +29,6 @@ rises through one of the adjustment holes punched clean through the long
 strap, with a keeper holding the tail down. The lengths come from the retail
 fit range rather than being eyeballed; the Ultra 2 wears it at its wider
 strap width.
-
-<MockupExplorer
-  component="GalaxyWatchMockup"
-  props={{ color: '#33363c', bandColor: '#23252a', float: true, rotation: [0, 0.3, 0] }}
-/>
 
 ## `<GalaxyWatch>` vs `<GalaxyWatchMockup>`
 
@@ -63,28 +68,6 @@ There is no `orientation` prop.
 
 ## The models
 
-### Galaxy Watch 8
-
-The 44 mm aluminium cushion with the 1.47″ 480×480 dial (240×240 logical).
-Retail finishes: `graphite`, `silver`.
-
-<MockupExplorer
-  component="GalaxyWatchMockup"
-  props={{ variant: 'watch8', color: 'graphite', bandColor: '#23252a', rotation: [0, 0.3, 0] }}
-/>
-
-### Galaxy Watch 9
-
-The Watch 8's case to the tenth of a millimetre - the generation is chip,
-battery and Wear OS 7, none of it visible from outside - so the model shares
-the Watch 8's measured geometry deliberately. Retail finishes: `graphite`,
-`silver`.
-
-<MockupExplorer
-  component="GalaxyWatchMockup"
-  props={{ variant: 'watch9', color: 'silver', bandColor: '#c9cbd0', rotation: [0, 0.3, 0] }}
-/>
-
 ### Galaxy Watch Ultra 2
 
 The 47 mm grade-4 titanium squircle: two millimetres deeper, a 1.52″ 498×498
@@ -93,7 +76,8 @@ Retail finishes: `titaniumsilver`, `titaniumgray`.
 
 <MockupExplorer
   component="GalaxyWatchMockup"
-  props={{ variant: 'watchultra2', color: 'titaniumgray', bandColor: '#2f3136', rotation: [0, 0.3, 0] }}
+  variant="watchultra2"
+  props={{ color: 'titaniumgray', bandColor: '#2f3136', rotation: [0, 0.3, 0] }}
 />
 
 ## Mockup-able areas
@@ -102,7 +86,7 @@ Every live surface filled with chroma green, labeled with the prop that
 feeds it - the fastest way to see exactly where your content lands and
 what stays 3D hardware.
 
-<MockupExplorer component="GalaxyWatchMockup" screen="chroma" />
+<MockupExplorer component="GalaxyWatchMockup" variant="watchultra2" screen="chroma" />
 
 ## More examples
 
@@ -116,5 +100,8 @@ off-wrist. The mockup backs the camera off to frame the full length.
 
 <MockupExplorer
   component="GalaxyWatchMockup"
+  variant="watchultra2"
   props={{ bandOpen: true, color: '#33363c', bandColor: '#23252a', rotation: [0, 3.14, 0] }}
 />
+
+<DeviceDisclaimer brands="Samsung" />

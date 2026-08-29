@@ -253,7 +253,12 @@ const MODELS = new Map<unknown, ModelControls>([
   [
     FoldMockup,
     {
-      catalog: FOLD_COLORWAYS.fold7,
+      variants: [
+        { value: 'fold7', label: 'Galaxy Z Fold 7' },
+        { value: 'fold8', label: 'Galaxy Z Fold 8' },
+        { value: 'fold8ultra', label: 'Galaxy Z Fold 8 Ultra' },
+      ],
+      catalogs: FOLD_COLORWAYS as Record<string, Colorway[]>,
       controls: [
         ORIENTATION,
         openAngle(0, 180, 180, 'open'),
@@ -264,7 +269,11 @@ const MODELS = new Map<unknown, ModelControls>([
   [
     FlipMockup,
     {
-      catalog: FLIP_COLORWAYS.flip7,
+      variants: [
+        { value: 'flip7', label: 'Galaxy Z Flip 7' },
+        { value: 'flip8', label: 'Galaxy Z Flip 8' },
+      ],
+      catalogs: FLIP_COLORWAYS as Record<string, Colorway[]>,
       controls: [
         ORIENTATION,
         openAngle(0, 180, 180, 'open'),
@@ -284,7 +293,11 @@ const MODELS = new Map<unknown, ModelControls>([
   [
     GalaxyWatchMockup,
     {
-      variants: [{ value: 'watch8', label: 'Galaxy Watch 8' }],
+      variants: [
+        { value: 'watch8', label: 'Galaxy Watch 8' },
+        { value: 'watch9', label: 'Galaxy Watch 9' },
+        { value: 'watchultra2', label: 'Galaxy Watch Ultra 2' },
+      ],
       catalogs: GALAXY_WATCH_COLORWAYS as Record<string, Colorway[]>,
       controls: [swatch('bandColor', 'band'), toggle('bandOpen', 'unbuckled', false)],
     },

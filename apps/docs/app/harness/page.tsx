@@ -27,7 +27,9 @@ import {
   VinylRecordMockup,
   BusShelterMockup,
   FlipMockup,
+  type FlipVariant,
   FoldMockup,
+  type FoldVariant,
   IDCardMockup,
   Laptop,
   type LaptopVariant,
@@ -43,6 +45,7 @@ import {
   VanMockup,
   AppleWatch,
   GalaxyWatch,
+  type GalaxyWatchVariant,
 } from 'react-3d-mockups'
 
 /**
@@ -118,6 +121,10 @@ function regionProbe(Mockup: object): React.ReactNode {
  *               | phone | iphone | bus | van | shelter | tv | idcard
  *               | store | magazine (default tablet)
  *   pvariant    device variant id                  (phone, iphone)
+ *   fvariant    device variant id                  (fold)
+ *   flvariant   device variant id                  (flip)
+ *   wvariant    watch8 | watch9 | watchultra2 - selects the Galaxy watch
+ *               (anything else is the Apple watch)
  *   bandOpen    1 | 0 - unbuckled band             (watch)
  *   variant     device variant id                  (tablet only)
  *   color       retail colorway id, or any CSS color (colorway= also accepted)
@@ -403,6 +410,7 @@ function HarnessScene() {
     const dist = Number(params.get('dist') ?? 7.4)
     return (
       <FlipMockup
+        variant={(params.get('flvariant') ?? undefined) as FlipVariant | undefined}
         openAngle={params.get('openAngle') ? Number(params.get('openAngle')) : params.get('open') !== '0'}
         orientation={orientation}
         color={color}
@@ -420,6 +428,7 @@ function HarnessScene() {
     const dist = Number(params.get('dist') ?? 8.4)
     return (
       <FoldMockup
+        variant={(params.get('fvariant') ?? undefined) as FoldVariant | undefined}
         openAngle={params.get('openAngle') ? Number(params.get('openAngle')) : params.get('open') !== '0'}
         orientation={orientation}
         color={color}
@@ -450,11 +459,13 @@ function HarnessScene() {
     )
   }
 
-  // The two watches are separate components; `wvariant=watch8` still selects
-  // the Galaxy so existing probe URLs keep working.
+  // The two watches are separate components; any `wvariant` beginning with
+  // `watch` (watch8, watch9, watchultra2) selects that Galaxy model, so
+  // existing `wvariant=watch8` probe URLs keep working.
   if (device === 'watch') {
     const dist = Number(params.get('dist') ?? 6.4)
-    const galaxy = params.get('wvariant') === 'watch8'
+    const wvariant = params.get('wvariant')
+    const galaxy = wvariant?.startsWith('watch')
     const shared = {
       color,
       bandColor: params.get('bandColor') ?? undefined,
@@ -463,7 +474,11 @@ function HarnessScene() {
     return (
       <MockupCanvas controls={controls} camera={{ position: [0, cy, dist], fov: 40 }} shadows={shadows}>
         {galaxy ? (
-          <GalaxyWatch {...shared} bandOpen={params.get('bandOpen') === '1'}>
+          <GalaxyWatch
+            {...shared}
+            variant={wvariant as GalaxyWatchVariant}
+            bandOpen={params.get('bandOpen') === '1'}
+          >
             {screen}
           </GalaxyWatch>
         ) : (

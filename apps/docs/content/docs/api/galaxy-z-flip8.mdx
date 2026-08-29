@@ -1,3 +1,13 @@
+---
+title: Galaxy Z Flip 8
+description: The Galaxy Z Flip 8 in WebGL, with a live prop explorer and the full FlipMockup reference.
+---
+
+Drive every prop from the inspector; the `demo.tsx` panel rewrites itself to
+exactly what is being passed. The explorer is pinned to `variant="flip8"`; everything below applies to the whole family.
+
+<MockupExplorer component="FlipMockup" variant="flip8" />
+
 `<Flip>` renders a Galaxy Z Flip - the Z Flip 7 or Z Flip 8, chosen with
 `variant`; `<FlipMockup>` is the all-in-one version. One device, two form
 factors: **open** (default) fills your content onto the tall main display, and
@@ -9,11 +19,6 @@ the bottom. Detail geometry (button pills, lens rings, ports, seams) follows a
 reference scan of the retail Flip 7 checked against the official product
 photography; the Flip 8 carries the same details on its fractionally larger,
 thinner body.
-
-<MockupExplorer
-  component="FlipMockup"
-  props={{ color: 'coralred', rotation: [0, -0.3, 0] }}
-/>
 
 ## `<Flip>` vs `<FlipMockup>`
 
@@ -57,6 +62,7 @@ wraps around the cameras exactly like the real FlexWindow:
 
 <MockupExplorer
   component="FlipMockup"
+  variant="flip8"
   props={{ openAngle: false, autoRotate: true, float: true, color: 'coralred', surfaceBackground: '#000' }}
 />
 
@@ -68,20 +74,11 @@ bending across it:
 
 <MockupExplorer
   component="FlipMockup"
+  variant="flip8"
   props={{ openAngle: 100, color: '#47536b', rotation: [0, -0.25, 0] }}
 />
 
 ## The models
-
-### Galaxy Z Flip 7
-
-The 6.85″ flagship clamshell (360×838 open, 316×349 folded). Retail finishes:
-`blueshadow`, `jetblack`, `coralred`, `mint`.
-
-<MockupExplorer
-  component="FlipMockup"
-  props={{ variant: 'flip7', color: 'coralred', rotation: [0, -0.3, 0] }}
-/>
 
 ### Galaxy Z Flip 8
 
@@ -92,7 +89,8 @@ Retail finishes: `pink`, `cream`, `graphite`, `mint`.
 
 <MockupExplorer
   component="FlipMockup"
-  props={{ variant: 'flip8', color: 'pink', rotation: [0, -0.3, 0] }}
+  variant="flip8"
+  props={{ color: 'pink', rotation: [0, -0.3, 0] }}
 />
 
 ## Colorways
@@ -107,4 +105,6 @@ Every live surface filled with chroma green, labeled with the slot that
 feeds it - the fastest way to see exactly where your content lands and
 what stays 3D hardware.
 
-<MockupExplorer component="FlipMockup" screen="chroma" />
+<MockupExplorer component="FlipMockup" variant="flip8" screen="chroma" />
+
+<DeviceDisclaimer brands="Samsung" />

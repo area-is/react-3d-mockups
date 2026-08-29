@@ -1,14 +1,19 @@
+---
+title: Galaxy Z Fold 8 Ultra
+description: The Galaxy Z Fold 8 Ultra in WebGL, with a live prop explorer and the full FoldMockup reference.
+---
+
+Drive every prop from the inspector; the `demo.tsx` panel rewrites itself to
+exactly what is being passed. The explorer is pinned to `variant="fold8ultra"`; everything below applies to the whole family.
+
+<MockupExplorer component="FoldMockup" variant="fold8ultra" />
+
 `<Fold>` renders a Galaxy Z Fold - the Z Fold 7, the wide Z Fold 8 or the
 Z Fold 8 Ultra, chosen with `variant`; `<FoldMockup>` is the all-in-one
 version. One device, two form factors: **open** (default) fills your content
 onto the large inner display - a faint crease runs down its center - and
 **closed** (`openAngle={false}`) folds to the cover display with the rear
 camera pill on the back.
-
-<MockupExplorer
-  component="FoldMockup"
-  props={{ color: '#c9ccce', rotation: [0, -0.3, 0] }}
-/>
 
 ## `<Fold>` vs `<FoldMockup>`
 
@@ -53,6 +58,7 @@ single prop:
 
 <MockupExplorer
   component="FoldMockup"
+  variant="fold8ultra"
   props={{ openAngle: false, autoRotate: true, float: true, color: '#3a3d42', surfaceBackground: '#000' }}
 />
 
@@ -64,35 +70,11 @@ the crease:
 
 <MockupExplorer
   component="FoldMockup"
+  variant="fold8ultra"
   props={{ openAngle: 110, color: '#47536b', rotation: [0, -0.35, 0] }}
 />
 
 ## The models
-
-### Galaxy Z Fold 7
-
-The tall book: a 6.5″ 21:9 cover display folding open into the nearly square
-8.0″ inner panel (820×910), with the vertical triple-camera pill top-right on
-the back. Retail finishes: `blueshadow`, `jetblack`, `silvershadow`, `mint`.
-
-<MockupExplorer
-  component="FoldMockup"
-  props={{ variant: 'fold7', color: 'silvershadow', rotation: [0, -0.3, 0] }}
-/>
-
-### Galaxy Z Fold 8
-
-The wide one. Folded it is a short, broad bar with a 5.5″ cover display
-(480×758); unfolded it is **wider than it is tall** - a landscape 4:3 tablet
-whose 7.6″ inner panel renders 1020×770 in the default pose, so design for a
-landscape viewport when it is open. `orientation="landscape"` stands it
-upright into 770×1020 instead. Retail finishes: `lavender`, `cream`,
-`graphite`, `pistachio`.
-
-<MockupExplorer
-  component="FoldMockup"
-  props={{ variant: 'fold8', color: 'lavender', rotation: [0, -0.3, 0] }}
-/>
 
 ### Galaxy Z Fold 8 Ultra
 
@@ -104,7 +86,8 @@ grid, and the 200 MP triple camera. Retail finishes: `violetshadow`, `cream`,
 
 <MockupExplorer
   component="FoldMockup"
-  props={{ variant: 'fold8ultra', color: 'violetshadow', rotation: [0, -0.3, 0] }}
+  variant="fold8ultra"
+  props={{ color: 'violetshadow', rotation: [0, -0.3, 0] }}
 />
 
 ## Colorways
@@ -119,4 +102,6 @@ Every live surface filled with chroma green, labeled with the slot that
 feeds it - the fastest way to see exactly where your content lands and
 what stays 3D hardware.
 
-<MockupExplorer component="FoldMockup" screen="chroma" />
+<MockupExplorer component="FoldMockup" variant="fold8ultra" screen="chroma" />
+
+<DeviceDisclaimer brands="Samsung" />

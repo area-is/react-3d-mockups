@@ -4,24 +4,21 @@ description: The Galaxy Z Flip 7 in WebGL, with a live prop explorer and the ful
 ---
 
 Drive every prop from the inspector; the `demo.tsx` panel rewrites itself to
-exactly what is being passed. Everything below applies to this component.
+exactly what is being passed. The explorer is pinned to `variant="flip7"`; everything below applies to the whole family.
 
-<MockupExplorer component="FlipMockup" />
+<MockupExplorer component="FlipMockup" variant="flip7" />
 
-`<Flip>` renders a Galaxy Z Flip 7; `<FlipMockup>` is the all-in-one version.
-One device, two form factors: **open** (default) fills your content onto the
-tall 6.85″ main display, and **closed** (`openAngle={false}`) folds to the compact
-square whose front is nearly all cover screen - with the two separately
-protruding lens rings and flash sitting on the glass (no plate joins them,
-matching the retail hardware), and the hinge band (complete with its
-engraved wordmark) capping the bottom. Detail geometry (button pills, lens
-rings, ports, seams) follows a reference scan of the retail device checked
-against the official product photography.
-
-<MockupExplorer
-  component="FlipMockup"
-  props={{ color: 'coralred', rotation: [0, -0.3, 0] }}
-/>
+`<Flip>` renders a Galaxy Z Flip - the Z Flip 7 or Z Flip 8, chosen with
+`variant`; `<FlipMockup>` is the all-in-one version. One device, two form
+factors: **open** (default) fills your content onto the tall main display, and
+**closed** (`openAngle={false}`) folds to the compact square whose front is
+nearly all cover screen - with the two separately protruding lens rings and
+flash sitting on the glass (no plate joins them, matching the retail
+hardware), and the hinge band (complete with its engraved wordmark) capping
+the bottom. Detail geometry (button pills, lens rings, ports, seams) follows a
+reference scan of the retail Flip 7 checked against the official product
+photography; the Flip 8 carries the same details on its fractionally larger,
+thinner body.
 
 ## `<Flip>` vs `<FlipMockup>`
 
@@ -52,9 +49,10 @@ Beyond the [shared screen props](/docs/screen-content) and, on the mockup, the
 
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
-| `openAngle` | `boolean \| number` | `true` | How far the clamshell is open. `true` is the unfolded tall phone (content on the 360×837 main display), `false` the folded compact (content on the nearly square 316×353 cover display, lens rings overlaid like cutouts). A number is degrees (0 = shut, 180 = flat) and renders the real Flex Mode pose: the halves pivot around the Armor FlexHinge while its glossy spine band (with the SAMSUNG engraving) rolls into the gap, and your content bends across the fold on two composited planes. The pose is continuous: every angle renders its own pose, and only the extremes hand over to the dedicated folded (~0°) and flat (180°) poses, which draw the crease as one seamless screen. |
+| `variant` | `'flip7' \| 'flip8'` | `'flip7'` | Which Galaxy Z Flip to render. The Flip 8 is a hair bigger and thinner, its main display grown to 6.9″ on the same panel grid; the cover screen is unchanged. |
+| `openAngle` | `boolean \| number` | `true` | How far the clamshell is open. `true` is the unfolded tall phone (content on the main display), `false` the folded compact (content on the nearly square cover display, lens rings overlaid like cutouts). A number is degrees (0 = shut, 180 = flat) and renders the real Flex Mode pose: the halves pivot around the Armor FlexHinge while its glossy spine band (with the SAMSUNG engraving) rolls into the gap, and your content bends across the fold on two composited planes. The pose is continuous: every angle renders its own pose, and only the extremes hand over to the dedicated folded (~0°) and flat (180°) poses, which draw the crease as one seamless screen. |
 | `orientation` | `'portrait' \| 'landscape'` | `'portrait'` | Landscape lays the device on its side and swaps the virtual display with upright content. |
-| `color` | `string` | `'#22252b'` | Back glass / cover. Takes a retail colorway id from `FLIP_COLORWAYS`, which brings that model's measured frame and hinge band with it, or any CSS color - the metal is then derived from it. |
+| `color` | `string` | `'#22252b'` | Back glass / cover. Takes a retail colorway id from `FLIP_COLORWAYS[variant]`, which brings that model's frame and hinge band with it, or any CSS color - the metal is then derived from it. |
 | `resolution` | `number` | per state | CSS pixel width of the active display; height follows the panel aspect. |
 
 ## The two states
@@ -64,6 +62,7 @@ wraps around the cameras exactly like the real FlexWindow:
 
 <MockupExplorer
   component="FlipMockup"
+  variant="flip7"
   props={{ openAngle: false, autoRotate: true, float: true, color: 'coralred', surfaceBackground: '#000' }}
 />
 
@@ -75,15 +74,28 @@ bending across it:
 
 <MockupExplorer
   component="FlipMockup"
-  props={{ openAngle: 100, color: 'blueshadow', rotation: [0, -0.25, 0] }}
+  variant="flip7"
+  props={{ openAngle: 100, color: '#47536b', rotation: [0, -0.25, 0] }}
+/>
+
+## The models
+
+### Galaxy Z Flip 7
+
+The 6.85″ flagship clamshell (360×838 open, 316×349 folded). Retail finishes:
+`blueshadow`, `jetblack`, `coralred`, `mint`.
+
+<MockupExplorer
+  component="FlipMockup"
+  variant="flip7"
+  props={{ color: 'coralred', rotation: [0, -0.3, 0] }}
 />
 
 ## Colorways
 
-Pass an id for the retail finish - `color="coralred"`, `color="blueshadow"`,
-`color="jetblack"`, `color="mint"` - and the frame and hinge band come with it.
-A CSS color gets metal derived from it instead, so `color="#bfe3d0"` needs
-nothing else.
+Pass an id from that model's catalog in `FLIP_COLORWAYS` for the retail finish
+- the frame and hinge band come with it. A CSS color gets metal derived from
+it instead, so `color="#bfe3d0"` needs nothing else.
 
 ## Mockup-able areas
 
@@ -91,6 +103,6 @@ Every live surface filled with chroma green, labeled with the slot that
 feeds it - the fastest way to see exactly where your content lands and
 what stays 3D hardware.
 
-<MockupExplorer component="FlipMockup" screen="chroma" />
+<MockupExplorer component="FlipMockup" variant="flip7" screen="chroma" />
 
 <DeviceDisclaimer brands="Samsung" />

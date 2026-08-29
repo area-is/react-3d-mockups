@@ -4,32 +4,31 @@ description: The Galaxy Watch 8 in WebGL, with a live prop explorer and the full
 ---
 
 Drive every prop from the inspector; the `demo.tsx` panel rewrites itself to
-exactly what is being passed. Everything below applies to this component.
+exactly what is being passed. The explorer is pinned to `variant="watch8"`; everything below applies to the whole family.
 
-<MockupExplorer component="GalaxyWatchMockup" />
+<MockupExplorer component="GalaxyWatchMockup" variant="watch8" />
 
-`<GalaxyWatch>` and `<GalaxyWatchMockup>` render a Samsung Galaxy Watch 8,
-44 mm, wearing a real wristband on an invisible wrist directly behind the case -
-two domed, tapering straps meeting at a closure on the underside of the wrist,
-matching how worn-band product photos pose it.
+`<GalaxyWatch>` and `<GalaxyWatchMockup>` render a Samsung Galaxy Watch - the
+Watch 8, the Watch 9 or the Watch Ultra 2, chosen with `variant` - wearing a
+real wristband on an invisible wrist directly behind the case: two domed,
+tapering straps meeting at a closure on the underside of the wrist, matching
+how worn-band product photos pose it.
 
-The case is the aluminium "cushion" squircle carrying a **fully round** 1.47"
-display raised on its dial puck, so the metal stays visible around the live
-circular 240×240 face. Two raised chamfered keys straddle the mic hole on the
-right edge, with twin machined speaker slots on the left. The back carries the
-BioActive sensor puck standing proud of the aluminium, an optical heart sensor
-behind its round crystal ringed by the ECG electrode.
+Every model is the "cushion" squircle carrying a **fully round** display
+raised on its dial puck, so the metal stays visible around the live circular
+face. The 44 mm Watch 8 and Watch 9 are aluminium with two raised chamfered
+keys straddling the mic hole; the 47 mm Watch Ultra 2 is titanium, deeper,
+with a three-key run ending in its orange Quick Button - orange whatever the
+case finish, because on the hardware it is. The back carries the BioActive
+sensor puck standing proud of the case, an optical heart sensor behind its
+round crystal ringed by the ECG electrode.
 
-Its band is the Dynamic-Lug-style two-strap band: nearly case-wide at the
+The band is the Dynamic-Lug-style two-strap band: nearly case-wide at the
 connector, tapering around the wrist to a stainless pin buckle whose tongue
-rises through one of the adjustment holes punched clean through the long strap,
-with a keeper holding the tail down. The lengths come from the retail fit range
-rather than being eyeballed.
-
-<MockupExplorer
-  component="GalaxyWatchMockup"
-  props={{ color: '#33363c', bandColor: '#23252a', float: true, rotation: [0, 0.3, 0] }}
-/>
+rises through one of the adjustment holes punched clean through the long
+strap, with a keeper holding the tail down. The lengths come from the retail
+fit range rather than being eyeballed; the Ultra 2 wears it at its wider
+strap width.
 
 ## `<GalaxyWatch>` vs `<GalaxyWatchMockup>`
 
@@ -59,13 +58,26 @@ Beyond the [shared screen props](/docs/screen-content):
 
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
-| `variant` | `'watch8'` | `'watch8'` | Which Galaxy Watch to render. |
-| `color` | `string` | `'#1c1d21'` | Aluminium case. Takes a retail colorway id from `GALAXY_WATCH_COLORWAYS` (`graphite`, `silver`) or any CSS color. |
+| `variant` | `'watch8' \| 'watch9' \| 'watchultra2'` | `'watch8'` | Which Galaxy Watch to render. The Watch 9 is the Watch 8's case with the generation's internals; the Watch Ultra 2 is the 47 mm titanium squircle. |
+| `color` | `string` | `'#1c1d21'` | Case. Takes a retail colorway id from `GALAXY_WATCH_COLORWAYS[variant]` (`graphite`/`silver` on the 44 mm models, `titaniumsilver`/`titaniumgray` on the Ultra 2) or any CSS color. |
 | `bandColor` | `string` | `'#2a2c31'` | Strap colorway (fluoroelastomer). |
 | `bandOpen` | `boolean` | `false` | Lay the band out unbuckled and flat instead of wearing it. |
-| `resolution` | `number` | `240` | Virtual display width - 240 is the watch's own dp grid, and the display is round, so give your face a `border-radius: 50%` root (or design edge-to-edge and let the crystal mask it). |
+| `resolution` | `number` | per variant | Virtual display width - each model's own dp grid (240 on the 44 mm models, 249 on the Ultra 2), and the display is round, so give your face a `border-radius: 50%` root (or design edge-to-edge and let the crystal mask it). |
 
 There is no `orientation` prop.
+
+## The models
+
+### Galaxy Watch 8
+
+The 44 mm aluminium cushion with the 1.47″ 480×480 dial (240×240 logical).
+Retail finishes: `graphite`, `silver`.
+
+<MockupExplorer
+  component="GalaxyWatchMockup"
+  variant="watch8"
+  props={{ color: 'graphite', bandColor: '#23252a', rotation: [0, 0.3, 0] }}
+/>
 
 ## Mockup-able areas
 
@@ -73,7 +85,7 @@ Every live surface filled with chroma green, labeled with the prop that
 feeds it - the fastest way to see exactly where your content lands and
 what stays 3D hardware.
 
-<MockupExplorer component="GalaxyWatchMockup" screen="chroma" />
+<MockupExplorer component="GalaxyWatchMockup" variant="watch8" screen="chroma" />
 
 ## More examples
 
@@ -87,6 +99,7 @@ off-wrist. The mockup backs the camera off to frame the full length.
 
 <MockupExplorer
   component="GalaxyWatchMockup"
+  variant="watch8"
   props={{ bandOpen: true, color: '#33363c', bandColor: '#23252a', rotation: [0, 3.14, 0] }}
 />
 

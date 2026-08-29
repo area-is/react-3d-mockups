@@ -1,5 +1,6 @@
 /**
- * Galaxy Z Fold-style device dimensions - the Galaxy Z Fold 7.
+ * Galaxy Z Fold-style device dimensions - the Galaxy Z Fold 7, the Galaxy
+ * Z Fold 8 and the Galaxy Z Fold 8 Ultra.
  *
  * A book-fold foldable has two form factors, and this spec carries both so the
  * one device can render either:
@@ -18,6 +19,13 @@
  *
  * Real Galaxy Z Fold 7: unfolded 158.4 x 143.2 x 4.2 mm (8.0" 2184x1968 inner,
  * ratio ~1.11); folded 158.4 x 72.8 x 8.9 mm (6.5" 2520x1080 cover, ratio ~2.32).
+ * Real Galaxy Z Fold 8 Ultra: the same chassis to the published tenth of a
+ * millimetre, 4.1 mm thin unfolded, with a 2504x2256 inner panel in the same
+ * 8.0" diagonal. Real Galaxy Z Fold 8: the generation's new WIDE form factor -
+ * folded a short, broad 123.9 x 81.9 x 9.7 mm bar (5.5" 1248x1972 cover),
+ * unfolded a landscape 123.9 x 161.4 x 4.5 mm tablet whose 7.6" 2448x1848
+ * inner panel is natively 4:3 landscape. The hinge still runs vertically, so
+ * the same spec shape carries it; it is simply wider than it is tall.
  */
 
 import type { Orientation } from '../../orientation'
@@ -59,7 +67,11 @@ export interface FoldSpec {
     display: { width: number; height: number; radius: number }
     /** Inner-display punch hole; `offsetX` is signed distance from center. */
     punchHole: { radius: number; offsetX: number; offsetY: number }
-    /** Default CSS px width of the portrait inner display. */
+    /**
+     * Default CSS px width of the inner display in the unrotated pose. That
+     * pose is portrait on the Fold 7 / Fold 8 Ultra; the Fold 8's inner panel
+     * is natively landscape, so its unrotated width is the landscape one.
+     */
     resolution: number
   }
   /** Rear camera, given in each state's own back-face coordinates. */
@@ -170,8 +182,116 @@ const FOLD7: FoldSpec = {
   antennaLines: [1.115],
 }
 
-export const FOLD_VARIANTS: Record<'fold7', FoldSpec> = {
+/**
+ * Galaxy Z Fold 8 Ultra - the Fold 7's chassis, deliberately: the published
+ * unfolded and folded footprints are identical to the Fold 7's, and only the
+ * unfolded thickness moves, 4.2 -> 4.1 mm. The change is inside the panel:
+ * the same 8.0" diagonal now drives 2504x2256 px on the same 910x820 dp grid
+ * (2504/910 = 2256/820 = 2.75), so the physical display rect and the logical
+ * resolution both carry over. The camera keeps the Fold 7's triple layout
+ * around a 200 MP main. Every detail measurement is the Fold 7 scan's, which
+ * the identical chassis keeps valid.
+ */
+const FOLD8ULTRA: FoldSpec = {
+  closed: FOLD7.closed,
+  open: {
+    ...FOLD7.open,
+    // The tenth of a millimetre the generation shaved off: 4.1 mm.
+    body: { ...FOLD7.open.body, depth: 0.112 },
+  },
+  rearCamera: FOLD7.rearCamera,
+  buttons: FOLD7.buttons,
+  buttonProfile: FOLD7.buttonProfile,
+  hinge: FOLD7.hinge,
+  bottomEdge: FOLD7.bottomEdge,
+  antennaLines: FOLD7.antennaLines,
+}
+
+/**
+ * Galaxy Z Fold 8 - the wide form factor, not a reshaped Fold 7: folded it is
+ * a short, broad 123.9 x 81.9 x 9.7 mm bar with a 5.5" 1248x1972 cover panel,
+ * and it unfolds around the same vertical hinge into a landscape
+ * 123.9 x 161.4 x 4.5 mm tablet whose 7.6" 2448x1848 inner panel is natively
+ * 4:3 landscape - the one display in the catalog whose unrotated pose is
+ * wider than tall. Body, panel and camera-count figures are the published
+ * hardware; detail geometry (camera pill proportions, ring size and pitch,
+ * buttons, hinge, ports) is adapted from the Fold 7 reference scan and the
+ * official Fold 8 product renders, pending a scan of the retail device.
+ *
+ * Resolutions: the cover panel runs 424 ppi, and 1248/2.6 = 480 dp puts it in
+ * the density bucket nearest its true 163 dp/in; the inner panel divides by
+ * the Fold 7 inner's own 2.4 (2448x1848 -> 1020x770).
+ */
+const FOLD8: FoldSpec = {
+  closed: {
+    body: { width: 2.234, height: 3.38, depth: 0.265, radius: 0.09, bevel: 0.018 },
+    // The Fold 7's closed-flush hairline seam read carries over.
+    gap: 0.012,
+    // 74.71 x 118.05 mm cover panel (5.5", 1248x1972), centered.
+    display: { width: 2.038, height: 3.22, radius: 0.09 },
+    punchHole: { radius: 0.053, offsetY: 0.127 },
+    resolution: 480,
+  },
+  open: {
+    body: { width: 4.403, height: 3.38, depth: 0.123, radius: 0.09, bevel: 0.012 },
+    // 154.07 x 116.31 mm inner panel (7.6", 2448x1848, landscape 4:3).
+    display: { width: 4.203, height: 3.173, radius: 0.06 },
+    // Punch centered on the right half, 3.7 mm below the top display edge.
+    punchHole: { radius: 0.065, offsetX: 1.051, offsetY: 0.1 },
+    resolution: 1020,
+  },
+  rearCamera: {
+    // Folded: the Fold 7's corner pill at the Fold 7's margins - 17.2 mm in
+    // from the free edge, 6.2 mm plateau clearance to the top edge - shortened
+    // to the generation's two lenses on the same 16.7 mm ring pitch.
+    closed: {
+      plateau: { x: 0.647, y: 1.038, width: 0.54, height: 0.966, radius: 0.266, raise: 0.073 },
+      island: { x: 0.647, y: 1.038, width: 0.416, height: 0.87, radius: 0.208, raise: 0.059 },
+      // Top to bottom: 50 MP main, 50 MP ultra-wide.
+      rings: [
+        { y: 1.266, r: 0.214, pupil: 0.48 },
+        { y: 0.811, r: 0.214, pupil: 0.38 },
+      ],
+      flash: { x: 0.193, y: 1.038, r: 0.058 },
+    },
+    // Unfolded: the same module riding the camera half (right of the spine).
+    open: {
+      plateau: { x: 1.757, y: 1.038, width: 0.54, height: 0.966, radius: 0.266, raise: 0.073 },
+      island: { x: 1.757, y: 1.038, width: 0.416, height: 0.87, radius: 0.208, raise: 0.059 },
+      rings: [
+        { y: 1.266, r: 0.214, pupil: 0.48 },
+        { y: 0.811, r: 0.214, pupil: 0.38 },
+      ],
+      flash: { x: 1.303, y: 1.038, r: 0.058 },
+    },
+  },
+  // The Fold 7's keys at the Fold 7's relative rail positions on the shorter
+  // body: volume above power on the right edge.
+  buttons: [
+    { y: 0.606, length: 0.507 },
+    { y: 0.138, length: 0.354 },
+  ],
+  buttonProfile: { protrusion: 0.01, thickness: 0.05 },
+  hinge: { width: 0.166, overhang: 0.03, emboss: { length: 0.456 } },
+  bottomEdge: {
+    closed: {
+      usb: { x: 0, width: 0.264, height: 0.081 },
+      speaker: { x: 0, width: 0.366, height: 0.045 },
+    },
+    open: {
+      // USB centered on the camera half, speaker centered on the cover half.
+      usb: { x: 1.101, width: 0.264, height: 0.081 },
+      speakers: [{ x: -1.101, width: 0.366, height: 0.045 }],
+      mics: [{ x: 1.94, r: 0.026 }, { x: -1.906, r: 0.023 }],
+    },
+  },
+  antennaLines: [0.872],
+}
+
+export const FOLD_VARIANTS: Record<'fold7' | 'fold8' | 'fold8ultra', FoldSpec> = {
   fold7: FOLD7,
+  fold8: FOLD8,
+  fold8ultra: FOLD8ULTRA,
 }
 
 export type FoldVariant = keyof typeof FOLD_VARIANTS

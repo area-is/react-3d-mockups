@@ -53,10 +53,18 @@ const ROWS = {
   tabs11ultra: ['galaxyTab', { variant: 'tabs11ultra' }],
   series11: ['appleWatch', { variant: 'series11' }],
   watch8: ['galaxyWatch', { variant: 'watch8' }],
+  watch9: ['galaxyWatch', { variant: 'watch9' }],
+  watchultra2: ['galaxyWatch', { variant: 'watchultra2' }],
   'fold7-open': ['fold', { variant: 'fold7', openAngle: true }],
   'fold7-closed': ['fold', { variant: 'fold7', openAngle: false }],
+  'fold8-open': ['fold', { variant: 'fold8', openAngle: true }],
+  'fold8-closed': ['fold', { variant: 'fold8', openAngle: false }],
+  'fold8ultra-open': ['fold', { variant: 'fold8ultra', openAngle: true }],
+  'fold8ultra-closed': ['fold', { variant: 'fold8ultra', openAngle: false }],
   'flip7-open': ['flip', { variant: 'flip7', openAngle: true }],
   'flip7-closed': ['flip', { variant: 'flip7', openAngle: false }],
+  'flip8-open': ['flip', { variant: 'flip8', openAngle: true }],
+  'flip8-closed': ['flip', { variant: 'flip8', openAngle: false }],
   studiodisplay: ['studioDisplay', {}],
 }
 
@@ -71,8 +79,8 @@ function parseDoc() {
     if (!/\d/.test(display)) continue
 
     let key = variantCell.replace(/`/g, '').trim()
-    if (key.includes('fold7')) key = key.includes('false') ? 'fold7-closed' : 'fold7-open'
-    else if (key.includes('flip7')) key = key.includes('false') ? 'flip7-closed' : 'flip7-open'
+    const foldable = key.match(/^((?:fold|flip)\w*)/)
+    if (foldable) key = `${foldable[1]}-${key.includes('false') ? 'closed' : 'open'}`
     else if (key === '-' || key === '') key = 'studiodisplay'
 
     const panel = display.match(/(\d+)[x×](\d+)/)
@@ -197,8 +205,8 @@ if (WRITE) {
     const cells = line.split('|')
     if (cells.length < 8) continue
     let key = cells[2].replace(/`/g, '').trim()
-    if (key.includes('fold7')) key = key.includes('false') ? 'fold7-closed' : 'fold7-open'
-    else if (key.includes('flip7')) key = key.includes('false') ? 'flip7-closed' : 'flip7-open'
+    const foldable = key.match(/^((?:fold|flip)\w*)/)
+    if (foldable) key = `${foldable[1]}-${key.includes('false') ? 'closed' : 'open'}`
     else if (key === '-' || key === '') key = 'studiodisplay'
     const row = rows.find((r) => r.key === key)
     if (!row?.rendered) continue

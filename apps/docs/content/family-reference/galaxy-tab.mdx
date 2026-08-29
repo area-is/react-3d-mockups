@@ -14,6 +14,28 @@ edge in portrait and the top center in landscape, just like the physical panel.
   props={{ variant: 'tabs11', color: 'gray', rotation: [0, -0.3, 0] }}
 />
 
+## `<GalaxyTab>` vs `<GalaxyTabMockup>`
+
+<BareVsMockup object="GalaxyTab" kind="galaxyTab" slot="Screen" />
+
+```tsx
+import { MockupCanvas, GalaxyTab, GalaxyTabMockup } from 'react-3d-mockups'
+
+// The one-liner: its own canvas, with lighting, a ground shadow, drag-to-orbit
+// controls and a camera already framed on the object.
+<GalaxyTabMockup float style={{ height: 520 }}>
+  <YourApp />
+</GalaxyTabMockup>
+
+// The same model with no stage of its own. Inside a canvas you arrange
+// yourself it can be posed, animated, lit and joined by anything else.
+<MockupCanvas>
+  <GalaxyTab rotation={[0, 0.4, 0]}>
+    <YourApp />
+  </GalaxyTab>
+</MockupCanvas>
+```
+
 ## Props
 
 Beyond the [shared screen props](/docs/screen-content):

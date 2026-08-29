@@ -592,7 +592,7 @@ function WatchBody({
 
       {/* keys on the right edge, seated in their machined recesses: Apple's
           near-flush side button, the Galaxy's two raised chamfered keys */}
-      {buttons.map(({ y, length, width, proud }) => (
+      {buttons.map(({ y, length, width, proud, color: keyColor }) => (
         <SideKey
           key={y}
           side={1}
@@ -601,7 +601,7 @@ function WatchBody({
           length={length}
           thickness={width}
           protrusion={proud}
-          color={color}
+          color={keyColor ?? color}
         />
       ))}
 
@@ -801,8 +801,10 @@ export const AppleWatch = Object.assign(AppleWatchImpl, watchSlots)
 
 export interface GalaxyWatchProps extends WatchCommonProps {
   /**
-   * Which Galaxy Watch to render: `watch8` (Galaxy Watch 8, 44 mm cushion case
-   * with the round display - the default and only model today).
+   * Which Galaxy Watch to render: `watch8` (Galaxy Watch 8, 44 mm cushion
+   * case - the default), `watch9` (Galaxy Watch 9, 44 mm - the same case,
+   * new internals) or `watchultra2` (Galaxy Watch Ultra 2, 47 mm titanium
+   * cushion squircle with the orange Quick Button and a wider strap).
    */
   variant?: GalaxyWatchVariant
   /**
@@ -816,10 +818,11 @@ export interface GalaxyWatchProps extends WatchCommonProps {
 }
 
 /**
- * A procedurally built Samsung Galaxy Watch 8: 44 mm cushion case with the
- * fully round 480x480 display raised on its dial puck, two flat chamfered keys,
- * machined speaker slots, and the BioActive sensor puck standing proud of the
- * aluminium back.
+ * A procedurally built Samsung Galaxy Watch - the Watch 8 or Watch 9's 44 mm
+ * aluminium cushion case, or the Watch Ultra 2's 47 mm titanium one, chosen
+ * with `variant`: the fully round display raised on its dial puck, flat
+ * chamfered keys (the Ultra 2 adds its orange Quick Button), machined speaker
+ * slots, and the BioActive sensor puck standing proud of the back.
  *
  * It wears the tapering Dynamic-Lug-style band: two straps closing with a
  * stainless pin buckle and keeper over a row of punched adjustment holes, sized

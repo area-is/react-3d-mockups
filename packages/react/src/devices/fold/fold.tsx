@@ -46,8 +46,8 @@ export interface FoldProps extends Omit<GroupProps, 'children' | 'color'>, Surfa
    *
    * `true` (default) renders the unfolded tablet - your content fills the large,
    * nearly square inner display (with a faint center crease). `false` renders the
-   * folded candy-bar - your content fills the tall cover display and the rear
-   * triple camera shows on the back.
+   * folded candy-bar - your content fills the cover display and the rear
+   * camera pill shows on the back.
    *
    * A number (0 = shut, 180 = flat) renders the real Flex Mode book pose: the
    * panels pivot around the Armor FlexHinge while its rounded spine (with the
@@ -105,7 +105,8 @@ function slabGeometry(width: number, height: number, radius: number, depth: numb
 }
 
 /**
- * A procedurally built Samsung Galaxy Z Fold 7. One device, two form factors:
+ * A procedurally built Samsung Galaxy Z Fold - the Z Fold 7, the wide Z Fold 8
+ * or the Z Fold 8 Ultra, chosen with `variant`. One device, two form factors:
  * the unfolded tablet (big inner display) and the folded candy-bar - two
  * stacked slabs with the real crevice of air between them - switched with the
  * `openAngle` prop. No 3D asset files are loaded - the whole device is generated
@@ -330,6 +331,13 @@ function FoldImpl({
     )
   }, [mode, spec.closed])
   React.useEffect(() => () => coverGlassGeometry?.dispose(), [coverGlassGeometry])
+
+  // Where the (off) cover screen sits on the back of the open device: centered
+  // on the cover half, i.e. inset from the open body's left edge by half the
+  // folded width - and its punch camera, mirrored from the cover-screen spec.
+  const coverBackX = (spec.open.body.width - spec.closed.body.width) / 2
+  const coverPunchY = spec.closed.display.height / 2 - spec.closed.punchHole.offsetY
+  const coverPunchR = spec.closed.punchHole.radius
 
   // The vertical SAMSUNG emboss on the hinge spine - vector geometry from the SVG.
   const spineLogoGeometry = React.useMemo(
@@ -646,12 +654,12 @@ function FoldImpl({
               {/* body-coordinate details, shifted into this half's local frame */}
               <group position-x={hw / 2}>
                 {coverGlassGeometry && (
-                  <group position={[-0.982, 0, 0]}>
+                  <group position={[-coverBackX, 0, 0]}>
                     <mesh geometry={coverGlassGeometry} rotation-y={Math.PI} position-z={-b.depth / 2 - 0.003}>
                       <meshPhysicalMaterial color="#0a0b0f" metalness={0.15} roughness={0.14} clearcoat={1} clearcoatRoughness={0.1} />
                     </mesh>
-                    <mesh rotation-x={Math.PI / 2} position={[0, 1.961, -b.depth / 2 - 0.005]}>
-                      <cylinderGeometry args={[0.053, 0.053, 0.004, 20]} />
+                    <mesh rotation-x={Math.PI / 2} position={[0, coverPunchY, -b.depth / 2 - 0.005]}>
+                      <cylinderGeometry args={[coverPunchR, coverPunchR, 0.004, 20]} />
                       <meshPhysicalMaterial color="#1a2130" metalness={0.4} roughness={0.2} clearcoat={1} />
                     </mesh>
                   </group>
@@ -796,7 +804,7 @@ function FoldImpl({
 
           {/* the cover display, dark, on the back of the left half */}
           {coverGlassGeometry && (
-            <group position={[-0.982, 0, 0]}>
+            <group position={[-coverBackX, 0, 0]}>
               <mesh
                 geometry={coverGlassGeometry}
                 rotation-y={Math.PI}
@@ -805,8 +813,8 @@ function FoldImpl({
                 <meshPhysicalMaterial color="#0a0b0f" metalness={0.15} roughness={0.14} clearcoat={1} clearcoatRoughness={0.1} />
               </mesh>
               {/* its punch camera, top center of the cover panel */}
-              <mesh rotation-x={Math.PI / 2} position={[0, 1.961, -body.depth / 2 - 0.005]}>
-                <cylinderGeometry args={[0.053, 0.053, 0.004, 20]} />
+              <mesh rotation-x={Math.PI / 2} position={[0, coverPunchY, -body.depth / 2 - 0.005]}>
+                <cylinderGeometry args={[coverPunchR, coverPunchR, 0.004, 20]} />
                 <meshPhysicalMaterial color="#1a2130" metalness={0.4} roughness={0.2} clearcoat={1} />
               </mesh>
             </group>

@@ -15,6 +15,28 @@ layouts apply.
   props={{ orientation: 'landscape', rotation: [0, -0.3, 0] }}
 />
 
+## `<IPad>` vs `<IPadMockup>`
+
+<BareVsMockup object="IPad" kind="ipad" slot="Screen" />
+
+```tsx
+import { MockupCanvas, IPad, IPadMockup } from 'react-3d-mockups'
+
+// The one-liner: its own canvas, with lighting, a ground shadow, drag-to-orbit
+// controls and a camera already framed on the object.
+<IPadMockup float style={{ height: 520 }}>
+  <YourApp />
+</IPadMockup>
+
+// The same model with no stage of its own. Inside a canvas you arrange
+// yourself it can be posed, animated, lit and joined by anything else.
+<MockupCanvas>
+  <IPad rotation={[0, 0.4, 0]}>
+    <YourApp />
+  </IPad>
+</MockupCanvas>
+```
+
 ## Props
 
 Beyond the [shared screen props](/docs/screen-content):

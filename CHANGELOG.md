@@ -7,6 +7,20 @@ Notable changes to `react-3d-mockups`. This project follows
 
 ### Added
 
+- **The 2026 Samsung generation: five new devices.** `FoldMockup` gains
+  `variant="fold8"` - the generation's new *wide* form factor, folding open
+  around the same vertical hinge into a landscape 4:3 tablet (1020×770
+  logical, the one display in the catalog whose unrotated pose is wider than
+  tall) - and `variant="fold8ultra"`, the Fold 7's chassis carrying the
+  sharper 2504×2256 inner panel on the same 820×910 grid. `FlipMockup` gains
+  `variant="flip8"` (6.9" main panel on the same grid, unchanged cover).
+  `GalaxyWatchMockup` gains `variant="watch9"` (the Watch 8's case, new
+  internals) and `variant="watchultra2"` - the 47 mm titanium cushion
+  squircle with its 1.52" 498×498 dial, wider strap and the orange Quick
+  Button, which stays orange whatever the case finish because on the
+  hardware it is. Each variant ships its retail colorways, and every body
+  and panel figure is the published hardware dimension.
+
 - **`statusBar` on phones, foldables and tablets.** `<IPhoneMockup statusBar />`
   draws the iOS bar; the Galaxy phones, both foldables and the Galaxy Tabs draw
   One UI's. Pass an object to set the clock, the meters, the carrier or the ink
@@ -31,11 +45,11 @@ Notable changes to `react-3d-mockups`. This project follows
 
 ### Changed (breaking)
 
-- **The package is now `react-3d-mockups`.** It was `area-3d-mockups`; nothing
+- **The package is now `react-3d-mockups`.** It was `react-3d-mockups`; nothing
   else moved, so the change is one line in your manifest and one in each import.
 
   ```diff
-  - import { GalaxyMockup } from 'area-3d-mockups'
+  - import { GalaxyMockup } from 'react-3d-mockups'
   + import { GalaxyMockup } from 'react-3d-mockups'
   ```
 
