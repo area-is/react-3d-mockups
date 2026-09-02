@@ -31,11 +31,13 @@ export const MILK_CARTON = {
    *
    * `radius` is the corner fold - board creased on a rule comes off it
    * rounded, not knife-edged, so every fold on the carton keeps this much
-   * radius. The roof's footprint is the same rounded rectangle, which is what
-   * carries a corner's fillet up through the eave rather than ending it under
-   * a square overhang.
+   * radius: about 1.3 mm, which is what a crease in 0.5 mm board actually
+   * turns on. It was 3 mm, which rounded the carton off like a bar of soap and
+   * pushed the flat print faces well short of their corners. The roof's
+   * footprint is the same rounded rectangle, which is what carries a corner's
+   * fillet up through the eave rather than ending it under a square overhang.
    */
-  body: { width: 1.734, height: 3.469, depth: 1.734, radius: 0.055 },
+  body: { width: 1.734, height: 3.469, depth: 1.734, radius: 0.024 },
   /**
    * The gable roof. `rise` is how far the ridge stands above the walls;
    * `tuck` is how deep the ear fold pulls each end inward where it is
@@ -146,15 +148,39 @@ export const MILK_CARTON_SIZE_MM: MilkCartonSizeMm = { width: 95, height: 241, d
 
 /** Everything the renderer needs to build a carton of a given size. */
 export interface MilkCartonLayout {
-  /** The walls, up to the eave where the roof starts. */
-  body: { width: number; height: number; depth: number; radius: number }
+  /**
+   * The walls, up to the eave where the roof starts. `face` is the flat of
+   * each wall between its corner folds - the part a print actually lies on -
+   * so the live panels are sized to it rather than to the wall's full width,
+   * which would put their edges out past the folds.
+   */
+  body: {
+    width: number
+    height: number
+    depth: number
+    radius: number
+    face: { width: number; depth: number }
+  }
   /**
    * The roof: its rise above the eave, the length of one slanted panel, the
    * flat its ridge fold keeps (`crease`, a half-width in z), and the ear fold
    * each end pinches into - `tuck` deep at `tuckAt` of the rise, dying to
    * nothing at the eave below and pinched back to the fin above.
+   *
+   * `fold` is the eave's fillet radius, and `panel` is the straight run of
+   * the slope between that fillet and the ridge flat - the flat a roof print
+   * lies on - as a length along the slope and the centre it is placed at, in
+   * z and in height above the eave.
    */
-  gable: { rise: number; slant: number; tuck: number; tuckAt: number; crease: number }
+  gable: {
+    rise: number
+    slant: number
+    tuck: number
+    tuckAt: number
+    crease: number
+    fold: number
+    panel: { length: number; centerZ: number; centerY: number }
+  }
   /** Root thickness, the top edge's share of it, the edge rounding, and the end knuckles' extra. */
   fin: { height: number; thickness: number; taper: number; radius: number; knuckle: number }
   cap: {
@@ -198,8 +224,20 @@ export function milkCartonLayout(size: MilkCartonSizeMm = MILK_CARTON_SIZE_MM): 
   // have taken their share (see MIN_WALL_SHARE).
   const bodyHeight = Math.max(overall - rise - fin.height, overall * MIN_WALL_SHARE)
   const capScale = width / MILK_CARTON.body.width
+  // Never a fold wider than the face it is on has room for.
+  const radius = Math.min(MILK_CARTON.body.radius, width / 4, depth / 4)
+  // At least as wide as the fin's root, so the fin stands on a flat rather
+  // than balancing on a knife edge - and never so wide it flattens the roof.
+  const crease = Math.min(Math.max(depth * GABLE_CREASE, thickness * 0.55), depth * 0.08)
+  const roof = milkCartonRoof({ depth, radius }, { rise, crease })
   return {
-    body: { width, height: bodyHeight, depth, radius: MILK_CARTON.body.radius },
+    body: {
+      width,
+      height: bodyHeight,
+      depth,
+      radius,
+      face: { width: width - 2 * radius, depth: depth - 2 * radius },
+    },
     gable: {
       rise,
       slant: Math.hypot(depth / 2, rise),
@@ -207,9 +245,9 @@ export function milkCartonLayout(size: MilkCartonSizeMm = MILK_CARTON_SIZE_MM): 
       // otherwise fold its two ends through each other.
       tuck: Math.min(depth * GABLE_TUCK, width / 2),
       tuckAt: EAR_FOLD_PEAK,
-      // At least as wide as the fin's root, so the fin stands on a flat rather
-      // than balancing on a knife edge - and never so wide it flattens the roof.
-      crease: Math.min(Math.max(depth * GABLE_CREASE, thickness * 0.55), depth * 0.08),
+      crease,
+      fold: roof.fold,
+      panel: roof.panel,
     },
     fin,
     cap: {
@@ -225,6 +263,77 @@ export function milkCartonLayout(size: MilkCartonSizeMm = MILK_CARTON_SIZE_MM): 
       rim: MILK_CARTON.cap.rim * capScale,
     },
     height: bodyHeight + rise + fin.height,
+  }
+}
+
+/**
+ * The roof in profile, front to back: a function of z alone, in the (z, y)
+ * plane with y measured up from the eave.
+ */
+export interface MilkCartonRoof {
+  /** The eave fillet's radius - the board's fold, never wider than the slope has room for. */
+  fold: number
+  /** Rise per unit of depth. */
+  pitch: number
+  /** Length along the slope per unit of depth. */
+  along: number
+  /** Where the eave fillet hands over to the straight slope. */
+  filletEndZ: number
+  filletEndY: number
+  /** Height of the ridge flat, where the fin stands. */
+  apex: number
+  /** The board's height above the eave at `z`. */
+  heightAt: (z: number) => number
+  /** The straight run a roof print lies on: its length along the slope, and its centre. */
+  panel: { length: number; centerZ: number; centerY: number }
+}
+
+/**
+ * The roof profile.
+ *
+ * The slope is not a line drawn from the eave: the eave is a FOLD, so the
+ * roof leaves the wall on a fillet of the board's own fold radius - tangent to
+ * the wall at the eave, tangent to the slope a little way up. The slope is the
+ * tangent to that arc at the roof's pitch, which lifts the ridge by a hair
+ * over where a sharp crease would have put it; the fin absorbs that so the
+ * carton stays exactly as tall as the spec says.
+ *
+ * Shared by the model, which lofts the roof from it, and the metrics, which
+ * report the roof panels' printable run from it - so the two can never
+ * disagree about where a print on the roof ends.
+ */
+export function milkCartonRoof(
+  body: { depth: number; radius: number },
+  gable: { rise: number; crease: number }
+): MilkCartonRoof {
+  const hd = body.depth / 2
+  const crease = gable.crease
+  const fold = Math.min(body.radius, (hd - crease) / 2)
+  const pitch = gable.rise / hd
+  const along = Math.hypot(1, pitch)
+  const filletEndZ = hd - fold + (fold * pitch) / along
+  const filletEndY = fold / along
+  const heightAt = (z: number): number => {
+    const az = Math.abs(z)
+    if (az >= filletEndZ) {
+      // On the fillet: the upper arc of the circle sat on the eave, inside
+      // the corner, that the wall and the slope are both tangent to.
+      const dz = az - (hd - fold)
+      return Math.sqrt(Math.max(0, fold * fold - dz * dz))
+    }
+    return filletEndY + (filletEndZ - Math.max(az, crease)) * pitch
+  }
+  const run = filletEndZ - crease
+  const centerZ = crease + run / 2
+  return {
+    fold,
+    pitch,
+    along,
+    filletEndZ,
+    filletEndY,
+    apex: heightAt(crease),
+    heightAt,
+    panel: { length: run * along, centerZ, centerY: heightAt(centerZ) },
   }
 }
 
@@ -246,25 +355,30 @@ export function milkCartonMmPerUnit(size: MilkCartonSizeMm = MILK_CARTON_SIZE_MM
   return Math.max(size.width, size.height, size.depth) / MILK_CARTON_HEIGHT
 }
 
-/** Live geometry of the four walls and both roof panels. */
+/**
+ * Live geometry of the four walls and both roof panels: each is the flat of
+ * its face - a wall between its corner folds, a roof slope between the eave
+ * fillet and the ridge - because that is where a print lies. The corners are
+ * square: every edge of a face is a crease.
+ */
 export const MILK_CARTON_METRICS = {
   mmPerUnit: ({ size }) => milkCartonMmPerUnit(size),
   regions: ({ size }) => {
     const { body, gable } = milkCartonLayout(size)
-    const pxPerUnit = MILK_CARTON.resolution / body.width
+    const pxPerUnit = MILK_CARTON.resolution / body.face.width
     const panel = (width: number, height: number) => ({
       width,
       height,
-      radius: body.radius,
+      radius: 0,
       resolution: Math.round(width * pxPerUnit),
     })
     return {
-      front: panel(body.width, body.height),
-      back: panel(body.width, body.height),
-      right: panel(body.depth, body.height),
-      left: panel(body.depth, body.height),
-      gableFront: panel(body.width, gable.slant),
-      gableBack: panel(body.width, gable.slant),
+      front: panel(body.face.width, body.height),
+      back: panel(body.face.width, body.height),
+      right: panel(body.face.depth, body.height),
+      left: panel(body.face.depth, body.height),
+      gableFront: panel(body.width, gable.panel.length),
+      gableBack: panel(body.width, gable.panel.length),
     }
   },
 } as const satisfies MockupMetrics<{ size?: MilkCartonSizeMm }>

@@ -49,12 +49,17 @@ function CustomBoxImpl({
   const w = size.width * scale
   const h = size.height * scale
   const d = size.depth * scale
-  const radius = Math.min(0.02, w / 2 - 0.001, h / 2 - 0.001, d / 2 - 0.001)
+  // The edges are softened by a hair, not rounded: the faces are what the
+  // caller sized in millimetres, and a real rounding would spend that much
+  // of every face on the curve - under a print sized to the whole face, which
+  // then stood off the edges as a sliver from any angle. This much is below
+  // what a print reaches at any zoom.
+  const edge = Math.min(0.004, w / 2 - 0.001, h / 2 - 0.001, d / 2 - 0.001)
 
   const pxPerUnit = resolution / w
 
   const shared = {
-    radius,
+    radius: 0,
   }
 
   const lift = 0.004
@@ -75,7 +80,7 @@ function CustomBoxImpl({
 
   return (
     <group {...groupProps}>
-      <RoundedBox args={[w, h, d]} radius={Math.max(radius, 0.004)}>
+      <RoundedBox args={[w, h, d]} radius={edge}>
         <meshPhysicalMaterial color={color} metalness={0} roughness={0.7} />
       </RoundedBox>
 

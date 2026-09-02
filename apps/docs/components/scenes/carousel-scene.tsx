@@ -70,11 +70,11 @@ import {
   type MockupFraming,
 } from 'react-3d-mockups/core'
 import { ChalkHoursArt, ChalkMenuArt } from '../screens/print-art'
+import { CartonBack, CartonFacts, CartonFront, CartonRoof, CartonStory } from '../screens/carton-art'
 import {
   SwissBag,
   SwissBill,
   SwissBox,
-  SwissCarton,
   SwissChecker,
   SwissConstruction,
   SwissDialA,
@@ -479,10 +479,26 @@ const OBJECTS: Entry[] = [
       ['kraft', 'Kraft', '#cbab7f'],
       ['slate', 'Slate', '#d3dae0']
     ),
-    content: () => <SwissCarton />,
+    material: true,
+    content: (color) => <CartonFront material={color} />,
+    // The one object whose every face is printed, because that is what a
+    // carton is: the front is the `screen`, and the sides, the back and the
+    // roof carry what a dairy puts there, all on the same board.
     render: ({ color, screen, surface, surfaceStyle }) => (
       <MilkCarton color={color} surfaceBackground={surface} surfaceStyle={surfaceStyle}>
         {screen}
+        <MilkCarton.Right>
+          <CartonFacts material={color} />
+        </MilkCarton.Right>
+        <MilkCarton.Left>
+          <CartonStory material={color} />
+        </MilkCarton.Left>
+        <MilkCarton.Back>
+          <CartonBack material={color} />
+        </MilkCarton.Back>
+        <MilkCarton.GableFront>
+          <CartonRoof material={color} />
+        </MilkCarton.GableFront>
       </MilkCarton>
     ),
   },

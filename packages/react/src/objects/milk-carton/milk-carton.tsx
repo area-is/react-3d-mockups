@@ -7,6 +7,7 @@ import {
   MILK_CARTON_REGIONS,
   gearShape,
   milkCartonLayout,
+  milkCartonRoof,
   roundedRectShape,
   type MilkCartonSizeMm,
 } from '../../core'
@@ -103,43 +104,19 @@ function MilkCartonImpl({
   const normalZ = gable.rise / gable.slant
 
   /*
-   * The roof profile, front to back, in the (z, y) plane.
-   *
-   * The slope is not a line drawn from the eave: the eave is a FOLD, so the
-   * roof leaves the wall on a fillet of the board's own fold radius - tangent
-   * to the wall at the eave, tangent to the slope a little way up. The slope
-   * is the tangent to that arc at the roof's pitch, which lifts the ridge by a
-   * hair over where a sharp crease would have put it; the fin absorbs that so
-   * the carton stays exactly as tall as the spec says.
-   *
-   * Everything up here is a function of z alone, which is what lets the roof
-   * loft in strips.
+   * The roof profile, front to back, in the (z, y) plane - core's, so the
+   * geometry lofted from it and the printable run the metrics report can
+   * never disagree. Everything up here is a function of z alone, which is
+   * what lets the roof loft in strips.
    */
   const hw = body.width / 2
   const hd = body.depth / 2
   const crease = gable.crease
-  /** The corner fold, never wide enough to eat the slope it rounds. */
-  const fold = Math.min(body.radius, hw / 2, (hd - crease) / 2)
-  const pitch = gable.rise / hd
-  const along = Math.hypot(1, pitch)
-  /** Where the eave fillet hands over to the straight slope. */
-  const filletEndZ = hd - fold + (fold * pitch) / along
-  const filletEndY = eave + fold / along
-  const heightAt = React.useCallback(
-    (z: number): number => {
-      const az = Math.abs(z)
-      if (az >= filletEndZ) {
-        // On the fillet: the upper arc of the circle sat on the eave, inside
-        // the corner, that the wall and the slope are both tangent to.
-        const dz = az - (hd - fold)
-        return eave + Math.sqrt(Math.max(0, fold * fold - dz * dz))
-      }
-      return filletEndY + (filletEndZ - Math.max(az, crease)) * pitch
-    },
-    [hd, fold, eave, filletEndZ, filletEndY, crease, pitch]
-  )
+  const roof = React.useMemo(() => milkCartonRoof(body, gable), [body, gable])
+  const { fold } = roof
+  const heightAt = React.useCallback((z: number): number => eave + roof.heightAt(z), [eave, roof])
   /** Height of the ridge flat, where the fin stands. */
-  const apex = heightAt(crease)
+  const apex = eave + roof.apex
   /** The fin makes up whatever the roof left between the flat and the top. */
   const finHeight = Math.max(top - apex, fin.height * 0.5)
 
@@ -398,14 +375,28 @@ function MilkCartonImpl({
   }
   const plastic = { color: capColor, metalness: 0, roughness: 0.38, clearcoat: 0.55 }
 
+  /*
+   * The live panels are the FLATS of their faces - a wall between its corner
+   * folds, a roof slope between the eave fillet and the ridge - because that
+   * is where a print lies. Sized to the whole face they overhung the folds,
+   * and from any angle but head-on the overhang showed as a sliver of the
+   * artwork standing off the board. Their corners are square: every edge of
+   * a face is a crease.
+   */
   const panelDefaults = { surfaceBackground, resolution, surfaceStyle }
-  const pxPerUnit = resolution / body.width
+  const pxPerUnit = resolution / body.face.width
   // The end panels are as wide as the carton is deep, so they take their own
   // px width at the front panel's dpi rather than the front panel's number.
-  const endDefaults = { ...panelDefaults, resolution: Math.round(body.depth * pxPerUnit) }
-  const shared = { radius: body.radius }
+  const endDefaults = { ...panelDefaults, resolution: Math.round(body.face.depth * pxPerUnit) }
+  const roofDefaults = { ...panelDefaults, resolution: Math.round(body.width * pxPerUnit) }
+  const shared = { radius: 0 }
   // Live surfaces float a hair off the board, clear of z-fighting.
   const LIFT = 0.004
+  // The roof panels float three times that. Seen from above, a slope's depth
+  // and its panel's are close enough that a coarse depth buffer draws the
+  // board over the print at the walls' lift; at 0.7 mm there is no contest,
+  // and it is still nothing the eye can find.
+  const ROOF_LIFT = LIFT * 3
   // The side seam's lap, ~6 mm on the stock carton, and its step, one ply.
   const seamLap = Math.min(body.width * 0.07, height * 0.028)
   const seamPly = LIFT * 0.85
@@ -474,8 +465,10 @@ function MilkCartonImpl({
         <group
           position={[
             0,
-            eave + gable.rise * capSize.offset,
-            (body.depth / 2) * (1 - capSize.offset),
+            // On the board itself, which the eave fillet lifts a hair above
+            // the line an unfolded roof would sit on.
+            heightAt(hd * (1 - capSize.offset)),
+            hd * (1 - capSize.offset),
           ]}
           // Rotating +Y onto the panel's outward normal stands the cap up off
           // the slant rather than off the floor.
@@ -522,7 +515,7 @@ function MilkCartonImpl({
       <DeviceScreen
         {...shared}
         {...resolveSurface(regions.front, panelDefaults)}
-        width={body.width}
+        width={body.face.width}
         height={body.height}
         position={[0, base + body.height / 2, body.depth / 2 + LIFT]}
       >
@@ -534,7 +527,7 @@ function MilkCartonImpl({
         <DeviceScreen
           {...shared}
           {...resolveSurface(regions.back, panelDefaults)}
-          width={body.width}
+          width={body.face.width}
           height={body.height}
           position={[0, base + body.height / 2, -body.depth / 2 - LIFT]}
           rotation={[0, Math.PI, 0]}
@@ -548,7 +541,7 @@ function MilkCartonImpl({
         <DeviceScreen
           {...shared}
           {...resolveSurface(regions.right, endDefaults)}
-          width={body.depth}
+          width={body.face.depth}
           height={body.height}
           position={[body.width / 2 + LIFT, base + body.height / 2, 0]}
           rotation={[0, Math.PI / 2, 0]}
@@ -560,7 +553,7 @@ function MilkCartonImpl({
         <DeviceScreen
           {...shared}
           {...resolveSurface(regions.left, endDefaults)}
-          width={body.depth}
+          width={body.face.depth}
           height={body.height}
           position={[-body.width / 2 - LIFT, base + body.height / 2, 0]}
           rotation={[0, -Math.PI / 2, 0]}
@@ -569,9 +562,11 @@ function MilkCartonImpl({
         </DeviceScreen>
       )}
 
-      {/* live roof panels. Both are the same surface on the same slant, so the
-          back one is the front one seen from the other side: half a turn of
-          the group, then the identical local pose. */}
+      {/* live roof panels: the straight run of each slope, between the eave
+          fillet and the ridge flat, full width - the slope's side edges are
+          the creases it folds into the ears on. Both are the same surface on
+          the same slant, so the back one is the front one seen from the other
+          side: half a turn of the group, then the identical local pose. */}
       {([1, -1] as const).map((s) => {
         const slot = s === 1 ? regions.gableFront : regions.gableBack
         if (slot == null) return null
@@ -579,13 +574,13 @@ function MilkCartonImpl({
           <group key={`gable-${s}`} rotation-y={s === 1 ? 0 : Math.PI}>
             <DeviceScreen
               {...shared}
-              {...resolveSurface(slot, panelDefaults)}
+              {...resolveSurface(slot, roofDefaults)}
               width={body.width}
-              height={gable.slant}
+              height={gable.panel.length}
               position={[
                 0,
-                eave + gable.rise / 2 + normalY * LIFT,
-                body.depth / 4 + normalZ * LIFT,
+                eave + gable.panel.centerY + normalY * ROOF_LIFT,
+                gable.panel.centerZ + normalZ * ROOF_LIFT,
               ]}
               rotation={[-tilt, 0, 0]}
             >

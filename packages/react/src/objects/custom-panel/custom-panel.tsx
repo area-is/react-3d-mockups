@@ -1,7 +1,13 @@
 import * as React from 'react'
-import { RoundedBox } from '@react-three/drei'
+import * as THREE from 'three'
 import type { ThreeElements } from '@react-three/fiber'
-import { CUSTOM_PANEL, CUSTOM_PANEL_REGIONS, customPanelScale, type CustomSizeMm } from '../../core'
+import {
+  CUSTOM_PANEL,
+  CUSTOM_PANEL_REGIONS,
+  customPanelScale,
+  roundedRectShape,
+  type CustomSizeMm,
+} from '../../core'
 import { DeviceScreen } from '../../screen/device-screen'
 import { collectSlots, createSlots, resolveSurface, type SurfaceProps } from '../../slots'
 
@@ -52,8 +58,32 @@ function CustomPanelImpl({
   const w = size.width * scale
   const h = size.height * scale
   const t = Math.max(0.012, (size.thickness ?? CUSTOM_PANEL.thickness) * scale)
-  const radius = Math.min(cornerRadius * scale, t / 2 - 0.001, 0.2)
+  /*
+   * The corner rounding is IN THE FACE - a die-cut corner on a flat sheet -
+   * so the stock is a rounded rectangle extruded to its thickness, with the
+   * edges merely softened. It used to be a rounded box, which rounds the
+   * edges by the same amount as the corners: a 20 mm corner radius rounded
+   * the edges by 20 mm too, and the print, sized to the whole face, hung that
+   * far past the flat on every side.
+   */
+  const radius = Math.max(0, Math.min(cornerRadius * scale, Math.min(w, h) / 2 - 0.001))
+  const bevel = Math.min(0.004, t / 2 - 0.001)
 
+  const bodyGeometry = React.useMemo(() => {
+    const shape = roundedRectShape(w - bevel * 2, h - bevel * 2, Math.max(0, radius - bevel))
+    const depth = t - bevel * 2
+    const geometry = new THREE.ExtrudeGeometry(shape, {
+      depth,
+      bevelEnabled: bevel > 0,
+      bevelThickness: bevel,
+      bevelSize: bevel,
+      bevelSegments: 2,
+      curveSegments: 16,
+    })
+    geometry.translate(0, 0, -depth / 2)
+    return geometry
+  }, [w, h, t, radius, bevel])
+  React.useEffect(() => () => bodyGeometry.dispose(), [bodyGeometry])
 
   const surfaceDefaults = {
     surfaceBackground,
@@ -63,14 +93,14 @@ function CustomPanelImpl({
   const faceProps = {
     width: w,
     height: h,
-    radius: Math.max(radius, 0),
+    radius,
   }
 
   return (
     <group {...groupProps}>
-      <RoundedBox args={[w, h, t]} radius={Math.max(radius, 0.004)}>
+      <mesh geometry={bodyGeometry}>
         <meshPhysicalMaterial color={color} metalness={0} roughness={0.65} />
-      </RoundedBox>
+      </mesh>
 
       <DeviceScreen
         {...faceProps}

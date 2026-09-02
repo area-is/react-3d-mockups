@@ -141,8 +141,10 @@ function doorGlassShape(): THREE.Shape {
  */
 function buildFullWrapClip(pxPerUnit: number, mirrored: boolean, overWindows: boolean): string {
   const { rockerY, wheels, profile } = VAN
-  // Keep the wrap just inside the shell's beveled edge.
-  const inset = 0.01
+  // Keep the wrap just inside the shell's beveled edge: matches the in-plane
+  // `bevelSize` of the shell ExtrudeGeometry, so the artwork ends where the
+  // flat cap does instead of overhanging onto the bevel.
+  const inset = 0.015
   const X = (x: number) => ((mirrored ? profile.noseX - x : x - profile.tailX) * pxPerUnit).toFixed(1)
   const Y = (y: number) => ((profile.roofY - y) * pxPerUnit).toFixed(1)
   const P = (x: number, y: number) => `${X(x)} ${Y(y)}`
@@ -774,8 +776,10 @@ function VanImpl({
         <meshPhysicalMaterial color="#141619" metalness={0.3} roughness={0.65} />
       </RoundedBox>
       {/* license-plate recess between grille and bumper, sized off the plate
-          so the surround stays even if the plate format ever changes */}
-      <RoundedBox args={[0.03, VAN.plate.height + 0.01, VAN.plate.width + 0.02]} radius={0.012} position={[2.82, -0.42, 0]}>
+          so the surround stays even if the plate format ever changes. A
+          RoundedBox's flat face is only (h - 2r) x (w - 2r), so pad by
+          2r + 0.004 per axis to keep 2 mm of flat plinth all round the plate */}
+      <RoundedBox args={[0.03, VAN.plate.height + 0.032, VAN.plate.width + 0.032]} radius={0.012} position={[2.82, -0.42, 0]}>
         <meshPhysicalMaterial color="#dfe2e6" metalness={0.1} roughness={0.5} />
       </RoundedBox>
       {plateSlot != null && (
@@ -878,7 +882,8 @@ function VanImpl({
       <RoundedBox args={[0.03, 0.17, 0.34]} radius={0.012} position={[-2.822, -0.78, -0.3]}>
         <meshPhysicalMaterial color="#15171a" metalness={0.2} roughness={0.7} />
       </RoundedBox>
-      <RoundedBox args={[0.014, VAN.plate.height + 0.01, VAN.plate.width + 0.01]} radius={0.008} position={[-2.834, -0.78, -0.3]}>
+      {/* flat face of a RoundedBox is (h - 2r) x (w - 2r): pad by 2r + 0.004 so the plate sits on flat plinth */}
+      <RoundedBox args={[0.014, VAN.plate.height + 0.024, VAN.plate.width + 0.024]} radius={0.008} position={[-2.834, -0.78, -0.3]}>
         <meshPhysicalMaterial color="#e6e9ed" metalness={0.05} roughness={0.5} />
       </RoundedBox>
       {plateSlot != null && (

@@ -21,8 +21,9 @@
 import type { MockupFraming, MockupMetrics, RegionSpec } from '../../regions'
 
 export const SHOPPING_BAG = {
-  /** The bag: width (x), height (y), gusset depth (z). */
-  body: { width: 3.368, height: 4.421, depth: 1.474, radius: 0.02 },
+  /** The bag: width (x), height (y), gusset depth (z). The walls are cut
+   * square, so the faces carry no corner radius. */
+  body: { width: 3.368, height: 4.421, depth: 1.474 },
   /** Wall stock thickness (visual). */
   wall: 0.014,
   /** How far the side-gusset crease pulls inward at the mouth (it dies to
@@ -50,7 +51,7 @@ export const SHOPPING_BAG_SIZE_MM: ShoppingBagSizeMm = { width: 320, height: 420
 
 /** Everything the renderer needs to build a bag of a given size. */
 export interface ShoppingBagLayout {
-  body: { width: number; height: number; depth: number; radius: number }
+  body: { width: number; height: number; depth: number }
   wall: number
   gusset: number
   handle: { radius: number; tube: number; rise: number; patch: { width: number; height: number } }
@@ -69,7 +70,7 @@ export function shoppingBagLayout(size: ShoppingBagSizeMm = SHOPPING_BAG_SIZE_MM
   const height = size.height * scale
   const depth = size.depth * scale
   return {
-    body: { width, height, depth, radius: SHOPPING_BAG.body.radius },
+    body: { width, height, depth },
     wall: SHOPPING_BAG.wall,
     // crease depth follows the gusset, but never folds past ~mid-panel
     gusset: Math.min(depth * 0.061, width * 0.1),
@@ -105,7 +106,7 @@ export const SHOPPING_BAG_METRICS = {
     const one = {
       width: body.width,
       height: body.height,
-      radius: body.radius,
+      radius: 0,
       resolution: SHOPPING_BAG.resolution,
     }
     return { front: one, back: one }

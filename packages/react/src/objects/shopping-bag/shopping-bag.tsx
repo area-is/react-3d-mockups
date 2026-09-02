@@ -154,7 +154,9 @@ function ShoppingBagImpl({
   const faceProps = {
     width: body.width,
     height: body.height,
-    radius: body.radius,
+    // square corners: the walls are sharp boxGeometry, so rounding the
+    // artwork would only expose bare kraft at the corners
+    radius: 0,
   }
 
   // handle hardware hangs from the rim in proportion to the handle itself

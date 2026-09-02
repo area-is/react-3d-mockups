@@ -80,8 +80,10 @@ function roundedHolePath(minX: number, minY: number, maxX: number, maxY: number,
  */
 function buildFullSideClip(pxPerUnit: number, mirrored: boolean, overWindows: boolean): string {
   const { skirtY, wheels, profile, windowBand, doors, driverWindow } = BUS
-  // Keep the wrap just inside the shell's beveled edge.
-  const inset = 0.01
+  // Keep the wrap just inside the shell's beveled edge: matches the in-plane
+  // `bevelSize` of the shell ExtrudeGeometry, so the artwork ends where the
+  // flat cap does instead of overhanging onto the bevel.
+  const inset = 0.015
   const margin = 0.004
   const X = (x: number) => ((mirrored ? profile.noseX - x : x - profile.tailX) * pxPerUnit).toFixed(1)
   const Y = (y: number) => ((profile.roofY - y) * pxPerUnit).toFixed(1)

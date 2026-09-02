@@ -77,26 +77,32 @@ export function mailerBoxMmPerUnit(size: MailerBoxSizeMm = MAILER_BOX_SIZE_MM): 
   return Math.max(size.width, size.height, size.depth) / MAILER_BOX.body.width
 }
 
-/** Live geometry of all six panels. */
+/**
+ * Live geometry of all six panels: each is the flat of its face - the face
+ * less the edge rounding on every side, which is curve rather than print
+ * surface - with square corners.
+ */
 export const MAILER_BOX_METRICS = {
   mmPerUnit: ({ size }) => mailerBoxMmPerUnit(size),
   regions: ({ size }) => {
     const { body } = mailerBoxLayout(size)
     const { resolution } = MAILER_BOX
+    const inset = body.radius * 2
+    const flat = { width: body.width - inset, height: body.height - inset, depth: body.depth - inset }
     const pxPerUnit = resolution / body.width
     const face = (width: number, height: number) => ({
       width,
       height,
-      radius: body.radius,
+      radius: 0,
       resolution: Math.round(width * pxPerUnit),
     })
     return {
-      top: face(body.width, body.depth),
-      front: face(body.width, body.height),
-      back: face(body.width, body.height),
-      right: face(body.depth, body.height),
-      left: face(body.depth, body.height),
-      bottom: face(body.width, body.depth),
+      top: face(flat.width, flat.depth),
+      front: face(flat.width, flat.height),
+      back: face(flat.width, flat.height),
+      right: face(flat.depth, flat.height),
+      left: face(flat.depth, flat.height),
+      bottom: face(flat.width, flat.depth),
     }
   },
 } as const satisfies MockupMetrics<{ size?: MailerBoxSizeMm }>

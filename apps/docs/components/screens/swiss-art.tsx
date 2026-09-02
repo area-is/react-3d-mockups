@@ -36,13 +36,13 @@ import type { PatternDefinition } from 'tabbied'
 /*  Ink                                                                */
 /* ------------------------------------------------------------------ */
 
-const PAPER = '#efede6'
-const INK = '#141414'
-const SIGNAL = '#e1341e'
+export const PAPER = '#efede6'
+export const INK = '#141414'
+export const SIGNAL = '#e1341e'
 
-const FONT = 'var(--font-inter), Inter, system-ui, -apple-system, "Segoe UI", sans-serif'
+export const FONT = 'var(--font-inter), Inter, system-ui, -apple-system, "Segoe UI", sans-serif'
 
-interface Tone {
+export interface Tone {
   ground: string
   text: string
   /** Palette handed to the pattern: background first, then its marks. */
@@ -83,7 +83,7 @@ function luminance(hex: string): number {
  * shapes: mid-tone boards (olive, slate) carry white better than the contrast
  * ratio alone suggests.
  */
-function materialTone(material: string): Tone {
+export function materialTone(material: string): Tone {
   const ink = luminance(material) < 0.35 ? PAPER : INK
   return { ground: 'transparent', text: ink, palette: ['transparent', ink, SIGNAL] }
 }
@@ -136,7 +136,7 @@ const RESEED_MS = 2600
  * Tabbied drops ticks under `prefers-reduced-motion`, on a hidden tab, and for
  * anything scrolled out of view, so none of this runs when it should not.
  */
-function Pattern({
+export function Pattern({
   pattern,
   seed,
   palette,
@@ -162,7 +162,7 @@ function Pattern({
 }
 
 /** Uppercase micro-type: the index, the section, the colophon. */
-function Micro({ children, style }: { children: ReactNode; style?: CSSProperties }) {
+export function Micro({ children, style }: { children: ReactNode; style?: CSSProperties }) {
   return (
     <span
       style={{
@@ -199,14 +199,14 @@ function Title({ children, style }: { children: ReactNode; style?: CSSProperties
   )
 }
 
-const rule = (color: string): CSSProperties => ({
+export const rule = (color: string): CSSProperties => ({
   height: '0.5cqmin',
   minHeight: 1,
   background: color,
   flex: 'none',
 })
 
-const sheet = (tone: Tone): CSSProperties => ({
+export const sheet = (tone: Tone): CSSProperties => ({
   width: '100%',
   height: '100%',
   boxSizing: 'border-box',
@@ -554,19 +554,6 @@ export const SwissSleeve = () => (
     kicker="Long play"
     title={'Concentric'}
     meta="Side A · 33⅓"
-  />
-)
-
-export const SwissCarton = () => (
-  <SwissStack
-    pattern={chase}
-    seed="carton-bars"
-    tone="paper"
-    grid="4x6"
-    index="11"
-    kicker="Vollmilch"
-    title={'Milch\n1 L'}
-    meta="Pasteurisiert · 3.5%"
   />
 )
 
