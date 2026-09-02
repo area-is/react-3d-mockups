@@ -77,6 +77,7 @@ an object sets the clock, the meters and the ink.
 | `date` | `string` | - | The date beside the clock, as iPadOS shows it when "Show Date in Status Bar" is on. iPad only. |
 | `signal` | `number` | `4` | Cellular bars lit, 0-4. |
 | `wifi` | `number` | `3` | Wi-Fi arcs lit, 0-3. |
+| `wifiGeneration` | `number` | - | The small `6` or `7` One UI hangs off the Wi-Fi fan on a Wi-Fi 6 or 7 network. One UI only. |
 | `battery` | `number` | `1` | Charge level, 0-1. |
 | `batteryState` | `'normal' \| 'charging' \| 'low'` | `'normal'` | Colours the fill, and adds the bolt. |
 | `batteryPercent` | `boolean` | iOS `false`, One UI `true` | Show the charge as a number, where each system puts it: inside the iPhone's capsule, as `100%` beside the iPad's, inside One UI's pill. One UI 8.5 always shows it, so it is on there by default; off draws the older outline capsule. |

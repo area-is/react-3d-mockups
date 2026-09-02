@@ -268,6 +268,11 @@ export interface StatusBarContent {
   signal?: number
   /** Wi-Fi arcs lit, 0-3. */
   wifi?: number
+  /**
+   * The Wi-Fi generation badge - the small `6` or `7` One UI hangs off the
+   * fan on a Wi-Fi 6 or 7 network. One UI only; off unless set.
+   */
+  wifiGeneration?: number
   /** Charge level, 0-1. */
   battery?: number
   batteryState?: StatusBarBattery
@@ -284,9 +289,12 @@ export interface StatusBarContent {
 }
 
 /** Fully resolved content, defaults applied. */
-export type ResolvedStatusBarContent = Required<Omit<StatusBarContent, 'carrier' | 'date'>> & {
+export type ResolvedStatusBarContent = Required<
+  Omit<StatusBarContent, 'carrier' | 'date' | 'wifiGeneration'>
+> & {
   carrier?: string
   date?: string
+  wifiGeneration?: number
 }
 
 export const STATUS_BAR_DEFAULTS: ResolvedStatusBarContent = {
