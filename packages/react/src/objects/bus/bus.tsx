@@ -643,14 +643,16 @@ function BusImpl({
             </group>
           )
         })}
+        {/* route-number box behind the curb-side corner of the glass, above
+            the wipers' parked line, with the faint warmth of its LEDs */}
         {(() => {
           const at = onGlass(0.36)
           return (
             <RoundedBox
-              args={[0.01, 0.13, 0.26]}
+              args={[0.01, 0.11, 0.24]}
               radius={0.004}
               smoothness={1} bevelSegments={1}
-              position={[at.x + 0.006, glassBottom + 0.1, 0.36]}
+              position={[at.x + 0.006, glassBottom + 0.19, 0.36]}
               rotation-y={at.rotY}
             >
               <meshPhysicalMaterial color="#0b0d10" emissive="#ffb340" emissiveIntensity={0.07} roughness={0.3} clearcoat={1} />

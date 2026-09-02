@@ -11,22 +11,51 @@ import {
   VAN_FULL_WRAP_RESOLUTION,
   type VanCoverage,
 } from '../../core'
-import { DeviceScreen } from '../../screen/device-screen'
+import { DeviceScreen, SCREEN_MASK_INSET } from '../../screen/device-screen'
 import { collectSlots, createSlots, resolveSurface, type SurfaceProps } from '../../slots'
 import { RoadWheel, WheelArchFlare } from '../road-wheel'
 
 type GroupProps = ThreeElements['group']
 
+type Side = 1 | -1
+const SIDES = [1, -1] as const
 
+/** A carve rect in wrap coordinates, as the clip-path helpers take it. */
+interface CarveRect {
+  minX: number
+  minY: number
+  maxX: number
+  maxY: number
+  r: number
+}
 
 /**
- * Cab door, in world units on the side elevation - proportioned from
- * ProMaster/Sprinter-class references: the shut line runs up the vertical
- * B-pillar edge, across a flat top just under the roof rail, down a front
- * edge raked parallel to the A-pillar to the beltline, then near-vertical
- * to the wheel arch. The door glass repeats the same raked front with a
- * flat top and a vertical rear edge. Seams are a real door gap (~5 mm),
- * not the chunky bars of a cartoon.
+ * The shell is extruded with a small in-plane bevel: its flat side caps are
+ * the nominal profile, and the band between them stands this far outside it
+ * (the nose face, roof and rocker all sit `SHELL_FLARE` proud of their spec
+ * line across the middle of the width). Everything that has to clear the
+ * shell - roof hardware, the nose and tail faces - measures from here, and
+ * the full wrap's clip insets by the same amount so the livery ends where
+ * the flat side cap does instead of overhanging the bevel.
+ */
+const SHELL_FLARE = 0.015
+
+/**
+ * How far every hole in a blending occluder stands outside its DOM slit. The
+ * DOM's antialiased edge then lands under solid canvas rather than on the
+ * mask's own fade, where the two half-transparencies let a pixel of PAGE
+ * through; the recessed seam strip behind is wider still, so the hole only
+ * ever shows dark metal.
+ */
+const HOLE_MARGIN = 0.001
+
+/**
+ * Cab door, in world units on the side elevation - proportioned from step-van
+ * references: the shut line runs up the vertical B-pillar edge, across a flat
+ * top just under the roof rail, down a front edge raked parallel to the
+ * A-pillar to the beltline, then near-vertical to the wheel arch. The door
+ * glass repeats the same raked front with a flat top and a vertical rear
+ * edge. Seams are a real door gap (~5 mm), not the chunky bars of a cartoon.
  */
 const SEAM_RAKE = 0.486 // dx per unit dy of the windshield slope
 /** Raked front seam above the beltline, parallel to the A-pillar. */
@@ -34,6 +63,12 @@ const RAKED_SEAM = { bottomX: 2.06, bottomY: 0.245, topY: 0.8825, half: 0.0025 }
 const rakedSeamX = (y: number) => RAKED_SEAM.bottomX - SEAM_RAKE * (y - RAKED_SEAM.bottomY)
 /** Door glass frame: raked front, flat top, vertical rear (world coords). */
 const DOOR_GLASS = { rearX: 1.09, frontX: 2.03, bottomY: 0.26, topY: 0.8 } as const
+/**
+ * The rubber gasket seated around the door glass, as the outline grows past
+ * the glass edge. A wrap installer trims at the rubber, not at the glass, so
+ * the full wrap carves this outline and the gasket shows bare through it.
+ */
+const GLASS_GASKET = 0.024
 
 /**
  * The shell's side profile as a THREE shape - shared by the extruded body
@@ -88,9 +123,63 @@ const DOOR_SEAMS = [
   { minX: 1.042, maxX: 1.462, minY: -0.8595, maxY: -0.8545 },
 ] as const
 
-/** Rounded-rect hole path (world coords) matching one wrap-clip carve. */
-function roundedHolePath(minX: number, minY: number, maxX: number, maxY: number, r: number): THREE.Path {
-  const p = new THREE.Path()
+/**
+ * Vertical seams between the box's side sheets - a step-van body is skinned
+ * in ~1.2 m aluminium panels - placed clear of both arches so no seam ever
+ * runs into an opening, and stopped short of the top and bottom rails that
+ * cap them. Recessed like the door seams, they lie under the panel wrap and
+ * are carved as slits out of the full wrap, where a real film tucks in.
+ */
+const BOX_SEAMS = [-2.45, -1.05, 0.05].map((x) => ({
+  minX: x - 0.0025,
+  maxX: x + 0.0025,
+  minY: VAN.rockerY + 0.075,
+  maxY: VAN.profile.roofY - 0.075,
+}))
+
+/** Every axis-aligned slit a full side wrap carves. */
+const SIDE_SEAMS = [...DOOR_SEAMS, ...BOX_SEAMS]
+
+/**
+ * The rear frame and its roll-up door, in world x. The frame (corner posts,
+ * header, sill) and the door's slat crests share one face `REAR_FACE_X`; the
+ * grooves between slats sink `ROLLUP_CREST` behind it, and the live rear
+ * wrap floats just in front of the crests. Both rear wrap regions carve a
+ * slit over every groove - a film laid on a roll-up door follows each slat
+ * and tucks into every joint, which is exactly the look of a wrapped truck.
+ */
+const ROLLUP_CREST = 0.017
+const ROLLUP_GROOVE_HALF = 0.003
+/** Half the shut gap around the door leaf, between it and the frame. */
+const ROLLUP_EDGE_GAP = 0.003
+const REAR_FACE_X = VAN.profile.tailX - 0.035
+const ROLLUP_GROOVE_X = REAR_FACE_X + ROLLUP_CREST
+const REAR_SCREEN_X = REAR_FACE_X - 0.006
+const rollupPitch = (VAN.rollup.topY - VAN.rollup.bottomY) / VAN.rollup.slats
+/** Y of every slat joint on the door. */
+const ROLLUP_GROOVES = Array.from({ length: VAN.rollup.slats - 1 }, (_, i) => VAN.rollup.bottomY + rollupPitch * (i + 1))
+
+/**
+ * Tail-lamp stacks set into the rear corner posts - brake, turn, reverse -
+ * and the high-mount third brake light in the header. Each lens stands
+ * proud of the rear wrap plane, and the full wrap carves it to `margin` of
+ * clear install space, so the livery reads cut around lamps mounted ON the
+ * body rather than sunken behind it.
+ */
+const TAIL_LAMPS = {
+  z: 0.825,
+  width: 0.12,
+  margin: 0.006,
+  lenses: [
+    { y: 0.1, height: 0.2, color: '#8c1524', emissive: '#c11a30', intensity: 0.45 },
+    { y: -0.09, height: 0.12, color: '#f2a33c', emissive: '#ffb340', intensity: 0.4 },
+    { y: -0.23, height: 0.12, color: '#e9ecef', emissive: '#f2f5f8', intensity: 0.2 },
+  ],
+} as const
+const THIRD_BRAKE = { y: 1.0675, height: 0.035, halfWidth: 0.25, margin: 0.005 } as const
+
+/** Trace a rounded rect (world coords, counterclockwise) onto a path or shape. */
+function traceRoundedRect<T extends THREE.Path>(p: T, minX: number, minY: number, maxX: number, maxY: number, r: number): T {
   p.moveTo(minX + r, minY)
   p.lineTo(maxX - r, minY)
   p.quadraticCurveTo(maxX, minY, maxX, minY + r)
@@ -104,20 +193,47 @@ function roundedHolePath(minX: number, minY: number, maxX: number, maxY: number,
   return p
 }
 
+/** Rounded-rect hole path (world coords) matching one wrap-clip carve. */
+function roundedHolePath(minX: number, minY: number, maxX: number, maxY: number, r: number): THREE.Path {
+  return traceRoundedRect(new THREE.Path(), minX, minY, maxX, maxY, r)
+}
+
+/**
+ * The cab door glass outline, grown outward by `inflate` (0 for the glass
+ * itself, `GLASS_GASKET` for the rubber around it): rear and bottom edges
+ * move straight out, the raked front edge moves along its own normal, and
+ * the corner radii grow with it so the gasket stays concentric with the
+ * glass. One set of numbers feeds the glass mesh, the gasket plate, the
+ * occluder hole and (reverse-traced) the wrap clip.
+ */
+function doorGlassCorners(inflate = 0) {
+  const k = SEAM_RAKE
+  const rearX = DOOR_GLASS.rearX - inflate
+  const frontX = DOOR_GLASS.frontX + inflate * (Math.sqrt(1 + k * k) + k)
+  const bottomY = DOOR_GLASS.bottomY - inflate
+  const topY = DOOR_GLASS.topY + inflate
+  const ftX = frontX - k * (topY - bottomY)
+  const len = Math.hypot(ftX - frontX, topY - bottomY)
+  return {
+    rearX,
+    frontX,
+    bottomY,
+    topY,
+    ftX,
+    ux: (ftX - frontX) / len,
+    uy: (topY - bottomY) / len,
+    rB: 0.03 + inflate,
+    rT: 0.05 + inflate,
+  }
+}
+
 /**
  * The cab door glass as a THREE shape (world coords, counterclockwise):
  * raked front edge parallel to the A-pillar, flat top under the roof rail,
- * vertical rear edge - rounded corners. Shared by the glass mesh, the
- * blending occluder's hole and (reverse-traced) the wrap clip.
+ * vertical rear edge - rounded corners.
  */
-function doorGlassShape(): THREE.Shape {
-  const { rearX, frontX, bottomY, topY } = DOOR_GLASS
-  const ftX = frontX - SEAM_RAKE * (topY - bottomY)
-  const len = Math.hypot(ftX - frontX, topY - bottomY)
-  const ux = (ftX - frontX) / len
-  const uy = (topY - bottomY) / len
-  const rB = 0.03
-  const rT = 0.05
+function doorGlassShape(inflate = 0): THREE.Shape {
+  const { rearX, frontX, bottomY, topY, ftX, ux, uy, rB, rT } = doorGlassCorners(inflate)
   const s = new THREE.Shape()
   s.moveTo(rearX + rB, bottomY)
   s.lineTo(frontX - rB, bottomY)
@@ -141,10 +257,8 @@ function doorGlassShape(): THREE.Shape {
  */
 function buildFullWrapClip(pxPerUnit: number, mirrored: boolean, overWindows: boolean): string {
   const { rockerY, wheels, profile } = VAN
-  // Keep the wrap just inside the shell's beveled edge: matches the in-plane
-  // `bevelSize` of the shell ExtrudeGeometry, so the artwork ends where the
-  // flat cap does instead of overhanging onto the bevel.
-  const inset = 0.015
+  // Keep the wrap just inside the shell's beveled edge (see `SHELL_FLARE`).
+  const inset = SHELL_FLARE
   const X = (x: number) => ((mirrored ? profile.noseX - x : x - profile.tailX) * pxPerUnit).toFixed(1)
   const Y = (y: number) => ((profile.roofY - y) * pxPerUnit).toFixed(1)
   const P = (x: number, y: number) => `${X(x)} ${Y(y)}`
@@ -175,26 +289,22 @@ function buildFullWrapClip(pxPerUnit: number, mirrored: boolean, overWindows: bo
     `L ${P(tail + 0.09, top)} Q ${P(tail, top)} ${P(tail, top - 0.09)} ` +
     `L ${P(tail, bottom + 0.06)} Q ${P(tail, bottom)} ${P(tail + 0.06, bottom)} Z `
 
-  // Door glass, traced world-clockwise (reverse of the mesh shape): raked
-  // front parallel to the A-pillar, flat top, vertical rear edge.
-  const { rearX, frontX, bottomY: gB, topY: gT } = DOOR_GLASS
-  const ftX = frontX - SEAM_RAKE * (gT - gB)
-  const gLen = Math.hypot(ftX - frontX, gT - gB)
-  const gUx = (ftX - frontX) / gLen
-  const gUy = (gT - gB) / gLen
-  const rB2 = 0.03
-  const rT2 = 0.05
+  // The door glass AND its gasket, traced world-clockwise (reverse of the
+  // mesh shape): the film is cut at the rubber, so the carve is the gasket's
+  // outline, not the glass's.
+  const { rearX, frontX, bottomY: gB, topY: gT, ftX, ux: gUx, uy: gUy, rB: rB2, rT: rT2 } = doorGlassCorners(GLASS_GASKET)
   const glass =
     `M ${P(rearX + rB2, gB)} Q ${P(rearX, gB)} ${P(rearX, gB + rB2)} ` +
     `L ${P(rearX, gT - rT2)} Q ${P(rearX, gT)} ${P(rearX + rT2, gT)} ` +
     `L ${P(ftX - rT2, gT)} Q ${P(ftX, gT)} ${P(ftX - gUx * rT2, gT - gUy * rT2)} ` +
     `L ${P(frontX + gUx * rB2, gB + gUy * rB2)} Q ${P(frontX, gB)} ${P(frontX - rB2, gB)} Z `
 
-  // The cab-door shut lines are carved as slits - the crevice is a gap the
-  // film tucks into on a real wrap. No other hardware carves: the sides
-  // composite per-pixel ('blending'), so the proud mirror, handle and door
-  // track draw over the livery on their own - hardware remounted over vinyl.
-  const seams = DOOR_SEAMS.map((s) => clipRoundedRect(P, R, sweep, { ...s, r: 0.002 })).join('')
+  // The cab-door shut lines and the box's sheet seams are carved as slits -
+  // the crevice is a gap the film tucks into on a real wrap. No other
+  // hardware carves: the sides composite per-pixel ('blending'), so the
+  // proud rails, mirrors, handles and markers draw over the livery on their
+  // own - hardware remounted over vinyl.
+  const seams = SIDE_SEAMS.map((s) => clipRoundedRect(P, R, sweep, { ...s, r: 0.002 })).join('')
   // The raked front seam: a fixed-order parallelogram - the CSS x mirror
   // flips outline and hole winding together, so one point order serves
   // both sides.
@@ -207,13 +317,55 @@ function buildFullWrapClip(pxPerUnit: number, mirrored: boolean, overWindows: bo
 }
 
 /**
- * SVG path clipping the rear wrap. Both coverages carve the barn-door shut
- * line (a real van's center crevice stays visible through any wrap); the
- * full-coverage wrap additionally carves every taillight lamp, the third
- * brake light and the hinge knuckles - each to a slim install margin, so
- * the livery runs right up to the hardware and the lamps (which stand
- * slightly proud of the wrap plane) read mounted ON the wrap, not sunken.
+ * Everything a rear wrap carves, as rects in world (z, y). Both coverages
+ * carve the roll-up door's slat joints; the full-coverage wrap - which runs
+ * past the door leaf onto the frame - additionally carves the shut gap
+ * around the leaf, every tail-lamp lens and the third brake light, each to
+ * a slim install margin. Slits meet the door-edge slits exactly but never
+ * cross them: overlapping holes cancel back to filled under the nonzero rule.
  */
+function rearCarves(full: boolean): CarveRect[] {
+  const spec = full ? VAN.rearFull : VAN.rear
+  const halfW = spec.width / 2
+  const bottomY = spec.y - spec.height / 2
+  const { halfWidth, topY } = VAN.rollup
+  const g = ROLLUP_GROOVE_HALF
+  const carves: CarveRect[] = []
+  // Slat joints span the door leaf under a full wrap, the panel under a
+  // panel wrap - stopping 2 mm inside its outline.
+  const zMax = full ? halfWidth - 0.0025 : halfW - 0.002
+  for (const y of ROLLUP_GROOVES) carves.push({ minX: -zMax, maxX: zMax, minY: y - g, maxY: y + g, r: 0.002 })
+  if (!full) return carves
+  // The shut gap: up both door edges from the wrap's bottom, across the top.
+  for (const s of SIDES) {
+    carves.push({ minX: s * halfWidth - 0.0025, maxX: s * halfWidth + 0.0025, minY: bottomY + 0.002, maxY: topY - 0.0025, r: 0.002 })
+  }
+  carves.push({ minX: -halfWidth - 0.0025, maxX: halfWidth + 0.0025, minY: topY - 0.0025, maxY: topY + 0.0025, r: 0.002 })
+  for (const s of SIDES) {
+    for (const lens of TAIL_LAMPS.lenses) {
+      const m = TAIL_LAMPS.margin
+      const z = s * TAIL_LAMPS.z
+      carves.push({
+        minX: z - TAIL_LAMPS.width / 2 - m,
+        maxX: z + TAIL_LAMPS.width / 2 + m,
+        minY: lens.y - lens.height / 2 - m,
+        maxY: lens.y + lens.height / 2 + m,
+        r: 0.02,
+      })
+    }
+  }
+  const m = THIRD_BRAKE.margin
+  carves.push({
+    minX: -THIRD_BRAKE.halfWidth - m,
+    maxX: THIRD_BRAKE.halfWidth + m,
+    minY: THIRD_BRAKE.y - THIRD_BRAKE.height / 2 - m,
+    maxY: THIRD_BRAKE.y + THIRD_BRAKE.height / 2 + m,
+    r: 0.012,
+  })
+  return carves
+}
+
+/** SVG path clipping the rear wrap: its rounded outline minus `rearCarves`. */
 function buildRearClip(pxPerUnit: number, full: boolean): string {
   const spec = full ? VAN.rearFull : VAN.rear
   const halfW = spec.width / 2
@@ -222,73 +374,119 @@ function buildRearClip(pxPerUnit: number, full: boolean): string {
   // The rear plane faces −X; its CSS x axis runs along world +z unmirrored.
   const P = (z: number, y: number) => `${((z + halfW) * pxPerUnit).toFixed(1)} ${((topY - y) * pxPerUnit).toFixed(1)}`
   const R = (u: number) => (u * pxPerUnit).toFixed(1)
+  const outline = clipRoundedRectOutline(P, R, 1, { minX: -halfW, minY: bottomY, maxX: halfW, maxY: topY, r: spec.radius })
+  return (outline + rearCarves(full).map((c) => clipRoundedRect(P, R, 1, c)).join('')).trim()
+}
 
-  const outline = clipRoundedRectOutline(P, R, 1, {
-    minX: -halfW,
-    minY: bottomY,
-    maxX: halfW,
-    maxY: topY,
-    r: spec.radius,
-  })
-  // The center shut line between the barn doors.
-  const slit = clipRoundedRect(P, R, 1, {
-    minX: -0.008,
-    maxX: 0.008,
-    minY: bottomY + 0.002,
-    maxY: topY - 0.002,
-    r: 0.004,
-  })
-  if (!full) return (outline + slit).trim()
+/**
+ * Depth occluder for the rear wrap: the screen's own silhouette (held the
+ * standard hair inside the DOM edge) with a hole over every carve. Without
+ * it the default rectangular mask would clear the canvas across the slat
+ * slits too, and the PAGE would show through each joint instead of the dark
+ * groove behind. Built in the screen's local plane: x along world +z, y
+ * relative to the panel centre.
+ */
+function rearOccluderGeometry(full: boolean): THREE.BufferGeometry {
+  const spec = full ? VAN.rearFull : VAN.rear
+  const inset = Math.min(spec.width, spec.height) * SCREEN_MASK_INSET
+  const hw = spec.width / 2 - inset
+  const hh = spec.height / 2 - inset
+  const shape = traceRoundedRect(new THREE.Shape(), -hw, -hh, hw, hh, Math.max(0, spec.radius - inset))
+  for (const c of rearCarves(full)) {
+    const m = HOLE_MARGIN
+    shape.holes.push(roundedHolePath(c.minX - m, c.minY - spec.y - m, c.maxX + m, c.maxY - spec.y + m, c.r + m))
+  }
+  return new THREE.ShapeGeometry(shape, 8)
+}
 
-  // Each lamp carved individually - brake, turn, reverse - so the livery
-  // runs right up to every lens (bus-parity precision).
-  const lamps = ([1, -1] as const)
-    .flatMap((side) =>
-      (
-        [
-          { y0: -0.026, y1: 0.186 },
-          { y0: -0.181, y1: -0.039 },
-          { y0: -0.311, y1: -0.189 },
-        ] as const
-      ).map(({ y0, y1 }) =>
-        clipRoundedRect(P, R, 1, {
-          minX: side === 1 ? 0.774 : -0.906,
-          maxX: side === 1 ? 0.906 : -0.774,
-          minY: y0,
-          maxY: y1,
-          r: 0.02,
-        })
-      )
-    )
-    .join('')
-  // High-mount third brake light strip above the doors.
-  const brake = clipRoundedRect(P, R, 1, {
-    minX: -0.281,
-    maxX: 0.281,
-    minY: 1.0265,
-    maxY: 1.0735,
-    r: 0.012,
-  })
-  // Barn-door hinge knuckles at the outer door edges, two per side.
-  const hinges = ([1, -1] as const)
-    .flatMap((side) =>
-      (
-        [
-          { y0: 0.499, y1: 0.601 },
-          { y0: -0.301, y1: -0.199 },
-        ] as const
-      ).map(({ y0, y1 }) =>
-        clipRoundedRect(P, R, 1, {
-          minX: side === 1 ? 0.912 : -0.948,
-          maxX: side === 1 ? 0.948 : -0.912,
-          minY: y0,
-          maxY: y1,
-          r: 0.01,
-        })
-      )
-    )
-    .join('')
-  return (outline + slit + lamps + brake + hinges).trim()
+/**
+ * The cargo box roof is crowned - a shallow arch across the width so rain
+ * runs off - and the crown fades out over the cab, whose roof is the flat
+ * cap the profile draws. A hard-edged slab roof is the single biggest
+ * "toy" cue on a box body from any three-quarter view above eye level.
+ */
+const ROOF_CROWN = {
+  sag: 0.035,
+  x0: VAN.profile.tailX + 0.09,
+  x1: VAN.profile.roofStartX - 0.02,
+  halfWidth: VAN.body.width / 2 - VAN.body.bevel,
+} as const
+
+/** Crown height above the shell's roof band at (x, z). */
+function roofCrown(x: number, z: number): number {
+  const { sag, x0, x1, halfWidth } = ROOF_CROWN
+  const radius = (halfWidth * halfWidth + sag * sag) / (2 * sag)
+  const arc = Math.sqrt(Math.max(0, radius * radius - z * z)) - (radius - sag)
+  const ease = (t: number) => {
+    const u = Math.min(1, Math.max(0, t))
+    return u * u * (3 - 2 * u)
+  }
+  return arc * ease((x1 - x) / 0.5) * ease((x - x0) / 0.3)
+}
+
+/** Y of the roof skin at (x, z): the shell's flared roof band plus the crown. */
+const roofTop = (x: number, z: number) => VAN.profile.roofY + SHELL_FLARE + 0.002 + roofCrown(x, z)
+
+function roofCrownGeometry(): THREE.BufferGeometry {
+  const { x0, x1, halfWidth } = ROOF_CROWN
+  const nx = 40
+  const nz = 16
+  const positions: number[] = []
+  const indices: number[] = []
+  for (let i = 0; i <= nx; i++) {
+    const x = x0 + ((x1 - x0) * i) / nx
+    for (let j = 0; j <= nz; j++) {
+      const z = -halfWidth + (2 * halfWidth * j) / nz
+      positions.push(x, roofTop(x, z), z)
+    }
+  }
+  for (let i = 0; i < nx; i++) {
+    for (let j = 0; j < nz; j++) {
+      const a = i * (nz + 1) + j
+      const b = a + 1
+      const c = a + nz + 1
+      const d = c + 1
+      indices.push(a, b, c, b, d, c)
+    }
+  }
+  const geometry = new THREE.BufferGeometry()
+  geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3))
+  geometry.setIndex(indices)
+  geometry.computeVertexNormals()
+  return geometry
+}
+
+/**
+ * The roll-up door leaf as one extrusion: a stack of interlocking slats,
+ * each a flat face with chamfered top and bottom edges, dropping to the
+ * groove floor at every joint. The profile is drawn in (y, proudness) and
+ * extruded across the door width, so the whole door is one draw call whose
+ * shading sells the slats - the dark strips sunk in each groove do the rest.
+ */
+function rollupDoorGeometry(): THREE.BufferGeometry {
+  const { halfWidth, bottomY, topY, slats } = VAN.rollup
+  const g = ROLLUP_GROOVE_HALF
+  const chamfer = 0.012
+  const s = new THREE.Shape()
+  s.moveTo(bottomY, 0)
+  for (let i = 0; i < slats; i++) {
+    const y0 = bottomY + i * rollupPitch + (i === 0 ? ROLLUP_EDGE_GAP : g)
+    const y1 = bottomY + (i + 1) * rollupPitch - (i === slats - 1 ? ROLLUP_EDGE_GAP : g)
+    s.lineTo(y0, 0)
+    s.lineTo(y0 + chamfer, ROLLUP_CREST)
+    s.lineTo(y1 - chamfer, ROLLUP_CREST)
+    s.lineTo(y1, 0)
+  }
+  s.lineTo(topY, 0)
+  s.lineTo(topY, -0.004)
+  s.lineTo(bottomY, -0.004)
+  s.closePath()
+  const width = (halfWidth - ROLLUP_EDGE_GAP) * 2
+  const geometry = new THREE.ExtrudeGeometry(s, { depth: width, bevelEnabled: false })
+  // shape x → world y, shape y (proudness) → world −x, extrusion along z
+  geometry.rotateZ(Math.PI / 2)
+  geometry.translate(0, 0, -width / 2)
+  return geometry
 }
 
 export interface VanProps extends Omit<GroupProps, 'children' | 'color'>, SurfaceProps {
@@ -322,14 +520,18 @@ export interface VanProps extends Omit<GroupProps, 'children' | 'color'>, Surfac
 }
 
 /**
- * A procedurally built cargo van (generic Transit/Sprinter-style silhouette,
- * no brand): the shell is the side profile - clamshell hood, cowl break,
- * raked windshield, high roof, wheel-arch cutouts - extruded across the
- * width, with wheels (six-lug steel rims), glass, wipers, door shut lines,
- * a sliding-door step, roof ribs, antenna, lights, rear hinges and license
- * plate, mirrors and bumpers added on. The flat cargo side carries a live
- * vinyl-wrap panel for your livery - or, with `coverage="full"`, the whole
- * side elevation and the whole rear face. No 3D asset files are loaded.
+ * A procedurally built delivery step van (generic MT45 / Utilimaster-class
+ * walk-in body, no brand): the shell is the side profile - stub clamshell
+ * hood, cowl break, raked windshield, high roof, wheel-arch cutouts -
+ * extruded across the width, with a crowned box roof, dark wheel wells,
+ * dual rear wheels on eight-lug rims, gasketed cab glass behind a two-piece
+ * windshield, door shut lines and paddle handles, West-Coast mirrors,
+ * aluminium top, bottom and rub rails with rear corner caps, a slatted
+ * roll-up rear door with its latch bar, corner tail lamps, marker lights,
+ * a diamond-plate step bumper and mud flaps added on. The flat cargo side
+ * carries a live vinyl-wrap panel for your livery - or, with
+ * `coverage="full"`, the whole side elevation and the whole rear face. No
+ * 3D asset files are loaded.
  *
  * The origin is the body center; the road sits `VAN.groundY` below it. The
  * wrap panel faces +Z. Must be rendered inside a react-three-fiber `<Canvas>`
@@ -338,7 +540,7 @@ export interface VanProps extends Omit<GroupProps, 'children' | 'color'>, Surfac
  * ```tsx
  * <Van coverage="full">
  *   <YourLivery />
- *   <Van.Rear><RearDoors /></Van.Rear>
+ *   <Van.Rear><RearDoor /></Van.Rear>
  *   <Van.LicensePlate>AREA 51</Van.LicensePlate>
  * </Van>
  * ```
@@ -353,7 +555,7 @@ function VanImpl({
   ...groupProps
 }: VanProps) {
   const regions = collectSlots(children, VAN_REGIONS)
-  const { body, rockerY, wheels, profile, wrap, rear: rearPanel, rearFull } = VAN
+  const { body, rockerY, wheels, profile, wrap, rear: rearPanel, rearFull, rollup } = VAN
   // Screens occlude against OTHER registered bodies only - see the bus's
   // matching note: the convex shell's own ray hits at oblique angles were
   // false positives, and the backface culler covers every view the body
@@ -437,10 +639,11 @@ function VanImpl({
     if (!fullWrap) return null
     const build = (mirroredSide: boolean) => {
       const s = vanProfileShape()
-      if (!overGlass) s.holes.push(doorGlassShape())
-      for (const seam of DOOR_SEAMS) s.holes.push(roundedHolePath(seam.minX, seam.minY, seam.maxX, seam.maxY, 0.002))
+      const m = HOLE_MARGIN
+      if (!overGlass) s.holes.push(doorGlassShape(GLASS_GASKET + m))
+      for (const seam of SIDE_SEAMS) s.holes.push(roundedHolePath(seam.minX - m, seam.minY - m, seam.maxX + m, seam.maxY + m, 0.002 + m))
       const rakedHole = new THREE.Path()
-      const rh = RAKED_SEAM.half
+      const rh = RAKED_SEAM.half + m
       const rTopX = rakedSeamX(RAKED_SEAM.topY)
       rakedHole.moveTo(rTopX - rh, RAKED_SEAM.topY)
       rakedHole.lineTo(rTopX + rh, RAKED_SEAM.topY)
@@ -462,10 +665,14 @@ function VanImpl({
     },
     [sideOccluderGeometries]
   )
+  // The rear wrap always carves the door's slat joints, so it always needs
+  // its own mask with matching holes (see `rearOccluderGeometry`).
+  const rearOccluder = React.useMemo(() => rearOccluderGeometry(fullWrap), [fullWrap])
+  React.useEffect(() => () => rearOccluder.dispose(), [rearOccluder])
   // Only the full-coverage sides need a custom depth mask: their DOM is
   // clipped to the wrap outline, so the mask must carve the same glass out of
   // the silhouette - otherwise the livery's rectangle would hide the mirrors,
-  // handles, track and hinges that stand proud of it. A panel ad is a plain
+  // handles, rails and markers that stand proud of it. A panel ad is a plain
   // rect, and its own silhouette already is its mask.
   const sideScreenOcclusion = (blendGeometry?: THREE.BufferGeometry) =>
     fullWrap ? { occluderGeometry: blendGeometry } : {}
@@ -479,7 +686,7 @@ function VanImpl({
       bevelThickness: body.bevel,
       // a small in-plane bevel keeps the profile within ~15mm of its nominal
       // outline, so glass planes and lamps placed on it stay visible
-      bevelSize: 0.015,
+      bevelSize: SHELL_FLARE,
       bevelSegments: 3,
       curveSegments: 24,
     })
@@ -504,19 +711,30 @@ function VanImpl({
 
   // Cab door glass: raked front parallel to the A-pillar, flat top and a
   // vertical rear edge with rounded corners, like the references. Built in
-  // world side-elevation coords from the same shape as the wrap carve.
+  // world side-elevation coords from the same shape as the wrap carve, with
+  // the gasket a flat plate of the inflated outline behind it.
   const doorGlassGeometry = React.useMemo(
     () => new THREE.ExtrudeGeometry(doorGlassShape(), { depth: 0.02, bevelEnabled: false }),
     []
   )
+  const gasketGeometry = React.useMemo(() => new THREE.ShapeGeometry(doorGlassShape(GLASS_GASKET), 12), [])
+  const roofGeometry = React.useMemo(roofCrownGeometry, [])
+  const doorGeometry = React.useMemo(rollupDoorGeometry, [])
 
   React.useEffect(() => {
     return () => {
       shellGeometry.dispose()
       doorGlassGeometry.dispose()
+      gasketGeometry.dispose()
+      roofGeometry.dispose()
+      doorGeometry.dispose()
     }
-  }, [shellGeometry, doorGlassGeometry])
+  }, [shellGeometry, doorGlassGeometry, gasketGeometry, roofGeometry, doorGeometry])
 
+  // Automotive paint is a dielectric base under a clear lacquer - modelling
+  // it as half-metal desaturates the body into dull sheet and kills the wet
+  // highlight the clearcoat is there to provide.
+  const paint = { color, metalness: 0.08, roughness: 0.42, clearcoat: 1, clearcoatRoughness: 0.06, envMapIntensity: 1.1 }
   // Automotive laminate: a near-black dielectric with a mirror-smooth
   // surface, so the studio panels read as reflections instead of grey plastic.
   const glassMaterial = (
@@ -529,171 +747,44 @@ function VanImpl({
       envMapIntensity={1.8}
     />
   )
-  const trimMaterial = <meshPhysicalMaterial color="#23262b" metalness={0.1} roughness={0.7} />
+  // Matte black trim, soft rubber, satin aluminium extrusions, bright
+  // chrome, dark steel - the four finishes a work truck is built from.
+  const trim = { color: '#23262b', metalness: 0.1, roughness: 0.7 }
+  const rubber = { color: '#131417', metalness: 0, roughness: 0.95 }
+  const alu = { color: '#c3c7cd', metalness: 0.85, roughness: 0.38, envMapIntensity: 1.0 }
+  const chrome = { color: '#e2e6ea', metalness: 1, roughness: 0.14, envMapIntensity: 1.3 }
+  const steel = { color: '#1b1e23', metalness: 0.5, roughness: 0.65 }
+  const seam = { color: '#191b1f', metalness: 0.2, roughness: 0.8 }
+  const trimMaterial = <meshPhysicalMaterial {...trim} />
+
+  // Where the outer tires sit: their outboard sidewall just inside the side
+  // cap, so the wheel fills its arch instead of hiding up inside it.
+  const wheelZ = body.width / 2 - 0.135
+  // Rails break at the arches like the sheets they cap: rear corner to the
+  // rear arch, rear arch to the front arch, ending at the B-pillar seam.
+  const railSpans = [
+    [profile.tailX + 0.07, wheels.rearX - wheels.archRadius - 0.03],
+    [wheels.rearX + wheels.archRadius + 0.03, 1.02],
+  ] as const
+  const flankH = profile.roofY - rockerY
+  const flankMidY = (profile.roofY + rockerY) / 2
 
   return (
     <group {...groupProps}>
-      {/* painted shell. Automotive paint is a dielectric base under a clear
-          lacquer - modelling it as half-metal (the old `metalness: 0.4`)
-          desaturates the body into dull sheet and kills the wet highlight the
-          clearcoat is there to provide. */}
+      {/* painted shell */}
       <mesh geometry={shellGeometry}>
-        <meshPhysicalMaterial
-          color={color}
-          metalness={0.08}
-          roughness={0.42}
-          clearcoat={1}
-          clearcoatRoughness={0.06}
-          envMapIntensity={1.1}
-        />
+        <meshPhysicalMaterial {...paint} />
       </mesh>
 
-      {/* pressed body form. A panel van's sides ARE flat - that is what makes
-          them wrap surfaces - but they are not featureless: a lower feature
-          line runs the cargo length and the rocker steps in below it. Both sit
-          a hair BEHIND the wrap plane, so a livery covers them exactly like
-          vinyl following the body contour, and they show on bare paint (and
-          below the panel wrap, which starts higher up the side). */}
-      {([1, -1] as const).map((side) => (
-        <group key={side} position-z={side * (body.width / 2 - 0.004)}>
-          {/* both lines break at the wheel arches, like the pressings they
-              stand in for - a stripe running straight over an arch opening
-              is the giveaway of a decal */}
-          {(
-            [
-              [profile.tailX + 0.12, wheels.rearX - wheels.archRadius - 0.02],
-              [wheels.rearX + wheels.archRadius + 0.02, wheels.frontX - wheels.archRadius - 0.02],
-            ] as const
-          ).flatMap(([x0, x1]) =>
-            [
-              { y: -0.55, height: 0.022 },
-              { y: rockerY + 0.115, height: 0.032 },
-            ].map(({ y, height }) => (
-              <mesh key={`${x0}${y}`} position={[(x0 + x1) / 2, y, 0]}>
-                <boxGeometry args={[x1 - x0, height, 0.014]} />
-                <meshPhysicalMaterial color={color} metalness={0.08} roughness={0.6} clearcoat={0.7} />
-              </mesh>
-            ))
-          )}
-        </group>
-      ))}
-
-      {/* mud flaps behind the rear wheels */}
-      {([1, -1] as const).map((side) => (
-        <mesh
-          key={side}
-          position={[wheels.rearX - wheels.archRadius - 0.06, rockerY - 0.16, side * (body.width / 2 - 0.14)]}
-        >
-          <boxGeometry args={[0.02, 0.34, wheels.width + 0.06]} />
-          <meshPhysicalMaterial color="#131417" metalness={0} roughness={0.95} />
-        </mesh>
-      ))}
-
-      {/* windshield on the cowl-to-header segment, with the two wipers
-          parked across its base - the give-away cue of a working cab */}
-      <group position={[windshield.mid[0], windshield.mid[1], 0]} rotation-z={windshield.tilt}>
-        <mesh rotation-y={Math.PI / 2}>
-          <planeGeometry args={[body.width - 0.28, windshield.length - 0.1]} />
-          {glassMaterial}
-        </mesh>
-        {[-0.28, 0.36].map((z) => (
-          <mesh
-            key={z}
-            position={[0.024, -windshield.length / 2 + 0.28, z]}
-            rotation-x={0.42}
-          >
-            <boxGeometry args={[0.014, 0.5, 0.028]} />
-            <meshPhysicalMaterial color="#0e0f12" metalness={0.2} roughness={0.85} />
-          </mesh>
-        ))}
-      </group>
-
-      {/* cab door glass, both sides - trapezoid following the A-pillar. The
-          0.02 extrusion runs +z from its base, so each side gets its own base
-          z that leaves the outer face ~10mm proud of the shell - or recessed
-          beneath the wrap plane when that side's wrap covers the glass. */}
-      {[1, -1].map((side) => {
-        const covered =
-          fullWrap && (side === 1 ? overGlass && regions.curbSide != null : overGlass && regions.streetSide != null)
-        // The 0.02 extrusion always runs +z, so each side's base leaves the
-        // outer face ~10mm proud - or tucked under the wrap plane when the
-        // wrap covers the glass.
-        const base =
-          side === 1 ? body.width / 2 - (covered ? 0.018 : 0.01) : -body.width / 2 + (covered ? 0.002 : -0.01)
-        return (
-          <mesh key={side} geometry={doorGlassGeometry} position={[0, 0, base]}>
-            {glassMaterial}
-          </mesh>
-        )
-      })}
-
-      {/* cab door handles, just under the window sill near the rear edge -
-          where the references mount them */}
-      {[1, -1].map((side) => (
-        <RoundedBox key={side} args={[0.162, 0.029, 0.022]} radius={0.01} position={[1.26, 0.12, side * 0.982]}>
-          {trimMaterial}
-        </RoundedBox>
-      ))}
-
-      {/* cab-door shut lines, both sides: the A-pillar seam, the B-pillar
-          seam and the sill seam joining them (`DOOR_SEAMS`) - recessed dark
-          strips sunk to the body surface, a GAP like the rear barn-door
-          crevice, never a ridge. The full wrap carves matching slits (and
-          the blending occluder matching holes), so the crevice reads
-          through any livery. Each strip is a hair wider/taller than its
-          slit so no background ever peeks through the carve edge. */}
-      {[1, -1].map((side) => {
-        const rTopX = rakedSeamX(RAKED_SEAM.topY)
-        const rakedLen = Math.hypot(RAKED_SEAM.bottomX - rTopX, RAKED_SEAM.topY - RAKED_SEAM.bottomY)
-        const rakedAngle = Math.atan2(RAKED_SEAM.topY - RAKED_SEAM.bottomY, rTopX - RAKED_SEAM.bottomX)
-        return (
-          <group key={side}>
-            {DOOR_SEAMS.map((s) => (
-              <mesh
-                key={`${s.minX}${s.minY}`}
-                position={[(s.minX + s.maxX) / 2, (s.minY + s.maxY) / 2, side * 0.9715]}
-              >
-                <boxGeometry args={[s.maxX - s.minX + 0.008, s.maxY - s.minY + 0.008, 0.01]} />
-                <meshPhysicalMaterial color="#191b1f" metalness={0.2} roughness={0.8} />
-              </mesh>
-            ))}
-            {/* raked front seam strip, rotated along the A-pillar slope */}
-            <mesh
-              position={[(rTopX + RAKED_SEAM.bottomX) / 2, (RAKED_SEAM.topY + RAKED_SEAM.bottomY) / 2, side * 0.9715]}
-              rotation-z={rakedAngle}
-            >
-              <boxGeometry args={[rakedLen + 0.008, RAKED_SEAM.half * 2 + 0.008, 0.01]} />
-              <meshPhysicalMaterial color="#191b1f" metalness={0.2} roughness={0.8} />
-            </mesh>
-          </group>
-        )
-      })}
-
-      {/* curb-side sliding-door track groove, from behind the door to the
-          rear quarter - above the panel wrap's top edge (y 1.10), and held
-          proud of the full wrap's DOM plane so blending draws it over any
-          livery like remounted hardware */}
-      <mesh position={[-0.8, 1.14, body.width / 2 + 0.012]}>
-        <boxGeometry args={[3.4, 0.038, 0.018]} />
-        <meshPhysicalMaterial color="#191b1f" metalness={0.2} roughness={0.8} />
+      {/* crowned box roof, fading into the flat cab roof (see `roofCrown`) */}
+      <mesh geometry={roofGeometry}>
+        <meshPhysicalMaterial {...paint} roughness={0.5} />
       </mesh>
-
-      {/* black entry step under the curb-side sliding door, hung below the
-          rocker line - outside every wrap region, so it stays visible */}
-      <RoundedBox args={[1.55, 0.09, 0.06]} radius={0.02} position={[0.05, -0.93, body.width / 2 - 0.02]}>
-        {trimMaterial}
+      {/* roof vent over the cargo bay, and the stub antenna on the cab roof */}
+      <RoundedBox args={[0.36, 0.05, 0.36]} radius={0.015} smoothness={2} bevelSegments={2} position={[-1.9, roofTop(-1.9, 0) + 0.02, 0]}>
+        <meshPhysicalMaterial color="#3a3d43" metalness={0.2} roughness={0.75} />
       </RoundedBox>
-
-      {/* high-roof cap detail: shallow longitudinal ribs pressed into the
-          sheet metal, the Sprinter/Transit roof signature from a 3/4 view */}
-      {[-0.54, -0.18, 0.18, 0.54].map((z) => (
-        <RoundedBox key={z} args={[3.5, 0.014, 0.055]} radius={0.006} position={[-0.68, profile.roofY + 0.005, z]}>
-          <meshPhysicalMaterial color={color} metalness={0.4} roughness={0.35} clearcoat={1} clearcoatRoughness={0.15} />
-        </RoundedBox>
-      ))}
-
-      {/* stub antenna on the front roof corner */}
-      <group position={[1.08, profile.roofY, -0.56]}>
+      <group position={[1.08, roofTop(1.08, -0.56), -0.56]}>
         <mesh position={[0, 0.015, 0]}>
           <cylinderGeometry args={[0.022, 0.028, 0.03, 12]} />
           {trimMaterial}
@@ -704,82 +795,316 @@ function VanImpl({
         </mesh>
       </group>
 
-      {/* fog-light recesses set into the bumper corners */}
-      {[1, -1].map((side) => (
-        <RoundedBox key={side} args={[0.06, 0.095, 0.17]} radius={0.025} position={[2.845, -0.7, side * 0.6]}>
-          <meshPhysicalMaterial color="#0e0f11" metalness={0.3} roughness={0.55} />
-        </RoundedBox>
-      ))}
-
-      {/* running gear: dark wheel-well liners fill the arch openings, axles
-          tie each wheel pair together, and an underbody pan closes the gap
-          between the rockers - so the wheels read as attached, not floating */}
+      {/* wheel wells: a dark half-tub inside each arch, open to both sides,
+          so the opening reads as a recess with a wheel in it instead of a
+          hole printed on a flat slab - plus the rolled arch lip */}
       {([wheels.frontX, wheels.rearX] as const).map((x) => (
-        <group key={x}>
-          <mesh position={[x, rockerY + (wheels.archRadius + 0.02) / 2, 0]}>
-            <boxGeometry args={[wheels.archRadius * 2 - 0.04, wheels.archRadius + 0.02, body.width - 0.08]} />
-            <meshPhysicalMaterial color="#0c0d10" metalness={0} roughness={1} />
+        <group key={x} position={[x, rockerY, 0]}>
+          <mesh rotation-x={Math.PI / 2}>
+            <cylinderGeometry
+              args={[
+                wheels.archRadius - SHELL_FLARE - 0.006,
+                wheels.archRadius - SHELL_FLARE - 0.006,
+                body.width - 0.07,
+                24,
+                1,
+                true,
+                Math.PI / 2,
+                Math.PI,
+              ]}
+            />
+            <meshPhysicalMaterial color="#0b0c0f" metalness={0} roughness={1} side={THREE.DoubleSide} />
           </mesh>
-          <mesh rotation-x={Math.PI / 2} position={[x, wheels.centerY, 0]}>
-            <cylinderGeometry args={[0.055, 0.055, body.width - 0.34, 12]} />
-            <meshPhysicalMaterial color="#191b1f" metalness={0.5} roughness={0.7} />
-          </mesh>
+          {SIDES.map((s) => (
+            <WheelArchFlare key={s} radius={wheels.archRadius} tube={0.02} z={s * (body.width / 2)} side={s} />
+          ))}
         </group>
       ))}
+
+      {/* running gear: axles (a differential pumpkin on the rear one), the
+          underbody pan closing the gap between the rockers, and the fuel
+          tank slung under the curb side - what a low camera sees */}
+      <mesh rotation-x={Math.PI / 2} position={[wheels.frontX, wheels.centerY, 0]}>
+        <cylinderGeometry args={[0.05, 0.05, body.width - 0.36, 12]} />
+        <meshPhysicalMaterial {...steel} />
+      </mesh>
+      <mesh rotation-x={Math.PI / 2} position={[wheels.rearX, wheels.centerY, 0]}>
+        <cylinderGeometry args={[0.06, 0.06, body.width - 0.36, 12]} />
+        <meshPhysicalMaterial {...steel} />
+      </mesh>
+      <mesh position={[wheels.rearX, wheels.centerY + 0.01, 0.05]}>
+        <sphereGeometry args={[0.13, 16, 12]} />
+        <meshPhysicalMaterial {...steel} />
+      </mesh>
       <mesh position={[0, rockerY - 0.075, 0]}>
         <boxGeometry args={[body.length - 0.9, 0.15, body.width - 0.4]} />
         <meshPhysicalMaterial color="#0d0e11" metalness={0.1} roughness={0.95} />
       </mesh>
+      <RoundedBox args={[0.8, 0.2, 0.42]} radius={0.05} smoothness={2} bevelSegments={2} position={[0.3, -1.0, 0.55]}>
+        <meshPhysicalMaterial {...steel} roughness={0.55} />
+      </RoundedBox>
 
-      {/* wheels: lathed tires with bulging sidewalls, rounded shoulders and
-          grooved tread, on dished six-lug steel rims - plus the rolled lip
-          around each arch, without which the openings read as holes printed
-          on a flat slab */}
+      {/* wheels: lathed tires on eight-lug rims - singles up front, duals on
+          the drive axle, the inner tire set back by the spec's `dualOffset`.
+          Dual rears are the one glance-cue that says "truck" rather than
+          "van", and the inner tire shows between the arch and the ground */}
       {([wheels.frontX, wheels.rearX] as const).map((x) =>
-        ([1, -1] as const).map((side) => (
-          <React.Fragment key={`${x}${side}`}>
+        SIDES.map((s) => (
+          <React.Fragment key={`${x}${s}`}>
             <RoadWheel
               radius={wheels.radius}
               width={wheels.width}
-              face={side}
-              lugs={6}
-              rimColor="#b7bcc4"
-              position={[x, wheels.centerY, side * (body.width / 2 - 0.145)]}
+              face={s}
+              lugs={8}
+              rimRatio={0.6}
+              rimColor="#c9cdd3"
+              position={[x, wheels.centerY, s * wheelZ]}
             />
-            {/* dark moulded arch trim, as on work-spec vans - it stands
-                proud of the wrap plane, so it reads as trim the installer cut
-                around rather than a stripe of the wrong body colour on top of
-                the livery */}
-            <WheelArchFlare
-              radius={wheels.archRadius}
-              tube={0.026}
-              z={side * (body.width / 2)}
-              side={side}
-              position={[x, rockerY, 0]}
-            />
+            {x === wheels.rearX && (
+              <RoadWheel
+                radius={wheels.radius}
+                width={wheels.width}
+                face={s === 1 ? -1 : 1}
+                lugs={8}
+                rimRatio={0.6}
+                rimColor="#c9cdd3"
+                position={[x, wheels.centerY, s * (wheelZ - wheels.dualOffset)]}
+              />
+            )}
           </React.Fragment>
         ))
       )}
 
-      {/* wide slatted grille spanning the nose between the headlights, just
-          under the hood's front edge (the modern Transit/Sprinter face) */}
-      <RoundedBox args={[0.05, 0.28, 1.12]} radius={0.03} position={[2.81, -0.11, 0]}>
-        <meshPhysicalMaterial color="#15171b" metalness={0.3} roughness={0.6} />
-      </RoundedBox>
-      {[-0.045, -0.125, -0.205].map((y) => (
-        <RoundedBox key={y} args={[0.055, 0.036, 1.06]} radius={0.015} position={[2.815, y, 0]}>
-          <meshPhysicalMaterial color="#2c3037" metalness={0.5} roughness={0.45} />
-        </RoundedBox>
+      {/* the box's side hardware, both flanks: aluminium top rail under the
+          roof edge, bottom rail along the rocker, a black rub rail at the
+          floor line (both broken at the arches), the rear corner cap, side
+          marker lights and the cab-door step. All stand proud of the wrap
+          plane, so a full livery reads cut around them like remounted trim */}
+      {SIDES.map((s) => {
+        const z = s * (body.width / 2)
+        return (
+          <group key={s}>
+            <mesh position={[(profile.tailX + 0.07 + 1.28) / 2, profile.roofY - 0.03, z + s * 0.015]}>
+              <boxGeometry args={[1.28 - (profile.tailX + 0.07), 0.06, 0.03]} />
+              <meshPhysicalMaterial {...alu} />
+            </mesh>
+            {railSpans.map(([x0, x1]) => (
+              <React.Fragment key={x0}>
+                <mesh position={[(x0 + x1) / 2, rockerY + 0.03, z + s * 0.015]}>
+                  <boxGeometry args={[x1 - x0, 0.06, 0.03]} />
+                  <meshPhysicalMaterial {...alu} />
+                </mesh>
+                <mesh position={[(x0 + x1) / 2, -0.5, z + s * 0.01]}>
+                  <boxGeometry args={[x1 - x0, 0.05, 0.02]} />
+                  <meshPhysicalMaterial {...trim} />
+                </mesh>
+              </React.Fragment>
+            ))}
+            {/* rear corner cap, the side leg (the rear leg is with the tail) */}
+            <mesh position={[profile.tailX + 0.035, flankMidY, z + s * 0.015]}>
+              <boxGeometry args={[0.07, flankH, 0.03]} />
+              <meshPhysicalMaterial {...alu} />
+            </mesh>
+            {/* amber marker at the front of the box, red at the rear, on the top rail */}
+            {(
+              [
+                { x: 0.9, color: '#f2a33c', emissive: '#ffb340' },
+                { x: -2.62, color: '#8c1524', emissive: '#c11a30' },
+              ] as const
+            ).map(({ x, color: c, emissive }) => (
+              <RoundedBox key={x} args={[0.07, 0.03, 0.014]} radius={0.006} smoothness={2} bevelSegments={2} position={[x, profile.roofY - 0.03, z + s * 0.037]}>
+                <meshPhysicalMaterial color={c} emissive={emissive} emissiveIntensity={0.4} roughness={0.25} clearcoat={1} />
+              </RoundedBox>
+            ))}
+            <RoundedBox args={[0.36, 0.05, 0.07]} radius={0.015} smoothness={2} bevelSegments={2} position={[1.25, rockerY - 0.045, z - s * 0.035]}>
+              {trimMaterial}
+            </RoundedBox>
+          </group>
+        )
+      })}
+
+      {/* shut lines and sheet seams, both sides: the cab door's A-pillar,
+          B-pillar and sill seams (`DOOR_SEAMS`) and the box's panel joints
+          (`BOX_SEAMS`) - recessed dark strips sunk to the body surface, a
+          GAP like the rear door's shut gap, never a ridge. The full wrap
+          carves matching slits (and the blending occluder matching holes),
+          so every crevice reads through the livery. Each strip is a hair
+          wider than its hole so no background ever peeks through the edge. */}
+      {SIDES.map((s) => {
+        const rTopX = rakedSeamX(RAKED_SEAM.topY)
+        const rakedLen = Math.hypot(RAKED_SEAM.bottomX - rTopX, RAKED_SEAM.topY - RAKED_SEAM.bottomY)
+        const rakedAngle = Math.atan2(RAKED_SEAM.topY - RAKED_SEAM.bottomY, rTopX - RAKED_SEAM.bottomX)
+        return (
+          <group key={s}>
+            {SIDE_SEAMS.map((seamRect) => (
+              <mesh
+                key={`${seamRect.minX}${seamRect.minY}`}
+                position={[(seamRect.minX + seamRect.maxX) / 2, (seamRect.minY + seamRect.maxY) / 2, s * 0.9715]}
+              >
+                <boxGeometry args={[seamRect.maxX - seamRect.minX + 0.008, seamRect.maxY - seamRect.minY + 0.008, 0.01]} />
+                <meshPhysicalMaterial {...seam} />
+              </mesh>
+            ))}
+            {/* raked front seam strip, rotated along the A-pillar slope */}
+            <mesh
+              position={[(rTopX + RAKED_SEAM.bottomX) / 2, (RAKED_SEAM.topY + RAKED_SEAM.bottomY) / 2, s * 0.9715]}
+              rotation-z={rakedAngle}
+            >
+              <boxGeometry args={[rakedLen + 0.008, RAKED_SEAM.half * 2 + 0.008, 0.01]} />
+              <meshPhysicalMaterial {...seam} />
+            </mesh>
+          </group>
+        )
+      })}
+
+      {/* cab door glass, both sides, seated in its rubber gasket: the gasket
+          is a flat plate of the inflated outline lying on the body, the
+          glass an extrusion standing ~10 mm proud of it - or tucked beneath
+          the wrap plane when that side's wrap runs over the glass */}
+      {SIDES.map((s) => {
+        const covered =
+          fullWrap && (s === 1 ? overGlass && regions.curbSide != null : overGlass && regions.streetSide != null)
+        // The 0.02 extrusion always runs +z, so each side's base leaves the
+        // outer face ~10mm proud - or under the wrap plane when covered.
+        const base = s === 1 ? body.width / 2 - (covered ? 0.018 : 0.01) : -body.width / 2 + (covered ? 0.002 : -0.01)
+        return (
+          <group key={s}>
+            <mesh geometry={gasketGeometry} position={[0, 0, s * (body.width / 2 + 0.002)]}>
+              <meshPhysicalMaterial color="#0f1013" metalness={0} roughness={0.9} side={THREE.DoubleSide} />
+            </mesh>
+            <mesh geometry={doorGlassGeometry} position={[0, 0, base]}>
+              {glassMaterial}
+            </mesh>
+          </group>
+        )
+      })}
+
+      {/* paddle door handles in a dark recess under the sill, near the
+          rear edge of the door where the references mount them */}
+      {SIDES.map((s) => (
+        <group key={s}>
+          <mesh position={[1.3, 0.12, s * (body.width / 2 + 0.01)]}>
+            <boxGeometry args={[0.2, 0.065, 0.012]} />
+            <meshPhysicalMaterial color="#111317" metalness={0.2} roughness={0.8} />
+          </mesh>
+          <RoundedBox args={[0.15, 0.028, 0.018]} radius={0.008} smoothness={2} bevelSegments={2} position={[1.31, 0.125, s * (body.width / 2 + 0.022)]}>
+            <meshPhysicalMaterial {...chrome} roughness={0.3} />
+          </RoundedBox>
+        </group>
       ))}
-      {/* slim lower intake in the bumper band */}
-      <RoundedBox args={[0.05, 0.12, 1.2]} radius={0.02} position={[2.86, -0.72, 0]}>
-        <meshPhysicalMaterial color="#141619" metalness={0.3} roughness={0.65} />
+
+      {/* West-Coast mirrors: a tall head hung on a tubular frame - two arms
+          off the A-pillar at the beltline and below, a vertical tube joining
+          them - with a convex spot mirror beneath. The long reach past the
+          body is what a walk-in cab needs to see down its own flank */}
+      {SIDES.map((s) => {
+        const frameZ = s * 1.19
+        const headZ = s * 1.215
+        return (
+          <group key={s}>
+            {[0.74, 0.32].map((y) => (
+              <mesh key={y} rotation-x={Math.PI / 2} position={[2.03, y, s * ((body.width / 2 + 1.19) / 2)]}>
+                <cylinderGeometry args={[0.012, 0.012, 1.19 - body.width / 2 + 0.02, 8]} />
+                {trimMaterial}
+              </mesh>
+            ))}
+            <mesh position={[2.03, 0.53, frameZ]}>
+              <cylinderGeometry args={[0.012, 0.012, 0.5, 8]} />
+              {trimMaterial}
+            </mesh>
+            <RoundedBox args={[0.045, 0.36, 0.17]} radius={0.012} smoothness={2} bevelSegments={2} position={[2.0, 0.53, headZ]}>
+              {trimMaterial}
+            </RoundedBox>
+            <mesh position={[1.976, 0.53, headZ]} rotation-y={-Math.PI / 2}>
+              <planeGeometry args={[0.15, 0.33]} />
+              {glassMaterial}
+            </mesh>
+            <mesh position={[1.995, 0.27, headZ]} rotation-z={Math.PI / 2}>
+              <cylinderGeometry args={[0.05, 0.05, 0.02, 16]} />
+              {trimMaterial}
+            </mesh>
+            <mesh position={[1.983, 0.27, headZ]} rotation-y={-Math.PI / 2}>
+              <circleGeometry args={[0.042, 16]} />
+              {glassMaterial}
+            </mesh>
+          </group>
+        )
+      })}
+
+      {/* windshield on the cowl-to-header segment: a two-piece screen in a
+          black rubber gasket, split by the centre post every walk-in cab
+          has, with the two wipers parked across its base - the give-away
+          cue of a working cab. Local x is the glass normal, y runs up the rake */}
+      <group position={[windshield.mid[0], windshield.mid[1], 0]} rotation-z={windshield.tilt}>
+        <mesh rotation-y={Math.PI / 2} position-x={-0.006}>
+          <planeGeometry args={[body.width - 0.2, windshield.length - 0.04]} />
+          <meshPhysicalMaterial color="#0f1013" metalness={0} roughness={0.9} />
+        </mesh>
+        <mesh rotation-y={Math.PI / 2}>
+          <planeGeometry args={[body.width - 0.28, windshield.length - 0.1]} />
+          {glassMaterial}
+        </mesh>
+        <mesh position-x={0.004}>
+          <boxGeometry args={[0.008, windshield.length - 0.1, 0.035]} />
+          <meshPhysicalMaterial color="#0f1013" metalness={0} roughness={0.9} />
+        </mesh>
+        {[-0.3, 0.34].map((z) => (
+          <group key={z} position={[0.024, -windshield.length / 2 + 0.26, z]} rotation-x={0.42}>
+            <mesh>
+              <boxGeometry args={[0.01, 0.46, 0.014]} />
+              <meshPhysicalMaterial color="#0e0f12" metalness={0.2} roughness={0.85} />
+            </mesh>
+            <mesh position={[0.006, 0.02, 0]}>
+              <boxGeometry args={[0.006, 0.42, 0.03]} />
+              <meshPhysicalMaterial color="#0e0f12" metalness={0.2} roughness={0.85} />
+            </mesh>
+          </group>
+        ))}
+      </group>
+
+      {/* ---- the nose ---- */}
+      {/* chromed grille surround between the headlamps under the hood line,
+          a dark mesh panel behind it and five bright slats across */}
+      <RoundedBox args={[0.05, 0.3, 0.92]} radius={0.03} smoothness={2} bevelSegments={2} position={[profile.noseX + 0.012, -0.1, 0]}>
+        <meshPhysicalMaterial {...chrome} />
       </RoundedBox>
-      {/* license-plate recess between grille and bumper, sized off the plate
+      <mesh position={[profile.noseX + 0.02, -0.1, 0]}>
+        <boxGeometry args={[0.03, 0.26, 0.86]} />
+        <meshPhysicalMaterial color="#101215" metalness={0.3} roughness={0.7} />
+      </mesh>
+      {[-2, -1, 0, 1, 2].map((k) => (
+        <mesh key={k} position={[profile.noseX + 0.04, -0.1 + k * 0.048, 0]}>
+          <boxGeometry args={[0.02, 0.026, 0.84]} />
+          <meshPhysicalMaterial color="#2c3037" metalness={0.6} roughness={0.4} />
+        </mesh>
+      ))}
+      {/* headlamp clusters flanking the grille, tops kissing the hood line:
+          a dark housing, a clear lens over two projector reflectors, and
+          the amber turn signal wrapping the outer end */}
+      {SIDES.map((s) => (
+        <group key={s} position={[0, -0.09, s * 0.72]}>
+          <RoundedBox args={[0.07, 0.25, 0.46]} radius={0.03} smoothness={2} bevelSegments={2} position={[profile.noseX + 0.005, 0, 0]}>
+            <meshPhysicalMaterial color="#0d0f12" metalness={0.3} roughness={0.55} />
+          </RoundedBox>
+          <RoundedBox args={[0.02, 0.19, 0.36]} radius={0.02} smoothness={2} bevelSegments={2} position={[profile.noseX + 0.042, 0, -s * 0.04]}>
+            <meshPhysicalMaterial color="#dfe5ee" emissive="#dfe9f5" emissiveIntensity={0.15} metalness={0.2} roughness={0.15} clearcoat={1} />
+          </RoundedBox>
+          {[-0.13, 0.05].map((dz) => (
+            <mesh key={dz} rotation-z={Math.PI / 2} position={[profile.noseX + 0.055, 0, s * dz]}>
+              <cylinderGeometry args={[0.052, 0.052, 0.016, 16]} />
+              <meshPhysicalMaterial color="#f4f7fb" emissive="#eef4ff" emissiveIntensity={0.6} metalness={0.4} roughness={0.15} clearcoat={1} />
+            </mesh>
+          ))}
+          <RoundedBox args={[0.02, 0.15, 0.07]} radius={0.015} smoothness={2} bevelSegments={2} position={[profile.noseX + 0.04, 0, s * 0.185]}>
+            <meshPhysicalMaterial color="#f2a33c" emissive="#ffb340" emissiveIntensity={0.4} roughness={0.25} clearcoat={1} />
+          </RoundedBox>
+        </group>
+      ))}
+      {/* license-plate plinth between grille and bumper, sized off the plate
           so the surround stays even if the plate format ever changes. A
           RoundedBox's flat face is only (h - 2r) x (w - 2r), so pad by
           2r + 0.004 per axis to keep 2 mm of flat plinth all round the plate */}
-      <RoundedBox args={[0.03, VAN.plate.height + 0.032, VAN.plate.width + 0.032]} radius={0.012} position={[2.82, -0.42, 0]}>
+      <RoundedBox args={[0.03, VAN.plate.height + 0.032, VAN.plate.width + 0.032]} radius={0.012} smoothness={2} bevelSegments={2} position={[profile.noseX + 0.012, -0.42, 0]}>
         <meshPhysicalMaterial color="#dfe2e6" metalness={0.1} roughness={0.5} />
       </RoundedBox>
       {plateSlot != null && (
@@ -798,92 +1123,123 @@ function VanImpl({
           {plateFace}
         </DeviceScreen>
       )}
-      {/* headlight units flanking the grille, tops kissing the hood line,
-          reaching out to the corners with the amber segment wrapping the end */}
-      {[1, -1].map((side) => (
-        <group key={side}>
-          <RoundedBox args={[0.06, 0.22, 0.44]} radius={0.03} position={[2.81, -0.07, side * 0.72]}>
-            <meshPhysicalMaterial
-              color="#e8edf4"
-              emissive="#dfe9f5"
-              emissiveIntensity={0.25}
-              metalness={0.3}
-              roughness={0.2}
-              clearcoat={1}
-            />
-          </RoundedBox>
-          <RoundedBox args={[0.055, 0.16, 0.09]} radius={0.025} position={[2.8, -0.09, side * 0.93]}>
-            <meshPhysicalMaterial
-              color="#f2a33c"
-              emissive="#ffb340"
-              emissiveIntensity={0.4}
-              roughness={0.25}
-              clearcoat={1}
-            />
-          </RoundedBox>
-        </group>
-      ))}
-
-      {/* black plastic bumper band low on the nose, wrapping the corners -
-          a slim skid band, not a half-height mass */}
-      <RoundedBox args={[0.14, 0.3, body.width + 0.02]} radius={0.05} position={[2.8, -0.73, 0]}>
+      {/* black bumper across the nose, wrapping the corners: a deep upper
+          bar stepped over a set-back lower bar - the relief that separates
+          a moulded bumper from a painted band - with round fog lamps in the
+          lower bar and a valance closing under it */}
+      <RoundedBox args={[0.16, 0.14, body.width + 0.05]} radius={0.04} smoothness={2} bevelSegments={2} position={[profile.noseX + 0.03, -0.66, 0]}>
         {trimMaterial}
       </RoundedBox>
-      <RoundedBox args={[0.1, 0.16, body.width + 0.02]} radius={0.04} position={[-2.77, -0.82, 0]}>
+      <RoundedBox args={[0.13, 0.13, body.width + 0.05]} radius={0.035} smoothness={2} bevelSegments={2} position={[profile.noseX + 0.015, -0.8, 0]}>
         {trimMaterial}
       </RoundedBox>
-      {/* taillight clusters: brake (red) / turn (amber) / reverse (white),
-          stacked at hand height on the rear corners like real van lamps -
-          standing ~20 mm proud of the wrap plane, so a full livery reads as
-          cut around lamps mounted ON the doors, not sunken behind them */}
-      {[1, -1].map((side) => (
-        <group key={side} position={[-2.821, 0, side * 0.84]}>
-          <RoundedBox args={[0.05, 0.2, 0.12]} radius={0.02} position={[0, 0.08, 0]}>
-            <meshPhysicalMaterial color="#8c1524" emissive="#c11a30" emissiveIntensity={0.45} roughness={0.25} clearcoat={1} />
-          </RoundedBox>
-          <RoundedBox args={[0.05, 0.13, 0.12]} radius={0.02} position={[0, -0.11, 0]}>
-            <meshPhysicalMaterial color="#f2a33c" emissive="#ffb340" emissiveIntensity={0.4} roughness={0.25} clearcoat={1} />
-          </RoundedBox>
-          <RoundedBox args={[0.05, 0.11, 0.12]} radius={0.02} position={[0, -0.25, 0]}>
-            <meshPhysicalMaterial color="#e9ecef" emissive="#f2f5f8" emissiveIntensity={0.2} roughness={0.25} clearcoat={1} />
-          </RoundedBox>
-        </group>
-      ))}
-
-      {/* rear barn-door center shut line, running the full door height -
-          every rear wrap carves a slit over it, so the crevice stays
-          visible through any livery like on a real wrapped van */}
-      <mesh position={[-2.822, 0.12, 0]}>
-        <boxGeometry args={[0.01, 1.96, 0.014]} />
-        <meshPhysicalMaterial color="#191b1f" metalness={0.2} roughness={0.8} />
+      <mesh position={[profile.noseX - 0.01, -0.89, 0]}>
+        <boxGeometry args={[0.06, 0.05, body.width - 0.5]} />
+        <meshPhysicalMaterial {...rubber} />
       </mesh>
-      {/* high-mount third brake light strip above the doors, proud of the
-          wrap plane and carved out of the full wrap */}
-      <RoundedBox args={[0.025, 0.035, 0.55]} radius={0.01} position={[-2.83, 1.05, 0]}>
+      {SIDES.map((s) => (
+        <group key={s} position={[profile.noseX + 0.08, -0.8, s * 0.6]}>
+          <mesh rotation-z={Math.PI / 2}>
+            <cylinderGeometry args={[0.052, 0.052, 0.02, 16]} />
+            <meshPhysicalMaterial color="#0e0f11" metalness={0.3} roughness={0.55} />
+          </mesh>
+          <mesh rotation-z={Math.PI / 2} position-x={0.008}>
+            <cylinderGeometry args={[0.04, 0.04, 0.012, 16]} />
+            <meshPhysicalMaterial color="#e8edf4" emissive="#dfe9f5" emissiveIntensity={0.25} metalness={0.3} roughness={0.2} clearcoat={1} />
+          </mesh>
+        </group>
+      ))}
+
+      {/* ---- the tail ---- */}
+      {/* rear frame around the door opening: corner posts, header and sill,
+          all on one face `REAR_FACE_X` level with the door's slat crests */}
+      {SIDES.map((s) => (
+        <mesh key={s} position={[(REAR_FACE_X + profile.tailX) / 2, flankMidY, s * ((rollup.halfWidth + ROLLUP_EDGE_GAP + body.width / 2) / 2)]}>
+          <boxGeometry args={[profile.tailX - REAR_FACE_X, flankH, body.width / 2 - rollup.halfWidth - ROLLUP_EDGE_GAP]} />
+          <meshPhysicalMaterial {...paint} />
+        </mesh>
+      ))}
+      <mesh position={[(REAR_FACE_X + profile.tailX) / 2, (rollup.topY + ROLLUP_EDGE_GAP + profile.roofY) / 2, 0]}>
+        <boxGeometry args={[profile.tailX - REAR_FACE_X, profile.roofY - rollup.topY - ROLLUP_EDGE_GAP, rollup.halfWidth * 2]} />
+        <meshPhysicalMaterial {...paint} />
+      </mesh>
+      <mesh position={[(REAR_FACE_X + profile.tailX) / 2, (rockerY + rollup.bottomY - ROLLUP_EDGE_GAP) / 2, 0]}>
+        <boxGeometry args={[profile.tailX - REAR_FACE_X, rollup.bottomY - ROLLUP_EDGE_GAP - rockerY, rollup.halfWidth * 2]} />
+        <meshPhysicalMaterial {...paint} />
+      </mesh>
+      {/* the roll-up door leaf, its slat joints and the shut gap around it
+          sunk as dark strips behind the crests - every rear wrap carves a
+          slit over each joint, so the slats read through any livery */}
+      <mesh geometry={doorGeometry} position-x={ROLLUP_GROOVE_X}>
+        <meshPhysicalMaterial {...paint} />
+      </mesh>
+      {ROLLUP_GROOVES.map((y) => (
+        <mesh key={y} position={[ROLLUP_GROOVE_X - 0.003, y, 0]}>
+          <boxGeometry args={[0.006, 0.01, rollup.halfWidth * 2 + 0.012]} />
+          <meshPhysicalMaterial {...seam} />
+        </mesh>
+      ))}
+      {SIDES.map((s) => (
+        <mesh key={s} position={[ROLLUP_GROOVE_X - 0.003, (rollup.bottomY + rollup.topY) / 2, s * rollup.halfWidth]}>
+          <boxGeometry args={[0.006, rollup.topY - rollup.bottomY + 0.01, 0.01]} />
+          <meshPhysicalMaterial {...seam} />
+        </mesh>
+      ))}
+      <mesh position={[ROLLUP_GROOVE_X - 0.003, rollup.topY, 0]}>
+        <boxGeometry args={[0.006, 0.01, rollup.halfWidth * 2 + 0.01]} />
+        <meshPhysicalMaterial {...seam} />
+      </mesh>
+      {/* latch bar across the bottom slat with its centre handle, and the
+          pull strap hanging off it - under every rear wrap's bottom edge */}
+      <mesh position={[REAR_FACE_X - 0.0175, -0.72, 0]}>
+        <boxGeometry args={[0.035, 0.045, rollup.halfWidth * 2 + 0.02]} />
+        <meshPhysicalMaterial {...alu} />
+      </mesh>
+      <RoundedBox args={[0.03, 0.03, 0.12]} radius={0.008} smoothness={2} bevelSegments={2} position={[REAR_FACE_X - 0.05, -0.72, 0]}>
+        {trimMaterial}
+      </RoundedBox>
+      <mesh position={[REAR_FACE_X - 0.04, -0.79, 0.4]}>
+        <boxGeometry args={[0.008, 0.1, 0.045]} />
+        <meshPhysicalMaterial {...rubber} />
+      </mesh>
+      {/* tail-lamp stacks in the corner posts: brake / turn / reverse */}
+      {SIDES.map((s) => (
+        <group key={s} position={[REAR_FACE_X - 0.02, 0, s * TAIL_LAMPS.z]}>
+          {TAIL_LAMPS.lenses.map((lens) => (
+            <RoundedBox key={lens.y} args={[0.04, lens.height, TAIL_LAMPS.width]} radius={0.015} smoothness={2} bevelSegments={2} position={[0, lens.y, 0]}>
+              <meshPhysicalMaterial color={lens.color} emissive={lens.emissive} emissiveIntensity={lens.intensity} roughness={0.25} clearcoat={1} />
+            </RoundedBox>
+          ))}
+        </group>
+      ))}
+      {/* high-mount third brake light in the header, and three red LED
+          markers on the rear top rail */}
+      <RoundedBox args={[0.03, THIRD_BRAKE.height, THIRD_BRAKE.halfWidth * 2]} radius={0.01} smoothness={2} bevelSegments={2} position={[REAR_FACE_X - 0.017, THIRD_BRAKE.y, 0]}>
         <meshPhysicalMaterial color="#8c1524" emissive="#c11a30" emissiveIntensity={0.45} roughness={0.25} clearcoat={1} />
       </RoundedBox>
-      {/* vertical grab handle on the right rear door leaf, kept just behind
-          the rear wrap plane so a live rear panel covers it cleanly */}
-      <RoundedBox args={[0.024, 0.162, 0.03]} radius={0.008} position={[-2.82, -0.26, -0.12]}>
-        {trimMaterial}
-      </RoundedBox>
-      {/* barn-door hinge knuckles at the outer door edges, two per side -
-          the full rear wrap carves a tight hole around each, so they show
-          through any livery like install-cut hardware */}
-      {[1, -1].map((side) =>
-        [0.55, -0.25].map((y) => (
-          <RoundedBox key={`${side}${y}`} args={[0.05, 0.09, 0.024]} radius={0.008} position={[-2.835, y, side * 0.93]}>
-            {trimMaterial}
-          </RoundedBox>
-        ))
-      )}
-      {/* license recess and plate low on the left door leaf, under every
-          wrap region's bottom edge */}
-      <RoundedBox args={[0.03, 0.17, 0.34]} radius={0.012} position={[-2.822, -0.78, -0.3]}>
+      <mesh position={[REAR_FACE_X - 0.005, profile.roofY - 0.005, 0]}>
+        <boxGeometry args={[0.05, 0.07, body.width + 0.06]} />
+        <meshPhysicalMaterial {...alu} />
+      </mesh>
+      {[-0.14, 0, 0.14].map((z) => (
+        <RoundedBox key={z} args={[0.014, 0.028, 0.07]} radius={0.006} smoothness={2} bevelSegments={2} position={[REAR_FACE_X - 0.035, profile.roofY - 0.005, z]}>
+          <meshPhysicalMaterial color="#8c1524" emissive="#c11a30" emissiveIntensity={0.45} roughness={0.25} clearcoat={1} />
+        </RoundedBox>
+      ))}
+      {/* rear corner caps, the rear legs (the side legs are with the flanks) */}
+      {SIDES.map((s) => (
+        <mesh key={s} position={[REAR_FACE_X - 0.016, flankMidY, s * (body.width / 2 - 0.0375)]}>
+          <boxGeometry args={[0.032, flankH, 0.075]} />
+          <meshPhysicalMaterial {...alu} />
+        </mesh>
+      ))}
+      {/* license recess and plate on the sill, left of centre, under every
+          rear wrap's bottom edge */}
+      <RoundedBox args={[0.03, 0.17, 0.34]} radius={0.012} smoothness={2} bevelSegments={2} position={[REAR_FACE_X - 0.012, -0.78, -0.3]}>
         <meshPhysicalMaterial color="#15171a" metalness={0.2} roughness={0.7} />
       </RoundedBox>
       {/* flat face of a RoundedBox is (h - 2r) x (w - 2r): pad by 2r + 0.004 so the plate sits on flat plinth */}
-      <RoundedBox args={[0.014, VAN.plate.height + 0.024, VAN.plate.width + 0.024]} radius={0.008} position={[-2.834, -0.78, -0.3]}>
+      <RoundedBox args={[0.014, VAN.plate.height + 0.024, VAN.plate.width + 0.024]} radius={0.008} smoothness={2} bevelSegments={2} position={[REAR_FACE_X - 0.026, -0.78, -0.3]}>
         <meshPhysicalMaterial color="#e6e9ed" metalness={0.05} roughness={0.5} />
       </RoundedBox>
       {plateSlot != null && (
@@ -896,32 +1252,50 @@ function VanImpl({
             surfaceBackground: '#f4f6f8',
             resolution: VAN.plate.resolution,
           })}
-          position={[-2.843, -0.78, -0.3]}
+          position={[REAR_FACE_X - 0.036, -0.78, -0.3]}
           rotation={[0, -Math.PI / 2, 0]}
         >
           {plateFace}
         </DeviceScreen>
       )}
-
-      {/* door mirrors: heads reach only ~165 mm beyond the body per side,
-          each hung from two short arms off the door at beltline */}
-      {[1, -1].map((side) => (
-        <group key={side}>
-          <mesh position={[2.08, 0.62, side * 1.0]}>
-            <boxGeometry args={[0.03, 0.025, 0.09]} />
-            {trimMaterial}
+      {/* full-width step bumper hung under the tail on two brackets, its
+          top a galvanised diamond plate with raised tread bars - the step
+          a driver climbs to reach the door */}
+      <mesh position={[profile.tailX - 0.12, -0.955, 0]}>
+        <boxGeometry args={[0.24, 0.07, body.width + 0.04]} />
+        <meshPhysicalMaterial {...steel} />
+      </mesh>
+      <mesh position={[profile.tailX - 0.13, -0.918, 0]}>
+        <boxGeometry args={[0.22, 0.006, body.width]} />
+        <meshPhysicalMaterial color="#9ea3aa" metalness={0.75} roughness={0.5} />
+      </mesh>
+      {Array.from({ length: 9 }, (_, i) => -0.8 + i * 0.2).map((z) => (
+        <mesh key={z} position={[profile.tailX - 0.13, -0.912, z]}>
+          <boxGeometry args={[0.18, 0.006, 0.014]} />
+          <meshPhysicalMaterial color="#b3b8bf" metalness={0.75} roughness={0.45} />
+        </mesh>
+      ))}
+      {SIDES.map((s) => (
+        <mesh key={s} position={[profile.tailX + 0.16, -0.93, s * 0.62]}>
+          <boxGeometry args={[0.5, 0.05, 0.06]} />
+          <meshPhysicalMaterial {...steel} />
+        </mesh>
+      ))}
+      {/* mud flaps behind the rear duals, hung from an aluminium strip */}
+      {SIDES.map((s) => (
+        <group key={s} position={[wheels.rearX - wheels.archRadius - 0.05, 0, s * 0.71]}>
+          <mesh position-y={rockerY - 0.16}>
+            <boxGeometry args={[0.02, 0.32, 0.54]} />
+            <meshPhysicalMaterial {...rubber} />
           </mesh>
-          <mesh position={[2.08, 0.44, side * 1.0]}>
-            <boxGeometry args={[0.03, 0.025, 0.09]} />
-            {trimMaterial}
+          <mesh position-y={rockerY - 0.005}>
+            <boxGeometry args={[0.03, 0.025, 0.56]} />
+            <meshPhysicalMaterial {...alu} />
           </mesh>
-          <RoundedBox args={[0.07, 0.26, 0.15]} radius={0.02} position={[2.03, 0.52, side * 1.055]}>
-            {trimMaterial}
-          </RoundedBox>
         </group>
       ))}
 
-      {/* the live wraps: real DOM on the curb side, street side and rear doors */}
+      {/* the live wraps: real DOM on the curb side, street side and rear door */}
       <DeviceScreen
         width={side.width}
         height={side.height}
@@ -953,8 +1327,9 @@ function VanImpl({
           height={rearSpec.height}
           radius={rearSpec.radius}
           {...rearSurface}
-          position={[-body.length / 2 - 0.026, rearSpec.y, 0]}
+          position={[REAR_SCREEN_X, rearSpec.y, 0]}
           rotation={[0, -Math.PI / 2, 0]}
+          occluderGeometry={rearOccluder}
           screenStyle={rearStyle}
         >
           {regions.rear.children}
