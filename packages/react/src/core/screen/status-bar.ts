@@ -94,13 +94,14 @@ const IOS_TABLET: StatusBarMetrics = {
 }
 
 /**
- * One UI. Samsung sets a smaller, bolder clock than Apple and puts it flush
- * left rather than centring it, with the trailing cluster tight against the
- * right inset. The band is shallower: a punch hole costs less glass than an
- * island, and One UI spends less of it.
+ * One UI. Samsung sets a smaller, bolder clock than Apple - its cap height
+ * sits level with the battery pill beside it - and puts it flush left rather
+ * than centring it, with the trailing cluster tight against the right inset.
+ * The band is shallower: a punch hole costs less glass than an island, and
+ * One UI spends less of it.
  */
 const ONEUI_PHONE: StatusBarMetrics = {
-  fontSize: 13,
+  fontSize: 14,
   iconHeight: 11,
   gap: 5,
   inset: 16,
@@ -139,6 +140,25 @@ export interface StatusBarLayoutOptions {
   width: number
   /** The front-camera cutout, when the device has one. */
   cutout?: StatusBarCutout
+  /**
+   * The display's corner radius, in the same CSS px. A cluster set at the
+   * inset sits inside the corner arc when the radius is larger than the inset
+   * - every iPad - so it moves in just far enough to clear the glass.
+   */
+  corner?: number
+}
+
+/** Breathing room between a glyph and the arc it has just cleared. */
+const CORNER_MARGIN = 4
+
+/**
+ * How far in from the display edge a horizontal line `y` below the top meets
+ * a corner arc of radius `r` - nothing once the line has dropped below it.
+ */
+const cornerClearance = (r: number, y: number): number => {
+  if (!(r > 0) || y >= r) return 0
+  const dy = r - Math.max(0, y)
+  return r - Math.sqrt(r * r - dy * dy)
 }
 
 /** Where the bar's parts land on the surface, in CSS px from the top-left. */
@@ -178,16 +198,25 @@ export function statusBarLayout({
   formFactor,
   width,
   cutout,
+  corner = 0,
 }: StatusBarLayoutOptions): StatusBarLayout {
   const metrics = statusBarMetrics(platform, formFactor)
+  // A cluster at the inset must also clear the corner arc, judged at the top
+  // of the clock - the highest thing in the row.
+  const edge = (centerY: number) =>
+    Math.max(
+      metrics.inset,
+      cornerClearance(corner, centerY - metrics.fontSize / 2) + CORNER_MARGIN
+    )
 
   if (!cutout) {
+    const centerY = metrics.height / 2
     return {
       ...metrics,
       bandHeight: metrics.height,
-      centerY: metrics.height / 2,
-      leadingX: metrics.inset,
-      trailingX: width - metrics.inset,
+      centerY,
+      leadingX: edge(centerY),
+      trailingX: width - edge(centerY),
       split: false,
     }
   }
@@ -206,8 +235,8 @@ export function statusBarLayout({
     centerY,
     // On iOS the clock is centred in the left ear; the caller measures its own
     // text, so this is the ear's centre and the binding shifts by half a width.
-    leadingX: split ? earStart / 2 : metrics.inset,
-    trailingX: split ? (earEnd + width) / 2 : width - metrics.inset,
+    leadingX: split ? earStart / 2 : edge(centerY),
+    trailingX: split ? (earEnd + width) / 2 : width - edge(centerY),
     split,
   }
 }
@@ -224,8 +253,17 @@ export type StatusBarBattery = 'normal' | 'charging' | 'low'
  * status bar for years.
  */
 export interface StatusBarContent {
-  /** Clock face. Defaults to `9:41`, Apple's canonical keynote time. */
+  /**
+   * Clock face. Defaults to `9:41`, Apple's canonical keynote time - and on
+   * iPad to `9:41 AM`, because iPadOS has the room to print the period and
+   * does.
+   */
   time?: string
+  /**
+   * The date beside the clock - `Tue Sep 2` - which iPadOS shows when "Show
+   * Date in Status Bar" is on. iPad only; off unless set.
+   */
+  date?: string
   /** Cellular bars lit, 0-4. */
   signal?: number
   /** Wi-Fi arcs lit, 0-3. */
@@ -233,15 +271,22 @@ export interface StatusBarContent {
   /** Charge level, 0-1. */
   battery?: number
   batteryState?: StatusBarBattery
-  /** Show the charge as a number beside the icon - a One UI habit. */
+  /**
+   * Show the charge as a number. Each system prints it its own way: iPhone
+   * sets it inside the capsule (iOS 16 and later), iPad writes `100%` beside
+   * the icon, and One UI 8.5 fills its battery pill with it. Off by default on
+   * iOS, on by default on One UI, which always shows it - turning it off there
+   * draws the older outline-capsule icon instead.
+   */
   batteryPercent?: boolean
   /** Carrier name, One UI only. */
   carrier?: string
 }
 
 /** Fully resolved content, defaults applied. */
-export type ResolvedStatusBarContent = Required<Omit<StatusBarContent, 'carrier'>> & {
+export type ResolvedStatusBarContent = Required<Omit<StatusBarContent, 'carrier' | 'date'>> & {
   carrier?: string
+  date?: string
 }
 
 export const STATUS_BAR_DEFAULTS: ResolvedStatusBarContent = {
@@ -253,9 +298,24 @@ export const STATUS_BAR_DEFAULTS: ResolvedStatusBarContent = {
   batteryPercent: false,
 }
 
-/** Apply the defaults, and clamp anything a caller can get wrong. */
-export function resolveStatusBarContent(content?: StatusBarContent): ResolvedStatusBarContent {
-  const merged = { ...STATUS_BAR_DEFAULTS, ...content }
+/**
+ * Apply the defaults, and clamp anything a caller can get wrong.
+ *
+ * The platform and form factor pick the defaults that differ: One UI shows
+ * the battery percentage unless told not to, iOS hides it unless asked, and
+ * an iPad's clock carries the period an iPhone's leaves off.
+ */
+export function resolveStatusBarContent(
+  content?: StatusBarContent,
+  platform: StatusBarPlatform = 'ios',
+  formFactor: StatusBarFormFactor = 'phone'
+): ResolvedStatusBarContent {
+  const merged = {
+    ...STATUS_BAR_DEFAULTS,
+    ...(platform === 'oneui' ? { batteryPercent: true } : {}),
+    ...(platform === 'ios' && formFactor === 'tablet' ? { time: '9:41 AM' } : {}),
+    ...content,
+  }
   return {
     ...merged,
     signal: clamp(Math.round(merged.signal), 0, 4),

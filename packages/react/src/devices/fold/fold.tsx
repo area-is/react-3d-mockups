@@ -479,6 +479,7 @@ function FoldImpl({
     platform: 'oneui',
     formFactor: isOpenFace ? 'tablet' : 'phone',
     width: res,
+    corner: px(display.radius),
     cutout: landscape
       ? undefined
       : { halfWidth: px(holeR), centerY: px(holeOffsetY), offsetX: px(holeX) },

@@ -480,6 +480,7 @@ function IPhoneImpl({
               platform: 'ios',
               formFactor: 'phone',
               width: res,
+              corner: px(display.radius),
               cutout: landscape
                 ? undefined
                 : {

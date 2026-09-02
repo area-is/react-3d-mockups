@@ -67,25 +67,27 @@ an object sets the clock, the meters and the ink.
 
 ```tsx
 <IPhoneMockup statusBar />
-<GalaxyMockup statusBar={{ time: '14:05', battery: 0.42, batteryPercent: true }} />
-<IPadMockup statusBar={{ color: '#1c1c1e' }} />   // dark ink for a light screen
+<GalaxyMockup statusBar={{ time: '14:05', battery: 0.42, batteryState: 'charging' }} />
+<IPadMockup statusBar={{ date: 'Tue Sep 2', color: '#1c1c1e' }} />   // dark ink for a light screen
 ```
 
 | Field | Type | Default | Description |
 | --- | --- | --- | --- |
-| `time` | `string` | `'9:41'` | Clock face. |
+| `time` | `string` | `'9:41'` | Clock face. iPad gets `'9:41 AM'`, because iPadOS prints the period. |
+| `date` | `string` | - | The date beside the clock, as iPadOS shows it when "Show Date in Status Bar" is on. iPad only. |
 | `signal` | `number` | `4` | Cellular bars lit, 0-4. |
 | `wifi` | `number` | `3` | Wi-Fi arcs lit, 0-3. |
 | `battery` | `number` | `1` | Charge level, 0-1. |
-| `batteryState` | `'normal' \| 'charging' \| 'low'` | `'normal'` | Colours the fill. |
-| `batteryPercent` | `boolean` | `false` | Show the charge as a number beside the icon. |
+| `batteryState` | `'normal' \| 'charging' \| 'low'` | `'normal'` | Colours the fill, and adds the bolt. |
+| `batteryPercent` | `boolean` | iOS `false`, One UI `true` | Show the charge as a number, where each system puts it: inside the iPhone's capsule, as `100%` beside the iPad's, inside One UI's pill. One UI 8.5 always shows it, so it is on there by default; off draws the older outline capsule. |
 | `carrier` | `string` | - | Carrier name. One UI only - iOS has not shown one for years. |
 | `color` | `string` | `'#ffffff'` | Ink. Pass a dark value for a light screen, the way an app picks its status-bar style. |
 
 Which bar you get is the device's to decide, not yours: iPhones and iPads draw
 the iOS one, Galaxy phones, foldables and tablets the One UI one, and the two
 differ in layout as well as styling - iOS centres the clock in the ear left of
-the Dynamic Island, One UI sets it flush to the inset.
+the Dynamic Island and reads signal, Wi-Fi, battery on the right; One UI sets
+the clock flush to the inset and reads Wi-Fi, signal, battery.
 
 The bar is placed from the hardware rather than from a constant. Each device
 already carries its front-camera geometry, so the glyph row is centred on the

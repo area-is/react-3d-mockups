@@ -35,23 +35,31 @@ export const MILK_CARTON = {
    * carries a corner's fillet up through the eave rather than ending it under
    * a square overhang.
    */
-  body: { width: 1.734, height: 3.469, depth: 1.734, radius: 0.034 },
+  body: { width: 1.734, height: 3.469, depth: 1.734, radius: 0.055 },
   /**
    * The gable roof. `rise` is how far the ridge stands above the walls;
    * `tuck` is how deep the ear fold pulls each end inward where it is
    * deepest - the side panel keeps its full width as it rises while the roof
    * narrows toward the ridge, and that excess board folds inward rather than
    * vanishing. It is what makes a carton's ends pinched rather than flat.
-   * `crease` is the half-width of the flat the ridge fold keeps, for the same
-   * reason the walls have a corner radius.
+   * `crease` is the half-width of the flat the ridge fold keeps: the fin's
+   * root stands on it, so it is sized to the fin rather than to the fold.
+   *
+   * The tuck is 12 mm on the half-gallon. It was 20, which read as a dent
+   * punched into the end rather than board folded in: a real ear is pinched
+   * hard just under the fin and shallow everywhere else, and its depth is
+   * limited by how much board the fold actually has to shed.
    */
-  gable: { rise: 0.694, tuck: 0.36, crease: 0.026 },
+  gable: { rise: 0.694, tuck: 0.22, crease: 0.06 },
   /**
-   * The sealed top fin, standing on the ridge: four plies of board and the
-   * seal between them, which is why it is thin next to everything else on the
-   * carton. `radius` rounds its edges - it is a pressed fold, not a cut slab.
+   * The sealed top fin, standing on the ridge. Four plies of board and the
+   * seal between them: 5 mm thick where the ears fold into its root, tapering
+   * to `taper` of that at the sealed top edge, which is pressed round. It was
+   * modelled at 1.5 mm - a single ply - and read as a sheet of paper stood on
+   * the roof. `knuckle` is the extra thickness at each end, where the ear
+   * folds gather: a real fin is visibly fatter at its ends than in the middle.
    */
-  fin: { height: 0.237, thickness: 0.028, radius: 0.011 },
+  fin: { height: 0.237, thickness: 0.095, taper: 0.62, radius: 0.03, knuckle: 0.3 },
   /**
    * The screw cap on the front roof panel: the cap itself, the collar it is
    * moulded onto, and `offset` - how far up the slant it sits, as a fraction
@@ -147,7 +155,8 @@ export interface MilkCartonLayout {
    * nothing at the eave below and pinched back to the fin above.
    */
   gable: { rise: number; slant: number; tuck: number; tuckAt: number; crease: number }
-  fin: { height: number; thickness: number; radius: number }
+  /** Root thickness, the top edge's share of it, the edge rounding, and the end knuckles' extra. */
+  fin: { height: number; thickness: number; taper: number; radius: number; knuckle: number }
   cap: {
     radius: number
     height: number
@@ -179,8 +188,11 @@ export function milkCartonLayout(size: MilkCartonSizeMm = MILK_CARTON_SIZE_MM): 
   const fin = {
     height: width * FIN_HEIGHT,
     thickness,
-    // A rounded box cannot round past half its own smallest side.
-    radius: Math.min(width * FIN_RADIUS, thickness * 0.45),
+    taper: MILK_CARTON.fin.taper,
+    // The sealed edge is a half-round of the tapered thickness, so the
+    // rounding can never exceed what the top has to round.
+    radius: Math.min(width * FIN_RADIUS, thickness * MILK_CARTON.fin.taper * 0.5),
+    knuckle: MILK_CARTON.fin.knuckle,
   }
   // The walls are what the overall height has left over once the roof and fin
   // have taken their share (see MIN_WALL_SHARE).
@@ -195,9 +207,9 @@ export function milkCartonLayout(size: MilkCartonSizeMm = MILK_CARTON_SIZE_MM): 
       // otherwise fold its two ends through each other.
       tuck: Math.min(depth * GABLE_TUCK, width / 2),
       tuckAt: EAR_FOLD_PEAK,
-      // Wider than the fin standing on it, so a soft shoulder of folded board
-      // shows either side of the seal instead of a knife edge running into it.
-      crease: Math.min(depth * GABLE_CREASE, depth * 0.06),
+      // At least as wide as the fin's root, so the fin stands on a flat rather
+      // than balancing on a knife edge - and never so wide it flattens the roof.
+      crease: Math.min(Math.max(depth * GABLE_CREASE, thickness * 0.55), depth * 0.08),
     },
     fin,
     cap: {

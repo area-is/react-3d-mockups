@@ -503,6 +503,7 @@ function FlipImpl({
     platform: 'oneui',
     formFactor: 'phone',
     width: res,
+    corner: px(display.radius),
     cutout: landscape
       ? undefined
       : {

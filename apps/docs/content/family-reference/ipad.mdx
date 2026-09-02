@@ -45,6 +45,7 @@ Beyond the [shared screen props](/docs/screen-content):
 | --- | --- | --- | --- |
 | `variant` | `'ipadpro13' \| 'ipadpro11' \| 'ipadair13' \| 'ipadair11' \| 'ipad11'` | `'ipadpro13'` | Which iPad: Pro 13"/11" (camera pod, Pencil strip, Face ID), Air 13"/11" (single lens, Touch ID top button), or the A16 iPad (single lens, edge Smart Connector). |
 | `orientation` | `'portrait' \| 'landscape'` | `'portrait'` | Landscape lays the tablet on its side and swaps the virtual display (for example 1376×1032 on the 13" Pro) with upright content. |
+| `statusBar` | `boolean \| StatusBarContent` | `false` | Draw the system status bar across the top of the screen. `true` gives the platform's defaults - iPadOS's, a 24pt strip with the clock at the leading inset and the meters at the trailing one; an object sets the clock, the meters and the ink (`{{ time: '14:05', battery: 0.42, batteryPercent: true, color: '#1c1c1e' }}`). It is placed from this device's own camera cutout and logical grid, so it lines up with the hardware on every variant. See [Status bar](/docs/screen-content#status-bar). |
 | `resolution` | `number` | per variant | Defaults to the variant's logical grid: 1032×1376 (ipadpro13), 834×1210 (ipadpro11), 1024×1366 (ipadair13), 820×1180 (ipadair11, ipad11). |
 | `color` | `string` | per variant | Body color. Takes a retail colorway id from `IPAD_COLORWAYS` - Pro `spaceblack`/`silver`, Air `spacegray`/`starlight`/`purple`/`blue`, iPad `silver`/`blue`/`pink`/`yellow` - or any CSS color. |
 

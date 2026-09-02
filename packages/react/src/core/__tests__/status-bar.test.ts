@@ -110,6 +110,23 @@ describe('statusBarLayout', () => {
     expect(shifted.trailingX - centred.trailingX).toBeCloseTo(offsetX / 2, 6)
   })
 
+  it('moves the clusters in past a corner larger than the inset, and not otherwise', () => {
+    const metrics = statusBarMetrics('ios', 'tablet')
+    const flat = statusBarLayout({ platform: 'ios', formFactor: 'tablet', width: 1032 })
+    const rounded = statusBarLayout({ platform: 'ios', formFactor: 'tablet', width: 1032, corner: 60 })
+    const small = statusBarLayout({ platform: 'ios', formFactor: 'tablet', width: 1032, corner: 8 })
+
+    expect(rounded.leadingX).toBeGreaterThan(flat.leadingX)
+    expect(1032 - rounded.trailingX).toBeCloseTo(rounded.leadingX, 6)
+    expect(small.leadingX).toBe(metrics.inset)
+    // The top of the clock is on the glass - inside the arc's circle, centred
+    // at (r, r) - where the bare inset would have left it off the corner.
+    const top = rounded.centerY - metrics.fontSize / 2
+    const inside = (x: number) => (x - 60) ** 2 + (top - 60) ** 2 <= 60 ** 2
+    expect(inside(rounded.leadingX)).toBe(true)
+    expect(inside(metrics.inset)).toBe(false)
+  })
+
   it('gives a tablet a smaller clock than a phone on the same platform', () => {
     expect(statusBarMetrics('ios', 'tablet').fontSize).toBeLessThan(
       statusBarMetrics('ios', 'phone').fontSize
@@ -128,6 +145,22 @@ describe('resolveStatusBarContent', () => {
     expect(resolved.signal).toBe(4)
     expect(resolved.wifi).toBe(0)
     expect(resolved.battery).toBe(1)
+  })
+
+  it('shows the percentage on One UI unless told otherwise, and hides it on iOS unless asked', () => {
+    expect(resolveStatusBarContent(undefined, 'oneui').batteryPercent).toBe(true)
+    expect(resolveStatusBarContent(undefined, 'ios').batteryPercent).toBe(false)
+    expect(resolveStatusBarContent({ batteryPercent: false }, 'oneui').batteryPercent).toBe(false)
+    expect(resolveStatusBarContent({ batteryPercent: true }, 'ios').batteryPercent).toBe(true)
+  })
+
+  it('gives an iPad the period iPadOS prints, and nothing else', () => {
+    expect(resolveStatusBarContent(undefined, 'ios', 'tablet').time).toBe('9:41 AM')
+    expect(resolveStatusBarContent(undefined, 'ios', 'phone').time).toBe('9:41')
+    expect(resolveStatusBarContent(undefined, 'oneui', 'tablet').time).toBe('9:41')
+    expect(resolveStatusBarContent({ time: '10:09' }, 'ios', 'tablet').time).toBe('10:09')
+    // The date is opt-in: nothing resolves one.
+    expect(resolveStatusBarContent(undefined, 'ios', 'tablet').date).toBeUndefined()
   })
 
   it('rounds fractional bar counts rather than emitting half a bar', () => {

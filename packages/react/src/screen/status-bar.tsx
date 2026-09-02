@@ -2,6 +2,7 @@ import * as React from 'react'
 import {
   resolveStatusBarContent,
   statusBarLayout,
+  type StatusBarBattery,
   type StatusBarContent,
   type StatusBarCutout,
   type StatusBarFormFactor,
@@ -17,7 +18,7 @@ import {
  * the battery capsule with its nub - have to stay crisp at any size and take
  * the surface's colour. The proportions are each platform's own, so an iOS
  * battery is Apple's rounded 25x13 capsule and a One UI battery is Samsung's
- * squarer, bolder one.
+ * pill with the percentage set into it.
  *
  * It is positioned, never in flow: the bar sits above whatever the caller
  * passes as children and always at the top of the panel, which is what a real
@@ -32,6 +33,8 @@ export interface StatusBarProps extends StatusBarContent {
   width: number
   /** The device's front-camera cutout, when it has one. */
   cutout?: StatusBarCutout
+  /** The display's corner radius in CSS px, so the clusters clear the arc. */
+  corner?: number
   /**
    * Ink. Defaults to white, which is what sits over the dark wallpapers and
    * full-bleed art these mockups usually carry; pass a dark value for a light
@@ -39,6 +42,95 @@ export interface StatusBarProps extends StatusBarContent {
    */
   color?: string
 }
+
+/** The tint a battery's fill takes in each state, if not the ink. */
+const batteryFill = (state: StatusBarBattery, ink: string, low: string, charging: string) =>
+  state === 'low' ? low : state === 'charging' ? charging : ink
+
+/**
+ * A meter with its number set into it: ink over the empty run of the track,
+ * knocked out of the filled run. This is how iOS 16's capsule and One UI 8.5's
+ * pill both print the percentage - the digits invert where they cross the
+ * fill, so they never vanish into it at any level.
+ *
+ * Two clipped copies of the same shape, sharing one label: the filled run is
+ * painted in the meter's colour with the label masked out of it, and the rest
+ * is painted faintly with the label drawn on top in ink.
+ */
+function LabeledMeter({
+  x,
+  y,
+  width,
+  height,
+  rx,
+  level,
+  color,
+  fill,
+  label,
+}: {
+  x: number
+  y: number
+  width: number
+  height: number
+  rx: number
+  level: number
+  /** Ink: the empty run and the digits over it. */
+  color: string
+  /** The filled run - ink, or a charge or low-battery tint. */
+  fill: string
+  /** The label, in the given paint. Rendered once per layer. */
+  label: (paint: string) => React.ReactNode
+}) {
+  // One bar per screen, many screens per page: the ids have to be unique.
+  const id = React.useId().replace(/[^a-zA-Z0-9]/g, '')
+  const filled = width * level
+  return (
+    <>
+      <defs>
+        <clipPath id={`${id}f`}>
+          <rect x={x} y={y} width={filled} height={height} />
+        </clipPath>
+        <clipPath id={`${id}r`}>
+          <rect x={x + filled} y={y} width={width - filled} height={height} />
+        </clipPath>
+        <mask id={`${id}m`} maskUnits="userSpaceOnUse" x={x} y={y} width={width} height={height}>
+          <rect x={x} y={y} width={width} height={height} fill="#fff" />
+          {label('#000')}
+        </mask>
+      </defs>
+      <rect
+        x={x}
+        y={y}
+        width={width}
+        height={height}
+        rx={rx}
+        fill={fill}
+        clipPath={`url(#${id}f)`}
+        mask={`url(#${id}m)`}
+      />
+      <g clipPath={`url(#${id}r)`}>
+        <rect x={x} y={y} width={width} height={height} rx={rx} fill={color} opacity={0.32} />
+        {label(color)}
+      </g>
+    </>
+  )
+}
+
+/**
+ * The baseline that centres a run of digits on `cy`: half a cap height below
+ * it. Set explicitly rather than with `dominant-baseline`, which the fallback
+ * fonts do not all agree on.
+ */
+const baseline = (cy: number, fontSize: number) => cy + fontSize * 0.36
+
+/** A charge bolt, on a 6x10 grid at the origin. */
+const Bolt = ({ x, y, scale, paint }: { x: number; y: number; scale: number; paint: string }) => (
+  <path
+    d="M3.6 0 0 5.6h2.4L1.9 10 6 4.2H3.5z"
+    fill={paint}
+    transform={`translate(${x} ${y}) scale(${scale})`}
+  />
+)
 
 /** iOS cellular: four bars, equal width, ascending, square-ish corners. */
 function IosSignal({ h, lit, color }: { h: number; lit: number; color: string }) {
@@ -94,46 +186,90 @@ function IosWifi({ h, lit, color }: { h: number; lit: number; color: string }) {
   )
 }
 
-/** iOS battery: a 25x13 rounded capsule, a 1pt outline, a nub, an inset fill. */
+/**
+ * iOS battery: Apple's 25x13 rounded capsule with a nub on the trailing edge.
+ * Plain, it is a faint outline with the charge inset in it. With the
+ * percentage on - which iOS 16 brought to every iPhone - the outline goes and
+ * the capsule itself becomes the meter, the number set into it.
+ */
 function IosBattery({
   h,
   level,
   state,
   color,
+  percent,
 }: {
   h: number
   level: number
-  state: 'normal' | 'charging' | 'low'
+  state: StatusBarBattery
   color: string
+  percent: boolean
 }) {
-  const w = h * (25 / 13)
-  const fill = state === 'low' ? '#ff3b30' : state === 'charging' ? '#34c759' : color
+  const w = h * (27 / 13)
+  const fill = batteryFill(state, color, '#ff3b30', '#34c759')
+  const label = String(Math.round(level * 100))
+  // The bolt shares the capsule with two digits; with three there is no room,
+  // and the green fill already says it is charging.
+  const bolt = state === 'charging' && label.length < 3
+  const size = label.length >= 3 ? 9.6 : bolt ? 9.4 : 11
   return (
     <svg width={w} height={h} viewBox="0 0 27 13" aria-hidden focusable="false" style={{ width: w, height: h }}>
-      <rect
-        x="0.6"
-        y="0.6"
-        width="23.8"
-        height="11.8"
-        rx="3.6"
-        fill="none"
-        stroke={color}
-        strokeWidth="1.1"
-        opacity="0.42"
-      />
-      <path
-        d="M25.8 4.6c1 .3 1.4 1 1.4 1.9s-.4 1.6-1.4 1.9z"
-        fill={color}
-        opacity="0.42"
-      />
-      <rect
-        x="2.1"
-        y="2.1"
-        width={Math.max(0, 20.8 * level)}
-        height="8.8"
-        rx="2.2"
-        fill={fill}
-      />
+      <path d="M25.8 4.6c1 .3 1.4 1 1.4 1.9s-.4 1.6-1.4 1.9z" fill={color} opacity="0.42" />
+      {percent ? (
+        <LabeledMeter
+          x={0}
+          y={0}
+          width={25}
+          height={13}
+          rx={4.2}
+          level={level}
+          color={color}
+          fill={fill}
+          label={(paint) => (
+            <>
+              {bolt ? <Bolt x={2} y={2.6} scale={0.78} paint={paint} /> : null}
+              <text
+                // Sized by what it has to fit: three digits squeeze down the
+                // way SF's compact numerals do on the real thing, and two
+                // give a little to the bolt. Not `textLength` - Chromium
+                // scales those glyphs about the origin rather than the anchor
+                // and paints them somewhere else.
+                x={bolt ? 17 : 12.5}
+                y={baseline(6.5, size)}
+                textAnchor="middle"
+                fontSize={size}
+                fontWeight={700}
+                fill={paint}
+              >
+                {label}
+              </text>
+            </>
+          )}
+        />
+      ) : (
+        <>
+          <rect
+            x="0.6"
+            y="0.6"
+            width="23.8"
+            height="11.8"
+            rx="3.6"
+            fill="none"
+            stroke={color}
+            strokeWidth="1.1"
+            opacity="0.42"
+          />
+          <rect
+            x="2.1"
+            y="2.1"
+            width={Math.max(0, 20.8 * level)}
+            height="8.8"
+            rx="2.2"
+            fill={fill}
+          />
+          {state === 'charging' ? <Bolt x={9.6} y={1.6} scale={0.98} paint="#000" /> : null}
+        </>
+      )}
     </svg>
   )
 }
@@ -182,20 +318,71 @@ function OneUiWifi({ h, lit, color }: { h: number; lit: number; color: string })
   )
 }
 
-/** One UI battery: squarer body, heavier outline, nub on the trailing edge. */
+/**
+ * One UI battery. Since One UI 8.5 it is a pill, a touch taller than the
+ * icons beside it, filled to the charge with the percentage set into the
+ * fill - so that is the default. Without the percentage it falls back to the
+ * squarer outline capsule of the releases before, nub on the trailing edge.
+ */
 function OneUiBattery({
   h,
   level,
   state,
   color,
+  percent,
 }: {
   h: number
   level: number
-  state: 'normal' | 'charging' | 'low'
+  state: StatusBarBattery
   color: string
+  percent: boolean
 }) {
+  const fill = batteryFill(state, color, '#ff4d4f', '#3ddc84')
+  if (percent) {
+    const label = String(Math.round(level * 100))
+    const H = 14
+    // The pill grows with what it carries: three digits, and a bolt on charge.
+    const W = (label.length >= 3 ? 30 : 25) + (state === 'charging' ? 10 : 0)
+    const height = h * 1.12
+    const width = height * (W / H)
+    return (
+      <svg
+        width={width}
+        height={height}
+        viewBox={`0 0 ${W} ${H}`}
+        aria-hidden
+        focusable="false"
+        style={{ width, height }}
+      >
+        <LabeledMeter
+          x={0}
+          y={0}
+          width={W}
+          height={H}
+          rx={H / 2}
+          level={level}
+          color={color}
+          fill={fill}
+          label={(paint) => (
+            <>
+              {state === 'charging' ? <Bolt x={3} y={2.25} scale={0.95} paint={paint} /> : null}
+              <text
+                x={W / 2 + (state === 'charging' ? 5 : 0)}
+                y={baseline(H / 2, 11.6)}
+                textAnchor="middle"
+                fontSize={11.6}
+                fontWeight={700}
+                fill={paint}
+              >
+                {label}
+              </text>
+            </>
+          )}
+        />
+      </svg>
+    )
+  }
   const w = h * (24 / 12)
-  const fill = state === 'low' ? '#ff4d4f' : state === 'charging' ? '#3ddc84' : color
   return (
     <svg width={w} height={h} viewBox="0 0 26 12" aria-hidden focusable="false" style={{ width: w, height: h }}>
       <rect
@@ -211,6 +398,7 @@ function OneUiBattery({
       />
       <rect x="24.4" y="3.6" width="1.6" height="4.8" rx="0.8" fill={color} opacity="0.45" />
       <rect x="2.4" y="2.4" width={Math.max(0, 19.2 * level)} height="7.2" rx="1.4" fill={fill} />
+      {state === 'charging' ? <Bolt x={9.4} y={1.2} scale={0.96} paint="#000" /> : null}
     </svg>
   )
 }
@@ -221,19 +409,26 @@ function OneUiBattery({
  * The two are absolutely positioned rather than laid out in a flex row,
  * because on iOS they are not a row: each is centred in its own ear either
  * side of the Dynamic Island, and the gap between them is hardware.
+ *
+ * The trailing cluster runs in each system's own order. iOS reads signal,
+ * Wi-Fi, battery; One UI reads Wi-Fi, signal, battery. And the percentage,
+ * when shown, goes where each puts it: inside the iPhone's capsule, written
+ * out as `100%` before the iPad's, and inside One UI's pill.
  */
 export function StatusBar({
   platform,
   formFactor,
   width,
   cutout,
+  corner,
   color = '#ffffff',
   ...content
 }: StatusBarProps) {
-  const layout = statusBarLayout({ platform, formFactor, width, cutout })
-  const { time, signal, wifi, battery, batteryState, batteryPercent, carrier } =
-    resolveStatusBarContent(content)
+  const layout = statusBarLayout({ platform, formFactor, width, cutout, corner })
+  const { time, date, signal, wifi, battery, batteryState, batteryPercent, carrier } =
+    resolveStatusBarContent(content, platform, formFactor)
   const ios = platform === 'ios'
+  const tablet = formFactor === 'tablet'
   const h = layout.iconHeight
 
   const clusterStyle: React.CSSProperties = {
@@ -245,6 +440,11 @@ export function StatusBar({
     gap: layout.gap,
     lineHeight: 1,
     whiteSpace: 'nowrap',
+  }
+  const textStyle: React.CSSProperties = {
+    fontSize: layout.fontSize,
+    fontWeight: layout.fontWeight,
+    letterSpacing: `${layout.letterSpacing}em`,
   }
 
   return (
@@ -288,15 +488,10 @@ export function StatusBar({
           transform: layout.split ? 'translate(-50%, -50%)' : 'translateY(-50%)',
         }}
       >
-        <span
-          style={{
-            fontSize: layout.fontSize,
-            fontWeight: layout.fontWeight,
-            letterSpacing: `${layout.letterSpacing}em`,
-          }}
-        >
-          {time}
-        </span>
+        <span style={textStyle}>{time}</span>
+        {ios && tablet && date ? (
+          <span style={{ ...textStyle, marginLeft: layout.gap * 0.5 }}>{date}</span>
+        ) : null}
         {!ios && carrier ? (
           <span style={{ fontSize: layout.fontSize * 0.86, fontWeight: 500, opacity: 0.85 }}>
             {carrier}
@@ -311,22 +506,34 @@ export function StatusBar({
           transform: layout.split ? 'translate(-50%, -50%)' : 'translate(-100%, -50%)',
         }}
       >
-        {batteryPercent ? (
-          <span style={{ fontSize: layout.fontSize * 0.86, fontWeight: layout.fontWeight }}>
-            {Math.round(battery * 100)}
-          </span>
-        ) : null}
         {ios ? (
           <>
             <IosSignal h={h} lit={signal} color={color} />
             <IosWifi h={h} lit={wifi} color={color} />
-            <IosBattery h={h} level={battery} state={batteryState} color={color} />
+            {tablet && batteryPercent ? (
+              <span style={{ ...textStyle, marginLeft: layout.gap * 0.4 }}>
+                {Math.round(battery * 100)}%
+              </span>
+            ) : null}
+            <IosBattery
+              h={h}
+              level={battery}
+              state={batteryState}
+              color={color}
+              percent={batteryPercent && !tablet}
+            />
           </>
         ) : (
           <>
-            <OneUiSignal h={h} lit={signal} color={color} />
             <OneUiWifi h={h} lit={wifi} color={color} />
-            <OneUiBattery h={h} level={battery} state={batteryState} color={color} />
+            <OneUiSignal h={h} lit={signal} color={color} />
+            <OneUiBattery
+              h={h}
+              level={battery}
+              state={batteryState}
+              color={color}
+              percent={batteryPercent}
+            />
           </>
         )}
       </div>
@@ -353,6 +560,7 @@ export function renderStatusBar(
     formFactor: StatusBarFormFactor
     width: number
     cutout?: StatusBarCutout
+    corner?: number
   }
 ): React.ReactNode {
   if (!option) return null

@@ -548,6 +548,7 @@ function TabletBody({
               platform: logo?.mark === 'samsung' ? 'oneui' : 'ios',
               formFactor: 'tablet',
               width: res,
+              corner: px(display.radius),
             })}
             {notch ? (
               <div

@@ -163,7 +163,10 @@ export function editableProp(doc: PropDoc): EditableProp | null {
     return of({ kind: 'vector', axes: XYZ, ...bounds }, identity)
   }
 
-  if (type === 'boolean') {
+  // `boolean` on its own, or `boolean | SomeOptions`: a prop whose `true` is
+  // the ready-made form and whose object is the tuned one - `statusBar`. The
+  // switch drives the first; the object form is the snippet's to write.
+  if (type === 'boolean' || /^boolean \| [A-Z]\w*$/.test(type)) {
     return of({ kind: 'switch' }, stated === 'true')
   }
 

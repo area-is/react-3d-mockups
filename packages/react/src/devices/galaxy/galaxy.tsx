@@ -427,6 +427,7 @@ function GalaxyImpl({
               platform: 'oneui',
               formFactor: 'phone',
               width: res,
+              corner: px(display.radius),
               cutout: landscape
                 ? undefined
                 : { halfWidth: px(hole.radius), centerY: px(hole.offsetY), offsetX: 0 },

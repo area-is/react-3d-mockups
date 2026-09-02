@@ -58,6 +58,18 @@ import {
 const COVERAGE_PARAM = (value: string | null): 'panel' | 'full' | 'perforated' =>
   value === 'full' || value === 'perforated' ? value : 'panel'
 
+/** `statusBar`: `1`/`0` for the prop's boolean form, or a JSON object for the tuned one. */
+const parseStatusBar = (value: string | null): boolean | Record<string, unknown> | undefined => {
+  if (value === null) return undefined
+  if (value === '1') return true
+  if (value === '0') return false
+  try {
+    return JSON.parse(value) as Record<string, unknown>
+  } catch {
+    return undefined
+  }
+}
+
 const PLAIN = {
   aframe: AFrameSignMockup,
   billboard: BillboardMockup,
@@ -140,6 +152,7 @@ function regionProbe(Mockup: object): React.ReactNode {
  *   screen      dark | gradient                    (default gradient)
  *   shadows     1 | 0                              (default 0 - clean poses)
  *   controls    1 | 0                              (default 0 - drag tests)
+ *   statusBar   1 | 0 | JSON StatusBarContent      (phones, foldables, tablets)
  */
 function HarnessScene() {
   const params = useSearchParams()
@@ -153,6 +166,7 @@ function HarnessScene() {
   const cy = Number(params.get('cy') ?? 0)
   const shadows = params.get('shadows') === '1'
   const controls = params.get('controls') === '1'
+  const statusBar = parseStatusBar(params.get('statusBar'))
   const screen =
     // `clear` paints nothing at all: it exists to show what the surface
     // background is FOR - with it, content that doesn't cover every pixel
@@ -414,6 +428,7 @@ function HarnessScene() {
         openAngle={params.get('openAngle') ? Number(params.get('openAngle')) : params.get('open') !== '0'}
         orientation={orientation}
         color={color}
+        statusBar={statusBar}
         controls={controls}
         camera={{ position: [0, cy, dist], fov: 40 }}
         shadows={shadows}
@@ -432,6 +447,7 @@ function HarnessScene() {
         openAngle={params.get('openAngle') ? Number(params.get('openAngle')) : params.get('open') !== '0'}
         orientation={orientation}
         color={color}
+        statusBar={statusBar}
         controls={controls}
         camera={{ position: [0, cy, dist], fov: 40 }}
         shadows={shadows}
@@ -451,6 +467,7 @@ function HarnessScene() {
           variant={(params.get('pvariant') ?? undefined) as GalaxyVariant & IPhoneVariant}
           color={color}
           orientation={orientation}
+          statusBar={statusBar}
           rotation={[rx, ry, 0]}
         >
           {screen}
@@ -516,6 +533,7 @@ function HarnessScene() {
           variant={variant as GalaxyTabVariant}
           color={color}
           orientation={orientation}
+          statusBar={statusBar}
           rotation={[rx, ry, 0]}
         >
           {screen}
@@ -525,6 +543,7 @@ function HarnessScene() {
           variant={variant as IPadVariant}
           color={color}
           orientation={orientation}
+          statusBar={statusBar}
           rotation={[rx, ry, 0]}
         >
           {screen}
