@@ -561,8 +561,14 @@ function BusImpl({
   const dualOuterZ = tireFaceZ - wheels.dualWidth / 2
   const dualInnerZ = dualOuterZ - wheels.dualWidth - wheels.dualGap
   // The rear wrap plane hugs the tail wall by 20 mm; every tail fitting but
-  // the lamps (carved out individually) stays inside that.
+  // the lamps (carved out individually) stays inside that. The rear window
+  // is the exception when a full wrap carves around it: the wrap's depth
+  // mask erases everything behind its plane, carve or no carve, so the
+  // glass steps just proud of the plane to show through the hole - and
+  // drops back behind it when perforated film runs over the window.
   const rearPlaneX = tailFace - 0.02
+  const rearGlassCarved = fullWrap && !overGlass && regions.rear != null
+  const rearGlassX = rearGlassCarved ? rearPlaneX - 0.004 : tailFace + 0.014
 
   // Windshield: curved in plan like the references - a slice of a 5-unit
   // cylinder bulging ~35 mm at the centre mullion - flat in elevation. Its
@@ -655,13 +661,17 @@ function BusImpl({
               position={[at.x + 0.006, glassBottom + 0.19, 0.36]}
               rotation-y={at.rotY}
             >
-              <meshPhysicalMaterial color="#0b0d10" emissive="#ffb340" emissiveIntensity={0.07} roughness={0.3} clearcoat={1} />
+              <meshPhysicalMaterial color="#101215" emissive="#ffb340" emissiveIntensity={0.05} roughness={0.3} clearcoat={1} />
             </RoundedBox>
           )
         })()}
+        {/* (RoundedBox radii stay under half the thinnest dimension: drei
+            builds the box from a (w-2r) x (h-2r) shape plus an r bevel, and a
+            radius past that inverts the shape and overshoots the box - the
+            rear grille's edges once poked through the wrap plane that way.) */}
         <RoundedBox
           args={[0.012, destination.height + 0.028, destination.width + 0.04]}
-          radius={0.01}
+          radius={0.005}
           smoothness={2} bevelSegments={1}
           position={[glassEdgeX, signY, 0]}
         >
@@ -939,7 +949,7 @@ function BusImpl({
           signal strip along its foot */}
       {([1, -1] as const).map((side) => (
         <group key={side} position={[noseFace, -0.43, side * 0.42]}>
-          <RoundedBox args={[0.04, 0.17, 0.4]} radius={0.02} smoothness={2} bevelSegments={1} position-x={0.006}>
+          <RoundedBox args={[0.04, 0.17, 0.4]} radius={0.015} smoothness={2} bevelSegments={1} position-x={0.006}>
             {frameMaterial}
           </RoundedBox>
           {[-0.09, 0.09].map((dz) => (
@@ -978,7 +988,7 @@ function BusImpl({
           turn signal in amber - in a housing at each corner, and the bumper */}
       <RoundedBox
         args={[0.03, rearWindow.height + 0.05, rearWindow.width + 0.05]}
-        radius={0.03}
+        radius={0.012}
         smoothness={2} bevelSegments={1}
         position={[tailFace + 0.008, rearWindow.y, 0]}
       >
@@ -986,9 +996,9 @@ function BusImpl({
       </RoundedBox>
       <RoundedBox
         args={[0.05, rearWindow.height, rearWindow.width]}
-        radius={0.03}
+        radius={0.02}
         smoothness={2} bevelSegments={1}
-        position={[tailFace + 0.014, rearWindow.y, 0]}
+        position={[rearGlassX, rearWindow.y, 0]}
       >
         {glassMaterial}
       </RoundedBox>
@@ -1006,7 +1016,7 @@ function BusImpl({
         <boxGeometry args={[0.006, 0.008, 1.228]} />
         <meshPhysicalMaterial color="#15171b" metalness={0.2} roughness={0.8} />
       </mesh>
-      <RoundedBox args={[0.03, 0.24, 0.92]} radius={0.02} smoothness={2} bevelSegments={1} position={[tailFace + 0.009, 0.05, 0]}>
+      <RoundedBox args={[0.03, 0.24, 0.92]} radius={0.012} smoothness={2} bevelSegments={1} position={[tailFace + 0.009, 0.05, 0]}>
         <meshPhysicalMaterial color="#111317" metalness={0.3} roughness={0.65} />
       </RoundedBox>
       {[-0.08, -0.04, 0, 0.04, 0.08].map((dy) => (
@@ -1017,7 +1027,7 @@ function BusImpl({
       ))}
       {([1, -1] as const).map((side) => (
         <group key={side} position={[tailFace, 0, side * 0.56]}>
-          <RoundedBox args={[0.016, 0.44, 0.14]} radius={0.02} smoothness={2} bevelSegments={1} position={[0.002, 0.16, 0]}>
+          <RoundedBox args={[0.016, 0.44, 0.14]} radius={0.007} smoothness={2} bevelSegments={1} position={[0.002, 0.16, 0]}>
             {frameMaterial}
           </RoundedBox>
           {(
