@@ -19,26 +19,35 @@
 import type { MockupFraming, MockupMetrics, RegionSpec } from '../../regions'
 
 export const BUS = {
-  /** Overall body: length (x), height (y), width (z). `bevel` rounds the shell edges. */
-  body: { length: 6.4, height: 1.684, width: 1.363, bevel: 0.04 },
+  /**
+   * Overall body: length (x), height (y), width (z). `bevel` is how deep
+   * (across the width) the shell's roofline and corner rounding runs - a
+   * transit body's roof edge is a soft ~90 mm radius, not a box edge.
+   */
+  body: { length: 6.4, height: 1.684, width: 1.363, bevel: 0.045 },
   /** Y of the ground plane relative to the origin (wheels touch here). */
   groundY: -0.842,
   /** Y of the body's lower skirt edge (~330 mm low-floor ground clearance). */
   skirtY: -0.676,
   /**
-   * Wheels: front axle 2.7 m from the nose, 6 m wheelbase, ~1 m tires.
-   * The front axle runs single tires; the drive axle runs duals -
-   * `dualWidth` is each tire of the pair, `dualGap` the space between them.
+   * Wheels: front axle 2.7 m from the nose, 6 m wheelbase, 305/70R22.5-class
+   * tires (~1.03 m) on 22.5" rims. The front axle runs single tires; the
+   * drive axle runs duals - `dualWidth` is each tire of the pair, `dualGap`
+   * the space between them. The arch is a semicircle of `archRadius` about
+   * `archY` (a little under the axle line) standing on short vertical legs
+   * from the skirt - the tall, square-shouldered opening of a low-floor
+   * body, ~1.27 m across, rather than a half-round scallop in the skirt.
    */
   wheels: {
     frontX: 1.779,
     rearX: -1.379,
-    radius: 0.263,
-    archRadius: 0.305,
-    width: 0.2,
-    dualWidth: 0.158,
-    dualGap: 0.021,
-    centerY: -0.587,
+    radius: 0.27,
+    archRadius: 0.335,
+    archY: -0.6,
+    width: 0.21,
+    dualWidth: 0.17,
+    dualGap: 0.02,
+    centerY: -0.572,
   },
   /**
    * Side profile checkpoints (x, y): flat nose face, lightly-raked
@@ -72,8 +81,11 @@ export const BUS = {
     { x: 2.724, width: 0.6, bottomY: -0.66 },
     { x: -0.158, width: 0.63, bottomY: -0.66 },
   ],
-  /** Roof HVAC pod over the rear half. */
-  hvac: { length: 1.579, height: 0.184, width: 1.079, x: -0.632 },
+  /**
+   * Roof HVAC pod over the rear half - a low ~230 mm rooftop unit (the tall
+   * slab of older coaches would push the height past 3.4 m).
+   */
+  hvac: { length: 1.579, height: 0.12, width: 1.079, x: -0.632 },
   /**
    * Live king-size ad panels (30" x 144" = 762 x 3658 mm) on both sides,
    * between the wheel arches, top edge tucked under the window sill.

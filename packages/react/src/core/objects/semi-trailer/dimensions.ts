@@ -24,11 +24,38 @@ export const SEMI_TRAILER = {
   groundY: -1.066,
   /**
    * Tandem axles at the rear, dual tires per side - `width` is each tire of
-   * the pair, `dualGap` the space between them.
+   * the pair, `dualGap` the space between them. A 295/75R22.5 is ~1.0 m
+   * across on a 22.5" rim, hence the rim ratio.
    */
-  wheels: { axles: [-2.03, -2.53] as const, radius: 0.203, width: 0.121, dualGap: 0.026, centerY: -0.863 },
+  wheels: {
+    axles: [-2.03, -2.53] as const,
+    radius: 0.203,
+    width: 0.121,
+    dualGap: 0.026,
+    centerY: -0.863,
+    rimRatio: 0.567,
+  },
   /** Landing gear legs, well behind the kingpin. */
   landingGear: { x: 1.75, spread: 0.33 },
+  /**
+   * Extruded aluminium top and bottom rails along each side wall: their
+   * heights, and how far they stand proud of the sheet. The stand-off stays
+   * inside the side panels' own plane so the rails never cross the wrap.
+   */
+  rails: { top: 0.0375, bottom: 0.0775, stand: 0.0045 },
+  /**
+   * Rear door frame: corner post width (across the trailer), how far the
+   * frame stands behind the box face, and where the four door lock rods run
+   * (distance from the centreline, mirrored on both doors).
+   */
+  rearFrame: { post: 0.0725, depth: 0.031, lockRods: [0.175, 0.405] as const },
+  /**
+   * Aero side skirt: x span, where its top edge hangs below the floor, its
+   * drop, the inward tilt (radians) and the diagonal cut at its front end.
+   */
+  skirt: { front: 1.45, rear: -1.7, top: -0.605, height: 0.32, tilt: 0.12, chamfer: 0.3 },
+  /** ICC under-ride guard: bar centre above the road, half-width, upright spacing. */
+  guard: { height: 0.176, halfWidth: 0.4825, uprights: 0.28 },
   /** Live wrap panels on both smooth sides. */
   side: { width: 6.1, height: 1.05, radius: 0.012 },
   /** Live panel on the rear doors, inside the door frame and lock rods. */
