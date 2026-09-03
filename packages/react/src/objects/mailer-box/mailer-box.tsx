@@ -110,8 +110,17 @@ function MailerBoxImpl({
     </>
   )
 
+  /*
+   * The live panels are the flats of the faces, not the faces: a rounded box
+   * spends `radius` of every edge on the curve, so a panel the full face size
+   * hangs that much past the flat on every side and shows as a sliver of the
+   * print standing off the board wherever the box is seen at an angle. The
+   * flat is `2r` smaller each way, and its corners are square.
+   */
+  const inset = body.radius * 2
+  const face = { width: body.width - inset, height: body.height - inset, depth: body.depth - inset }
   const shared = {
-    radius: body.radius,
+    radius: 0,
   }
   const panelDefaults = {
     surfaceBackground,
@@ -119,7 +128,7 @@ function MailerBoxImpl({
     surfaceStyle,
   }
   // the end panels' virtual width follows the box depth at the top dpi
-  const endDefaults = { ...panelDefaults, resolution: Math.round(body.depth * pxPerUnit) }
+  const endDefaults = { ...panelDefaults, resolution: Math.round(face.depth * pxPerUnit) }
 
   return (
     <group {...groupProps}>
@@ -165,7 +174,17 @@ function MailerBoxImpl({
               <meshPhysicalMaterial color={color} metalness={0} roughness={0.82} />
             </mesh>
           ))}
-          <mesh position={[0.9 * labelScale, 0.008, 0.7 * labelScale]} rotation={[-Math.PI / 2, 0, 0.06]}>
+          {/* Kept inside the flat of the lid: skewed and pushed toward the
+              front corner, its far corner used to reach past the edge and
+              hang in the air off the side of the box. */}
+          <mesh
+            position={[
+              Math.min(0.9 * labelScale, body.width / 2 - body.radius - 0.75 * labelScale),
+              0.008,
+              Math.min(0.7 * labelScale, body.depth / 2 - body.radius - 1.06 * labelScale),
+            ]}
+            rotation={[-Math.PI / 2, 0, 0.06]}
+          >
             <planeGeometry args={[1.3 * labelScale, 1.95 * labelScale]} />
             <meshPhysicalMaterial color="#f4f5f2" metalness={0} roughness={0.6} />
           </mesh>
@@ -177,8 +196,8 @@ function MailerBoxImpl({
         <DeviceScreen
           {...shared}
           {...resolveSurface(regions.top, panelDefaults)}
-          width={body.width}
-          height={body.depth}
+          width={face.width}
+          height={face.depth}
           position={[0, body.height / 2 + 0.004, 0]}
           rotation={[-Math.PI / 2, 0, 0]}
           overlay={seamOverlay}
@@ -192,8 +211,8 @@ function MailerBoxImpl({
         <DeviceScreen
           {...shared}
           {...resolveSurface(regions.front, panelDefaults)}
-          width={body.width}
-          height={body.height}
+          width={face.width}
+          height={face.height}
           position={[0, 0, body.depth / 2 + 0.004]}
         >
           {regions.front.children}
@@ -205,8 +224,8 @@ function MailerBoxImpl({
         <DeviceScreen
           {...shared}
           {...resolveSurface(regions.back, panelDefaults)}
-          width={body.width}
-          height={body.height}
+          width={face.width}
+          height={face.height}
           position={[0, 0, -body.depth / 2 - 0.004]}
           rotation={[0, Math.PI, 0]}
         >
@@ -219,8 +238,8 @@ function MailerBoxImpl({
         <DeviceScreen
           {...shared}
           {...resolveSurface(regions.bottom, panelDefaults)}
-          width={body.width}
-          height={body.depth}
+          width={face.width}
+          height={face.depth}
           position={[0, -body.height / 2 - 0.004, 0]}
           rotation={[Math.PI / 2, 0, 0]}
         >
@@ -233,8 +252,8 @@ function MailerBoxImpl({
         <DeviceScreen
           {...shared}
           {...resolveSurface(regions.right, endDefaults)}
-          width={body.depth}
-          height={body.height}
+          width={face.depth}
+          height={face.height}
           position={[body.width / 2 + 0.004, 0, 0]}
           rotation={[0, Math.PI / 2, 0]}
           overlay={tapeOverlay(true)}
@@ -246,8 +265,8 @@ function MailerBoxImpl({
         <DeviceScreen
           {...shared}
           {...resolveSurface(regions.left, endDefaults)}
-          width={body.depth}
-          height={body.height}
+          width={face.depth}
+          height={face.height}
           position={[-body.width / 2 - 0.004, 0, 0]}
           rotation={[0, -Math.PI / 2, 0]}
           overlay={tapeOverlay(true)}

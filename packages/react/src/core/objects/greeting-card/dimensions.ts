@@ -16,8 +16,8 @@
 import type { MockupFraming, MockupMetrics, RegionSpec } from '../../regions'
 
 export const GREETING_CARD = {
-  /** One folded panel. */
-  panel: { width: 2.268, height: 3.179, thickness: 0.009, radius: 0.006 },
+  /** One folded panel. The stock is cut square, so its faces carry no corner radius. */
+  panel: { width: 2.268, height: 3.179, thickness: 0.009 },
   /** Default opening angle in degrees (display sweet spot is 60-75). */
   openAngle: 65,
   /** Default CSS px width of one virtual panel face. */
@@ -41,7 +41,7 @@ export const GREETING_CARD_METRICS = {
   mmPerUnit: GREETING_CARD_MM_PER_UNIT,
   regions: () => {
     const { panel, resolution } = GREETING_CARD
-    const one = { width: panel.width, height: panel.height, radius: panel.radius, resolution }
+    const one = { width: panel.width, height: panel.height, radius: 0, resolution }
     return { front: one, insideLeft: one, insideRight: one, back: one }
   },
 } as const satisfies MockupMetrics

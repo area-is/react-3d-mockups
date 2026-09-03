@@ -52,7 +52,7 @@ import {
   STUDIO_DISPLAY_COLORWAYS,
   type Colorway,
   type MockupKind,
-} from 'area-3d-mockups'
+} from 'react-3d-mockups'
 
 /**
  * What the prop explorer needs to know about one mockup, over and above what
@@ -114,6 +114,7 @@ const DEVICES: Record<string, ExplorerSpec> = {
     ],
     colorways: GALAXY_COLORWAYS,
     orientation: true,
+    fixed: { statusBar: true },
     bare: Galaxy,
     bareName: 'Galaxy',
   },
@@ -130,6 +131,7 @@ const DEVICES: Record<string, ExplorerSpec> = {
     ],
     colorways: IPHONE_COLORWAYS,
     orientation: true,
+    fixed: { statusBar: true },
     bare: IPhone,
     bareName: 'IPhone',
   },
@@ -146,6 +148,7 @@ const DEVICES: Record<string, ExplorerSpec> = {
     colorways: FOLD_COLORWAYS,
     orientation: true,
     openable: true,
+    fixed: { statusBar: true },
   },
   FlipMockup: {
     Component: FlipMockup,
@@ -159,6 +162,7 @@ const DEVICES: Record<string, ExplorerSpec> = {
     colorways: FLIP_COLORWAYS,
     orientation: true,
     openable: true,
+    fixed: { statusBar: true },
   },
   LaptopMockup: {
     Component: LaptopMockup,
@@ -187,6 +191,7 @@ const DEVICES: Record<string, ExplorerSpec> = {
     ],
     colorways: IPAD_COLORWAYS,
     orientation: true,
+    fixed: { statusBar: true },
   },
   GalaxyTabMockup: {
     Component: GalaxyTabMockup,
@@ -199,6 +204,7 @@ const DEVICES: Record<string, ExplorerSpec> = {
     ],
     colorways: GALAXY_TAB_COLORWAYS,
     orientation: true,
+    fixed: { statusBar: true },
   },
   AppleWatchMockup: {
     Component: AppleWatchMockup,

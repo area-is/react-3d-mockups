@@ -7,6 +7,8 @@ import {
   MILK_CARTON_REGIONS,
   gearShape,
   milkCartonLayout,
+  milkCartonRoof,
+  roundedRectShape,
   type MilkCartonSizeMm,
 } from '../../core'
 import { DeviceScreen } from '../../screen/device-screen'
@@ -38,6 +40,8 @@ export interface MilkCartonProps extends Omit<GroupProps, 'children' | 'color'>,
   cap?: boolean
 }
 
+type V3 = [number, number, number]
+
 /**
  * A procedurally built gable-top beverage carton: poly-coated board walls, the
  * roof folding up to a ridge, an ear fold pinching each end inward the way the
@@ -45,6 +49,16 @@ export interface MilkCartonProps extends Omit<GroupProps, 'children' | 'color'>,
  * the front roof panel. Every wall is live DOM, and so are both roof panels -
  * the cap rides over the front one exactly like a real spout rides over the
  * print. No 3D asset files are loaded.
+ *
+ * Board is the thing to get right. A carton is one sheet creased on rules and
+ * folded, and every edge on it is a fold - which is never a knife edge but a
+ * small radius of bent board. So the walls' corners are rounded, the eave
+ * where the roof leaves the wall is a fillet rather than a crease line, the
+ * ridge runs out onto a flat the fin stands on, and the fin itself is four
+ * plies thick with a pressed round top and a knuckle at each end where the
+ * ears fold into it. The first pass here had all of those as single planes
+ * meeting at lines, and it read as a paper model of a carton rather than the
+ * carton.
  *
  * Must be rendered inside a react-three-fiber `<Canvas>` (or `<MockupCanvas>`).
  *
@@ -77,7 +91,7 @@ function MilkCartonImpl({
   // to the eave and the roof takes it the rest of the way to the fin's top.
   const base = -height / 2
   const eave = base + body.height
-  const ridge = eave + gable.rise
+  const top = base + height
   /*
    * The roof panel's pose, from the triangle it spans: it leans back from
    * vertical by `tilt`, and its outward normal (0, normalY, normalZ) is that
@@ -90,84 +104,62 @@ function MilkCartonImpl({
   const normalZ = gable.rise / gable.slant
 
   /*
-   * The ridge, flattened by the width of its own fold (`gable.crease`).
-   *
-   * Board creased on a rule comes off it rounded, so the two roof planes never
-   * actually meet in a line: they run out onto a narrow flat that the fin
-   * stands on. Both planes stay exactly where the spec puts them - the flat is
-   * where they would have crossed, which is why its top sits a hair below the
-   * nominal ridge and the fin grows by the same amount to keep the carton its
-   * documented height.
+   * The roof profile, front to back, in the (z, y) plane - core's, so the
+   * geometry lofted from it and the printable run the metrics report can
+   * never disagree. Everything up here is a function of z alone, which is
+   * what lets the roof loft in strips.
    */
-  const ridgeDrop = (gable.crease * gable.rise) / (body.depth / 2)
-  const apex = ridge - ridgeDrop
+  const hw = body.width / 2
+  const hd = body.depth / 2
+  const crease = gable.crease
+  const roof = React.useMemo(() => milkCartonRoof(body, gable), [body, gable])
+  const { fold } = roof
+  const heightAt = React.useCallback((z: number): number => eave + roof.heightAt(z), [eave, roof])
+  /** Height of the ridge flat, where the fin stands. */
+  const apex = eave + roof.apex
+  /** The fin makes up whatever the roof left between the flat and the top. */
+  const finHeight = Math.max(top - apex, fin.height * 0.5)
 
   /*
-   * The closed roof: a slanted panel front and back, running out onto the
-   * ridge flat, with an ear fold closing each end. One buffer, wound outward -
-   * the carton is solid, so nothing needs a back face.
+   * The closed roof, as one buffer wound outward: the two slopes lofted in
+   * strips across the width, a wall of board at each rounded corner from the
+   * eave up to wherever the slope has climbed to, and an ear fold closing each
+   * end. The carton is solid, so nothing needs a back face.
    *
-   * Two things shape it beyond the slopes.
-   *
-   * The CORNERS carry the walls' fold radius up through the eave. The roof's
-   * footprint is the body's rounded rectangle, not a sharp one: the same fold
-   * that rounds a vertical corner is still rounded where the roof sits on it,
-   * so the corner fillet runs into the roof instead of dead-ending under a
-   * square overhang. Every slope panel therefore narrows over its last
-   * `body.radius` of depth, and each corner gets a wall of its own from the
-   * eave up to wherever the slope has climbed to.
-   *
-   * The EAR FOLDS are why an end is not a flat triangle. The side panel
+   * The ear folds are why an end is not a flat triangle. The side panel
    * carries its full depth up past the eave while the roof narrows toward the
    * ridge, and the excess board has to go somewhere: it creases down the
-   * middle and folds INWARD, deepening the whole way up until the two halves
-   * close on each other just under the fin (`gable.tuckAt`) and are pinched
-   * flat to be sealed into it. So each end is two facets meeting along a
-   * crease that dives into the carton - flush with the wall at the eave,
-   * `gable.tuck` inside it just below the fin, back out to the fin at the top.
-   * Flat-shaded off its own faces, so every crease is real geometry catching
-   * real light rather than a line painted on a plane.
+   * middle and folds INWARD. The crease starts flush with the wall at the eave
+   * midpoint, dives in as it rises, is deepest just under the fin
+   * (`gable.tuckAt`, where the two halves close on each other), and is pinched
+   * flat into the fin's root. Modelling that crease as a LINE with two
+   * stations on it - rather than a single point every triangle fanned to - is
+   * what makes the end read as an inverted V of folded board with two wings
+   * either side, instead of a cone punched into the carton.
    */
   const roofGeometry = React.useMemo(() => {
-    const hw = body.width / 2
-    const hd = body.depth / 2
-    const crease = gable.crease
-    // The corner fold, never wide enough to eat the slope it rounds.
-    const fold = Math.min(body.radius, hw / 2, (hd - crease) / 2)
-    // Rise per unit of depth: the slopes are planes, so every height on the
-    // roof is a function of z alone - which is what lets it loft in strips.
-    const pitch = gable.rise / hd
-    const heightAt = (z: number) =>
-      Math.abs(z) <= crease ? apex : eave + (hd - Math.abs(z)) * pitch
-
     const positions: number[] = []
-    const push = (...vs: [number, number, number][]) => {
+    const push = (...vs: V3[]) => {
       for (const v of vs) positions.push(...v)
     }
     /** One triangle, wound outward: the far side of a pair mirrors across z or x. */
-    const tri = (
-      flip: boolean,
-      p: [number, number, number],
-      q: [number, number, number],
-      r: [number, number, number]
-    ) => (flip ? push(p, r, q) : push(p, q, r))
+    const tri = (flip: boolean, p: V3, q: V3, r: V3) => (flip ? push(p, r, q) : push(p, q, r))
 
-    /**
-     * The corner fold, sampled from the front face round to the side face -
-     * `z` walking in from the outer face, `x` walking out to the full width.
+    /*
+     * The corner fold in plan, sampled from the front face round to the side
+     * face: `z` walking in from the outer face, `x` walking out to the full
+     * width. Sampled finely enough that the eave fillet - which lives in the
+     * same band of z - comes out as an arc rather than a chamfer.
      */
-    const CORNER_STEPS = 5
+    const CORNER_STEPS = 9
     const arc = Array.from({ length: CORNER_STEPS + 1 }, (_, i) => {
       const angle = (i / CORNER_STEPS) * (Math.PI / 2)
       return { z: hd - fold + fold * Math.cos(angle), x: hw - fold + fold * Math.sin(angle) }
     })
 
-    /*
-     * The top surface, lofted as strips between stations in z: the corner fold
-     * at the front, the straight run of slope, the ridge flat, then the same
-     * mirrored. Each station is a horizontal line at that z, so a strip is one
-     * quad however the footprint narrows underneath it.
-     */
+    // The top surface, lofted between stations in z: each station is a
+    // horizontal line at that z, so a strip is one quad however the footprint
+    // narrows underneath it.
     const stations: { z: number; x: number }[] = [
       ...arc,
       { z: crease, x: hw },
@@ -183,74 +175,115 @@ function MilkCartonImpl({
       tri(false, [-near.x, nearY, near.z], [far.x, farY, far.z], [-far.x, farY, far.z])
     }
 
-    // The four corner walls, each running from the eave up to the slope above
-    // it - full height where it meets the side face, nothing at all where it
-    // meets the front, which is where the slope already reaches the eave.
+    // The four corner walls, from the eave up to the slope above - full height
+    // where they meet the side face, nothing where they meet the front, which
+    // is where the fillet has come back down to the eave.
     for (const sx of [1, -1] as const) {
       for (const sz of [1, -1] as const) {
         for (let i = 0; i < arc.length - 1; i++) {
           const a = arc[i]!
           const b = arc[i + 1]!
-          const foot = (p: { x: number; z: number }): [number, number, number] => [
-            sx * p.x,
-            eave,
-            sz * p.z,
-          ]
-          const top = (p: { x: number; z: number }): [number, number, number] => [
-            sx * p.x,
-            heightAt(p.z),
-            sz * p.z,
-          ]
+          const foot = (p: { x: number; z: number }): V3 => [sx * p.x, eave, sz * p.z]
+          const crown = (p: { x: number; z: number }): V3 => [sx * p.x, heightAt(p.z), sz * p.z]
           const flip = sx * sz < 0
-          tri(flip, foot(a), foot(b), top(b))
-          tri(flip, foot(a), top(b), top(a))
+          tri(flip, foot(a), foot(b), crown(b))
+          tri(flip, foot(a), crown(b), crown(a))
         }
       }
     }
 
     for (const s of [1, -1] as const) {
-      /*
-       * The ear fold at the `s` end: a fan from the tucked crease peak out to
-       * every corner of the opening it closes - along the eave with the
-       * crease's foot in the middle, up the two slope edges, and across the
-       * ends of the ridge flat. Walking the rim in order keeps every triangle
-       * wound the same way.
-       */
-      const shoulder = heightAt(hd - fold)
-      const peak: [number, number, number] = [
-        s * (hw - gable.tuck),
-        eave + gable.rise * gable.tuckAt,
-        0,
-      ]
-      const rim: [number, number, number][] = [
-        [s * hw, eave, hd - fold],
-        [s * hw, eave, 0],
-        [s * hw, eave, -(hd - fold)],
-        [s * hw, shoulder, -(hd - fold)],
-        [s * hw, apex, -crease],
-        [s * hw, apex, crease],
-        [s * hw, shoulder, hd - fold],
-      ]
-      for (let i = 0; i < rim.length; i++) {
-        tri(s === -1, rim[i]!, rim[(i + 1) % rim.length]!, peak)
-      }
+      const e = hd - fold
+      const shoulder = heightAt(e)
+      const wall = s * hw
+      // The rim of the opening the ear closes, walked in one direction so
+      // every face comes out wound the same way.
+      const A: V3 = [wall, eave, e]
+      const M: V3 = [wall, eave, 0]
+      const B: V3 = [wall, eave, -e]
+      const Bs: V3 = [wall, shoulder, -e]
+      const Bt: V3 = [wall, apex, -crease]
+      const At: V3 = [wall, apex, crease]
+      const As: V3 = [wall, shoulder, e]
+      // The crease line, dived into the carton: shallow low down, deepest just
+      // under the fin, where the two halves of the ear close on each other.
+      const low: V3 = [s * (hw - gable.tuck * 0.45), eave + gable.rise * 0.38, 0]
+      const peak: V3 = [s * (hw - gable.tuck), eave + gable.rise * gable.tuckAt, 0]
+      const flip = s === -1
+      // the bottom of the V, dying out flush at the eave
+      tri(flip, A, M, low)
+      tri(flip, M, B, low)
+      // the two wings, each a folded quad between a rim edge and the crease
+      tri(flip, B, Bs, peak)
+      tri(flip, B, peak, low)
+      tri(flip, As, A, low)
+      tri(flip, As, low, peak)
+      // the upper wings, running up the slope edges to the fin's root
+      tri(flip, Bs, Bt, peak)
+      tri(flip, At, As, peak)
+      // the pinch itself, closed into the fin
+      tri(flip, Bt, At, peak)
     }
     const geometry = new THREE.BufferGeometry()
     geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3))
+    // A planar projection is all the paper grain needs: it is noise, so a
+    // seam where the projection turns a corner is invisible.
+    const uvs: number[] = []
+    for (let i = 0; i < positions.length; i += 3) {
+      uvs.push(positions[i]! * 2 + positions[i + 2]! * 2, positions[i + 1]! * 2)
+    }
+    geometry.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2))
     geometry.computeVertexNormals()
     return geometry
-  }, [
-    body.width,
-    body.depth,
-    body.radius,
-    eave,
-    apex,
-    gable.rise,
-    gable.tuck,
-    gable.tuckAt,
-    gable.crease,
-  ])
+  }, [hw, hd, fold, crease, eave, apex, gable.rise, gable.tuck, gable.tuckAt, heightAt])
   React.useEffect(() => () => roofGeometry.dispose(), [roofGeometry])
+
+  /*
+   * The walls: the body's rounded rectangle, extruded from the base to the
+   * eave. Not a rounded box - that rounds the top and bottom edges too, and
+   * the top edge is where the roof's own fillet takes over, so a second
+   * rounding there left a groove along the eave. The bottom fold is a scored
+   * crease on a real carton and reads right crisp.
+   */
+  const wallGeometry = React.useMemo(() => {
+    const geometry = new THREE.ExtrudeGeometry(roundedRectShape(body.width, body.depth, body.radius), {
+      depth: body.height,
+      bevelEnabled: false,
+      curveSegments: 8,
+    })
+    // Extruded along +Z; stood upright so the extrusion runs up y.
+    geometry.rotateX(-Math.PI / 2)
+    geometry.translate(0, base, 0)
+    return geometry
+  }, [body.width, body.depth, body.radius, body.height, base])
+  React.useEffect(() => () => wallGeometry.dispose(), [wallGeometry])
+
+  /*
+   * The sealed fin: its profile - four plies thick at the root where the ears
+   * fold in, tapering to the sealed top edge, which is pressed round - swept
+   * across the carton's width.
+   */
+  const finGeometry = React.useMemo(() => {
+    const t0 = fin.thickness
+    const t1 = t0 * fin.taper
+    const h = finHeight
+    const profile = new THREE.Shape()
+    profile.moveTo(-t0 / 2, 0)
+    profile.lineTo(t0 / 2, 0)
+    profile.lineTo(t1 / 2, h - t1 / 2)
+    profile.absarc(0, h - t1 / 2, t1 / 2, 0, Math.PI, false)
+    profile.lineTo(-t0 / 2, 0)
+    const geometry = new THREE.ExtrudeGeometry(profile, {
+      depth: body.width,
+      bevelEnabled: false,
+      curveSegments: 10,
+    })
+    // Extruded along +Z; turned so the sweep runs along x and centred.
+    geometry.rotateY(Math.PI / 2)
+    geometry.translate(-body.width / 2, apex, 0)
+    return geometry
+  }, [fin.thickness, fin.taper, finHeight, body.width, apex])
+  React.useEffect(() => () => finGeometry.dispose(), [finGeometry])
 
   /*
    * The cap's grip: the same gear profile the watch crown is machined from,
@@ -271,47 +304,159 @@ function MilkCartonImpl({
   }, [cap, capSize.radius, capSize.flutes, capSize.fluteDepth, capSize.height, capSize.rim])
   React.useEffect(() => () => capGeometry?.dispose(), [capGeometry])
 
-  const board = { color, metalness: 0, roughness: 0.42, clearcoat: 0.45, clearcoatRoughness: 0.35 }
+  /*
+   * The board's grain: a speck of noise, drawn once into a canvas, used as the
+   * roughness map and a whisper of bump. Coated board is not a flat colour -
+   * it has the tooth of the paper under the polyethylene, which is what makes
+   * a flat wall read as material rather than as a fill. Generated rather than
+   * loaded, like everything else here, and deterministic so two cartons match.
+   */
+  const grain = React.useMemo(() => {
+    if (typeof document === 'undefined') return null
+    let seed = 7
+    const next = () => (seed = (seed * 16807) % 2147483647) / 2147483647
+    /** A square of white noise, `lo..hi` grey. */
+    const noise = (size: number, lo: number, hi: number) => {
+      const canvas = document.createElement('canvas')
+      canvas.width = size
+      canvas.height = size
+      const ctx = canvas.getContext('2d')
+      if (!ctx) return null
+      const image = ctx.createImageData(size, size)
+      for (let i = 0; i < image.data.length; i += 4) {
+        const v = lo + next() * (hi - lo)
+        image.data[i] = image.data[i + 1] = image.data[i + 2] = v
+        image.data[i + 3] = 255
+      }
+      ctx.putImageData(image, 0, 0)
+      return canvas
+    }
+    // Two scales, like the real thing: a soft mottle a millimetre or two
+    // across - coarse noise blown up with the browser's own bilinear filter -
+    // and a faint speckle of tooth over it. Per-texel noise alone is finer
+    // than a pixel at any sensible distance and just shimmers.
+    const size = 256
+    const mottle = noise(48, 176, 255)
+    const tooth = noise(size, 0, 255)
+    const canvas = document.createElement('canvas')
+    canvas.width = size
+    canvas.height = size
+    const ctx = canvas.getContext('2d')
+    if (!ctx || !mottle || !tooth) return null
+    ctx.imageSmoothingEnabled = true
+    ctx.imageSmoothingQuality = 'high'
+    ctx.drawImage(mottle, 0, 0, size, size)
+    ctx.globalAlpha = 0.12
+    ctx.drawImage(tooth, 0, 0)
+    const texture = new THREE.CanvasTexture(canvas)
+    texture.wrapS = texture.wrapT = THREE.RepeatWrapping
+    // One tile per world unit - about 55 mm on the stock carton, so the
+    // mottle lands at the scale coated board actually shows it.
+    texture.repeat.set(1, 1)
+    return texture
+  }, [])
+  React.useEffect(() => () => grain?.dispose(), [grain])
+
+  /*
+   * Poly-coated board: matte paper under a thin polyethylene skin. Mostly
+   * rough, with a soft sheen rather than a gloss - the first pass had it near
+   * a clearcoat, which is a plastic bottle's finish, not a carton's.
+   */
+  const board = {
+    color,
+    metalness: 0,
+    roughness: 0.62,
+    clearcoat: 0.2,
+    clearcoatRoughness: 0.55,
+    sheen: 0.35,
+    sheenRoughness: 0.75,
+    sheenColor: new THREE.Color('#ffffff'),
+    ...(grain ? { roughnessMap: grain, bumpMap: grain, bumpScale: 0.002 } : {}),
+  }
   const plastic = { color: capColor, metalness: 0, roughness: 0.38, clearcoat: 0.55 }
 
+  /*
+   * The live panels are the FLATS of their faces - a wall between its corner
+   * folds, a roof slope between the eave fillet and the ridge - because that
+   * is where a print lies. Sized to the whole face they overhung the folds,
+   * and from any angle but head-on the overhang showed as a sliver of the
+   * artwork standing off the board. Their corners are square: every edge of
+   * a face is a crease.
+   */
   const panelDefaults = { surfaceBackground, resolution, surfaceStyle }
-  const pxPerUnit = resolution / body.width
+  const pxPerUnit = resolution / body.face.width
   // The end panels are as wide as the carton is deep, so they take their own
   // px width at the front panel's dpi rather than the front panel's number.
-  const endDefaults = { ...panelDefaults, resolution: Math.round(body.depth * pxPerUnit) }
-  const shared = { radius: body.radius }
+  const endDefaults = { ...panelDefaults, resolution: Math.round(body.face.depth * pxPerUnit) }
+  const roofDefaults = { ...panelDefaults, resolution: Math.round(body.width * pxPerUnit) }
+  const shared = { radius: 0 }
   // Live surfaces float a hair off the board, clear of z-fighting.
   const LIFT = 0.004
+  // The roof panels float three times that. Seen from above, a slope's depth
+  // and its panel's are close enough that a coarse depth buffer draws the
+  // board over the print at the walls' lift; at 0.7 mm there is no contest,
+  // and it is still nothing the eye can find.
+  const ROOF_LIFT = LIFT * 3
+  // The side seam's lap, ~6 mm on the stock carton, and its step, one ply.
+  const seamLap = Math.min(body.width * 0.07, height * 0.028)
+  const seamPly = LIFT * 0.85
+
+  const knuckleWidth = Math.min(fin.height * 0.6, body.width * 0.12)
+  const knuckleThickness = fin.thickness * (1 + fin.knuckle)
 
   return (
     <group {...groupProps}>
       {/* the walls */}
-      <RoundedBox
-        args={[body.width, body.height, body.depth]}
-        radius={body.radius}
-        position={[0, base + body.height / 2, 0]}
-      >
+      <mesh geometry={wallGeometry}>
         <meshPhysicalMaterial {...board} />
-      </RoundedBox>
+      </mesh>
+
+      {/* The side seam: a carton is one blank wrapped round and glued down one
+          vertical edge, and the outer ply's edge stands a board's thickness
+          proud the whole height of the wall, a few millimetres in from the
+          corner. On the back-left edge, where a real one is, so it rides over
+          the back print rather than the front - and kept under the live
+          panel's lift, so a printed back covers it the way print does. It is
+          half a millimetre of step, so it reads as a line, never a bar. */}
+      <mesh
+        position={[-(hw - body.radius - seamLap / 2), base + body.height / 2, -(hd + seamPly * 0.4)]}
+      >
+        <boxGeometry args={[seamLap, body.height, seamPly]} />
+        <meshPhysicalMaterial {...board} />
+      </mesh>
 
       {/* the folded roof */}
       <mesh geometry={roofGeometry}>
         <meshPhysicalMaterial {...board} />
       </mesh>
 
-      {/* The sealed fin, pinched up from all four panels: four plies and the
-          seal between them, so it is thin - and pressed, so its edges are
-          rounded. It stands on the ridge flat and makes up the drop, leaving
-          the carton exactly as tall as the spec says. */}
-      <RoundedBox
-        args={[body.width, fin.height + ridgeDrop, fin.thickness]}
-        radius={fin.radius}
-        steps={1}
-        smoothness={3}
-        position={[0, apex + (fin.height + ridgeDrop) / 2, 0]}
-      >
+      {/* The sealed fin, pinched up from all four panels. */}
+      <mesh geometry={finGeometry}>
         <meshPhysicalMaterial {...board} />
-      </RoundedBox>
+      </mesh>
+
+      {/* The seal's root: a bead of folded board where the fin leaves the roof,
+          so the fin grows out of the ridge instead of standing on it. */}
+      <mesh position={[0, apex + fin.thickness * 0.08, 0]} rotation-z={Math.PI / 2}>
+        <cylinderGeometry args={[fin.thickness * 0.55, fin.thickness * 0.55, body.width, 24]} />
+        <meshPhysicalMaterial {...board} />
+      </mesh>
+
+      {/* The knuckles: each end of the fin is where an ear's worth of board
+          folds in and gets sealed, so the fin is fatter there than in the run
+          between - the detail that says the top was folded rather than cut. */}
+      {([1, -1] as const).map((s) => (
+        <RoundedBox
+          key={`knuckle-${s}`}
+          args={[knuckleWidth, finHeight * 0.92, knuckleThickness]}
+          radius={Math.min(fin.radius, knuckleThickness * 0.4, knuckleWidth * 0.4)}
+          steps={1}
+          smoothness={4}
+          position={[s * (hw - knuckleWidth / 2), apex + (finHeight * 0.92) / 2, 0]}
+        >
+          <meshPhysicalMaterial {...board} />
+        </RoundedBox>
+      ))}
 
       {/* the screw cap, moulded onto the front roof panel. Its collar sits on
           the panel and the cap stands proud of it, so it masks whatever the
@@ -320,13 +465,21 @@ function MilkCartonImpl({
         <group
           position={[
             0,
-            eave + gable.rise * capSize.offset,
-            (body.depth / 2) * (1 - capSize.offset),
+            // On the board itself, which the eave fillet lifts a hair above
+            // the line an unfolded roof would sit on.
+            heightAt(hd * (1 - capSize.offset)),
+            hd * (1 - capSize.offset),
           ]}
           // Rotating +Y onto the panel's outward normal stands the cap up off
           // the slant rather than off the floor.
           rotation-x={Math.atan2(gable.rise, body.depth / 2)}
         >
+          {/* the moulded base the spout is welded into, a low ring proud of
+              the board around the collar's foot */}
+          <mesh position={[0, capSize.collar * 0.15, 0]} rotation-x={Math.PI / 2}>
+            <torusGeometry args={[capSize.flange * 1.04, capSize.flange * 0.11, 10, 48]} />
+            <meshPhysicalMaterial {...plastic} roughness={0.5} />
+          </mesh>
           {/* the moulded neck flange the cap screws onto */}
           <mesh position={[0, capSize.collar / 2, 0]}>
             <cylinderGeometry args={[capSize.flange, capSize.flange, capSize.collar, 48]} />
@@ -362,7 +515,7 @@ function MilkCartonImpl({
       <DeviceScreen
         {...shared}
         {...resolveSurface(regions.front, panelDefaults)}
-        width={body.width}
+        width={body.face.width}
         height={body.height}
         position={[0, base + body.height / 2, body.depth / 2 + LIFT]}
       >
@@ -374,7 +527,7 @@ function MilkCartonImpl({
         <DeviceScreen
           {...shared}
           {...resolveSurface(regions.back, panelDefaults)}
-          width={body.width}
+          width={body.face.width}
           height={body.height}
           position={[0, base + body.height / 2, -body.depth / 2 - LIFT]}
           rotation={[0, Math.PI, 0]}
@@ -388,7 +541,7 @@ function MilkCartonImpl({
         <DeviceScreen
           {...shared}
           {...resolveSurface(regions.right, endDefaults)}
-          width={body.depth}
+          width={body.face.depth}
           height={body.height}
           position={[body.width / 2 + LIFT, base + body.height / 2, 0]}
           rotation={[0, Math.PI / 2, 0]}
@@ -400,7 +553,7 @@ function MilkCartonImpl({
         <DeviceScreen
           {...shared}
           {...resolveSurface(regions.left, endDefaults)}
-          width={body.depth}
+          width={body.face.depth}
           height={body.height}
           position={[-body.width / 2 - LIFT, base + body.height / 2, 0]}
           rotation={[0, -Math.PI / 2, 0]}
@@ -409,9 +562,11 @@ function MilkCartonImpl({
         </DeviceScreen>
       )}
 
-      {/* live roof panels. Both are the same surface on the same slant, so the
-          back one is the front one seen from the other side: half a turn of
-          the group, then the identical local pose. */}
+      {/* live roof panels: the straight run of each slope, between the eave
+          fillet and the ridge flat, full width - the slope's side edges are
+          the creases it folds into the ears on. Both are the same surface on
+          the same slant, so the back one is the front one seen from the other
+          side: half a turn of the group, then the identical local pose. */}
       {([1, -1] as const).map((s) => {
         const slot = s === 1 ? regions.gableFront : regions.gableBack
         if (slot == null) return null
@@ -419,13 +574,13 @@ function MilkCartonImpl({
           <group key={`gable-${s}`} rotation-y={s === 1 ? 0 : Math.PI}>
             <DeviceScreen
               {...shared}
-              {...resolveSurface(slot, panelDefaults)}
+              {...resolveSurface(slot, roofDefaults)}
               width={body.width}
-              height={gable.slant}
+              height={gable.panel.length}
               position={[
                 0,
-                eave + gable.rise / 2 + normalY * LIFT,
-                body.depth / 4 + normalZ * LIFT,
+                eave + gable.panel.centerY + normalY * ROOF_LIFT,
+                gable.panel.centerZ + normalZ * ROOF_LIFT,
               ]}
               rotation={[-tilt, 0, 0]}
             >

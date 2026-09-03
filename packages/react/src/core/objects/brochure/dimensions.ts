@@ -32,8 +32,9 @@ export interface BrochureSize {
  */
 export function brochureSpec({ width = 93.1, height = 215.9 }: BrochureSize = {}) {
   return {
-    /** One folded panel. Content you pass per panel maps onto this rect. */
-    panel: { width: width * BROCHURE_MM, height: height * BROCHURE_MM, thickness: 0.0075, radius: 0.008 },
+    /** One folded panel. Content you pass per panel maps onto this rect; the
+     * sheet is cut square, so it carries no corner radius. */
+    panel: { width: width * BROCHURE_MM, height: height * BROCHURE_MM, thickness: 0.0075 },
     /** Number of panels in the fold. */
     panels: 3,
     /** Default zig-zag fold angle in degrees (0 would be a flat unfolded sheet). */
@@ -87,7 +88,7 @@ export const BROCHURE_METRICS = {
   mmPerUnit: BROCHURE_MM_PER_UNIT,
   regions: ({ size }) => {
     const { panel, resolution } = size ? brochureSpec(size) : BROCHURE
-    const one = { width: panel.width, height: panel.height, radius: panel.radius, resolution }
+    const one = { width: panel.width, height: panel.height, radius: 0, resolution }
     return Object.fromEntries(BROCHURE_REGIONS.map(({ name }) => [name, one]))
   },
 } as const satisfies MockupMetrics<{ size?: BrochureSize }>

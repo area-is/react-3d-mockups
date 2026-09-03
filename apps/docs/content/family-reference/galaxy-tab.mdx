@@ -19,7 +19,7 @@ edge in portrait and the top center in landscape, just like the physical panel.
 <BareVsMockup object="GalaxyTab" kind="galaxyTab" slot="Screen" />
 
 ```tsx
-import { MockupCanvas, GalaxyTab, GalaxyTabMockup } from 'area-3d-mockups'
+import { MockupCanvas, GalaxyTab, GalaxyTabMockup } from 'react-3d-mockups'
 
 // The one-liner: its own canvas, with lighting, a ground shadow, drag-to-orbit
 // controls and a camera already framed on the object.
@@ -44,6 +44,7 @@ Beyond the [shared screen props](/docs/screen-content):
 | --- | --- | --- | --- |
 | `variant` | `'tabs11' \| 'tabs11ultra'` | `'tabs11'` | Tab S11 (single camera ring) or Tab S11 Ultra (dual rings, 14.6" panel with the U-shaped notch). |
 | `orientation` | `'portrait' \| 'landscape'` | `'portrait'` | Landscape lays the tablet on its side and swaps the virtual display with upright content. |
+| `statusBar` | `boolean \| StatusBarContent` | `false` | Draw the system status bar across the top of the screen. `true` gives the platform's defaults - One UI's tablet bar, with the clock at the leading inset and the meters at the trailing one; an object sets the clock, the meters and the ink (`{{ time: '14:05', battery: 0.42, batteryPercent: true, color: '#1c1c1e' }}`). It is placed from this device's own camera cutout and logical grid, so it lines up with the hardware on every variant. See [Status bar](/docs/screen-content#status-bar). |
 | `resolution` | `number` | per variant | Defaults to the variant's logical grid: 800×1280 (tabs11), 924×1480 (tabs11ultra). |
 | `color` | `string` | per variant | Body color. Takes a retail colorway id from `GALAXY_TAB_COLORWAYS` (`gray`, `silver`) or any CSS color. |
 

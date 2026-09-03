@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import { EmbeddedScreen } from '@/components/screens/embedded-screen'
 
 export const metadata: Metadata = {
-  title: 'Embedded | area-3d-mockups',
+  title: 'Embedded | React 3D Mockups',
   robots: { index: false },
 }
 

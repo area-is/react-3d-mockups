@@ -14,7 +14,7 @@ single-lens bar (Air), full-width triple-lens plateau with flash and LiDAR
 <BareVsMockup object="IPhone" kind="iphone" slot="Screen" />
 
 ```tsx
-import { MockupCanvas, IPhone, IPhoneMockup } from 'area-3d-mockups'
+import { MockupCanvas, IPhone, IPhoneMockup } from 'react-3d-mockups'
 
 // The one-liner: its own canvas, with lighting, a ground shadow, drag-to-orbit
 // controls and a camera already framed on the object.
@@ -39,6 +39,7 @@ Same API as [`Galaxy`](/docs/api/galaxy-s26), except:
 | --- | --- | --- | --- |
 | `variant` | `'17' \| 'air' \| 'pro' \| 'promax'` | `'17'` | Which iPhone 17 family device: 17 (two-lens pill), air (ultra-thin, single-lens bar), pro and promax (full-width plateau, flash + LiDAR). |
 | `orientation` | `'portrait' \| 'landscape'` | `'portrait'` | Landscape lays the device on its side and swaps the virtual display (for example 874×402 on the 17) with upright content. |
+| `statusBar` | `boolean \| StatusBarContent` | `false` | Draw the system status bar across the top of the screen. `true` gives the platform's defaults - iOS's, with the clock centred in the ear left of the Dynamic Island and the meters in the ear right of it; an object sets the clock, the meters and the ink (`{{ time: '14:05', battery: 0.42, batteryPercent: true, color: '#1c1c1e' }}`). It is placed from this device's own camera cutout and logical grid, so it lines up with the hardware on every variant. See [Status bar](/docs/screen-content#status-bar). |
 | `resolution` | `number` | per variant | Defaults to the variant's point grid: 402×874 (17, pro), 420×912 (air), 440×956 (promax). |
 | `color` | `string` | `'#1a1c20'` | Back glass. Takes a retail colorway id from `IPHONE_COLORWAYS` - 17 `black`, `white`, `lavender`, `mistblue`, `sage`; Air `spaceblack`, `cloudwhite`, `lightgold`, `skyblue`; Pro/Pro Max `silver`, `cosmicorange`, `deepblue` - which brings that model's measured chassis rail with it, or any CSS color - the rail is then derived from it. |
 

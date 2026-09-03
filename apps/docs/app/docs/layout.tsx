@@ -11,16 +11,16 @@ import { SITE_URL, socialMetadata } from '@/lib/site'
 import './docs.css'
 import '../screens.css'
 
-const DOCS_DESCRIPTION = 'Installation, usage guides and API reference for area-3d-mockups.'
+const DOCS_DESCRIPTION = 'Installation, usage guides and API reference for React 3D Mockups.'
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    template: '%s | area-3d-mockups',
-    default: 'Documentation | area-3d-mockups',
+    template: '%s | React 3D Mockups',
+    default: 'Documentation | React 3D Mockups',
   },
   description: DOCS_DESCRIPTION,
-  ...socialMetadata({ title: 'area-3d-mockups documentation', description: DOCS_DESCRIPTION }),
+  ...socialMetadata({ title: 'React 3D Mockups documentation', description: DOCS_DESCRIPTION }),
 }
 
 // Root layout for the documentation. It is deliberately separate from the

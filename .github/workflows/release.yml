@@ -1,6 +1,6 @@
-name: Release area-3d-mockups
+name: Release react-3d-mockups
 
-# Publishes `packages/react` to npm as `area-3d-mockups` using npm Trusted
+# Publishes `packages/react` to npm as `react-3d-mockups` using npm Trusted
 # Publishing (OIDC): no NPM_TOKEN, no secret in this repo at all. GitHub mints
 # a short-lived OIDC token, the npm CLI exchanges it for a publish credential,
 # and npm attaches a provenance attestation linking the tarball to this commit.
@@ -12,10 +12,10 @@ name: Release area-3d-mockups
 # hand from a laptop; this workflow takes over from the release after that.
 # Setup, once, after that first manual publish:
 #
-#   npm trust github area-3d-mockups \
+#   npm trust github react-3d-mockups \
 #     --repo area-is/3d-mockups --file release.yml --allow-publish
 #
-#   (or npmjs.com → area-3d-mockups → Settings → Trusted publishing. `npm trust`
+#   (or npmjs.com → react-3d-mockups → Settings → Trusted publishing. `npm trust`
 #    needs npm 11.15.0+ and account-level 2FA; it is not workspace-aware, hence
 #    naming the package explicitly. --allow-publish defaults to false, so the
 #    config is inert without it.)
@@ -29,8 +29,8 @@ name: Release area-3d-mockups
 # Release flow afterwards: bump the version in packages/react/package.json, land
 # it on main, then push a matching tag.
 #
-#   npm version patch -w area-3d-mockups   # or minor / major
-#   git commit -am 'Release area-3d-mockups v0.1.1'
+#   npm version patch -w react-3d-mockups   # or minor / major
+#   git commit -am 'Release react-3d-mockups v0.1.1'
 #   git tag v0.1.1
 #   git push origin main --follow-tags
 #
@@ -98,7 +98,7 @@ jobs:
             echo "::error::Tag $GITHUB_REF_NAME does not match packages/react/package.json ($manifest)."
             exit 1
           fi
-          echo "Publishing area-3d-mockups@$manifest"
+          echo "Publishing react-3d-mockups@$manifest"
 
       # A dispatched run defaults to packing only, so the workflow itself can be
       # exercised on a branch without burning a version number.

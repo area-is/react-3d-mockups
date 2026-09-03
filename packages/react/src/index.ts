@@ -64,6 +64,19 @@ export {
   type SurfaceInfo,
 } from './screen/use-surface'
 export {
+  StatusBar,
+  renderStatusBar,
+  type StatusBarProps,
+  type StatusBarOption,
+} from './screen/status-bar'
+export {
+  type StatusBarContent,
+  type StatusBarPlatform,
+  type StatusBarFormFactor,
+  type StatusBarBattery,
+  STATUS_BAR_DEFAULTS,
+} from './core'
+export {
   createSlot,
   createSlots,
   collectSlots,
@@ -126,7 +139,7 @@ export { CustomBox, type CustomBoxProps } from './objects/custom-box/custom-box'
 
 // The curated core surface: the types and pure data an app plausibly needs
 // next to the components. The FULL core (every spec constant, geometry helper,
-// screen/stage behavior) lives behind the `area-3d-mockups/core` subpath so its
+// screen/stage behavior) lives behind the `react-3d-mockups/core` subpath so its
 // internals can evolve without breaking this package's semver contract.
 export type { Orientation } from './core'
 export {

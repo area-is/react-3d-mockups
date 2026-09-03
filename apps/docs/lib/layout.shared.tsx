@@ -8,14 +8,11 @@ export function baseOptions(): BaseLayoutProps {
       title: (
         <>
           <Logo size={26} style={{ flexShrink: 0 }} />
-          area-3d-mockups
+          React 3D Mockups
         </>
       ),
     },
     githubUrl: 'https://github.com/area-is/3d-mockups',
-    links: [
-      { text: 'Home', url: '/' },
-      { text: 'Demos', url: '/demos' },
-    ],
+    links: [{ text: 'Home', url: '/' }],
   }
 }

@@ -1,8 +1,9 @@
 /**
- * Van object dimensions - a generic Euro-style cargo van (think Transit /
- * Sprinter silhouette, no brand): long-wheelbase panel van with a clamshell
- * hood, cowl break, raked windshield, high roof and a flat cargo side that
- * takes a vinyl-wrap livery.
+ * Van object dimensions - a generic delivery step van (think Freightliner
+ * MT45 / Utilimaster / Sprinter box body, no brand): a walk-in cab and a
+ * riveted cargo box in one tall shell, with a stub clamshell hood, cowl
+ * break, raked two-piece windshield, crowned roof, dual rear wheels, a
+ * roll-up rear door and flat cargo sides that take a vinyl-wrap livery.
  *
  * Normalized to ~1050 mm per world unit: 5.9 m long, 2.55 m tall, 2.05 m wide
  * becomes 5.62 x 2.43 x 1.95 units. The group origin sits mid-height at the
@@ -22,15 +23,23 @@ export const VAN = {
   groundY: -1.215,
   /** Y of the body's lower rocker edge (ground clearance above `groundY`). */
   rockerY: -0.881,
-  /** Wheels: axle x positions, tire radius, arch cutout radius, tire width. */
+  /**
+   * Wheels: axle x positions, tire radius, arch cutout radius, tire width.
+   * 19.5-inch delivery rubber (~775 mm) rather than a car-derived van tire -
+   * a step van carries its cargo on truck wheels, and the taller tire is a
+   * good part of what makes the body read as a truck instead of a toy. The
+   * rear axle is dual: `dualOffset` is the inner tire's setback from the
+   * outer one.
+   */
   wheels: {
     frontX: 1.905,
     rearX: -1.587,
-    radius: 0.362,
+    radius: 0.368,
     archRadius: 0.438,
     width: 0.24,
+    dualOffset: 0.255,
     /** Wheel axle height (tire bottom touches `groundY`). */
-    centerY: -0.853,
+    centerY: -0.847,
   },
   /**
    * Side profile checkpoints (x, y) used to build the extruded shell: bumper
@@ -51,6 +60,12 @@ export const VAN = {
     roofStartX: 1.3,
     roofY: 1.19,
   },
+  /**
+   * The roll-up rear door: its opening in the rear frame (half-width across
+   * z, sill and header y) and the slat count it rolls up in. Both rear wrap
+   * regions lie on this door, so its slat grooves are what they carve.
+   */
+  rollup: { halfWidth: 0.74, bottomY: -0.74, topY: 1.02, slats: 12 },
   /** Live vinyl-wrap panels on both cargo sides, clear of the arches and door glass. */
   wrap: { width: 3.72, height: 1.52, x: -0.86, y: 0.34, radius: 0.02 },
   /** Live wrap panel on the rear doors, between the taillight clusters. */

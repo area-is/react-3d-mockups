@@ -59,6 +59,50 @@ one vocabulary, whichever element you hang it off:
 </AFrameSignMockup>
 ```
 
+## Status bar
+
+Phones, foldables and tablets take a `statusBar` prop that draws the system
+bar across the top of the screen. `true` gives you the platform's defaults;
+an object sets the clock, the meters and the ink.
+
+```tsx
+<IPhoneMockup statusBar />
+<GalaxyMockup statusBar={{ time: '14:05', battery: 0.42, batteryState: 'charging' }} />
+<IPadMockup statusBar={{ date: 'Tue Sep 2', color: '#1c1c1e' }} />   // dark ink for a light screen
+```
+
+| Field | Type | Default | Description |
+| --- | --- | --- | --- |
+| `time` | `string` | `'9:41'` | Clock face. iPad gets `'9:41 AM'`, because iPadOS prints the period. |
+| `date` | `string` | - | The date beside the clock, as iPadOS shows it when "Show Date in Status Bar" is on. iPad only. |
+| `signal` | `number` | `4` | Cellular bars lit, 0-4. |
+| `wifi` | `number` | `3` | Wi-Fi arcs lit, 0-3. |
+| `wifiGeneration` | `number` | - | The small `6` or `7` One UI hangs off the Wi-Fi fan on a Wi-Fi 6 or 7 network. One UI only. |
+| `battery` | `number` | `1` | Charge level, 0-1. |
+| `batteryState` | `'normal' \| 'charging' \| 'low'` | `'normal'` | Colours the fill, and adds the bolt. |
+| `batteryPercent` | `boolean` | iOS `false`, One UI `true` | Show the charge as a number, where each system puts it: inside the iPhone's capsule, as `100%` beside the iPad's, inside One UI's pill. One UI 8.5 always shows it, so it is on there by default; off draws the older outline capsule. |
+| `carrier` | `string` | - | Carrier name. One UI only - iOS has not shown one for years. |
+| `color` | `string` | `'#ffffff'` | Ink. Pass a dark value for a light screen, the way an app picks its status-bar style. |
+
+Which bar you get is the device's to decide, not yours: iPhones and iPads draw
+the iOS one, Galaxy phones, foldables and tablets the One UI one, and the two
+differ in layout as well as styling - iOS centres the clock in the ear left of
+the Dynamic Island and reads signal, Wi-Fi, battery on the right; One UI sets
+the clock flush to the inset and reads Wi-Fi, signal, battery.
+
+The bar is placed from the hardware rather than from a constant. Each device
+already carries its front-camera geometry, so the glyph row is centred on the
+Dynamic Island or the punch hole and the band is symmetrical about it, on every
+variant and at whatever `resolution` you set. That includes the Z Fold's inner
+display, whose hole is off-centre: the bar clears it rather than assuming a
+centred camera. In landscape there is no cutout in the way, so both platforms
+fall back to a plain strip along the top.
+
+It sits *over* your content, exactly as it does on a real device - laying out
+underneath it is your business. The Flip's cover screen does not get one (One
+UI's cover face has its own clock and no status bar), and neither do laptops,
+monitors, watches or any of the print objects.
+
 ## Why screens are display-only
 
 A mockup is a picture of a device, not a device. Content on the glass renders
@@ -68,7 +112,7 @@ drag anywhere (body, background, or screen) rotates the model.
 
 That is a deliberate architectural choice, and it is what buys the mockup its
 looks. A screen is real DOM composited into a WebGL scene, and where that DOM
-sits in the stacking order decides how hardware can hide it. area-3d-mockups
+sits in the stacking order decides how hardware can hide it. react-3d-mockups
 always stacks it *under* the canvas and masks it with the depth buffer, so
 anything in front of the screen covers it exactly, pixel for pixel: a laptop's
 keyboard hides the screen's reflection, a phone's proud camera ring stands over

@@ -22,7 +22,7 @@ export const OG_IMAGE = {
   url: '/og.png',
   width: 1200,
   height: 630,
-  alt: 'area-3d-mockups: a live 3D phone mockup with real DOM on the glass',
+  alt: 'react-3d-mockups: a live 3D phone mockup with real DOM on the glass',
 }
 
 /** Shared Open Graph / Twitter block; pages override `title` and `description`. */
@@ -30,7 +30,7 @@ export function socialMetadata({ title, description }: { title: string; descript
   return {
     openGraph: {
       type: 'website' as const,
-      siteName: 'area-3d-mockups',
+      siteName: 'react-3d-mockups',
       title,
       description,
       images: [OG_IMAGE],

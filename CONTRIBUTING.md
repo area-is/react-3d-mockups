@@ -78,9 +78,9 @@ pointed out.
 
 ## Releasing
 
-`packages/react` is the only package that ships, as [`area-3d-mockups`]. It is
+`packages/react` is the only package that ships, as [`react-3d-mockups`]. It is
 the whole library: the core layer is a directory inside it (`src/core`), built
-as a second entry point and published as the `area-3d-mockups/core` subpath, so
+as a second entry point and published as the `react-3d-mockups/core` subpath, so
 the tarball is one self-contained install.
 
 Releases run on [`.github/workflows/release.yml`](.github/workflows/release.yml)
@@ -91,8 +91,8 @@ linking it to the commit. There is no `NPM_TOKEN` in this repository.
 A tag is the trigger:
 
 ```bash
-npm version patch -w area-3d-mockups   # or minor / major
-git commit -am 'Release area-3d-mockups v0.1.1'
+npm version patch -w react-3d-mockups   # or minor / major
+git commit -am 'Release react-3d-mockups v0.1.1'
 git tag v0.1.1
 git push origin main --follow-tags
 ```
@@ -109,4 +109,4 @@ the whole thing without spending a version number, run the workflow from the
 Actions tab with **Run workflow**. A dispatched run defaults to `--dry-run` and
 only packs.
 
-[`area-3d-mockups`]: https://www.npmjs.com/package/area-3d-mockups
+[`react-3d-mockups`]: https://www.npmjs.com/package/react-3d-mockups

@@ -36,7 +36,7 @@ body:
   - type: input
     id: version
     attributes:
-      label: area-3d-mockups version
+      label: react-3d-mockups version
       placeholder: 0.1.0
     validations:
       required: true

@@ -17,6 +17,7 @@ import {
   roundedRectShape,
 } from '../../core'
 import { DeviceScreen } from '../../screen/device-screen'
+import { renderStatusBar, type StatusBarOption } from '../../screen/status-bar'
 import { createLogoGeometry } from '../logos'
 import { createWordmarkTexture } from '../wordmark'
 import { LensRing, UsbC, cutGeometry, stadiumCutter, USB_CUT_DEPTH } from '../details'
@@ -46,6 +47,13 @@ export interface TabletCommonProps extends Omit<GroupProps, 'children' | 'color'
    * H×W with upright content - exactly like rotating the real tablet.
    */
   orientation?: 'portrait' | 'landscape'
+  /**
+   * Draw the system status bar across the top of the screen: `true` for the
+   * platform's defaults, or an object to set the clock, the meters and the
+   * ink. iPads get the iOS bar and Galaxy Tabs the One UI one, picked from the
+   * variant rather than from a prop.
+   */
+  statusBar?: StatusBarOption
   /**
    * Body color. Takes a retail colorway id from the family's catalog
    * (`IPAD_COLORWAYS` / `GALAXY_TAB_COLORWAYS` - iPad Pro Space Black and
@@ -88,6 +96,7 @@ function TabletBody({
   surfaceBackground = '#000000',
   resolution,
   surfaceStyle,
+  statusBar,
   ...groupProps
 }: TabletBodyProps) {
   const screen = collectSlots(children, SCREEN_REGIONS).screen
@@ -527,7 +536,21 @@ function TabletBody({
             surfaceStyle,
           })}
           overlay={
-            notch ? (
+            <>
+            {/*
+              * Which bar depends on whose tablet it is, and the model already
+              * says: the etched rear logo is Apple's or Samsung's. Neither
+              * family puts a cutout in the status bar's way - the Tab Ultra's
+              * notch is on the landscape-top edge, away from the clock - so
+              * both get the plain fixed-height strip.
+              */}
+            {renderStatusBar(statusBar, {
+              platform: logo?.mark === 'samsung' ? 'oneui' : 'ios',
+              formFactor: 'tablet',
+              width: res,
+              corner: px(display.radius),
+            })}
+            {notch ? (
               <div
                 aria-hidden
                 style={{
@@ -554,7 +577,8 @@ function TabletBody({
                   }}
                 />
               </div>
-            ) : undefined
+            ) : null}
+            </>
           }
         >
           {screen?.children}

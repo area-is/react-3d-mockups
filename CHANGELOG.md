@@ -1,6 +1,6 @@
 # Changelog
 
-Notable changes to `area-3d-mockups`. This project follows
+Notable changes to `react-3d-mockups`. This project follows
 [semantic versioning](https://semver.org/); dates are ISO-8601.
 
 ## Unreleased
@@ -21,7 +21,38 @@ Notable changes to `area-3d-mockups`. This project follows
   hardware it is. Each variant ships its retail colorways, and every body
   and panel figure is the published hardware dimension.
 
+- **`statusBar` on phones, foldables and tablets.** `<IPhoneMockup statusBar />`
+  draws the iOS bar; the Galaxy phones, both foldables and the Galaxy Tabs draw
+  One UI's. Pass an object to set the clock, the meters, the carrier or the ink
+  (`statusBar={{ time: '14:05', battery: 0.42, batteryPercent: true }}`).
+
+  It is placed from the hardware rather than from a constant: every device
+  already carries its front-camera geometry, so the glyph row is centred on the
+  Dynamic Island or the punch hole and the band is symmetrical about it - on
+  every variant, at whatever `resolution` you set, and including the Z Fold's
+  off-centre inner hole. The two platforms differ in layout, not just styling:
+  iOS centres the clock in the ear left of the island and the meters in the ear
+  right of it, One UI sets both flush to their insets. Landscape has no cutout
+  in the way, so both fall back to a plain strip.
+
+  The Flip's cover screen is deliberately excluded - One UI's cover face has its
+  own clock and no status bar - as are laptops, monitors, watches and every
+  print object.
+
+  `statusBarLayout()`, `statusBarMetrics()` and `resolveStatusBarContent()` are
+  exported from `react-3d-mockups/core` for bindings outside React, and
+  `<StatusBar>` from the package root for anyone composing one by hand.
+
 ### Changed (breaking)
+
+- **The package is now `react-3d-mockups`.** It was `react-3d-mockups`; nothing
+  else moved, so the change is one line in your manifest and one in each import.
+
+  ```diff
+  - import { GalaxyMockup } from 'react-3d-mockups'
+  + import { GalaxyMockup } from 'react-3d-mockups'
+  ```
+
 
 - **`open` is now `openAngle` on `FoldMockup`/`FlipMockup`** (and `Fold`/`Flip`,
   and in `mockupInfo('fold' | 'flip', …)`). It matches `LaptopMockup`'s existing

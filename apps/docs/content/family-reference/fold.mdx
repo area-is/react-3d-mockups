@@ -15,7 +15,7 @@ camera pill on the back.
 <BareVsMockup object="Fold" kind="fold" slot="Screen" />
 
 ```tsx
-import { MockupCanvas, Fold, FoldMockup } from 'area-3d-mockups'
+import { MockupCanvas, Fold, FoldMockup } from 'react-3d-mockups'
 
 // The one-liner: its own canvas, with lighting, a ground shadow, drag-to-orbit
 // controls and a camera already framed on the object.
@@ -42,6 +42,7 @@ Beyond the [shared screen props](/docs/screen-content) and, on the mockup, the
 | `variant` | `'fold7' \| 'fold8' \| 'fold8ultra'` | `'fold7'` | Which Galaxy Z Fold to render. `fold7` and `fold8ultra` share the tall book chassis; `fold8` is the generation's wide form factor, opening into a landscape 4:3 tablet. |
 | `openAngle` | `boolean \| number` | `true` | How far the book is open. `true` is the unfolded tablet (content on the big inner display, with a center crease), `false` the folded candy-bar (content on the cover display, rear camera pill showing). A number is degrees (0 = shut, 180 = flat) and renders the real Flex Mode book pose: the panels pivot around the Armor FlexHinge while its rounded spine (with the SAMSUNG engraving) stays tangent to both back shells, wrapping the fold at every angle, and your content bends across the crease on two composited planes. The pose is continuous: every angle renders its own pose, and only the extremes hand over to the dedicated folded (~0°) and flat (180°) poses, which draw the crease as one seamless screen. |
 | `orientation` | `'portrait' \| 'landscape'` | `'portrait'` | Rotates the device a quarter turn and swaps the virtual display with upright content. On the fold7 and fold8ultra that lays the tablet on its side; on the natively landscape fold8 it stands it upright. |
+| `statusBar` | `boolean \| StatusBarContent` | `false` | Draw the system status bar across the top of the screen. `true` gives the platform's defaults - One UI's, on the cover screen and on the inner display alike, clearing whichever punch hole is showing - including the inner display's off-centre one; an object sets the clock, the meters and the ink (`{{ time: '14:05', battery: 0.42, batteryPercent: true, color: '#1c1c1e' }}`). It is placed from this device's own camera cutout and logical grid, so it lines up with the hardware on every variant. See [Status bar](/docs/screen-content#status-bar). |
 | `color` | `string` | `'#3a3d42'` | Back panel. Takes a retail colorway id from `FOLD_COLORWAYS[variant]`, which brings that model's frame and hinge with it, or any CSS color - the metal is then derived from it. |
 | `resolution` | `number` | per state | CSS pixel width of the active display; height follows the panel aspect. Defaults to the device's own logical grid for whichever screen is showing - see the [device table](/docs/devices). |
 

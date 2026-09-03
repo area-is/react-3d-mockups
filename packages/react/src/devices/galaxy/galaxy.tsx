@@ -12,6 +12,7 @@ import {
   roundedRectShape,
 } from '../../core'
 import { DeviceScreen } from '../../screen/device-screen'
+import { renderStatusBar, type StatusBarOption } from '../../screen/status-bar'
 import { createLogoGeometry } from '../logos'
 import {
   SideKey,
@@ -46,6 +47,13 @@ export interface GalaxyProps extends Omit<GroupProps, 'children' | 'color'>, Sur
    */
   orientation?: 'portrait' | 'landscape'
   /**
+   * Draw the system status bar across the top of the screen: `true` for the
+   * platform's defaults, or an object to set the clock, the meters and the
+   * ink. It is placed from this device's own camera cutout and logical grid,
+   * so it lines up with the hardware on every variant.
+   */
+  statusBar?: StatusBarOption
+  /**
    * Back panel color, and the whole finish: the metal frame, buttons and
    * camera rings follow from it. A retail colorway id from `GALAXY_COLORWAYS`
    * (`'icyblue'`, `'mint'`…) gets that model's measured rail; any other CSS
@@ -79,6 +87,7 @@ function GalaxyImpl({
   surfaceBackground = '#000000',
   resolution,
   surfaceStyle,
+  statusBar,
   ...groupProps
 }: GalaxyProps) {
   const screen = collectSlots(children, SCREEN_REGIONS).screen
@@ -411,6 +420,18 @@ function GalaxyImpl({
           // it eats the same corner of your layout here that it eats on the
           // real panel, which is most of the point of looking at a mockup.
           overlay={
+            <>
+            {/* Landscape gets no cutout: the hole is off to the side there, so
+                One UI sets a plain strip along the top instead of clearing it. */}
+            {renderStatusBar(statusBar, {
+              platform: 'oneui',
+              formFactor: 'phone',
+              width: res,
+              corner: px(display.radius),
+              cutout: landscape
+                ? undefined
+                : { halfWidth: px(hole.radius), centerY: px(hole.offsetY), offsetX: 0 },
+            })}
             <div
               aria-hidden
               style={{
@@ -429,6 +450,7 @@ function GalaxyImpl({
                 zIndex: 2147483647,
               }}
             />
+            </>
           }
         >
           {screen?.children}

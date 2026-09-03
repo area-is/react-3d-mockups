@@ -1,4 +1,4 @@
-// area-3d-mockups/core - the renderer-agnostic heart of the library.
+// react-3d-mockups/core - the renderer-agnostic heart of the library.
 //
 // Device/object specs, region registries, framing, geometry math, and the
 // screen & stage behaviors. Everything here depends on `three` at most and
@@ -8,10 +8,10 @@
 // WebGL and no React.
 //
 // This file is also the package's second entry point, published as the
-// `area-3d-mockups/core` subpath, so specs can be imported without pulling in
+// `react-3d-mockups/core` subpath, so specs can be imported without pulling in
 // the components:
 //
-//   import { IPHONE_VARIANTS, STUDIO_LIGHTFORMERS } from 'area-3d-mockups/core'
+//   import { IPHONE_VARIANTS, STUDIO_LIGHTFORMERS } from 'react-3d-mockups/core'
 //
 // It carries no 'use client' directive, unlike the main entry - a server
 // component can import a spec for layout math. See ARCHITECTURE.md at the repo
@@ -87,6 +87,21 @@ export {
   screenSurfaceStyle,
 } from './screen/surface'
 export { type BackfaceCuller, createBackfaceCuller } from './screen/backface'
+export {
+  type StatusBarPlatform,
+  type StatusBarFormFactor,
+  type StatusBarCutout,
+  type StatusBarMetrics,
+  type StatusBarLayoutOptions,
+  type StatusBarLayout,
+  type StatusBarBattery,
+  type StatusBarContent,
+  type ResolvedStatusBarContent,
+  STATUS_BAR_DEFAULTS,
+  statusBarMetrics,
+  statusBarLayout,
+  resolveStatusBarContent,
+} from './screen/status-bar'
 export {
   LED_TEXT_COLOR,
   LED_TEXT_BACKGROUND,

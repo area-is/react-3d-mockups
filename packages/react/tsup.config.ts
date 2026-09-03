@@ -37,12 +37,12 @@ export default defineConfig([
   {
     ...shared,
     // Named so the output stays `dist/core.js`, which is what the
-    // `area-3d-mockups/core` subpath export resolves to.
+    // `react-3d-mockups/core` subpath export resolves to.
     entry: { core: 'src/core/index.ts' },
     /*
      * Regenerate `dist/catalog.json` after every build, watch rebuilds included.
      *
-     * It is a published export (`area-3d-mockups/catalog.json`), but only the
+     * It is a published export (`react-3d-mockups/catalog.json`), but only the
      * `build` and `prepare` scripts ran the generator - while `clean` deleted it
      * on every rebuild. So `npm run dev` wiped the catalog on startup and never
      * put it back, leaving the export dangling for the whole dev session.

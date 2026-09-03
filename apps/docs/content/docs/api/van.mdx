@@ -3,17 +3,19 @@ title: Van (cargo van)
 description: A wrap-ready cargo van with a live livery panel on the cargo side.
 ---
 
-`<Van>` and `<VanMockup>` render a generic Euro-style cargo van (a
-Transit/Sprinter-class silhouette, no brand): the shell is the side profile -
-clamshell hood, cowl break, raked windshield, high roof, wheel-arch cutouts -
-extruded across the width, with six-lug steel wheels, A-pillar-raked door
-glass, parked windshield wipers, cab-door shut lines, a sliding-door entry
-step, pressed roof ribs, a stub antenna, a wide slatted grille between
-headlights under the hood line, fog recesses in the bumper corners,
-license-plate recesses front and rear, barn-door hinges, mirrors on long
-arms and hand-height taillights added on. The flat cargo side carries a
-live 900×368 vinyl-wrap panel for your livery. The mockup grounds the wheels
-on a virtual road plane.
+`<Van>` and `<VanMockup>` render a generic delivery step van (an MT45 /
+Utilimaster-class walk-in body, no brand): the shell is the side profile -
+stub clamshell hood, cowl break, raked windshield, high roof, wheel-arch
+cutouts - extruded across the width, with a crowned box roof, dark wheel
+wells, dual rear wheels on eight-lug rims, gasketed A-pillar-raked door
+glass behind a two-piece windshield with parked wipers, cab-door shut lines
+and paddle handles, West-Coast mirrors, aluminium top, bottom and rub rails
+with rear corner caps, a slatted roll-up rear door with its latch bar, a
+chromed grille between projector headlamps, a stepped bumper with fog lamps,
+license-plate recesses front and rear, corner tail lamps, marker lights, a
+diamond-plate step bumper and mud flaps added on. The flat cargo side
+carries a live 900×368 vinyl-wrap panel for your livery. The mockup grounds
+the wheels on a virtual road plane.
 
 <MockupExplorer component="VanMockup" props={{ rotation: [0, -0.5, 0] }} />
 
@@ -22,7 +24,7 @@ on a virtual road plane.
 <BareVsMockup object="Van" kind="van" slot="CurbSide" />
 
 ```tsx
-import { MockupCanvas, Van, VanMockup } from 'area-3d-mockups'
+import { MockupCanvas, Van, VanMockup } from 'react-3d-mockups'
 
 // The one-liner: its own canvas, with lighting, a ground shadow, drag-to-orbit
 // controls and a camera already framed on the object.
@@ -47,7 +49,7 @@ Beyond the [shared screen props](/docs/screen-content):
 | --- | --- | --- | --- |
 | `color` | `string` | `'#eef0f2'` | Body paint. Wrap fleets are usually white. |
 | `surfaceBackground` | `string` | `'#ffffff'` | CSS background behind your wrap content. |
-| `coverage` | `'panel' \| 'full' \| 'perforated'` | `'panel'` | `'full'` covers the entire side elevations AND the whole rear face - door edge to door edge - carving out the wheel arches and door glass, while the proud hardware (mirrors, handles, door track, cab-door shut lines) draws on top of the livery via per-pixel depth compositing, like hardware remounted over the vinyl. On the rear, every taillight lamp, the third brake light and the hinge knuckles are carved to a slim install margin. Both coverages keep the barn-door shut line visible through the wrap. `'perforated'` is the same full wrap running OVER the cab door glass as perforated window film. |
+| `coverage` | `'panel' \| 'full' \| 'perforated'` | `'panel'` | `'full'` covers the entire side elevations AND the whole rear face - corner post to corner post - carving out the wheel arches and the gasketed door glass, while the proud hardware (rails, mirrors, handles, markers) draws on top of the livery via per-pixel depth compositing, like hardware remounted over the vinyl; the cab-door shut lines and the box's sheet seams are carved as slits the film tucks into. On the rear, every taillight lamp, the third brake light and the shut gap around the roll-up door are carved to a slim install margin. Both coverages keep the roll-up door's slat joints visible through the wrap. `'perforated'` is the same full wrap running OVER the cab door glass as perforated window film. |
 | `resolution` | `number` | `900` panel · `1360` full | Virtual side-wrap width in CSS px; the rear panel shares its dpi. |
 
 ## Regions
@@ -56,7 +58,7 @@ Beyond the [shared screen props](/docs/screen-content):
 | --- | --- |
 | `<VanMockup.CurbSide>` | Curb-side (+Z) wrap panel (bare children). |
 | `<VanMockup.StreetSide>` | Street-side (−Z) wrap panel. |
-| `<VanMockup.Rear>` | Rear doors: the between-the-taillights panel, or the whole barn-door face with `coverage="full"`. |
+| `<VanMockup.Rear>` | The roll-up rear door: the panel on its slats between the taillights, or the whole rear face with `coverage="full"`. |
 | `<VanMockup.LicensePlate>` | Both plates - US standard 6 × 12 in, nose and tail. One slot, since a vehicle's plates carry the same registration. A string renders the built-in plate face; a node renders as-is. |
 
 Every slot takes per-surface overrides - `surfaceBackground`,
@@ -80,21 +82,21 @@ what stays 3D hardware.
 ### Full-coverage wrap with carve-outs
 
 `coverage="full"` stretches the live panels across the entire side
-elevation (rockers to roofline, tail to nose) and across the whole barn-door rear
+elevation (rockers to roofline, tail to nose) and across the whole rear
 face. A CSS `clip-path` (computed from the same dimension spec the geometry
-is built from) carves the body outline, wheel arches, door glass and rear
-taillight clusters out of the live panels, and the sides composite per-pixel
-against a depth occluder shaped like that clip - so the wheels and glass
-show through the carves while the proud hardware (mirrors, door handles,
-the sliding-door track, the cab-door shut lines) draws over your livery,
-the way remounted hardware sits on real vinyl.
+is built from) carves the body outline, wheel arches, door glass, sheet
+seams and rear taillight clusters out of the live panels, and every panel
+composites per-pixel against a depth occluder shaped like that clip - so the
+wheels, glass and seams show through the carves while the proud hardware
+(mirrors, door handles, the body rails and corner caps, the marker lights)
+draws over your livery, the way remounted hardware sits on real vinyl.
 
 <MockupExplorer component="VanMockup" props={{ coverage: 'full', rotation: [0, -0.42, 0] }} />
 
 ### The rear three-quarter
 
-Same van from behind: rear-door panel between the brake/turn/reverse
-clusters, street-side wrap beyond.
+Same van from behind: the roll-up door's panel between the brake/turn/reverse
+clusters, its slat joints showing through, street-side wrap beyond.
 
 <MockupExplorer component="VanMockup" props={{ rotation: [0, 2.25, 0] }} />
 

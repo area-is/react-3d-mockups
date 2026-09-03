@@ -90,7 +90,9 @@ function BrochureImpl({
   const screenProps = {
     width: panel.width,
     height: panel.height,
-    radius: panel.radius,
+    // square corners: the stock is a sharp boxGeometry, so rounding the
+    // artwork would only expose bare paper at the corners
+    radius: 0,
   }
 
   /**

@@ -98,7 +98,7 @@ export function useSurface(): SurfaceInfo {
   const surface = React.useContext(SurfaceContext)
   if (!surface) {
     throw new Error(
-      '[area-3d-mockups] useSurface() must be called from content rendered inside a mockup surface ' +
+      '[react-3d-mockups] useSurface() must be called from content rendered inside a mockup surface ' +
         '(a device screen or a print face). Use useSurfaceOptional() if the component also renders outside one.'
     )
   }

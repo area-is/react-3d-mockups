@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
-import { MockupCanvas } from 'area-3d-mockups'
+import { MockupCanvas } from 'react-3d-mockups'
 import { ChromaSurface } from '../screens/chroma-surface'
 import { LiveCounter } from '../screens/live-counter'
 import { SurfaceArt } from '../screens/surface-art'
@@ -402,7 +402,7 @@ function openTag(name: string, props: string[], indent: string, selfClose = fals
 const preamble = (imports: string[], screen: string | null, stageHeight: number): Line[] => [
   { text: `'use client'` },
   { text: '' },
-  { text: `import { ${imports.join(', ')} } from 'area-3d-mockups'` },
+  { text: `import { ${imports.join(', ')} } from 'react-3d-mockups'` },
   ...(screen ? [{ text: `import { ${screen} } from './${KEBAB(screen)}'` }] : []),
   { text: '' },
   { text: 'export function Demo() {' },

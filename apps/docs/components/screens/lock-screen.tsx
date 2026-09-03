@@ -28,7 +28,7 @@ export function LockScreen() {
           ◈
         </span>
         <span>
-          <strong>area-3d-mockups</strong>
+          <strong>react-3d-mockups</strong>
           <br />
           Your 3D mockup is ready.
         </span>
