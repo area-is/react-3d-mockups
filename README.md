@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/area-a-dual-slant-green.svg" alt="react-3d-mockups" width="128" height="128" />
+  <img src="assets/logo-stack-green.svg" alt="react-3d-mockups" width="128" height="128" />
 </p>
 
 <h1 align="center">react-3d-mockups</h1>
