@@ -56,27 +56,27 @@ h3,
 h4 {
   line-height: 1.15;
   letter-spacing: -0.025em;
-  margin: 0 0 16px;
+  margin: 0 0 14px;
 }
 
 h1 {
-  font-size: clamp(38px, 5vw, 58px);
+  font-size: clamp(34px, 4.5vw, 52px);
   font-weight: 700;
   letter-spacing: -0.03em;
 }
 
 h2 {
-  font-size: clamp(24px, 3vw, 30px);
+  font-size: clamp(22px, 2.7vw, 27px);
   font-weight: 750;
 }
 
 h3 {
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 600;
 }
 
 p {
-  margin: 0 0 14px;
+  margin: 0 0 13px;
 }
 
 a {
@@ -100,9 +100,9 @@ code {
 }
 
 .container {
-  max-width: 1200px;
+  max-width: 1080px;
   margin: 0 auto;
-  padding: 0 clamp(16px, 4vw, 48px);
+  padding: 0 clamp(14px, 3.6vw, 43px);
 }
 
 .grad-text {
@@ -140,15 +140,15 @@ code {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  height: 64px;
+  height: 58px;
 }
 
 .brand {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
+  gap: 9px;
   font-weight: 650;
-  font-size: 16px;
+  font-size: 14px;
   letter-spacing: -0.015em;
   white-space: nowrap;
 }
@@ -161,15 +161,15 @@ code {
 .site-nav {
   display: flex;
   align-items: center;
-  gap: clamp(14px, 2.5vw, 28px);
-  font-size: 16px;
+  gap: clamp(13px, 2.25vw, 25px);
+  font-size: 14px;
   font-weight: 500;
 }
 
 .site-nav-wide {
   display: flex;
   align-items: center;
-  gap: clamp(14px, 2.5vw, 28px);
+  gap: clamp(13px, 2.25vw, 25px);
 }
 
 .site-nav a {
@@ -186,11 +186,11 @@ code {
   display: none;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
-  margin-right: -8px;
+  width: 36px;
+  height: 36px;
+  margin-right: -7px;
   border: 0;
-  border-radius: 10px;
+  border-radius: 9px;
   background: none;
   color: var(--muted);
   cursor: pointer;
@@ -213,7 +213,7 @@ code {
   right: 0;
   display: flex;
   flex-direction: column;
-  padding: 8px clamp(16px, 4vw, 48px) 14px;
+  padding: 7px clamp(14px, 3.6vw, 43px) 13px;
   /* Opaque, unlike the header it hangs from: this one covers page content
      rather than sitting over the top of it, and a blur behind text the reader
      is choosing between is noise. */
@@ -227,8 +227,8 @@ code {
 }
 
 .nav-sheet-link {
-  padding: 13px 2px;
-  font-size: 16px;
+  padding: 12px 2px;
+  font-size: 14px;
   font-weight: 600;
   color: var(--text);
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
@@ -242,9 +242,9 @@ code {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
-  border-radius: 10px;
+  width: 36px;
+  height: 36px;
+  border-radius: 9px;
   color: var(--muted);
   transition: color 0.15s ease, background 0.15s ease;
 }
@@ -262,12 +262,12 @@ code {
 .nav-menu-btn {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 5px;
   background: none;
   border: 0;
-  padding: 10px 0;
+  padding: 9px 0;
   font-family: inherit;
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 500;
   letter-spacing: inherit;
   color: var(--muted);
@@ -280,28 +280,36 @@ code {
   color: var(--text);
 }
 
+/* The lucide chevron in the Examples button. `flex: none` because the button
+   is a flex row and an SVG with no intrinsic ratio to defend will otherwise
+   let itself be squashed when the row is tight. */
 .nav-menu-caret {
-  font-size: 16px;
+  flex: none;
   color: var(--muted);
+  transition: transform 0.15s ease;
+}
+
+.nav-menu[data-open='true'] .nav-menu-caret {
+  transform: rotate(180deg);
 }
 
 .nav-menu-pop {
   position: absolute;
-  top: 44px;
-  right: -12px;
-  width: 250px;
+  top: 40px;
+  right: -11px;
+  width: 225px;
   background: #101319;
   border: 1px solid var(--border-strong);
-  border-radius: 12px;
+  border-radius: 11px;
   box-shadow: 0 24px 50px -18px rgba(0, 0, 0, 0.8);
-  padding: 8px;
+  padding: 7px;
   z-index: 20;
 }
 
 .nav-menu-item {
   display: block;
-  padding: 10px 12px;
-  border-radius: 8px;
+  padding: 9px 11px;
+  border-radius: 7px;
   background: rgba(80, 224, 66, 0.07);
   transition: background 0.15s ease;
 }
@@ -312,14 +320,14 @@ code {
 
 .nav-menu-item-title {
   display: block;
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 600;
   color: var(--text);
 }
 
 .nav-menu-item-desc {
   display: block;
-  font-size: 16px;
+  font-size: 14px;
   color: var(--muted);
   font-weight: 400;
   line-height: 1.45;
@@ -327,31 +335,31 @@ code {
 
 .nav-menu-note {
   display: block;
-  margin: 6px 12px 6px;
-  padding: 8px 0 4px;
+  margin: 5px 11px 5px;
+  padding: 7px 0 4px;
   border-top: 1px solid var(--border);
-  font-size: 16px;
+  font-size: 14px;
   color: var(--text-low);
 }
 
 .site-footer {
   border-top: 1px solid var(--border);
-  margin-top: clamp(48px, 7vw, 80px);
+  margin-top: clamp(43px, 6.3vw, 72px);
 }
 
 .footer-inner {
   display: flex;
   justify-content: space-between;
-  gap: 16px;
+  gap: 14px;
   flex-wrap: wrap;
-  padding: 20px clamp(16px, 4vw, 48px) 32px;
+  padding: 18px clamp(14px, 3.6vw, 43px) 29px;
   color: var(--text-low);
-  font-size: 16px;
+  font-size: 14px;
 }
 
 .footer-inner a {
   font-family: var(--font-mono);
-  font-size: 16px;
+  font-size: 14px;
   color: var(--text-low);
 }
 
@@ -366,10 +374,10 @@ code {
 .btn {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  padding: 13px 26px;
+  gap: 7px;
+  padding: 12px 23px;
   border-radius: 999px;
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 650;
   letter-spacing: -0.01em;
   white-space: nowrap;
@@ -400,8 +408,8 @@ code {
 .text-link {
   display: inline-flex;
   align-items: center;
-  padding: 11px 4px;
-  font-size: 16px;
+  padding: 10px 4px;
+  font-size: 14px;
   font-weight: 600;
   letter-spacing: -0.01em;
   color: var(--muted);
@@ -413,7 +421,7 @@ code {
 }
 
 .accent-link {
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 600;
   color: var(--accent);
 }
@@ -421,10 +429,10 @@ code {
 .eyebrow {
   text-transform: uppercase;
   letter-spacing: 0.2em;
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 500;
   color: var(--text-low);
-  margin: 0 0 18px;
+  margin: 0 0 16px;
 }
 
 /* ------------------------------------------------------------------ */
@@ -436,7 +444,7 @@ code {
   flex-direction: column;
   align-items: center;
   text-align: center;
-  padding: clamp(40px, 6vw, 64px) clamp(16px, 4vw, 48px) 0;
+  padding: clamp(36px, 5.4vw, 58px) clamp(14px, 3.6vw, 43px) 0;
 }
 
 /*
@@ -446,17 +454,17 @@ code {
  * the caps both read as shouting.
  */
 .hero .eyebrow {
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 400;
   letter-spacing: 0;
   text-transform: none;
-  margin: 0 0 12px;
+  margin: 0 0 11px;
 }
 
 /* Nothing follows the headline in the hero any more, the carousel's readout
    is the next line on the page and it brings its own spacing. */
 .hero h1 {
-  font-size: clamp(38px, 7vw, 76px);
+  font-size: clamp(34px, 6.3vw, 68px);
   font-weight: 700;
   letter-spacing: -0.035em;
   line-height: 1;
@@ -488,10 +496,10 @@ code {
 
 .hero-actions {
   display: flex;
-  gap: 14px;
+  gap: 13px;
   justify-content: center;
   flex-wrap: wrap;
-  margin-bottom: 18px;
+  margin-bottom: 16px;
 }
 
 /* ------------------------------------------------------------------ */
@@ -532,15 +540,15 @@ code {
      there is no margin for it to spill into. */
   overflow-x: clip;
   --carousel-fit: 0.83;
-  --carousel-stage-h: clamp(670px, 90vw, 840px);
-  --carousel-lift: clamp(84px, 8vw, 120px);
+  --carousel-stage-h: clamp(603px, 81vw, 756px);
+  --carousel-lift: clamp(76px, 7.2vw, 108px);
 }
 
 @media (max-width: 900px) {
   .carousel {
     --carousel-fit: 0.71;
-    --carousel-stage-h: clamp(600px, 86vw, 770px);
-    --carousel-lift: clamp(72px, 7vw, 96px);
+    --carousel-stage-h: clamp(540px, 77vw, 693px);
+    --carousel-lift: clamp(65px, 6.3vw, 86px);
   }
 }
 
@@ -556,8 +564,8 @@ code {
 @media (max-width: 620px) {
   .carousel {
     --carousel-fit: 0.87;
-    --carousel-stage-h: clamp(482px, 136vw, 644px);
-    --carousel-lift: clamp(56px, 14vw, 76px);
+    --carousel-stage-h: clamp(434px, 122vw, 580px);
+    --carousel-lift: clamp(50px, 12.6vw, 68px);
   }
 }
 
@@ -587,8 +595,8 @@ code {
      a shorter one. */
   top: calc(var(--carousel-stage-h) * 0.7);
   transform: translateX(-50%);
-  width: min(760px, 150%);
-  height: 260px;
+  width: min(684px, 150%);
+  height: 234px;
   border-radius: 50%;
   background: radial-gradient(50% 50% at 50% 50%, rgba(49, 211, 34, 0.12) 0%, transparent 70%);
   pointer-events: none;
@@ -679,12 +687,12 @@ code {
 
 .carousel-chevron[data-side='left'] {
   left: 0;
-  padding-left: clamp(12px, 3vw, 40px);
+  padding-left: clamp(11px, 2.7vw, 36px);
 }
 
 .carousel-chevron[data-side='right'] {
   right: 0;
-  padding-right: clamp(12px, 3vw, 40px);
+  padding-right: clamp(11px, 2.7vw, 36px);
 }
 
 /*
@@ -701,15 +709,15 @@ code {
   transition: opacity 0.2s ease;
   display: inline-flex;
   align-items: center;
-  gap: 7px;
-  padding: 5px 12px 5px 9px;
+  gap: 6px;
+  padding: 4px 11px 4px 8px;
   border: 1px solid rgba(49, 211, 34, 0.35);
   border-radius: 999px;
   background: rgba(8, 9, 12, 0.55);
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
   font-family: var(--font-mono);
-  font-size: 16px;
+  font-size: 14px;
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--accent-2);
@@ -787,7 +795,7 @@ code {
 
 .carousel-hint {
   font-family: var(--font-mono);
-  font-size: 16px;
+  font-size: 14px;
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--text-low);
@@ -816,7 +824,7 @@ code {
   align-items: center;
   justify-content: center;
   color: var(--muted);
-  font-size: 16px;
+  font-size: 14px;
   animation: pulse 1.6s ease-in-out infinite;
 }
 
@@ -829,8 +837,8 @@ code {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 14px;
-  padding: 20px 16px 6px;
+  gap: 13px;
+  padding: 18px 14px 5px;
   /* Stacked over the stage, which now starts above this row: without it the
      later sibling paints on top and the arrows and swatches stop taking
      clicks. */
@@ -855,14 +863,14 @@ code {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 8px 16px 0;
+  padding: 7px 14px 0;
 }
 
 .carousel-nav {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: clamp(12px, 3vw, 26px);
+  gap: clamp(11px, 2.7vw, 23px);
   width: 100%;
 }
 
@@ -870,8 +878,8 @@ code {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 44px;
-  height: 44px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   border: 1px solid rgba(255, 255, 255, 0.16);
   background: none;
@@ -894,12 +902,12 @@ code {
   /* Inter, like the rest of the page: the readout sits under the headline now,
      so it reads as a sentence about the object rather than a spec sticker. */
   font-family: var(--font-sans);
-  font-size: clamp(16px, 1.6vw, 18px);
+  font-size: clamp(14px, 1.45vw, 16px);
   /* Explicit rather than dropped: `body` tightens the whole page by -0.015em. */
   letter-spacing: 0;
   color: var(--muted);
   margin: 0;
-  min-width: min(360px, 58vw);
+  min-width: min(324px, 58vw);
   max-width: 100%;
   flex: 1 1 auto;
   text-align: center;
@@ -911,10 +919,39 @@ code {
   color: var(--text-low);
 }
 
+/*
+ * The object's name, linking to its reference page.
+ *
+ * Set in the page's text colour rather than the accent: the bar reads as the
+ * headline's subtitle, and an accent-coloured word in the middle of it would
+ * pull the eye off the object it is naming. The underline is what says it is a
+ * link, faint at rest and lit on hover - and it is `text-decoration`, not a
+ * border, so it breaks with the line when the readout wraps.
+ */
+.carousel-readout-link {
+  color: var(--text);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-decoration-color: rgba(255, 255, 255, 0.26);
+  text-underline-offset: 3px;
+  border-radius: 3px;
+  transition: color 0.15s ease, text-decoration-color 0.15s ease;
+}
+
+.carousel-readout-link:hover {
+  color: var(--accent-2);
+  text-decoration-color: var(--accent-2);
+}
+
+.carousel-readout-link:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
 .carousel-finishes {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 11px;
   flex-wrap: wrap;
   justify-content: center;
 }
@@ -934,20 +971,20 @@ code {
  */
 .carousel-finish-name {
   font-family: var(--font-sans);
-  font-size: 16px;
+  font-size: 14px;
   letter-spacing: 0;
   color: var(--muted);
-  min-width: 96px;
+  min-width: 86px;
 }
 
 .carousel-swatches {
   display: flex;
-  gap: 10px;
+  gap: 9px;
 }
 
 .carousel-swatch {
-  width: 24px;
-  height: 24px;
+  width: 22px;
+  height: 22px;
   border-radius: 50%;
   border: 0;
   padding: 0;
@@ -989,12 +1026,12 @@ code {
  * what keeps a full-bleed section from becoming a full-bleed line of text.
  */
 .features {
-  max-width: 1200px;
+  max-width: 1080px;
   margin: 0 auto;
-  padding: clamp(40px, 6vw, 76px) clamp(16px, 4vw, 48px) 0;
+  padding: clamp(36px, 5.4vw, 68px) clamp(14px, 3.6vw, 43px) 0;
   display: flex;
   flex-direction: column;
-  gap: clamp(30px, 4vw, 48px);
+  gap: clamp(27px, 3.6vw, 43px);
 }
 
 /* The index is the only ornament: it numbers the set without drawing a line
@@ -1002,22 +1039,22 @@ code {
 .feature-index {
   display: block;
   font-family: var(--font-mono);
-  font-size: 16px;
+  font-size: 14px;
   letter-spacing: 0.16em;
   color: var(--accent);
   font-variant-numeric: tabular-nums;
 }
 
 .features h2 {
-  font-size: clamp(21px, 2.2vw, 27px);
+  font-size: clamp(19px, 2vw, 24px);
   font-weight: 650;
   letter-spacing: -0.025em;
-  margin: 10px 0 10px;
+  margin: 9px 0 9px;
 }
 
 .features p {
   color: var(--muted);
-  font-size: clamp(16px, 1.35vw, 19px);
+  font-size: clamp(14px, 1.2vw, 17px);
   line-height: 1.6;
   margin: 0;
   max-width: 62ch;
@@ -1029,44 +1066,44 @@ code {
 /* ------------------------------------------------------------------ */
 
 .quickstart {
-  max-width: 1200px;
+  max-width: 1080px;
   margin: 0 auto;
-  padding: clamp(44px, 7vw, 72px) clamp(16px, 4vw, 48px) 0;
+  padding: clamp(40px, 6.3vw, 65px) clamp(14px, 3.6vw, 43px) 0;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
-  gap: 40px;
+  grid-template-columns: repeat(auto-fit, minmax(261px, 1fr));
+  gap: 36px;
   align-items: start;
 }
 
 .quickstart-copy h2 {
-  margin: 0 0 14px;
+  margin: 0 0 13px;
 }
 
 .quickstart-copy p {
   color: var(--muted);
-  font-size: 16px;
+  font-size: 14px;
   max-width: 44ch;
-  margin: 0 0 20px;
+  margin: 0 0 18px;
   text-wrap: pretty;
 }
 
 .quickstart-code {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 14px;
 }
 
 .quickstart-code pre {
   margin: 0;
-  padding: 15px 18px;
+  padding: 13px 16px;
   overflow-x: auto;
   font-family: var(--font-mono);
-  font-size: 16px;
+  font-size: 14px;
   line-height: 1.65;
   color: var(--text-code);
   background: rgba(255, 255, 255, 0.035);
   border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 12px;
+  border-radius: 11px;
 }
 
 /*
@@ -1176,13 +1213,13 @@ code {
   flex-direction: column;
   align-items: center;
   text-align: center;
-  padding: clamp(56px, 12vw, 140px) clamp(16px, 4vw, 48px);
+  padding: clamp(50px, 10.8vw, 126px) clamp(14px, 3.6vw, 43px);
 }
 
 .notfound h1 {
-  font-size: clamp(30px, 6vw, 46px);
+  font-size: clamp(27px, 5.4vw, 41px);
   letter-spacing: -0.02em;
-  margin: 0 0 14px;
+  margin: 0 0 13px;
 }
 
 .notfound .lede {
@@ -1207,19 +1244,19 @@ code {
   gap: 10px;
   height: 100%;
   min-height: 180px;
-  padding: 24px;
+  padding: 22px;
   text-align: center;
   color: var(--muted);
-  font-size: 16px;
+  font-size: 14px;
   line-height: 1.6;
   border: 1px dashed var(--border);
-  border-radius: 14px;
+  border-radius: 13px;
 }
 
 .scene-fallback strong {
   color: var(--text-high, #fff);
   font-weight: 600;
-  font-size: 16px;
+  font-size: 14px;
 }
 
 /* ------------------------------------------------------------------ */
@@ -1259,8 +1296,10 @@ code {
 .carousel-swatch::after {
   content: '';
   position: absolute;
-  /* Grows the hit area to 44px without moving the dot or the row. */
-  inset: -10px;
+  /* Grows the hit area to 44px without moving the dot or the row. The dot
+     came down to 22px with the rest of the page; the inset went up by the
+     same 2px so the target this rule exists to guarantee did not. */
+  inset: -11px;
 }
 
 /*

@@ -9,6 +9,7 @@ import {
   type ReactNode,
   type RefObject,
 } from 'react'
+import Link from 'next/link'
 import { useFrame } from '@react-three/fiber'
 import { Palette } from 'lucide-react'
 import type { Group } from 'three'
@@ -89,6 +90,7 @@ import {
   SwissRotation,
   SwissSleeve,
 } from '../screens/swiss-art'
+import { DEVICES as CATALOG_DEVICES, OBJECTS as CATALOG_OBJECTS } from '@/lib/mockup-catalog.mjs'
 
 /**
  * The hero carousel: ONE WebGL canvas holding every model on show.
@@ -284,6 +286,19 @@ const MAILER_FIT = fitFor(MAILER_BOX_FRAMING as MockupFraming<never>)
 const BAG_FIT = fitFor(SHOPPING_BAG_FRAMING as MockupFraming<never>)
 const POSTER_FIT = fitFor(POSTER_FRAME_FRAMING as MockupFraming<never>)
 const AFRAME_FIT = fitFor(A_FRAME_SIGN_FRAMING as MockupFraming<never>)
+
+/**
+ * Where the object on stage is documented.
+ *
+ * Every entry below is keyed by a catalog id, so its reference page is a lookup
+ * in the shared catalog rather than a second list of hrefs to keep in step with
+ * it - the same table the docs sidebar grids and the thumbnail generator read.
+ * An id with no catalog entry renders as plain text: a name that quietly stops
+ * being a link beats a link into a 404.
+ */
+const DOCS_HREF = new Map<string, string>(
+  [...CATALOG_DEVICES, ...CATALOG_OBJECTS].map((e: { id: string; href: string }) => [e.id, e.href])
+)
 
 /** One per device family - the variants are on their own docs pages. */
 const DEVICES: Entry[] = [
@@ -1038,6 +1053,7 @@ export default function CarouselScene() {
     return dev.colorways.find((c) => c.id === id)?.color ?? dev.colorways[0]!.color
   }
   const counter = `${String(active + 1).padStart(2, '0')} / ${N}`
+  const docsHref = DOCS_HREF.get(entry.id)
 
   /**
    * Which slots exist. Both windows are wider than what is on screen so a slot
@@ -1055,17 +1071,28 @@ export default function CarouselScene() {
       <div className="carousel-bar">
         <div className="carousel-nav">
           <button type="button" className="carousel-arrow" aria-label="Previous mockup" onClick={() => go(active - 1)}>
-            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
               <path d="M15 18l-6-6 6-6" />
             </svg>
           </button>
           {/* Announced politely: the strip is WebGL geometry, so without this
               a screen-reader user pressing the arrows hears nothing change. */}
           <p className="carousel-readout" aria-live="polite" aria-atomic="true">
-            <span className="dim">{counter}</span> · {entry.name} · {entry.res}
+            <span className="dim">{counter}</span> ·{' '}
+            {/* The name is the way off the home page and into the object's own
+                reference page - the model on stage is the one thing a visitor
+                is already looking at, and until now nothing here was clickable. */}
+            {docsHref ? (
+              <Link className="carousel-readout-link" href={docsHref}>
+                {entry.name}
+              </Link>
+            ) : (
+              entry.name
+            )}{' '}
+            · {entry.res}
           </p>
           <button type="button" className="carousel-arrow" aria-label="Next mockup" onClick={() => go(active + 1)}>
-            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
               <path d="M9 6l6 6-6 6" />
             </svg>
           </button>
@@ -1075,7 +1102,7 @@ export default function CarouselScene() {
               what the dots already say; the glyph holds the row's left edge
               without spelling it out, and the name stays for screen readers. */}
           <span className="carousel-finish-label">
-            <Palette size={17} strokeWidth={1.75} aria-hidden />
+            <Palette size={15} strokeWidth={1.75} aria-hidden />
             <span className="sr-only">Colors</span>
           </span>
           <span className="carousel-swatches">
@@ -1183,19 +1210,19 @@ export default function CarouselScene() {
             device could hide would be worse than no label. */}
         <div className="carousel-layer carousel-marks" aria-hidden>
           <span className="carousel-rotate-badge">
-            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M21 12a9 9 0 1 1-2.64-6.36" />
               <path d="M21 3v6h-6" />
             </svg>
             Drag to rotate
           </span>
           <span className="carousel-chevron" data-side="left">
-            <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            <svg viewBox="0 0 24 24" width="23" height="23" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
               <path d="M15 18l-6-6 6-6" />
             </svg>
           </span>
           <span className="carousel-chevron" data-side="right">
-            <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            <svg viewBox="0 0 24 24" width="23" height="23" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
               <path d="M9 6l6 6-6 6" />
             </svg>
           </span>

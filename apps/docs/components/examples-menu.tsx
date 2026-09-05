@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
+import { ChevronDown } from 'lucide-react'
 import { SITE_EXAMPLES } from './site-examples'
 
 /** "Examples" header dropdown: one entry today, room for more. */
@@ -27,7 +28,12 @@ export function ExamplesMenu() {
         aria-expanded={open}
         onClick={() => setOpen((o) => !o)}
       >
-        Examples <span className="nav-menu-caret">▼</span>
+        Examples
+        {/* Drawn rather than typed: the glyph this replaces was a literal ▼,
+            which renders at whatever weight and baseline the fallback font
+            happens to have. The icon also turns over when the menu opens, so
+            the button says which way it will go. */}
+        <ChevronDown className="nav-menu-caret" size={14} strokeWidth={2} aria-hidden />
       </button>
       {open ? (
         <span className="nav-menu-pop" role="menu">

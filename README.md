@@ -123,6 +123,10 @@ npm run deploy:docs    # build + deploy from your machine
 run before trusting a deploy, since it executes the app in the Workers runtime rather
 than Node.
 
+Moving the site to a different URL - in particular to a **path** on another domain,
+which needs a Worker route and a Next `basePath` rather than just DNS - is written up
+in [apps/docs/DEPLOYMENT.md](apps/docs/DEPLOYMENT.md).
+
 ### CI/CD
 
 **Deploys** are [Workers Builds](https://developers.cloudflare.com/workers/ci-cd/builds/),
