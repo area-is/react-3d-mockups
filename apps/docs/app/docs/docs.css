@@ -529,11 +529,27 @@
   height: var(--mx-control-h);
 }
 
+/*
+ * `inline-flex` and `line-height: 1`, not the button default.
+ *
+ * The button is a flex item, so it blockifies and lays its label out as an
+ * ordinary line box - one whose height is the 28px line-height inherited from
+ * the panel, against a box the segment stretches to 20px. A line box taller
+ * than its container is not centred in it: it starts at the top and overflows
+ * the bottom, which left the label sitting about 4px low inside its pill.
+ * Centring the button's own content is what actually fixes it; dropping the
+ * line-height keeps the label from setting the pill's height in the first
+ * place.
+ */
 .mx-segmented button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   border: 0;
   border-radius: 6px;
   padding: 0 9px;
   font-size: 12px;
+  line-height: 1;
   background: transparent;
   color: var(--color-fd-muted-foreground);
   cursor: pointer;
