@@ -1,5 +1,6 @@
 import * as React from 'react'
 import * as THREE from 'three'
+import { mergeVertices } from 'three/examples/jsm/utils/BufferGeometryUtils.js'
 import { Brush, Evaluator, SUBTRACTION } from 'three-bvh-csg'
 import { roundedRectShape } from '../core'
 
@@ -9,6 +10,23 @@ import { roundedRectShape } from '../core'
  * mic drillings) cut straight into the chassis geometry with CSG. Everything
  * is procedural geometry.
  */
+
+/**
+ * Re-weld an extruded solid so its rounded edges shade smoothly. ExtrudeGeometry
+ * emits an unindexed mesh with one flat normal per face, so a rolled bevel - a
+ * camera plateau's edge, an island's shoulder - renders as a stack of visible
+ * bands however many segments it has. Merging the coincident vertices and
+ * recomputing the normals turns the roll into one continuous highlight, which
+ * is what the product shots show. Consumes `geometry`.
+ */
+export function smoothShaded(geometry: THREE.BufferGeometry): THREE.BufferGeometry {
+  geometry.deleteAttribute('normal')
+  geometry.deleteAttribute('uv')
+  const welded = mergeVertices(geometry)
+  welded.computeVertexNormals()
+  geometry.dispose()
+  return welded
+}
 
 /**
  * A side key as a true stadium pill: semicircular ends along its length and a
@@ -97,6 +115,7 @@ export function LensRing({
   element = '#0b101e',
   pupil = 0.44,
   matte = false,
+  collar: collarProp,
   glint = '#2c3a5e',
 }: {
   r: number
@@ -120,6 +139,14 @@ export function LensRing({
    * against ~0.84 on the Galaxy rings.
    */
   matte?: boolean
+  /**
+   * Where the metal ends and the black cover glass begins, as a fraction of
+   * the ring radius. Overrides the finish's default (0.72 matte, 0.84
+   * polished): the product shots put the S26's dark rims at ~0.9, the
+   * iPhone 17's glossy colour-matched rims at ~0.86 and the 17 Pro's
+   * anodized collars at ~0.76.
+   */
+  collar?: number
   /** Coating flare on the front element - the violet/blue spot in the macro shots. */
   glint?: string
 }) {
@@ -128,8 +155,8 @@ export function LensRing({
   // collar's top reads as a flat lit band rather than a tilted chamfer: an
   // anodized collar is one wide band (a chamfer alone self-shadows and goes
   // near-black head-on), a machined one a narrow band above a bright chamfer.
-  const collar = matte ? 0.72 : 0.84
-  const rimInner = matte ? collar : 0.92
+  const collar = collarProp ?? (matte ? 0.72 : 0.84)
+  const rimInner = matte ? collar : collar + (1 - collar) * 0.5
   const chamfer = Math.min(0.006, proud * 0.22)
   // The collar's outer edge is rolled, not cut square: that little shoulder is
   // where the bright arc in every product shot comes from, and without it a
@@ -237,13 +264,16 @@ export function LensRing({
           radius rather than most of it sinking into the floor) */}
       <mesh position-z={floorZ} scale={[1, 1, glassRise / glassR]}>
         <sphereGeometry args={[glassR, 40, 24]} />
+        {/* kept dark on purpose: at 1.4x the studio softboxes reflected off
+            this dome brightly enough to read as a light grey disc, where every
+            product shot shows near-black glass with one crisp highlight */}
         <meshPhysicalMaterial
           color={element}
           metalness={0.1}
-          roughness={0.04}
+          roughness={0.06}
           clearcoat={1}
-          clearcoatRoughness={0.04}
-          envMapIntensity={1.4}
+          clearcoatRoughness={0.05}
+          envMapIntensity={0.55}
         />
       </mesh>
       {/* the inner element: tighter curve, coated - it carries the flare. Sits
@@ -261,22 +291,25 @@ export function LensRing({
           iridescence={0.4}
           iridescenceIOR={1.8}
           iridescenceThicknessRange={[140, 460]}
-          envMapIntensity={1.6}
+          envMapIntensity={0.9}
         />
       </mesh>
       {/* smoked cover glass sealing the bore just under the rim: darkens the
-          whole interior and carries one soft, glossy window reflection */}
+          whole interior and carries one soft, glossy window reflection. Its
+          reflection is held well down - a full-strength clearcoat under the
+          studio's white softboxes laid a uniform grey haze over the whole
+          bore, and the interior read as pewter where the hardware is black */}
       <mesh rotation-x={Math.PI / 2} position-z={boreTopZ + Math.min(0.002, proud * 0.08)}>
         <cylinderGeometry args={[boreR * 0.99, boreR * 0.99, 0.0016, 48]} />
         <meshPhysicalMaterial
           color="#05070c"
           transparent
-          opacity={0.5}
+          opacity={0.58}
           metalness={0.1}
-          roughness={0.05}
-          clearcoat={1}
-          clearcoatRoughness={0.06}
-          envMapIntensity={1.15}
+          roughness={0.08}
+          clearcoat={0.7}
+          clearcoatRoughness={0.08}
+          envMapIntensity={0.4}
           depthWrite={false}
         />
       </mesh>

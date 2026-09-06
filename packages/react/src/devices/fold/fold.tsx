@@ -19,6 +19,7 @@ import { createLogoGeometry } from '../logos'
 import {
   SideKey,
   LensRing,
+  FlashModule,
   UsbC,
   EdgeSocket,
   cutGeometry,
@@ -409,15 +410,10 @@ function FoldImpl({
           <LensRing r={r} proud={0.028} seat={0.03} frameColor={frameColor} pupil={pupil} />
         </group>
       ))}
-      <mesh rotation-x={Math.PI / 2} position={[cam.flash.x, cam.flash.y, backZ - 0.008]}>
-        <cylinderGeometry args={[cam.flash.r, cam.flash.r, 0.016, 32]} />
-        <meshPhysicalMaterial
-          color="#efe9da"
-          emissive="#fff3d6"
-          emissiveIntensity={0.25}
-          roughness={0.4}
-        />
-      </mesh>
+      {/* the LED flash window, seated on the back beside the plateau */}
+      <group position={[cam.flash.x, cam.flash.y, backZ - 0.002]}>
+        <FlashModule r={cam.flash.r} />
+      </group>
     </>
   )
 

@@ -25,6 +25,7 @@ import {
   cutGeometry,
   stadiumCutter,
   holeCutter,
+  smoothShaded,
   USB_CUT_DEPTH,
 } from '../details'
 import { collectSlots, createSlots, resolveSurface, type SurfaceProps } from '../../slots'
@@ -183,12 +184,20 @@ function IPhoneImpl({
   // (Air / Pro / Pro Max) - extruded so face corners are truly semicircular.
   const pedestalGeometry = React.useMemo(() => {
     const { frame } = rearCamera
-    // `wall` is the sloped skirt between the footprint and the top face - wide
+    // `wall` is the rolled edge between the footprint and the top face - wide
     // on the retail pedestals (2.6 mm on the 17's pill, 4.7 mm on the Air's
-    // bar), so it is authored per variant instead of following the raise.
+    // bar, 1.85 mm on the Pro's forged shelf), so it is authored per variant
+    // instead of following the raise.
     const wall = frame.wall ?? 0.018
     const raise = frame.raise ?? 0.048
-    const lift = Math.min(wall, raise * 0.6)
+    // The edge is one continuous quarter-ellipse from the back up to the
+    // face, `wall` wide and (nearly) the full `raise` tall - the pillowy
+    // roll in every product shot. Capping the roll at 60% of the raise left
+    // a vertical wall under a shallow chamfer, which rendered as a hard step
+    // with a dark band around it - a tile stuck on the phone. Only where the
+    // wall is narrower than the raise (the Pro shelf) does a short vertical
+    // wall remain under the roll, which is also how the hardware reads.
+    const lift = Math.min(wall, raise - 0.003)
     const radius =
       frame.radius ??
       (rearCamera.style === 'pill'
@@ -200,14 +209,15 @@ function IPhoneImpl({
       Math.max(0.01, radius - wall)
     )
     const geometry = new THREE.ExtrudeGeometry(shape, {
-      depth: Math.max(0.008, raise - lift),
+      depth: Math.max(0.003, raise - lift),
       bevelEnabled: true,
       bevelThickness: lift,
       bevelSize: wall,
-      bevelSegments: 3,
+      bevelSegments: 8,
       curveSegments: 24,
     })
-    return geometry
+    // smooth normals, or the roll shades as eight flat bands
+    return smoothShaded(geometry)
   }, [rearCamera])
 
   // The back shell's outer face, and the pedestal face standing `raise` proud
@@ -238,6 +248,19 @@ function IPhoneImpl({
   const shellFinish = aluminum
     ? { metalness: 0.6, roughness: 0.5, clearcoat: 0, envMapIntensity: 0.9 }
     : { metalness: 0.28, roughness: 0.31, clearcoat: 1, clearcoatRoughness: 0.2, envMapIntensity: 1 }
+  // The glass pedestals are not quite the back they sit on: the 17's pill is
+  // a deeper, more saturated cut of the colourway ("a more intense version of
+  // the main colour" in the hands-on reviews), and the Air's bar is polished
+  // where its back is satin - the glossy element every review remarks on.
+  const pedestalColor = React.useMemo(
+    () =>
+      rearCamera.style === 'pill'
+        ? `#${new THREE.Color(color).lerp(new THREE.Color('#000000'), 0.08).getHexString()}`
+        : color,
+    [color, rearCamera.style]
+  )
+  const pedestalFinish =
+    !aluminum && rearCamera.style === 'bar' ? { ...shellFinish, clearcoatRoughness: 0.08 } : shellFinish
   // Apple badge - real vector geometry from the SVG. The retail logo is
   // tone-on-tone in the back glass ("practically invisible in some light"):
   // a slight tone shift plus a glossier finish, no printed color.
@@ -312,11 +335,12 @@ function IPhoneImpl({
           rotation-y={Math.PI}
           position={[rearCamera.frame.x, rearCamera.frame.y, -shellZ]}
         >
-          <meshPhysicalMaterial color={color} {...shellFinish} />
+          <meshPhysicalMaterial color={pedestalColor} {...pedestalFinish} />
         </mesh>
 
-        {/* lens stacks: anodized collar standing proud of the pedestal, deep
-            black bore, coated front element */}
+        {/* lens stacks: the collar standing proud of the pedestal (glossy
+            colour-matched rim on the glass models, bead-blasted anodized on
+            the Pros), deep black bore, coated front element */}
         {rearCamera.lenses.map(({ x, y, r, h, pupil, glint }, i) => (
           <group key={i} position={[x, y, -pedestalTop]}>
             <LensRing
@@ -326,7 +350,8 @@ function IPhoneImpl({
               element="#0d1524"
               pupil={pupil}
               glint={glint}
-              matte
+              matte={rearCamera.ringFinish !== 'polished'}
+              collar={rearCamera.ringCollar}
             />
           </group>
         ))}

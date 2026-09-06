@@ -66,6 +66,32 @@ Notable changes to `react-3d-mockups`. This project follows
 
 ### Fixed
 
+- **The phone cameras now match the retail hardware.** Every rear camera was
+  reviewed against Apple's and Samsung's product photography and the
+  hands-on close-ups, and four things were wrong:
+
+  - *Lens interiors rendered pewter grey.* The front element and the smoked
+    cover glass reflected the stage's white softboxes hard enough to wash out
+    glass that every photo shows as near-black. Both are toned down, so a bore
+    reads as dark glass with one crisp highlight and the coating flare.
+  - *Every iPhone wore the Pro's collar.* The iPhone 17's rings are the thin,
+    glossy colour-matched rims of the glass-backed models and the iPhone Air's
+    the mirror titanium of its frame; both used to render as the Pro's broad
+    matte anodized collar. The Pros keep the matte collar at the width Apple's
+    close-ups show. The specs now carry `ringFinish` and `ringCollar`, so each
+    variant says which it is.
+  - *The camera pedestals had a hard, banded step around them.* The 17's pill,
+    the Air's bar and the Pro's forged plateau now roll into the back with one
+    smooth fillet - the full raise of the pedestal, or the fillet width where
+    that is narrower (`wall` on the Pro specs) - with smooth normals on the
+    extrusion so the roll shades as a curve rather than a stack of bands.
+  - *The Galaxy S26's rings followed the rail.* They are dark chrome on every
+    colourway - the white and mint phones were getting silver rings - with the
+    hairline rims and the taller bump of the hands-on photography; the Ultra's
+    second-column tele rings thin out to match. Samsung's flash was a flat
+    cream disc on the S26, S26 Ultra, Fold and Flip; all four now carry the
+    same domed LED window the iPhones already had.
+
 - **The iPhone 17 Pro and Pro Max rear lenses rendered inside out.** Their
   collars stand 0.7 mm proud of the camera plateau, but `LensRing` laid the
   bezel, barrel, front element and cover glass out at fixed depths behind the

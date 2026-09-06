@@ -45,8 +45,23 @@ export interface GalaxyPhoneSpec {
      * the front element's fraction of the ring radius (main lenses are wider
      * than ultra-wides and folded teles).
      */
-    rings: { x?: number; y: number; r: number; h?: number; pupil?: number }[]
-    flash: { x: number; y: number }
+    rings: { x?: number; y: number; r: number; h?: number; pupil?: number; collar?: number }[]
+    /**
+     * The lens rings' metal: `frame` follows the rail (the Ultra's titanium
+     * rings match its frame in every finish), `gunmetal` is the dark
+     * chrome the S26 wears on every colourway - graphite rings on the white
+     * and mint phones alike. Defaults to `frame`.
+     */
+    ringFinish?: 'frame' | 'gunmetal'
+    /**
+     * Where the ring's metal ends and the black cover glass begins, as a
+     * fraction of the ring radius (a ring's own `collar` overrides it). The
+     * S26's rims are hairline-thin (~0.9); the Ultra's broad (the 0.84
+     * default).
+     */
+    ringCollar?: number
+    /** LED flash window: position and radius (defaults to 1.8 mm). */
+    flash: { x: number; y: number; r?: number }
     /** Small auxiliary sensors (laser AF, extra mics…). */
     dots?: { x: number; y: number; r: number }[]
     /** Raised pill island seating the main lens column. `raise` is its height off the back. */
@@ -107,11 +122,20 @@ const S26: GalaxyPhoneSpec = {
       { y: 1.21, r: 0.201, pupil: 0.47 },
       { y: 0.774, r: 0.201, pupil: 0.34 },
     ],
-    flash: { x: 0.169, y: 1.413 },
+    // The rings are dark chrome on every colourway - graphite rims on the
+    // white phone in the hands-on photography, not the rail's silver - and
+    // hairline-thin, the black glass running out to ~0.9 of the radius.
+    ringFinish: 'gunmetal',
+    ringCollar: 0.9,
+    // A ~4.5 mm window on the flat back, a third of a ring across.
+    flash: { x: 0.169, y: 1.413, r: 0.062 },
     // Photo-measured capsule: 19.3 x 51.4 mm, i.e. a ~2.4 mm shoulder of
     // island around every ring - not the tight sleeve a ring-width pill gives.
-    island: { x: 0.584, y: 1.21, width: 0.527, height: 1.402, radius: 0.2635, raise: 0.028 },
-    ringHeight: 0.026,
+    // The side-on shots put the capsule ~1.1 mm off the glass with the rings
+    // another ~1.5 mm proud of it - the bump reviewers say rocks the phone on
+    // a table, and a good deal taller than the 1 mm rings it used to carry.
+    island: { x: 0.584, y: 1.21, width: 0.527, height: 1.402, radius: 0.2635, raise: 0.03 },
+    ringHeight: 0.042,
   },
   bottomEdge: {
     usb: { x: 0, width: 0.251, height: 0.087 },
@@ -165,10 +189,12 @@ const S26_ULTRA: GalaxyPhoneSpec = {
       { y: 0.833, r: 0.224, pupil: 0.3 },
       // Second column on the flat back: 9.3 mm tele rings, much flatter (~1.4 mm
       // proud), sharing the top two rings' rows with the flash between them.
-      { x: 0.169, y: 1.826, r: 0.128, h: 0.038, pupil: 0.34 },
-      { x: 0.169, y: 1.329, r: 0.128, h: 0.038, pupil: 0.34 },
+      // Their rims are thinner than the main column's - mostly black glass.
+      { x: 0.169, y: 1.826, r: 0.128, h: 0.038, pupil: 0.34, collar: 0.86 },
+      { x: 0.169, y: 1.329, r: 0.128, h: 0.038, pupil: 0.34, collar: 0.86 },
     ],
-    flash: { x: 0.169, y: 1.576 },
+    // A ~4.2 mm window tucked between the two tele rings.
+    flash: { x: 0.169, y: 1.576, r: 0.058 },
     // The stadium pill hugs the main column only (21.4 x 57.7 mm, 1.2 mm proud).
     island: { x: 0.66, y: 1.329, width: 0.584, height: 1.576, radius: 0.292, raise: 0.032 },
     // The Ultra's rings stand well proud of the pill face (~3.3 mm).
