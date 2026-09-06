@@ -75,6 +75,19 @@ export interface IPhoneSpec {
      * cluster flaring a different colour, because the AR coatings differ.
      */
     lenses: { x: number; y: number; r: number; h?: number; pupil?: number; glint?: string }[]
+    /**
+     * The lens collars' finish: `polished` is the bright, glossy rim of the
+     * glass-backed models (the 17's colour-matched aluminium, the Air's
+     * mirror titanium), `matte` the bead-blasted anodized collar of the Pro
+     * unibody. Defaults to `matte`.
+     */
+    ringFinish?: 'matte' | 'polished'
+    /**
+     * Where the collar's metal ends and the black cover glass begins, as a
+     * fraction of the ring radius - the rim reads thin on the 17 (~0.86) and
+     * broad on the Pros (~0.76). Defaults to the finish's own value.
+     */
+    ringCollar?: number
     flash: { x: number; y: number; r: number }
     /**
      * Small auxiliary openings. `mic` is a drilled hole, `sensor` a black-glass
@@ -126,10 +139,14 @@ const IPHONE_17: IPhoneSpec = {
   // glass; two Ø16 lenses 17.72 mm apart on the pill's axis, 3.45 mm of glass
   // above the back (so the rings stand 1.67 mm off the pill); the Ø6.28 flash
   // out on the flat back and the Ø1 mic on the pill beside the lenses, both on
-  // the lens pair's center line.
+  // the lens pair's center line. The rims are the glossy colour-matched
+  // aluminium rings of the glass-backed models - thin and bright in every
+  // product shot, with the black cover glass filling ~0.86 of each ring.
   rearCamera: {
     style: 'pill',
     frame: { x: 0.5949, y: 1.4086, width: 0.6697, height: 1.1381, raise: 0.0479, wall: 0.0703 },
+    ringFinish: 'polished',
+    ringCollar: 0.86,
     lenses: [
       { x: 0.5949, y: 1.647, r: 0.2153, h: 0.045, pupil: 0.5, glint: '#3f4f7a' },
       { x: 0.5949, y: 1.1701, r: 0.2153, h: 0.045, pupil: 0.46, glint: '#4b4270' },
@@ -180,9 +197,14 @@ const IPHONE_17_AIR: IPhoneSpec = {
   // glass with a broad 4.7 mm sloped wall; the single Ø15.82 lens 16.29 mm in
   // from the top-left corner, with the Ø2.30 mic and Ø6.30 flash on that same
   // center line at 51.34 and 58.42 mm.
+  // The ring is the same high-gloss mirror titanium as the frame (silver on
+  // the light finishes, black chrome on Space Black), a hair broader than the
+  // 17's rim.
   rearCamera: {
     style: 'bar',
     frame: { x: 0, y: 1.627, width: 1.739, height: 0.889, radius: 0.4445, raise: 0.082, wall: 0.128 },
+    ringFinish: 'polished',
+    ringCollar: 0.8,
     lenses: [{ x: 0.5669, y: 1.6638, r: 0.21, h: 0.0713, pupil: 0.5, glint: '#3f4f7a' }],
     flash: { x: -0.5672, y: 1.6638, r: 0.0848 },
     dots: [{ x: -0.3766, y: 1.6638, r: 0.031, kind: 'mic' }],
@@ -238,9 +260,15 @@ const IPHONE_17_PRO: IPhoneSpec = {
   // module clears the back by ~3.8 mm in total), the black bore fills ~0.72 of
   // the collar and the front element ~0.52, and the three coatings flare
   // visibly differently - blue on the main, violet on the ultra wide.
+  //
+  // The plateau's edge is not a step: Apple's close-ups show the forged shelf
+  // rolling over into the flat back with a ~1.85 mm fillet (`wall`), and the
+  // bead-blasted collars are broad, the glass starting ~0.76 of the way out.
   rearCamera: {
     style: 'bar',
-    frame: { x: 0, y: 1.4167, width: 1.895, height: 1.1647, radius: 0.269, raise: 0.0686 },
+    frame: { x: 0, y: 1.4167, width: 1.895, height: 1.1647, radius: 0.269, raise: 0.0686, wall: 0.05 },
+    ringFinish: 'matte',
+    ringCollar: 0.76,
     lenses: [
       // main (top-left from the back)
       { x: 0.5802, y: 1.6321, r: 0.215, h: 0.033, pupil: 0.48, glint: '#3f4f7a' },
@@ -312,10 +340,13 @@ const IPHONE_17_PRO_MAX: IPhoneSpec = {
   // Apple's drawing: same plateau architecture and the same camera rows as the
   // Pro - full-width unibody shelf from the top edge down to 44.01 mm, 2.55 mm
   // proud, lens trio 14.37 mm in from the top-left corner - with the flash /
-  // mic / LiDAR column pushed out to 64.16 mm by the wider body.
+  // mic / LiDAR column pushed out to 64.16 mm by the wider body. Same rolled
+  // plateau edge and broad anodized collars as the Pro.
   rearCamera: {
     style: 'bar',
-    frame: { x: 0, y: 1.5969, width: 2.06, height: 1.1642, radius: 0.32, raise: 0.0686 },
+    frame: { x: 0, y: 1.5969, width: 2.06, height: 1.1642, radius: 0.32, raise: 0.0686, wall: 0.05 },
+    ringFinish: 'matte',
+    ringCollar: 0.76,
     lenses: [
       // same modules as the Pro, so the same collars and coatings
       { x: 0.6632, y: 1.8127, r: 0.219, h: 0.033, pupil: 0.48, glint: '#3f4f7a' }, // main

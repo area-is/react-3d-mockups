@@ -17,11 +17,13 @@ import { createLogoGeometry } from '../logos'
 import {
   SideKey,
   LensRing,
+  FlashModule,
   UsbC,
   EdgeSocket,
   cutGeometry,
   stadiumCutter,
   holeCutter,
+  smoothShaded,
   USB_CUT_DEPTH,
 } from '../details'
 
@@ -55,10 +57,12 @@ export interface GalaxyProps extends Omit<GroupProps, 'children' | 'color'>, Sur
   statusBar?: StatusBarOption
   /**
    * Back panel color, and the whole finish: the metal frame, buttons and
-   * camera rings follow from it. A retail colorway id from `GALAXY_COLORWAYS`
-   * (`'icyblue'`, `'mint'`…) gets that model's measured rail; any other CSS
-   * color gets one derived from it (see `railColor`). A colorway id wins over
-   * a CSS color of the same name - pass hex if you meant the CSS one.
+   * (on the Ultra) the camera rings follow from it - the S26's rings are dark
+   * chrome on every finish, as on the hardware. A retail colorway id from
+   * `GALAXY_COLORWAYS` (`'icyblue'`, `'mint'`…) gets that model's measured
+   * rail; any other CSS color gets one derived from it (see `railColor`). A
+   * colorway id wins over a CSS color of the same name - pass hex if you
+   * meant the CSS one.
    */
   color?: string
   /**
@@ -170,10 +174,11 @@ function GalaxyImpl({
       bevelEnabled: true,
       bevelThickness: bevel,
       bevelSize: bevel,
-      bevelSegments: 3,
+      bevelSegments: 5,
       curveSegments: 16,
     })
-    return geometry
+    // smooth normals, so the shoulder reads as one soft roll rather than bands
+    return smoothShaded(geometry)
   }, [rearCamera.island])
 
   // SAMSUNG wordmark on the lower back - real vector geometry from the SVG.
@@ -235,6 +240,9 @@ function GalaxyImpl({
     () => `#${new THREE.Color(color).lerp(new THREE.Color('#ffffff'), 0.06).getHexString()}`,
     [color]
   )
+  // The S26's rings are dark chrome whatever the colourway (see the spec);
+  // the Ultra's titanium rings follow the rail.
+  const ringColor = rearCamera.ringFinish === 'gunmetal' ? '#3a3d43' : frameColor
 
   return (
     <group {...groupProps}>
@@ -272,7 +280,7 @@ function GalaxyImpl({
             <meshPhysicalMaterial color={islandColor} metalness={0.4} roughness={0.3} clearcoat={0.9} />
           </mesh>
         )}
-        {rearCamera.rings.map(({ x, y, r, h, pupil }, i) => (
+        {rearCamera.rings.map(({ x, y, r, h, pupil, collar }, i) => (
           <group
             key={i}
             position={[x ?? rearCamera.ringsX, y, backZ(x ?? rearCamera.ringsX, y, 0, raise)]}
@@ -280,27 +288,24 @@ function GalaxyImpl({
             <LensRing
               r={r}
               proud={h ?? rearCamera.ringHeight ?? 0.034}
-              frameColor={frameColor}
+              frameColor={ringColor}
               pupil={pupil}
+              collar={collar ?? rearCamera.ringCollar}
             />
           </group>
         ))}
-        <mesh
-          rotation-x={Math.PI / 2}
+        {/* the LED flash: a domed window with its warm phosphor showing
+            through, seated on the back (or the island) - it used to be a
+            flat cream disc, which is what a drawn-on flash looks like */}
+        <group
           position={[
             rearCamera.flash.x,
             rearCamera.flash.y,
-            backZ(rearCamera.flash.x, rearCamera.flash.y, 0.008, raise + 0.01),
+            backZ(rearCamera.flash.x, rearCamera.flash.y, 0.002, raise + 0.002),
           ]}
         >
-          <cylinderGeometry args={[0.05, 0.05, 0.016, 32]} />
-          <meshPhysicalMaterial
-            color="#efe9da"
-            emissive="#fff3d6"
-            emissiveIntensity={0.25}
-            roughness={0.4}
-          />
-        </mesh>
+          <FlashModule r={rearCamera.flash.r ?? 0.05} />
+        </group>
         {rearCamera.dots?.map(({ x, y, r }, i) => (
           <mesh
             key={i}

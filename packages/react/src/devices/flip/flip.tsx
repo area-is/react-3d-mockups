@@ -20,6 +20,7 @@ import { createLogoGeometry } from '../logos'
 import {
   SideKey,
   LensRing,
+  FlashModule,
   UsbC,
   EdgeSocket,
   cutGeometry,
@@ -351,16 +352,10 @@ function FlipImpl({
           <LensRing r={r} proud={cam.raise + 0.016} seat={0.03} frameColor={frameColor} pupil={pupil} />
         </group>
       ))}
-      <mesh rotation-x={Math.PI / 2} position={[cam.flash.x, cam.flash.y, surfaceZ + sign * 0.006]}>
-        <cylinderGeometry args={[cam.flash.r, cam.flash.r, 0.012, 24]} />
-        <meshPhysicalMaterial
-          color="#e8e4da"
-          emissive="#fff3d6"
-          emissiveIntensity={0.22}
-          roughness={0.35}
-          metalness={0.4}
-        />
-      </mesh>
+      {/* the LED flash window, flush on the cover glass beside the rings */}
+      <group position={[cam.flash.x, cam.flash.y, surfaceZ]} rotation-y={sign === 1 ? Math.PI : 0}>
+        <FlashModule r={cam.flash.r} />
+      </group>
     </group>
   )
 
