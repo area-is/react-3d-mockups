@@ -19,7 +19,10 @@ import type { PatternDefinition } from 'tabbied'
  * a generative pattern from `tabbied` doing the work that a photograph would
  * do on a real poster. The patterns are picked for the vocabulary the style
  * actually uses - concentric rings, halftone rasters, radial line fields,
- * square grids - and palettes are cut down to paper, ink and one signal red.
+ * square grids - and each piece has a palette of its own (`TONES`): a ground,
+ * an ink for the type and two or three marks for the pattern, from Bauhaus
+ * primaries on cream to lime on a bottle-green ground. Eighteen slots in one
+ * red-black-white would have been a screensaver; the carousel is a spread.
  *
  * What says the surfaces are live is the redraw rather than a control: the
  * device screens reseed themselves every couple of seconds (see `Pattern`),
@@ -45,14 +48,56 @@ export const FONT = 'var(--font-inter), Inter, system-ui, -apple-system, "Segoe 
 export interface Tone {
   ground: string
   text: string
+  /** The one loud colour on the sheet: the index, the kicker, the last mark in the pattern. */
+  accent: string
   /** Palette handed to the pattern: background first, then its marks. */
   palette: string[]
 }
 
-const TONES: Record<'paper' | 'ink', Tone> = {
-  paper: { ground: PAPER, text: INK, palette: [PAPER, INK, SIGNAL] },
-  ink: { ground: INK, text: PAPER, palette: [INK, PAPER, SIGNAL] },
-}
+const tone = (ground: string, text: string, accent: string, ...marks: string[]): Tone => ({
+  ground,
+  text,
+  accent,
+  palette: [ground, ...marks],
+})
+
+/**
+ * The carousel's palettes, one per piece. Each is a ground, an ink that
+ * reads on it, an accent, and the marks the pattern draws in - two or three,
+ * because a poster is a few flat colours, not a gradient. Light grounds
+ * alternate with dark ones down the strip so neighbouring screens never read
+ * as the same sheet.
+ */
+export const TONES = {
+  paper: tone(PAPER, INK, SIGNAL, INK, SIGNAL),
+  ink: tone(INK, PAPER, SIGNAL, PAPER, SIGNAL),
+  /** Cyan and white on navy. */
+  midnight: tone('#0f1b33', '#e8eefc', '#5ec8ff', '#5ec8ff', '#e8eefc', '#3560d6'),
+  /** Orange and amber on near-black. */
+  ember: tone('#1a1412', '#f6e7d8', '#ff7a45', '#ff7a45', '#f2b544', '#f6e7d8'),
+  /** The Bauhaus primaries on cream. */
+  cobalt: tone('#f1ede2', '#1f2a5a', '#e0402c', '#1f43c9', '#f0b323', '#e0402c'),
+  /** Lime on bottle green. */
+  moss: tone('#0f2e22', '#e6f2d9', '#b8e04a', '#b8e04a', '#e6f2d9', '#2f8f5b'),
+  /** Orange, ink and a blue on warm white. */
+  tangerine: tone('#f4efe6', '#26221f', '#ff6a1a', '#ff6a1a', '#26221f', '#2b6fd6'),
+  /** Coral and lilac on aubergine. */
+  plum: tone('#2a1738', '#f5e9f7', '#ff8fa3', '#ff8fa3', '#f5e9f7', '#9b5de5'),
+  /** Teal and apricot on sea glass. */
+  sea: tone('#e6f0ee', '#0f3d3e', '#f4a259', '#0f8b8d', '#0f3d3e', '#f4a259'),
+  /** One electric blue on black - the dial. */
+  electric: tone('#0b0f19', '#f0f4ff', '#3d7bff', '#3d7bff', '#f0f4ff'),
+  /** Terracotta on plaster - the other dial. */
+  terracotta: tone('#f7ede2', '#4a2c1f', '#c65d3b', '#c65d3b', '#4a2c1f'),
+  /** Yellow and white on graphite. */
+  graphite: tone('#232629', '#f5f5f0', '#ffd23f', '#ffd23f', '#f5f5f0', '#8a8f98'),
+  /** Gold on black - the record sleeve. */
+  gold: tone('#111111', '#f3e9c9', '#d4a744', '#d4a744', '#f3e9c9'),
+  /** Ultramarine and red on off-white - the concert bill. */
+  ultramarine: tone('#f3f1ea', '#11205e', '#e63b2e', '#1b3fbf', '#e63b2e'),
+} satisfies Record<string, Tone>
+
+export type ToneName = keyof typeof TONES
 
 /** sRGB relative luminance, 0 (black) to 1 (white). */
 function luminance(hex: string): number {
@@ -83,21 +128,22 @@ function luminance(hex: string): number {
  * shapes: mid-tone boards (olive, slate) carry white better than the contrast
  * ratio alone suggests.
  */
-export function materialTone(material: string): Tone {
+export function materialTone(material: string, accent: string = SIGNAL): Tone {
   const ink = luminance(material) < 0.35 ? PAPER : INK
-  return { ground: 'transparent', text: ink, palette: ['transparent', ink, SIGNAL] }
+  return { ground: 'transparent', text: ink, accent, palette: ['transparent', ink, accent] }
 }
 
 /**
  * What to set on a bar painted in the tone's own ink - the jacket's and the
  * sleeve's type band.
  *
- * Not `tone.ground`, which is what it used to be and is wrong the moment the
- * ground is the object itself: a material tone's ground is `transparent`, so
- * the band came out as a cream bar with invisible type on it. The band is
- * opaque and painted in `text`, so what reads on it is simply the other ink.
+ * The tone's own ground, for a sheet - a band painted in the ink takes the
+ * ground back as its type. Not for a material tone, whose ground is
+ * `transparent`: there the band came out as a cream bar with invisible type
+ * on it, so what reads on it is simply the other ink.
  */
-const onInk = (tone: Tone): string => (tone.text === INK ? PAPER : INK)
+const onInk = (tone: Tone): string =>
+  tone.ground === 'transparent' ? (tone.text === INK ? PAPER : INK) : tone.ground
 
 /* ------------------------------------------------------------------ */
 /*  Pieces                                                             */
@@ -219,6 +265,26 @@ export const sheet = (tone: Tone): CSSProperties => ({
   userSelect: 'none',
 })
 
+/**
+ * The sheet as an element, with the layout INSIDE it.
+ *
+ * Container-relative units on an element resolve against its nearest
+ * ancestor container, never against the element itself, so a `padding: 5cqw`
+ * set on the container root falls back to the viewport and comes out as 5 %
+ * of the browser window - which is how a 55 mm side panel got 140 px of
+ * padding and set its type at zero. Two elements, then: the outer is the
+ * query container, the inner lays out in the units the outer defines.
+ */
+export function Sheet({ tone, style, children }: { tone: Tone; style?: CSSProperties; children: ReactNode }) {
+  return (
+    <div style={sheet(tone)}>
+      <div style={{ width: '100%', height: '100%', boxSizing: 'border-box', display: 'flex', minWidth: 0, minHeight: 0, ...style }}>
+        {children}
+      </div>
+    </div>
+  )
+}
+
 /* ------------------------------------------------------------------ */
 /*  Layouts                                                            */
 /* ------------------------------------------------------------------ */
@@ -229,13 +295,15 @@ export interface SwissProps {
   seed?: string
   /** A screen: repaints on a timer instead of holding one composition. */
   live?: boolean
-  tone?: 'paper' | 'ink'
+  tone?: ToneName
   /**
    * Print straight onto the object instead of onto a sheet: the ground goes
    * transparent so this colour - the object's own finish - shows through, and
    * the ink is chosen to sit on it. Wins over `tone`.
    */
   material?: string
+  /** The second mark on a material print, where there is no tone to bring one. */
+  accent?: string
   /** Coarse on a small face, finer on a large one - see each caller. */
   grid?: string
   index: string
@@ -255,17 +323,18 @@ export function SwissStack({
   live,
   tone = 'paper',
   material,
+  accent,
   grid = '4x6',
   index,
   kicker,
   title,
   meta,
 }: SwissProps) {
-  const t = material ? materialTone(material) : TONES[tone]
+  const t = material ? materialTone(material, accent) : TONES[tone]
   return (
-    <div style={{ ...sheet(t), flexDirection: 'column', padding: '7cqmin', gap: '4cqmin' }}>
+    <Sheet tone={t} style={{ flexDirection: 'column', padding: '7cqmin', gap: '4cqmin' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-        <Micro style={{ color: SIGNAL }}>{index}</Micro>
+        <Micro style={{ color: t.accent }}>{index}</Micro>
         <Micro>{kicker}</Micro>
       </div>
       <div style={rule(t.text)} />
@@ -274,7 +343,7 @@ export function SwissStack({
       </div>
       <Title>{title}</Title>
       <Micro style={{ opacity: 0.72 }}>{meta}</Micro>
-    </div>
+    </Sheet>
   )
 }
 
@@ -288,13 +357,14 @@ export function SwissSplit({
   live,
   tone = 'paper',
   material,
+  accent,
   grid = '4x6',
   index,
   kicker,
   title,
   meta,
 }: SwissProps) {
-  const t = material ? materialTone(material) : TONES[tone]
+  const t = material ? materialTone(material, accent) : TONES[tone]
   return (
     <div style={{ ...sheet(t), flexDirection: 'row' }}>
       <div
@@ -306,7 +376,7 @@ export function SwissSplit({
           gap: '3cqmin',
         }}
       >
-        <Micro style={{ color: SIGNAL }}>{index}</Micro>
+        <Micro style={{ color: t.accent }}>{index}</Micro>
         <div style={rule(t.text)} />
         <Micro>{kicker}</Micro>
         <Title style={{ fontSize: '9cqmin', marginTop: 'auto' }}>{title}</Title>
@@ -329,13 +399,14 @@ export function SwissFrame({
   live,
   tone = 'paper',
   material,
+  accent,
   grid = '4x6',
   index,
   kicker,
   title,
   meta,
 }: SwissProps) {
-  const t = material ? materialTone(material) : TONES[tone]
+  const t = material ? materialTone(material, accent) : TONES[tone]
   return (
     <div style={{ ...sheet(t), flexDirection: 'column' }}>
       <div style={{ flex: 1, minHeight: 0, position: 'relative' }}>
@@ -353,7 +424,7 @@ export function SwissFrame({
         }}
       >
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-          <Micro style={{ color: SIGNAL }}>{index}</Micro>
+          <Micro style={{ color: t.accent }}>{index}</Micro>
           <Micro>{kicker}</Micro>
         </div>
         <Title style={{ fontSize: '10cqmin' }}>{title}</Title>
@@ -374,11 +445,12 @@ export function SwissDial({
   live,
   tone = 'ink',
   material,
+  accent,
   grid = '2x3',
   kicker,
   title,
 }: Omit<SwissProps, 'index' | 'meta'> & { index?: string; meta?: string }) {
-  const t = material ? materialTone(material) : TONES[tone]
+  const t = material ? materialTone(material, accent) : TONES[tone]
   return (
     <div style={{ ...sheet(t), position: 'relative', alignItems: 'flex-end' }}>
       <div style={{ position: 'absolute', inset: 0 }}>
@@ -397,7 +469,7 @@ export function SwissDial({
       >
         {/* A dial is ~200px across, so the micro-type has to be set larger
             here in proportion than it is on a sheet ten times the size. */}
-        <Micro style={{ color: SIGNAL, fontSize: '5cqmin' }}>{kicker}</Micro>
+        <Micro style={{ color: t.accent, fontSize: '5cqmin' }}>{kicker}</Micro>
         <Title style={{ fontSize: '22cqmin', marginTop: '2cqmin' }}>{title}</Title>
       </div>
     </div>
@@ -414,16 +486,19 @@ export function SwissDial({
  * screensaver rather than a showcase. Grids are coarser on the small faces and
  * finer on the large ones, so every object shows a comparable number of marks.
  *
- * The ten device screens are `live` and the seven printed faces are seeded.
- * That split is the whole point of the set: put them side by side in the strip
- * and the ones that are displays are the ones that keep changing.
+ * The ten device screens are `live` and the printed faces are seeded. That
+ * split is the whole point of the set: put them side by side in the strip and
+ * the ones that are displays are the ones that keep changing. The packaging -
+ * the carton, the cereal box, the shipper, the bag - is not in this set at
+ * all: those are modelled on real products (see `carton-art`, `package-art`)
+ * and carry no pattern.
  */
 
 export const SwissRotation = () => (
   <SwissStack
     pattern={gyre}
     live
-    tone="paper"
+    tone="midnight"
     grid="6x9"
     index="01"
     kicker="Rotation"
@@ -436,7 +511,7 @@ export const SwissRaster = () => (
   <SwissStack
     pattern={halftone}
     live
-    tone="ink"
+    tone="ember"
     grid="6x9"
     index="02"
     kicker="Raster"
@@ -449,7 +524,7 @@ export const SwissConstruction = () => (
   <SwissStack
     pattern={bauhaus}
     live
-    tone="paper"
+    tone="cobalt"
     grid="6x9"
     index="03"
     kicker="Konstruktion"
@@ -462,7 +537,7 @@ export const SwissField = () => (
   <SwissStack
     pattern={dipole}
     live
-    tone="ink"
+    tone="moss"
     grid="8x12"
     index="04"
     kicker="Feld"
@@ -475,7 +550,7 @@ export const SwissModule = () => (
   <SwissSplit
     pattern={ortho}
     live
-    tone="paper"
+    tone="tangerine"
     grid="6x9"
     index="05"
     kicker="Modul"
@@ -488,7 +563,7 @@ export const SwissEpicentre = () => (
   <SwissStack
     pattern={epicentre}
     live
-    tone="ink"
+    tone="plum"
     grid="6x9"
     index="06"
     kicker="Zentrum"
@@ -501,7 +576,7 @@ export const SwissChecker = () => (
   <SwissStack
     pattern={damier}
     live
-    tone="paper"
+    tone="sea"
     grid="6x9"
     index="07"
     kicker="Damier"
@@ -511,18 +586,18 @@ export const SwissChecker = () => (
 )
 
 export const SwissDialA = () => (
-  <SwissDial pattern={gyre} live tone="ink" grid="4x6" kicker="Zürich" title="9:41" />
+  <SwissDial pattern={gyre} live tone="electric" grid="4x6" kicker="Zürich" title="9:41" />
 )
 
 export const SwissDialB = () => (
-  <SwissDial pattern={damier} live tone="paper" grid="2x3" kicker="Basel" title="9:41" />
+  <SwissDial pattern={damier} live tone="terracotta" grid="2x3" kicker="Basel" title="9:41" />
 )
 
 export const SwissRhythm = () => (
   <SwissSplit
     pattern={chase}
     live
-    tone="ink"
+    tone="graphite"
     grid="6x9"
     index="08"
     kicker="Rhythmus"
@@ -536,6 +611,7 @@ export const SwissJacket = ({ material }: { material: string }) => (
     pattern={bauhaus}
     seed="book-jacket"
     material={material}
+    accent="#d9a441"
     grid="4x6"
     index="09"
     kicker="Edition"
@@ -548,7 +624,7 @@ export const SwissSleeve = () => (
   <SwissFrame
     pattern={gyre}
     seed="vinyl-sleeve"
-    tone="ink"
+    tone="gold"
     grid="6x9"
     index="10"
     kicker="Long play"
@@ -557,57 +633,11 @@ export const SwissSleeve = () => (
   />
 )
 
-export const SwissBox = () => (
-  <SwissStack
-    pattern={damier}
-    seed="box-checker"
-    tone="paper"
-    grid="4x6"
-    index="12"
-    kicker="Serie"
-    title={'Objekt\nzwölf'}
-    meta="Made in Switzerland"
-  />
-)
-
-export const SwissLid = ({ material }: { material: string }) => (
-  <SwissSplit
-    pattern={ortho}
-    seed="mailer-lid"
-    material={material}
-    grid="4x6"
-    index="13"
-    kicker="Versand"
-    title={'Open\nhere'}
-    meta="Recycled board"
-  />
-)
-
-/*
- * The jacket, the bag and the shipping box print onto their own material
- * rather than onto a sheet: `material` is the finish the carousel currently
- * has selected, so the navy cloth, the kraft and the charcoal all show through
- * the artwork and the swatches above the stage change the panel instead of
- * being painted over.
- */
-export const SwissBag = ({ material }: { material: string }) => (
-  <SwissStack
-    pattern={epicentre}
-    seed="bag-epicentre"
-    material={material}
-    grid="4x6"
-    index="14"
-    kicker="Boutique"
-    title={'Atelier\nSüd'}
-    meta="Limmatstrasse 22"
-  />
-)
-
 export const SwissBill = () => (
   <SwissStack
     pattern={dipole}
     seed="poster-bill"
-    tone="paper"
+    tone="ultramarine"
     grid="6x9"
     index="15"
     kicker="Konzert"

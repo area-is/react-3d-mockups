@@ -2,6 +2,7 @@
 
 import dynamic from 'next/dynamic'
 import type { MockupExplorerProps } from './mockup-explorer'
+import type { ImageExample } from './image-demo'
 
 /**
  * Client-side entry point for the one MDX component that pulls in the 3D
@@ -33,4 +34,14 @@ const MockupExplorerInner = dynamic(
 
 export function MockupExplorer(props: MockupExplorerProps) {
   return <MockupExplorerInner {...props} />
+}
+
+const ImageDemoInner = dynamic(() => import('./image-demo').then((m) => m.ImageDemo), {
+  ssr: false,
+  loading: () => <Placeholder height={440} />,
+})
+
+/** The Images guide's live examples - the same chunking as the explorer, for the same reason. */
+export function ImageDemo(props: { example: ImageExample; height?: number }) {
+  return <ImageDemoInner {...props} />
 }

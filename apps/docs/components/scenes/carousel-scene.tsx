@@ -73,9 +73,19 @@ import {
 import { ChalkHoursArt, ChalkMenuArt } from '../screens/print-art'
 import { CartonBack, CartonFacts, CartonFront, CartonRoof, CartonStory } from '../screens/carton-art'
 import {
-  SwissBag,
+  BagBack,
+  BagFront,
+  CerealBack,
+  CerealFacts,
+  CerealFront,
+  CerealStory,
+  CerealTop,
+  MailerEnd,
+  MailerFront,
+  MailerLid,
+} from '../screens/package-art'
+import {
   SwissBill,
-  SwissBox,
   SwissChecker,
   SwissConstruction,
   SwissDialA,
@@ -83,7 +93,6 @@ import {
   SwissEpicentre,
   SwissField,
   SwissJacket,
-  SwissLid,
   SwissModule,
   SwissRaster,
   SwissRhythm,
@@ -225,7 +234,10 @@ interface Entry {
   material?: boolean
   /**
    * The bare object. `screen` is live DOM for the staged models; the picker
-   * row passes `surface` instead - a painted screen costs no DOM layer.
+   * row passes `surface` instead - a painted screen costs no DOM layer. The
+   * packaging prints its other faces too, and gates them on `screen` for the
+   * same reason: five DOM panels on a seventeen-per-cent thumbnail are five
+   * layers nobody can see.
    */
   render: (props: {
     color: string
@@ -496,24 +508,28 @@ const OBJECTS: Entry[] = [
     ),
     material: true,
     content: (color) => <CartonFront material={color} />,
-    // The one object whose every face is printed, because that is what a
-    // carton is: the front is the `screen`, and the sides, the back and the
-    // roof carry what a dairy puts there, all on the same board.
+    // Every face is printed, because that is what a carton is: the front is
+    // the `screen`, and the sides, the back and the roof carry what a dairy
+    // puts there, all on the same board.
     render: ({ color, screen, surface, surfaceStyle }) => (
       <MilkCarton color={color} surfaceBackground={surface} surfaceStyle={surfaceStyle}>
         {screen}
-        <MilkCarton.Right>
-          <CartonFacts material={color} />
-        </MilkCarton.Right>
-        <MilkCarton.Left>
-          <CartonStory material={color} />
-        </MilkCarton.Left>
-        <MilkCarton.Back>
-          <CartonBack material={color} />
-        </MilkCarton.Back>
-        <MilkCarton.GableFront>
-          <CartonRoof material={color} />
-        </MilkCarton.GableFront>
+        {screen != null && (
+          <>
+            <MilkCarton.Right>
+              <CartonFacts material={color} />
+            </MilkCarton.Right>
+            <MilkCarton.Left>
+              <CartonStory material={color} />
+            </MilkCarton.Left>
+            <MilkCarton.Back>
+              <CartonBack material={color} />
+            </MilkCarton.Back>
+            <MilkCarton.GableFront>
+              <CartonRoof material={color} />
+            </MilkCarton.GableFront>
+          </>
+        )}
       </MilkCarton>
     ),
   },
@@ -529,10 +545,30 @@ const OBJECTS: Entry[] = [
       ['ink', 'Ink', '#20242c'],
       ['sage', 'Sage', '#b9c9b4']
     ),
-    content: () => <SwissBox />,
+    material: true,
+    content: (color) => <CerealFront material={color} />,
+    // A cereal box, which is what a 190 × 265 × 55 mm carton is: the bowl on
+    // the front, the Nutrition Facts down one side, the mill's story down the
+    // other, the best-by jetted on the top and a recipe on the back.
     render: ({ color, screen, surface, surfaceStyle }) => (
       <ProductBox color={color} surfaceBackground={surface} surfaceStyle={surfaceStyle}>
         {screen}
+        {screen != null && (
+          <>
+            <ProductBox.Right>
+              <CerealFacts material={color} />
+            </ProductBox.Right>
+            <ProductBox.Left>
+              <CerealStory material={color} />
+            </ProductBox.Left>
+            <ProductBox.Top>
+              <CerealTop material={color} />
+            </ProductBox.Top>
+            <ProductBox.Back>
+              <CerealBack material={color} />
+            </ProductBox.Back>
+          </>
+        )}
       </ProductBox>
     ),
   },
@@ -548,10 +584,25 @@ const OBJECTS: Entry[] = [
       ['slate', 'Slate', '#5c6672']
     ),
     material: true,
-    content: (color) => <SwissLid material={color} />,
+    content: (color) => <MailerLid material={color} />,
+    // A shipper: the brand on the lid under the tape, the pictograms down
+    // the ends where the tape wraps, the name along the front.
     render: ({ color, screen, surface, surfaceStyle }) => (
       <MailerBox color={color} surfaceBackground={surface} surfaceStyle={surfaceStyle}>
         {screen}
+        {screen != null && (
+          <>
+            <MailerBox.Front>
+              <MailerFront material={color} />
+            </MailerBox.Front>
+            <MailerBox.Right>
+              <MailerEnd material={color} />
+            </MailerBox.Right>
+            <MailerBox.Left>
+              <MailerEnd material={color} />
+            </MailerBox.Left>
+          </>
+        )}
       </MailerBox>
     ),
   },
@@ -568,10 +619,15 @@ const OBJECTS: Entry[] = [
       ['olive', 'Olive', '#7d8a5c']
     ),
     material: true,
-    content: (color) => <SwissBag material={color} />,
+    content: (color) => <BagFront material={color} />,
     render: ({ color, screen, surface, surfaceStyle }) => (
       <ShoppingBag color={color} surfaceBackground={surface} surfaceStyle={surfaceStyle}>
         {screen}
+        {screen != null && (
+          <ShoppingBag.Back>
+            <BagBack material={color} />
+          </ShoppingBag.Back>
+        )}
       </ShoppingBag>
     ),
   },
