@@ -1,0 +1,160 @@
+---
+title: Images as artwork
+description: Put a picture on the surface - a wallpaper, a poster, a product shot, a logo on kraft - and size it right.
+---
+
+The quickest artwork is a picture. A screen or a printed panel is a real DOM
+layer, so an `<img>` that fills it is all it takes: no texture, no UV map, no
+re-export when the picture changes. This page is the handful of things worth
+knowing when the artwork is a bitmap rather than a component.
+
+Every example below uses an image generated with OpenAI's GPT Image 2.5 at its
+`low` quality setting - see [Where these pictures came from](#where-these-pictures-came-from)
+for the call - and each one is the actual file the snippet names.
+
+## Fill the surface
+
+Set the image to the surface's full size and let `object-fit: cover` crop it
+to the panel's aspect, the way a print shop trims a bleed. The frame is the
+composition; the picture just has to cover it.
+
+```tsx
+import { PosterFrameMockup } from 'react-3d-mockups'
+
+const cover = { width: '100%', height: '100%', objectFit: 'cover', display: 'block' } as const
+
+<PosterFrameMockup float>
+  <img src="/art/poster.webp" alt="" style={cover} />
+</PosterFrameMockup>
+```
+
+<ImageDemo example="poster" />
+
+The same one line is a wallpaper on a phone. The status bar draws over it,
+exactly as it would on the device, so pick an image with a quiet top edge.
+
+```tsx
+<IPhoneMockup variant="pro" statusBar float>
+  <img src="/art/wallpaper.webp" alt="" style={cover} />
+</IPhoneMockup>
+```
+
+<ImageDemo example="wallpaper" />
+
+A product photograph on a laptop is the classic hero shot. A 3:2 photo on a
+16:10 panel loses a sliver top and bottom to `cover`; if the crop matters, use
+`object-fit: contain` with a `surfaceBackground` that matches the picture's
+edges and let it letterbox instead.
+
+```tsx
+<LaptopMockup variant="air15" float>
+  <img src="/art/coffee.webp" alt="" style={cover} />
+</LaptopMockup>
+```
+
+<ImageDemo example="laptop" />
+
+## When the aspect already matches
+
+A record sleeve is square, and so is a square image - nothing is cropped and
+`cover` and `contain` give the same picture. Check a surface's aspect with
+[`mockupInfo`](/docs/api/mockup-info) before you generate or export, and you
+can pick a size that needs no cropping at all.
+
+```tsx
+mockupInfo('vinylRecord').primary.aspect   // 1
+mockupInfo('posterFrame').primary.aspect   // 0.744 - a 2:3 sheet is close
+mockupInfo('laptop', { variant: 'air15' }).primary.aspect // 1.545 - shoot 3:2
+
+<VinylRecordMockup float>
+  <img src="/art/album.webp" alt="" style={cover} />
+</VinylRecordMockup>
+```
+
+<ImageDemo example="album" />
+
+## A transparent image on the material
+
+A logo is not a full-bleed picture: it sits on the board. Export it with a
+transparent background, size it as an element inside the surface, and set
+`surfaceBackground` to the object's own `color`, so everything the picture
+leaves clear is the bag. The same file prints on kraft, on gloss white or on a
+charcoal bag without being re-exported.
+
+```tsx
+<ShoppingBagMockup color="#c19a6b" surfaceBackground="#c19a6b" float>
+  <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '18% 14%' }}>
+    <img src="/art/fox.webp" alt="" style={{ width: '100%' }} />
+  </div>
+</ShoppingBagMockup>
+```
+
+<ImageDemo example="bag" />
+
+Do not reach for `surfaceBackground="transparent"` to get the board through -
+the surface sits under the canvas, so transparent pixels fall through to the
+page and read as a hole in the object. Paint the board's colour and let the
+image be the transparent thing. [Surface background](/docs/screen-content#surface-background)
+has the longer version.
+
+## How big should the image be?
+
+The surface is a viewport of a known size in CSS pixels, and that is the
+number to size against - not print resolution. A 444 × 597 mm poster is a
+poster in the real world, but on the mockup it is a 540 × 726 CSS px panel,
+drawn at whatever device pixel ratio the visitor's screen has. Twice the CSS
+size covers a 2× display; anything larger is bytes the page downloads and never
+shows.
+
+```ts
+import { mockupInfo } from 'react-3d-mockups'
+
+const { px } = mockupInfo('posterFrame').primary   // { width: 540, height: 726 }
+const target = { width: px.width * 2, height: px.height * 2 } // 1080 × 1452 for a 2× display
+```
+
+`px` follows the `resolution` prop: a larger `resolution` means a larger CSS
+viewport for your content to lay out in, at the same physical size on the
+object. For a bitmap it changes nothing about how big the image needs to be -
+the picture is scaled to the surface either way - so leave `resolution` alone
+and size the file to the default `px` grid.
+
+For the record: the images on this page are 1024 px on their short side, which
+is a little under 2× for the poster and the phone and comfortably over 1× for
+everything, at 70-340 KB each as WebP.
+
+## Where these pictures came from
+
+Each image here was generated with GPT Image 2.5 at `quality: 'low'`, the
+fastest and cheapest setting, which is plenty for artwork that will only ever
+be seen at a few hundred CSS pixels across. Three things made them usable as
+mockup artwork without editing:
+
+- **Pick the generation size closest to the surface's aspect.** `1024x1536`
+  for the poster and the phone, `1536x1024` for the laptop, `1024x1024` for
+  the sleeve and the logo, so `object-fit: cover` has almost nothing to crop.
+- **Ask for no text.** A mockup's surface is the place your own type goes,
+  and generated lettering is the first thing that gives a picture away.
+- **Ask for a transparent background** where the picture is a mark rather
+  than a scene - the fox above - so it prints on the material.
+
+```ts
+const res = await fetch('https://api.openai.com/v1/images/generations', {
+  method: 'POST',
+  headers: { Authorization: `Bearer ${process.env.OPENAI_API_KEY}`, 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    model: 'gpt-image-2.5-flare',
+    prompt: 'A mid-century travel poster of a mountain lake at dawn, flat colour shapes, no text.',
+    size: '1024x1536',
+    quality: 'low',
+    output_format: 'webp',
+    output_compression: 85,
+    // background: 'transparent', // for a logo or a mark
+  }),
+})
+const { data } = await res.json()
+await writeFile('public/art/poster.webp', Buffer.from(data[0].b64_json, 'base64'))
+```
+
+The same rules hold for a photograph or an export from a design tool: match
+the aspect, leave the type to the surface, and size to the CSS pixel grid.

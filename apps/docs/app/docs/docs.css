@@ -180,6 +180,26 @@
 /*  Prop explorer (components/mockup-explorer)                         */
 /* ------------------------------------------------------------------ */
 
+/*
+ * The Images guide's stages: one mockup per example, in the same card as the
+ * explorer so the page reads as one set of demos. Fixed height so the lazy
+ * scene has a box to hold while unmounted.
+ */
+.img-demo {
+  position: relative;
+  border: 1px solid var(--color-fd-border);
+  border-radius: 16px;
+  background:
+    repeating-conic-gradient(
+      color-mix(in oklab, var(--color-fd-foreground) 4%, transparent) 0% 25%,
+      transparent 0% 50%
+    )
+    50% / 26px 26px,
+    var(--color-fd-card);
+  overflow: hidden;
+  margin: 1.5rem 0;
+}
+
 .mx {
   --mx-accent: var(--color-fd-primary);
   /* One height for every interactive control in the inspector, and one row
