@@ -486,12 +486,12 @@ export function SwissDial({
  * screensaver rather than a showcase. Grids are coarser on the small faces and
  * finer on the large ones, so every object shows a comparable number of marks.
  *
- * The ten device screens are `live` and the printed faces are seeded. That
- * split is the whole point of the set: put them side by side in the strip and
- * the ones that are displays are the ones that keep changing. The packaging -
- * the carton, the cereal box, the shipper, the bag - is not in this set at
- * all: those are modelled on real products (see `carton-art`, `package-art`)
- * and carry no pattern.
+ * The device screens are `live` and the printed faces are seeded. That split
+ * is the whole point of the set: put them side by side in the strip and the
+ * ones that are displays are the ones that keep changing. Not everything on
+ * the carousel is in this set: the packaging is modelled on real products
+ * (`carton-art`, `package-art`), and the watch, the laptop and the Fold carry
+ * real apps (`device-apps`) - a watch face, a studio's website, a newspaper.
  */
 
 export const SwissRotation = () => (
@@ -520,19 +520,6 @@ export const SwissRaster = () => (
   />
 )
 
-export const SwissConstruction = () => (
-  <SwissStack
-    pattern={bauhaus}
-    live
-    tone="cobalt"
-    grid="6x9"
-    index="03"
-    kicker="Konstruktion"
-    title={'Circle\nsquare'}
-    meta="Werkbund · 1926"
-  />
-)
-
 export const SwissField = () => (
   <SwissStack
     pattern={dipole}
@@ -543,19 +530,6 @@ export const SwissField = () => (
     kicker="Feld"
     title={'Line\nfield'}
     meta="Studies in radiance"
-  />
-)
-
-export const SwissModule = () => (
-  <SwissSplit
-    pattern={ortho}
-    live
-    tone="tangerine"
-    grid="6x9"
-    index="05"
-    kicker="Modul"
-    title={'The\ngrid'}
-    meta="Twelve columns"
   />
 )
 
@@ -587,10 +561,6 @@ export const SwissChecker = () => (
 
 export const SwissDialA = () => (
   <SwissDial pattern={gyre} live tone="electric" grid="4x6" kicker="Zürich" title="9:41" />
-)
-
-export const SwissDialB = () => (
-  <SwissDial pattern={damier} live tone="terracotta" grid="2x3" kicker="Basel" title="9:41" />
 )
 
 export const SwissRhythm = () => (

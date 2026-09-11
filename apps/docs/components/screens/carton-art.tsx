@@ -2,14 +2,14 @@
 
 import type { CSSProperties, ReactNode } from 'react'
 import { FONT, INK, Micro, PAPER, Sheet, materialTone } from './swiss-art'
-import { JetPrint, NutritionFacts, Pill, RecycleMark, RoundSeal, SERIF, UpcA } from './label-art'
+import { JetPrint, NutritionFacts, Photo, Pill, RecycleMark, RoundSeal, SERIF, UpcA } from './label-art'
 
 /**
  * The milk carton's print, modelled on the half-gallon of whole milk in a US
  * grocery case: the red band a shelf reads as "whole" (blue is 2 %, green 1 %,
  * purple fat-free), the dairy's badge on it, "Vitamin D" in a pill, the farm
- * scene every carton has had since the fifties, "HALF GALLON (1.89 L)" set
- * large across the foot. The sides carry what the FDA and the co-op put
+ * painting every carton has had since the fifties (a generated gouache, see
+ * `/art/milk-farm.webp`), "HALF GALLON (1.89 L)" set large across the foot. The sides carry what the FDA and the co-op put
  * there: the Nutrition Facts panel rule for rule, the ingredient line, the
  * rBST pledge and its mandatory disclaimer, a scannable UPC-A, and on the
  * other side the story of the farms. The back sells the rest of the range
@@ -29,13 +29,6 @@ import { JetPrint, NutritionFacts, Pill, RecycleMark, RoundSeal, SERIF, UpcA } f
 const RED = '#c2182f'
 const NAVY = '#1d3557'
 const CREAM = '#fff8ea'
-const SUN = '#f6cf5b'
-const GRASS_FAR = '#a9d18e'
-const GRASS = '#7cb45e'
-const GRASS_NEAR = '#5f9a47'
-const BARN = '#b5352d'
-const BARN_DARK = '#8d2620'
-const COW = '#1f1f1f'
 
 /** Ink for the small print: the house navy on a light board, white ink on a dark one. */
 function dairyInk(material: string): { ink: string; onInk: string; dark: boolean } {
@@ -100,120 +93,6 @@ function Badge({ size, onBand }: { size: number; onBand?: boolean }) {
         EST. 1948 · VERMONT
       </span>
     </div>
-  )
-}
-
-/** A Holstein, standing, in the flat style a carton illustrates its herd in. */
-function Cow({ x, y, s = 1, flip }: { x: number; y: number; s?: number; flip?: boolean }) {
-  return (
-    <g transform={`translate(${x} ${y}) scale(${flip ? -s : s} ${s})`}>
-      <g stroke={COW} strokeWidth={2.2} strokeLinecap="round">
-        <path d="M-8 6v9" />
-        <path d="M-3 6v9" />
-        <path d="M5 6v9" />
-        <path d="M9 6v9" />
-      </g>
-      <path d="M-12 -3q-4 2-3 8" stroke={COW} strokeWidth={1.3} fill="none" strokeLinecap="round" />
-      <rect x={-12} y={-6} width={24} height={13} rx={5} fill="#ffffff" stroke={COW} strokeWidth={1.2} />
-      <path d="M-8-5q6-1 8 4-3 4-8 2z" fill={COW} />
-      <path d="M4-2q5-2 7 3-2 5-7 3z" fill={COW} />
-      <rect x={10} y={-9} width={8} height={9} rx={3} fill="#ffffff" stroke={COW} strokeWidth={1.2} />
-      <path d="M11-9l-2-3M17-9l2-3" stroke={COW} strokeWidth={1.2} strokeLinecap="round" />
-      <circle cx={16.4} cy={-4.2} r={0.9} fill={COW} />
-      <rect x={12} y={-2.2} width={6} height={2.6} rx={1.2} fill="#f0b8b0" />
-    </g>
-  )
-}
-
-/**
- * The front's picture: sun, barn and silo, a fence, the herd, and a glass of
- * milk in the foreground - the scene a carton has carried for seventy years,
- * in the flat cut-paper style it is still printed in.
- */
-function FarmScene() {
-  return (
-    <svg viewBox="0 0 200 150" preserveAspectRatio="xMidYMid slice" style={{ display: 'block', width: '100%', height: '100%' }} aria-hidden>
-      <defs>
-        <linearGradient id="carton-sky" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="#b9dcf3" />
-          <stop offset="1" stopColor="#edf6fb" />
-        </linearGradient>
-      </defs>
-      <rect width={200} height={150} fill="url(#carton-sky)" />
-      <circle cx={158} cy={34} r={21} fill={SUN} opacity={0.22} />
-      <circle cx={158} cy={34} r={14} fill={SUN} />
-      <g fill="#ffffff" opacity={0.95}>
-        <ellipse cx={46} cy={31} rx={17} ry={6} />
-        <ellipse cx={56} cy={27} rx={10} ry={7} />
-        <ellipse cx={38} cy={28} rx={8} ry={5} />
-        <ellipse cx={118} cy={47} rx={12} ry={4.5} />
-        <ellipse cx={125} cy={44} rx={7} ry={5} />
-      </g>
-      <path d="M0 92C30 72 70 70 100 84s60 16 100-6v72H0z" fill={GRASS_FAR} />
-      <g fill={GRASS_NEAR}>
-        <circle cx={24} cy={81} r={6.5} />
-        <circle cx={33} cy={84} r={4.8} />
-        <circle cx={178} cy={80} r={5.5} />
-        <circle cx={186} cy={83} r={4} />
-      </g>
-      <g stroke="#5a4634" strokeWidth={1.4}>
-        <path d="M24 87v6M33 88v5M178 85v5" />
-      </g>
-      <g>
-        <rect x={96} y={70} width={34} height={30} fill={BARN} />
-        <path d="M92 72l21-18 21 18z" fill={BARN_DARK} />
-        <rect x={108} y={82} width={10} height={18} fill="#f3e6d3" />
-        <path d="M108 82l10 18M118 82l-10 18" stroke={BARN} strokeWidth={1.2} />
-        <rect x={111} y={62} width={4} height={4} fill="#f3e6d3" />
-        <rect x={134} y={62} width={10} height={38} rx={1} fill="#d8d2c4" />
-        <path d="M134 62a5 5 0 0 1 10 0z" fill="#bdb4a3" />
-      </g>
-      <path d="M0 110c40-14 90-6 130-12s50-6 70 2v50H0z" fill={GRASS} />
-      <g stroke="#f7f1e3" strokeWidth={1.4} strokeLinecap="round">
-        <path d="M6 119h70M6 125h70" />
-        {[8, 20, 32, 44, 56, 68].map((x) => (
-          <path key={x} d={`M${x} 114v15`} />
-        ))}
-      </g>
-      <Cow x={104} y={114} s={1.05} />
-      <Cow x={152} y={120} s={1.2} flip />
-      <path d="M0 137c50-8 120-4 200-10v23H0z" fill={GRASS_NEAR} />
-      <g transform="translate(20 88)">
-        <path d="M4 0h30l-3 50H7z" fill="#eaf4fb" stroke="#b9d5e8" strokeWidth={1.2} />
-        <path d="M5.5 12h27l-2.6 38H8.1z" fill="#fffdf8" />
-        <path d="M6.8 3h24.4l-.5 8H7.2z" fill="#ffffff" opacity={0.55} />
-        <path d="M9 8v38" stroke="#ffffff" strokeWidth={2.4} opacity={0.75} strokeLinecap="round" />
-        <path d="M14 13c3-3 7-3 10 0" stroke="#e6eef5" strokeWidth={1.2} fill="none" />
-      </g>
-    </svg>
-  )
-}
-
-/** The story side's picture: one cow, close, on the pasture it is named after. */
-function PastureScene() {
-  return (
-    <svg viewBox="0 0 200 110" preserveAspectRatio="xMidYMid slice" style={{ display: 'block', width: '100%', height: '100%' }} aria-hidden>
-      <rect width={200} height={110} fill="#dbeef9" />
-      <circle cx={40} cy={26} r={12} fill={SUN} />
-      <path d="M0 62C40 46 90 50 130 44s50-4 70 6v60H0z" fill={GRASS_FAR} />
-      <g fill={GRASS_NEAR}>
-        <circle cx={170} cy={44} r={9} />
-        <circle cx={181} cy={49} r={7} />
-      </g>
-      <path d="M170 53v8M181 56v6" stroke="#5a4634" strokeWidth={1.6} />
-      <path d="M0 80c50-12 110-6 200-14v44H0z" fill={GRASS} />
-      <Cow x={96} y={70} s={3.2} />
-      <g fill="#ffffff">
-        <circle cx={30} cy={92} r={1.6} />
-        <circle cx={60} cy={98} r={1.4} />
-        <circle cx={150} cy={95} r={1.6} />
-        <circle cx={176} cy={100} r={1.3} />
-      </g>
-      <g fill="#f4d35e">
-        <circle cx={44} cy={100} r={1.4} />
-        <circle cx={132} cy={101} r={1.5} />
-      </g>
-    </svg>
   )
 }
 
@@ -298,7 +177,23 @@ export function CartonFront({ material }: { material: string }) {
         }}
       >
         <Micro style={{ fontSize: '2.6cqw', letterSpacing: '0.26em' }}>Grade A · Pasteurized · Homogenized</Micro>
-        <Badge size={56} onBand />
+        <div style={{ display: 'flex', alignItems: 'center', gap: '3.5cqw' }}>
+          <RoundSeal
+            size="13cqw"
+            legend="GRADE A · PASTEURIZED · "
+            color={CREAM}
+            ring={false}
+            center={<span style={{ fontFamily: SERIF, fontSize: '6cqw', lineHeight: 1 }}>A</span>}
+          />
+          <Badge size={52} onBand />
+          <RoundSeal
+            size="13cqw"
+            legend="FARMER OWNED · VERMONT · "
+            color={CREAM}
+            ring={false}
+            center={<span style={{ fontSize: '2.2cqw', fontWeight: 800, letterSpacing: '0.08em' }}>CO-OP</span>}
+          />
+        </div>
       </div>
       <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', padding: '4cqw 6cqw 4.5cqw', gap: '2.4cqw' }}>
         <div style={{ textAlign: 'center' }}>
@@ -320,9 +215,10 @@ export function CartonFront({ material }: { material: string }) {
             <br />
             Milk
           </div>
+          <Micro style={{ fontSize: '2.7cqw', display: 'block', marginTop: '1.8cqw', letterSpacing: '0.24em' }}>3.25 % Milkfat · Ultra-pasteurized</Micro>
         </div>
-        <div style={{ flex: 1, minHeight: 0, borderRadius: '3cqw', overflow: 'hidden', border: `0.6cqw solid ${ink}`, margin: '0.6cqw 0' }}>
-          <FarmScene />
+        <div style={{ flex: 1, minHeight: 0, borderRadius: '3cqw', overflow: 'hidden', margin: '0.6cqw 0' }}>
+          <Photo src="/art/milk-farm.webp" position="50% 58%" />
         </div>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', gap: '3cqw' }}>
           <div>
@@ -429,8 +325,9 @@ export function CartonStory({ material }: { material: string }) {
         make the rounds each morning and the milk is bottled the same day, so it reaches your table the way
         it left the farm.
       </p>
-      <div style={{ flex: 1, minHeight: 0, borderRadius: '3cqw', overflow: 'hidden', border: `0.6cqw solid ${ink}` }}>
-        <PastureScene />
+      <div style={{ flex: 1, minHeight: 0, borderRadius: '3cqw', overflow: 'hidden' }}>
+        {/* The herd, zoomed out of the same painting the front shows the glass in. */}
+        <Photo src="/art/milk-farm.webp" position="50% 50%" style={{ transform: 'scale(1.75)', transformOrigin: '76% 47%' }} />
       </div>
       <ul style={{ margin: 0, padding: 0, listStyle: 'none', display: 'grid', gap: '1.6cqw', ...body('3.3cqw', { fontWeight: 600 }) }}>
         <Tick color={RED}>No artificial growth hormones*</Tick>

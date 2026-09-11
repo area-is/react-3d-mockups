@@ -84,16 +84,14 @@ import {
   MailerFront,
   MailerLid,
 } from '../screens/package-art'
+import { Newspaper, SwissSite, WatchFace } from '../screens/device-apps'
 import {
   SwissBill,
   SwissChecker,
-  SwissConstruction,
   SwissDialA,
-  SwissDialB,
   SwissEpicentre,
   SwissField,
   SwissJacket,
-  SwissModule,
   SwissRaster,
   SwissRhythm,
   SwissRotation,
@@ -352,7 +350,7 @@ const DEVICES: Entry[] = [
     fit: FOLD_FIT,
     lift: 0,
     colorways: FOLD_COLORWAYS.fold7,
-    content: () => <SwissConstruction />,
+    content: () => <Newspaper />,
     render: ({ color, screen, surface, surfaceStyle, statusBar }) => (
       <Fold openAngle={CAROUSEL_OPEN_ANGLE} color={color} surfaceBackground={surface} surfaceStyle={surfaceStyle} statusBar={statusBar}>
         {screen}
@@ -381,7 +379,7 @@ const DEVICES: Entry[] = [
     fit: LAPTOP_FIT,
     lift: 0.55,
     colorways: LAPTOP_COLORWAYS.air13,
-    content: () => <SwissModule />,
+    content: () => <SwissSite />,
     render: ({ color, screen, surface, surfaceStyle }) => (
       <Laptop variant="air13" color={color} surfaceBackground={surface} surfaceStyle={surfaceStyle}>
         {screen}
@@ -435,7 +433,7 @@ const DEVICES: Entry[] = [
     fit: WATCH_FIT,
     lift: 0,
     colorways: GALAXY_WATCH_COLORWAYS.watch8,
-    content: () => <SwissDialB />,
+    content: () => <WatchFace />,
     render: ({ color, screen, surface, surfaceStyle }) => <GalaxyWatch color={color} surfaceBackground={surface} surfaceStyle={surfaceStyle}>{screen}</GalaxyWatch>,
   },
   {

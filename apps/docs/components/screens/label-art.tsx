@@ -21,6 +21,25 @@ export const SERIF = 'Georgia, "Iowan Old Style", "Palatino Linotype", "Book Ant
 /** The filling line's ink-jet: the one face of a package that is not typeset. */
 export const MONO = 'var(--font-jetbrains-mono), "JetBrains Mono", ui-monospace, Menlo, Consolas, monospace'
 
+/**
+ * A picture on the pack - the generated photograph or illustration a real
+ * package prints where a poster would have a pattern - full-bleed in its box
+ * unless told otherwise. `position` crops it (`object-position`), which is
+ * how the carton's story side shows the herd from the same painting the
+ * front shows the glass in.
+ */
+export function Photo({ src, position = '50% 50%', fit = 'cover', style }: { src: string; position?: string; fit?: 'cover' | 'contain'; style?: CSSProperties }) {
+  return (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      src={src}
+      alt=""
+      draggable={false}
+      style={{ display: 'block', width: '100%', height: '100%', objectFit: fit, objectPosition: position, ...style }}
+    />
+  )
+}
+
 /* ------------------------------------------------------------------ */
 /*  UPC-A                                                              */
 /* ------------------------------------------------------------------ */

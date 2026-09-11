@@ -2,7 +2,7 @@
 
 import type { CSSProperties, ReactNode } from 'react'
 import { FONT, INK, Micro, PAPER, Sheet, materialTone } from './swiss-art'
-import { JetPrint, NutritionFacts, Pill, RecycleMark, RoundSeal, SERIF, UpcA } from './label-art'
+import { JetPrint, NutritionFacts, Photo, Pill, RecycleMark, RoundSeal, SERIF, UpcA } from './label-art'
 
 /**
  * The packaging on the carousel, each modelled on the real thing it stands
@@ -110,168 +110,150 @@ function BrandTab({ p, size }: { p: Mill; size: number }) {
   )
 }
 
-/** The bowl: clusters in milk, a spoon, a splash, the honey going in - on a sunburst. */
-function BowlScene({ p }: { p: Mill }) {
-  const clusters: [number, number, number, string][] = [
-    [62, 66, 6.5, '#d68a2c'],
-    [74, 62, 5.5, '#e8a63b'],
-    [86, 67, 7, '#c47420'],
-    [99, 61, 6, '#e8a63b'],
-    [112, 66, 6.5, '#d68a2c'],
-    [56, 72, 5, '#e2983a'],
-    [68, 73, 6, '#c47420'],
-    [80, 74, 5.5, '#e8a63b'],
-    [93, 73, 6.5, '#d68a2c'],
-    [106, 74, 5.5, '#c47420'],
-    [120, 73, 6, '#e8a63b'],
-    [134, 67, 5.5, '#d68a2c'],
-    [140, 73, 5, '#e2983a'],
-    [46, 74, 4.5, '#d68a2c'],
-  ]
+/** The printed sunburst the bowl sits on - the one flat colour a cereal front is never without. */
+function Burst({ p }: { p: Mill }) {
   const rays = Array.from({ length: 18 }, (_, i) => {
     const a0 = (i * 20 * Math.PI) / 180
     const a1 = ((i * 20 + 9) * Math.PI) / 180
     const r = 150
-    return `M100 78 L${100 + r * Math.cos(a0)} ${78 + r * Math.sin(a0)} L${100 + r * Math.cos(a1)} ${78 + r * Math.sin(a1)} Z`
+    return `M100 100 L${100 + r * Math.cos(a0)} ${100 + r * Math.sin(a0)} L${100 + r * Math.cos(a1)} ${100 + r * Math.sin(a1)} Z`
   }).join(' ')
   return (
-    <svg viewBox="0 0 200 132" preserveAspectRatio="xMidYMid meet" style={{ display: 'block', width: '100%', height: '100%' }} aria-hidden>
+    <svg viewBox="0 0 200 200" preserveAspectRatio="xMidYMid meet" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }} aria-hidden>
       <defs>
-        <radialGradient id="cereal-burst" cx="50%" cy="60%" r="55%">
+        <radialGradient id="cereal-burst" cx="50%" cy="55%" r="55%">
           <stop offset="0" stopColor={p.honey} />
           <stop offset="1" stopColor={p.amber} />
         </radialGradient>
-        <linearGradient id="cereal-bowl" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="#fdfcf8" />
-          <stop offset="1" stopColor="#e3ded2" />
-        </linearGradient>
         <clipPath id="cereal-round">
-          <circle cx={100} cy={78} r={62} />
+          <circle cx={100} cy={100} r={98} />
         </clipPath>
       </defs>
-      <circle cx={100} cy={78} r={62} fill="url(#cereal-burst)" />
-      <path d={rays} fill="#ffffff" opacity={0.22} clipPath="url(#cereal-round)" />
-      {/* oats standing behind the bowl */}
-      <g stroke="#b98a3a" strokeWidth={1.6} strokeLinecap="round" fill="#d9a94f">
-        <path d="M44 88c-8-16-6-40 2-56" fill="none" />
-        <path d="M156 86c8-16 6-40-2-56" fill="none" />
-        {[0, 1, 2, 3].map((i) => (
-          <g key={i}>
-            <ellipse cx={42 - i * 1.2} cy={36 + i * 9} rx={2.6} ry={4.4} transform={`rotate(20 ${42 - i * 1.2} ${36 + i * 9})`} />
-            <ellipse cx={158 + i * 1.2} cy={34 + i * 9} rx={2.6} ry={4.4} transform={`rotate(-20 ${158 + i * 1.2} ${34 + i * 9})`} />
-          </g>
-        ))}
-      </g>
-      {/* the honey dipper and its drizzle */}
-      <g>
-        <path d="M60 4l10 12" stroke="#7a4a1e" strokeWidth={2.6} strokeLinecap="round" />
-        <g fill="#8a5a2b">
-          <ellipse cx={73} cy={19} rx={5.5} ry={2.6} transform="rotate(50 73 19)" />
-          <ellipse cx={76.5} cy={23} rx={5.5} ry={2.6} transform="rotate(50 76.5 23)" />
-          <ellipse cx={80} cy={27} rx={5} ry={2.4} transform="rotate(50 80 27)" />
-        </g>
-        <path d="M80 30c6 6-4 12 4 22 4 6 12 6 10 16" fill="none" stroke="#e9a52a" strokeWidth={3.2} strokeLinecap="round" />
-        <path d="M80 30c6 6-4 12 4 22 4 6 12 6 10 16" fill="none" stroke="#f7cf6a" strokeWidth={1.1} strokeLinecap="round" opacity={0.8} />
-      </g>
-      {/* the bowl */}
-      <ellipse cx={100} cy={124} rx={58} ry={5} fill="#000000" opacity={0.12} />
-      <path d="M38 70q2 48 62 52 60-4 62-52z" fill="url(#cereal-bowl)" />
-      <path d="M45 92q55 16 110 0" fill="none" stroke="#2f6fd1" strokeWidth={4.5} />
-      <path d="M40.5 78q59.5 14 119 0" fill="none" stroke="#2f6fd1" strokeWidth={1.6} opacity={0.6} />
-      <ellipse cx={100} cy={70} rx={62} ry={12} fill="#f1ede3" stroke="#d8d2c4" strokeWidth={1} />
-      <ellipse cx={100} cy={70} rx={54} ry={9} fill="#fffdf6" />
-      {clusters.map(([x, y, r, c], i) => (
-        <g key={i}>
-          <ellipse cx={x} cy={y} rx={r} ry={r * 0.78} fill={c} />
-          <circle cx={x - r * 0.3} cy={y - r * 0.25} r={r * 0.22} fill="#8a4c12" opacity={0.55} />
-          <circle cx={x + r * 0.35} cy={y + r * 0.1} r={r * 0.16} fill="#fbe0a0" opacity={0.6} />
-        </g>
-      ))}
-      {/* the spoon, resting in */}
-      <path d="M156 26l-22 38" stroke="#9aa0a8" strokeWidth={6} strokeLinecap="round" />
-      <path d="M156 26l-22 38" stroke="#d6dae0" strokeWidth={3.4} strokeLinecap="round" />
-      <ellipse cx={128} cy={68} rx={12} ry={7.5} fill="#c9ced5" stroke="#9aa0a8" strokeWidth={1} />
-      <ellipse cx={128} cy={67.5} rx={9} ry={4.8} fill="#fffdf6" />
-      <ellipse cx={126} cy={66} rx={4.2} ry={3.2} fill="#d68a2c" />
-      <ellipse cx={131.5} cy={68} rx={3.4} ry={2.6} fill="#e8a63b" />
-      {/* the splash */}
-      <g fill="#ffffff">
-        <path d="M160 56c2-6 6-8 8-14 1 6 4 9 5 14a6.5 6.5 0 1 1-13 0z" />
-        <circle cx={172} cy={40} r={2.2} />
-        <circle cx={178} cy={52} r={1.6} />
-        <circle cx={38} cy={58} r={2} />
-        <path d="M34 66c1-5 4-7 5-11 1 4 3 7 3 11a4 4 0 1 1-8 0z" />
-      </g>
-      {/* a couple of clusters on the table */}
-      <ellipse cx={30} cy={122} rx={6} ry={4.5} fill="#d68a2c" />
-      <ellipse cx={40} cy={126} rx={4.5} ry={3.4} fill="#e8a63b" />
-      <ellipse cx={168} cy={124} rx={5.5} ry={4} fill="#c47420" />
+      <circle cx={100} cy={100} r={98} fill="url(#cereal-burst)" />
+      <path d={rays} fill="#ffffff" opacity={0.2} clipPath="url(#cereal-round)" />
     </svg>
   )
 }
 
-/** The front: the tab, "Honey Oat Clusters", the bowl, three seals, the weight. */
+/**
+ * The "Facts Up Front" strip: calories, saturated fat, sodium and sugars per
+ * serving in four small tiles at the foot of the front. The US industry
+ * scheme every major cereal has carried since 2011 - and the single detail
+ * that most says "real box" rather than "designed box".
+ */
+function FactsUpFront({ p }: { p: Mill }) {
+  const items: [string, string, string][] = [
+    ['210', 'Calories', ''],
+    ['0g', 'Sat fat', '0% DV'],
+    ['190mg', 'Sodium', '8% DV'],
+    ['12g', 'Sugars', ''],
+  ]
+  return (
+    <div>
+      <Micro style={{ fontSize: '1.9cqw', display: 'block', marginBottom: '0.9cqw', opacity: 0.8 }}>Per 1 cup serving</Micro>
+      <div style={{ display: 'flex', gap: '1.1cqw' }}>
+        {items.map(([value, label, dv]) => (
+          <div
+            key={label}
+            style={{
+              border: `0.28cqw solid ${p.ink}`,
+              borderRadius: '1.6cqw',
+              padding: '1cqw 1.3cqw 0.9cqw',
+              textAlign: 'center',
+              minWidth: '9.6cqw',
+              lineHeight: 1,
+            }}
+          >
+            <div style={{ fontWeight: 800, fontSize: '3cqw', letterSpacing: '-0.02em' }}>{value}</div>
+            <div style={{ fontSize: '1.65cqw', fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', marginTop: '0.7cqw' }}>{label}</div>
+            <div style={{ fontSize: '1.55cqw', opacity: dv ? 0.75 : 0, marginTop: '0.4cqw' }}>{dv || '\u00a0'}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+/** The front: the tab, "Honey Oat Clusters", the bowl, the facts and seals, the weight. */
 export function CerealFront({ material }: { material: string }) {
   const p = mill(material)
   return (
-    <BoxFace material={material} style={{ gap: '1.6cqw' }}>
+    <BoxFace material={material} style={{ gap: '1.4cqw' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '2cqw' }}>
         <BrandTab p={p} size={2.7} />
         <Pill color={p.red} ink="#fff4dc" size="2.6cqw" style={{ transform: 'rotate(4deg)', marginTop: '0.4cqw' }}>
           Family size
         </Pill>
       </div>
-      <div style={{ textAlign: 'center', marginTop: '1.2cqw' }}>
-        <div style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: '12.5cqw', lineHeight: 0.95, color: p.amber, letterSpacing: '-0.015em' }}>
+      <div style={{ textAlign: 'center', marginTop: '0.4cqw' }}>
+        <div style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: '12cqw', lineHeight: 0.95, color: p.amber, letterSpacing: '-0.015em' }}>
           Honey Oat
         </div>
-        <div style={{ fontFamily: FONT, fontWeight: 900, fontSize: '16.4cqw', lineHeight: 0.92, letterSpacing: '-0.045em', color: p.title, marginTop: '-0.6cqw' }}>
+        <div style={{ fontFamily: FONT, fontWeight: 900, fontSize: '16cqw', lineHeight: 0.92, letterSpacing: '-0.045em', color: p.title, marginTop: '-0.6cqw' }}>
           CLUSTERS
         </div>
-        <div style={{ fontSize: '3.1cqw', fontWeight: 600, marginTop: '1.6cqw', letterSpacing: '0.01em' }}>
-          Toasted whole grain oat clusters with real honey
+        <div style={{ fontSize: '3cqw', fontWeight: 600, marginTop: '1.4cqw', letterSpacing: '0.01em' }}>
+          Toasted whole grain oat clusters with a touch of real honey
         </div>
       </div>
-      <div style={{ flex: 1, minHeight: 0, position: 'relative', margin: '0.6cqw 0' }}>
-        <BowlScene p={p} />
+      <div style={{ flex: 1, minHeight: 0, position: 'relative', margin: '0.4cqw 0' }}>
+        <Burst p={p} />
+        {/* The hero: a photograph, as on every cereal box in the aisle. It is a
+            cut-out, so the burst prints behind it and the board shows round it. */}
+        <Photo src="/art/cereal-bowl.webp" fit="contain" style={{ position: 'absolute', inset: '1% 3%', width: '94%', height: '98%' }} />
+        <div
+          style={{
+            position: 'absolute',
+            top: '4%',
+            right: '1%',
+            background: p.red,
+            color: '#fff4dc',
+            fontWeight: 800,
+            fontSize: '2.4cqw',
+            letterSpacing: '0.08em',
+            textTransform: 'uppercase',
+            padding: '1.2cqw 2cqw',
+            borderRadius: '0.6cqw',
+            transform: 'rotate(-6deg)',
+            lineHeight: 1.15,
+            textAlign: 'center',
+          }}
+        >
+          New!
+          <br />
+          <span style={{ fontWeight: 600, letterSpacing: '0.02em', textTransform: 'none', fontSize: '2.2cqw' }}>Bigger clusters</span>
+        </div>
       </div>
-      <div style={{ display: 'flex', justifyContent: 'center', gap: '3.6cqw' }}>
-        <RoundSeal
-          size="16cqw"
-          legend="WHOLE GRAIN · 32g PER SERVING · "
-          color={p.ink}
-          center={
-            <span style={{ fontSize: '4.2cqw', fontWeight: 900, letterSpacing: '-0.03em' }}>
-              32<span style={{ fontSize: '2.4cqw', fontWeight: 800 }}>g</span>
-            </span>
-          }
-        />
-        <RoundSeal
-          size="16cqw"
-          legend="NO ARTIFICIAL FLAVORS OR COLORS · "
-          color={p.ink}
-          center={
-            <svg viewBox="0 0 24 24" style={{ width: '60%', height: '60%' }} aria-hidden>
-              <path d="M4 12.5l5 5L20 6.5" fill="none" stroke={p.green} strokeWidth={3.4} strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-          }
-        />
-        <RoundSeal
-          size="16cqw"
-          legend="GOOD SOURCE OF FIBER · "
-          color={p.ink}
-          center={
-            <span style={{ fontSize: '2.7cqw', fontWeight: 800, letterSpacing: '0.02em' }}>
-              4g
-              <br />
-              FIBER
-            </span>
-          }
-        />
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', gap: '2cqw' }}>
+        <FactsUpFront p={p} />
+        <div style={{ display: 'flex', gap: '1.6cqw' }}>
+          <RoundSeal
+            size="13.5cqw"
+            legend="WHOLE GRAIN · 32g PER SERVING · "
+            color={p.ink}
+            center={
+              <span style={{ fontSize: '3.6cqw', fontWeight: 900, letterSpacing: '-0.03em' }}>
+                32<span style={{ fontSize: '2.1cqw', fontWeight: 800 }}>g</span>
+              </span>
+            }
+          />
+          <RoundSeal
+            size="13.5cqw"
+            legend="GOOD SOURCE OF FIBER · "
+            color={p.ink}
+            center={
+              <span style={{ fontSize: '2.3cqw', fontWeight: 800, letterSpacing: '0.02em' }}>
+                4g
+                <br />
+                FIBER
+              </span>
+            }
+          />
+        </div>
       </div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginTop: '0.6cqw' }}>
-        <div style={{ fontSize: '3.3cqw', fontWeight: 800, letterSpacing: '0.03em' }}>NET WT 18 OZ (1 LB 2 OZ) 510g</div>
-        <Micro style={{ fontSize: '2.3cqw', opacity: 0.72 }}>Naturally flavored</Micro>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginTop: '0.4cqw' }}>
+        <div style={{ fontSize: '3cqw', fontWeight: 800, letterSpacing: '0.03em', whiteSpace: 'nowrap' }}>NET WT 18 OZ (1 LB 2 OZ) 510g</div>
+        <Micro style={{ fontSize: '2.1cqw', opacity: 0.72, whiteSpace: 'nowrap' }}>No artificial flavors</Micro>
       </div>
     </BoxFace>
   )
@@ -342,8 +324,8 @@ export function CerealStory({ material }: { material: string }) {
         We started as a grain mill on the Ridgeway river, and we still buy our oats from the farms up the valley.
         Every batch is toasted in ovens you could stand in, then poured straight into the box.
       </p>
-      <div style={{ flex: 1, minHeight: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2cqw 0' }}>
-        <Wheat color={p.amber} style={{ height: '100%', maxHeight: '90cqw', width: 'auto' }} />
+      <div style={{ flex: 1, minHeight: 0, position: 'relative' }}>
+        <Photo src="/art/cereal-clusters.webp" fit="contain" />
       </div>
       <ol style={{ margin: 0, padding: 0, listStyle: 'none', display: 'grid', gap: '2.6cqw' }}>
         {steps.map(([name, how], i) => (
@@ -585,55 +567,55 @@ function materialToneInverse(ink: string): string {
   return ink === PAPER ? INK : PAPER
 }
 
-/** The lid: the brand across the top half, the handling marks along the foot, the tape between. */
+/**
+ * The lid: three zones with air between them, and nothing drawn as a line.
+ * The brand sits above the tape, the handling marks below it, and the
+ * header and the small print keep to the edges - the way a real shipper is
+ * laid out around the tape it knows is coming.
+ */
 export function MailerLid({ material }: { material: string }) {
   const ink = materialTone(material).text
+  const marks = [
+    ['fragile', 'Fragile'],
+    ['up', 'This way up'],
+    ['dry', 'Keep dry'],
+  ] as const
   return (
-    <ShipperFace material={material} style={{ justifyContent: 'space-between' }}>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '1.6cqw', height: '36%', minHeight: 0 }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1.6cqw' }}>
-            <Fern color={ink} style={{ height: '6cqw', width: 'auto' }} />
-            <Micro style={{ fontSize: '1.9cqw' }}>Fernhaven Candle Co.</Micro>
+    <ShipperFace material={material} style={{ display: 'grid', gridTemplateRows: '1fr 24% 1fr', padding: '4.6cqw 6cqw 4.4cqw' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', minHeight: 0 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '3cqw' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1.3cqw' }}>
+            <Fern color={ink} style={{ height: '4.4cqw', width: 'auto' }} />
+            <Micro style={{ fontSize: '1.85cqw', whiteSpace: 'nowrap' }}>Fernhaven Candle Co.</Micro>
           </div>
-          <Micro style={{ fontSize: '1.9cqw', opacity: 0.72 }}>Hand-poured in Burlington, Vermont · since 2019</Micro>
+          <Micro style={{ fontSize: '1.85cqw', whiteSpace: 'nowrap', opacity: 0.7 }}>Burlington, Vermont</Micro>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '3cqw', marginTop: 'auto' }}>
-          <div style={{ fontFamily: SERIF, fontSize: '11.5cqw', lineHeight: 0.9, letterSpacing: '-0.02em', whiteSpace: 'nowrap' }}>Fernhaven</div>
-          <div style={{ borderLeft: `0.3cqw solid ${ink}`, paddingLeft: '3cqw', display: 'grid', gap: '0.9cqw' }}>
-            <Micro style={{ fontSize: '1.9cqw' }}>Something good is in here.</Micro>
-            <Micro style={{ fontSize: '1.9cqw', opacity: 0.72 }}>Open gently · keep the box</Micro>
-          </div>
+        <div style={{ textAlign: 'center' }}>
+          <div style={{ fontFamily: SERIF, fontSize: '13cqw', lineHeight: 0.9, letterSpacing: '-0.02em' }}>Fernhaven</div>
+          <Micro style={{ fontSize: '1.9cqw', display: 'block', marginTop: '2.2cqw', whiteSpace: 'nowrap', letterSpacing: '0.32em' }}>
+            Hand-poured candles · Small batch · Since 2019
+          </Micro>
         </div>
       </div>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '2.4cqw', height: '36%', justifyContent: 'flex-end' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', gap: '2cqw' }}>
-          {(
-            [
-              ['fragile', 'Fragile'],
-              ['up', 'This way up'],
-              ['dry', 'Keep dry'],
-            ] as const
-          ).map(([kind, label]) => (
-            <div key={kind} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1.2cqw' }}>
-              <Pictogram kind={kind} color={ink} size="8.5cqw" />
-              <Micro style={{ fontSize: '1.8cqw' }}>{label}</Micro>
+      {/* the tape's lane, left clear */}
+      <div />
+      <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', minHeight: 0 }}>
+        <div style={{ display: 'flex', justifyContent: 'center', gap: '10cqw' }}>
+          {marks.map(([kind, label]) => (
+            <div key={kind} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1.5cqw' }}>
+              <Pictogram kind={kind} color={ink} size="7.4cqw" />
+              <Micro style={{ fontSize: '1.8cqw', whiteSpace: 'nowrap' }}>{label}</Micro>
             </div>
           ))}
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1.2cqw' }}>
-            <RecycleMark color={ink} size="8cqw" />
-            <Micro style={{ fontSize: '1.8cqw' }}>100% recycled</Micro>
-          </div>
-          <div style={{ flex: 1 }} />
-          <div style={{ display: 'grid', gap: '1.4cqw', textAlign: 'right' }}>
-            <Micro style={{ fontSize: '1.8cqw', opacity: 0.72 }}>Packed with care by</Micro>
-            <div style={{ borderBottom: `0.3cqw solid ${ink}`, width: '30cqw', height: '4cqw' }} />
-            <Micro style={{ fontSize: '1.8cqw', opacity: 0.72 }}>Order № · fernhaven.co</Micro>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1.5cqw' }}>
+            <RecycleMark color={ink} size="7cqw" />
+            <Micro style={{ fontSize: '1.8cqw', whiteSpace: 'nowrap' }}>Recycle</Micro>
           </div>
         </div>
-        <Micro style={{ fontSize: '1.8cqw', opacity: 0.72 }}>
-          This box is made from 100% post-consumer corrugate and printed with soy ink. Reuse it, then flatten and recycle it.
-        </Micro>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: '3cqw' }}>
+          <Micro style={{ fontSize: '1.7cqw', whiteSpace: 'nowrap', opacity: 0.7 }}>100% recycled corrugate · Soy ink · Reuse, then recycle</Micro>
+          <Micro style={{ fontSize: '1.7cqw', whiteSpace: 'nowrap', opacity: 0.7 }}>fernhaven.co</Micro>
+        </div>
       </div>
     </ShipperFace>
   )
@@ -678,66 +660,115 @@ export function MailerEnd({ material }: { material: string }) {
 /*  The shopping bag                                                   */
 /* ------------------------------------------------------------------ */
 
-/** The bookshop's two inks: the board's ink, and a red or a gold to go with it. */
+/** The florist's two inks: the board's ink, and a terracotta or a gold to go with it. */
 function shop(material: string): { ink: string; accent: string } {
   const t = materialTone(material)
-  return { ink: t.text, accent: t.text === INK ? '#9b2c2c' : '#e2b96a' }
+  return { ink: t.text, accent: t.text === INK ? '#b8532e' : '#e2b96a' }
 }
 
-/** An open book, for the seal. */
-function OpenBook({ color, style }: { color: string; style?: CSSProperties }) {
+/**
+ * The florist's mark: a loose bunch drawn in one line - a poppy, a stem of
+ * eucalyptus, an allium head and a few grasses - the botanical line drawing
+ * a flower shop prints on everything it hands over the counter.
+ */
+function Bunch({ color, style }: { color: string; style?: CSSProperties }) {
+  const line = { fill: 'none', stroke: color, strokeWidth: 2.1, strokeLinecap: 'round' as const, strokeLinejoin: 'round' as const }
+  const leaf = (x: number, y: number, rot: number, len = 26) => (
+    <path key={`${x}-${y}-${rot}`} d={`M0 0c${len * 0.3} -${len * 0.5} ${len * 0.75} -${len * 0.5} ${len} 0c-${len * 0.25} ${len * 0.5} -${len * 0.7} ${len * 0.5} -${len} 0z`} transform={`translate(${x} ${y}) rotate(${rot})`} {...line} />
+  )
   return (
-    <svg viewBox="0 0 64 44" style={{ display: 'block', ...style }} aria-hidden>
-      <path d="M4 8c9-4 18-4 28 2v30c-10-6-19-6-28-2z" fill="none" stroke={color} strokeWidth={2.6} strokeLinejoin="round" />
-      <path d="M60 8c-9-4-18-4-28 2v30c10-6 19-6 28-2z" fill="none" stroke={color} strokeWidth={2.6} strokeLinejoin="round" />
-      <path d="M10 16c6-1 11-1 17 2M10 22c6-1 11-1 17 2M10 28c6-1 11-1 17 2M37 18c6-3 11-3 17-2M37 24c6-3 11-3 17-2M37 30c6-3 11-3 17-2" stroke={color} strokeWidth={1.6} strokeLinecap="round" fill="none" />
+    <svg viewBox="0 0 220 250" style={{ display: 'block', ...style }} aria-hidden>
+      {/* stems, gathered at the foot */}
+      <path d="M110 248C104 200 106 150 104 96" {...line} />
+      <path d="M112 248C90 210 74 170 70 118" {...line} />
+      <path d="M108 248C136 206 150 170 148 112" {...line} />
+      <path d="M114 248C126 214 142 190 172 172" {...line} strokeWidth={1.6} />
+      <path d="M106 248C84 226 62 212 40 208" {...line} strokeWidth={1.6} />
+      {/* eucalyptus down the left stem */}
+      {[
+        [76, 200, -20],
+        [64, 178, -40],
+        [80, 160, 10],
+        [66, 138, -30],
+        [80, 122, 20],
+      ].map(([x, y, r]) => (
+        <circle key={`e${x}${y}`} cx={x} cy={y} r={8} transform={`rotate(${r} ${x} ${y})`} {...line} strokeWidth={1.8} />
+      ))}
+      {/* the poppy on the centre stem */}
+      <g transform="translate(104 78)">
+        <path d="M0-30c14-6 26 4 24 16-2 14-14 20-24 14-10 6-22 0-24-14-2-12 10-22 24-16z" {...line} />
+        <path d="M-10-8c6-8 14-8 20 0M-8 4c4 6 12 6 16 0" {...line} strokeWidth={1.6} />
+        <circle cx={0} cy={-1} r={4} fill={color} />
+        {[-24, -10, 6, 20].map((a) => (
+          <path key={a} d={`M0 -1 l ${Math.cos((a * Math.PI) / 180) * 9} ${Math.sin((a * Math.PI) / 180) * 9 - 9}`} {...line} strokeWidth={1.3} />
+        ))}
+      </g>
+      {/* leaves on the centre stem */}
+      {leaf(96, 150, -150, 24)}
+      {leaf(108, 176, 20, 26)}
+      {/* the allium on the right stem */}
+      <g transform="translate(148 96)">
+        <circle cx={0} cy={0} r={22} {...line} strokeWidth={1.4} strokeDasharray="2 5" />
+        {Array.from({ length: 12 }, (_, i) => {
+          const a = (i * 30 * Math.PI) / 180
+          return <circle key={i} cx={Math.cos(a) * 15} cy={Math.sin(a) * 15} r={2.2} fill={color} />
+        })}
+        <circle cx={0} cy={0} r={2.4} fill={color} />
+      </g>
+      {/* grasses */}
+      <path d="M172 172c8-14 10-28 6-44" {...line} strokeWidth={1.4} />
+      <path d="M178 128l-3 5M181 137l-4 5M176 118l-3 5" {...line} strokeWidth={1.3} />
+      <path d="M40 208c-6-12-4-24 4-34" {...line} strokeWidth={1.4} />
+      <circle cx={44} cy={174} r={3} fill={color} />
+      <circle cx={38} cy={186} r={2.4} fill={color} />
+      {/* the tie */}
+      <path d="M100 236c6-4 14-4 20 0M100 240c6 4 14 4 20 0" {...line} strokeWidth={1.6} />
     </svg>
   )
 }
 
-/** The front: the seal, the name in serifs, the shop's address along the foot. */
+/** The front: the bunch, the name in serifs, the shop's address along the foot. */
 export function BagFront({ material }: { material: string }) {
   const { ink, accent } = shop(material)
   const t = materialTone(material)
   return (
-    <Sheet tone={t} style={{ flexDirection: 'column', alignItems: 'center', padding: '14cqw 8cqw 7cqw', color: ink, textAlign: 'center' }}>
-      <RoundSeal
-        size="40cqw"
-        legend="HARBOR BOOKS · PORTLAND, ME · 1979 · "
-        color={ink}
-        center={<OpenBook color={ink} style={{ width: '100%' }} />}
-      />
-      <div style={{ fontFamily: SERIF, fontSize: '15.5cqw', lineHeight: 0.95, letterSpacing: '-0.02em', marginTop: '6cqw' }}>
-        Harbor
+    <Sheet tone={t} style={{ flexDirection: 'column', alignItems: 'center', padding: '12cqw 9cqw 6.5cqw', color: ink, textAlign: 'center' }}>
+      <Bunch color={ink} style={{ width: '46cqw', height: 'auto', flex: 'none' }} />
+      <div style={{ fontFamily: SERIF, fontSize: '13.5cqw', lineHeight: 0.98, letterSpacing: '-0.02em', marginTop: '3cqw' }}>
+        Marigold
         <br />
-        Books
+        <span style={{ fontStyle: 'italic', color: accent }}>&amp;</span> Moss
       </div>
-      <Micro style={{ fontSize: '2.9cqw', color: accent, marginTop: '4cqw' }}>New &amp; used books · Coffee · Readings</Micro>
-      <div style={{ flex: 1 }} />
-      <div style={{ width: '100%', borderTop: `0.35cqw solid ${ink}`, paddingTop: '3.4cqw', display: 'grid', gap: '2cqw' }}>
-        <Micro style={{ fontSize: '2.7cqw' }}>12 Commercial Street · Portland, Maine</Micro>
-        <Micro style={{ fontSize: '2.7cqw', opacity: 0.72 }}>harborbooks.shop · (207) 555-0163</Micro>
-        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '1.8cqw', marginTop: '1.4cqw' }}>
-          <RecycleMark color={ink} size="4.6cqw" />
-          <Micro style={{ fontSize: '2.3cqw', opacity: 0.72 }}>100% recycled kraft · please reuse</Micro>
+      <Micro style={{ fontSize: '2.8cqw', marginTop: '3.6cqw', letterSpacing: '0.3em' }}>Flowers · Plants · Workshops</Micro>
+      <div style={{ flex: 1, minHeight: '5cqw' }} />
+      <div style={{ display: 'grid', gap: '2cqw' }}>
+        <Micro style={{ fontSize: '2.7cqw' }}>34 Elm Street · Northampton, Mass.</Micro>
+        <Micro style={{ fontSize: '2.7cqw', opacity: 0.72 }}>marigoldandmoss.com · Tue–Sun 9–6</Micro>
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '1.8cqw', marginTop: '1.2cqw' }}>
+          <RecycleMark color={ink} size="4.4cqw" />
+          <Micro style={{ fontSize: '2.3cqw', opacity: 0.72 }}>Unbleached kraft · Please reuse me</Micro>
         </div>
       </div>
     </Sheet>
   )
 }
 
-/** The back: what a bookshop puts on the other side of its bag. */
+/** The back: what the shop prints on the other side of the bag. */
 export function BagBack({ material }: { material: string }) {
   const { ink, accent } = shop(material)
   const t = materialTone(material)
   return (
-    <Sheet tone={t} style={{ flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '16cqw 10cqw 9cqw', color: ink, textAlign: 'center', gap: '5cqw' }}>
-      <div style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: '8.6cqw', lineHeight: 1.18 }}>
-        &ldquo;A room without books is like a body without a soul.&rdquo;
+    <Sheet tone={t} style={{ flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '16cqw 11cqw 9cqw', color: ink, textAlign: 'center', gap: '5cqw' }}>
+      <div style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: '8.4cqw', lineHeight: 1.2 }}>
+        Grown slow.
+        <br />
+        Cut this morning.
+        <br />
+        Wrapped with care.
       </div>
-      <Micro style={{ fontSize: '2.9cqw', color: accent }}>Cicero, more or less</Micro>
+      <Micro style={{ fontSize: '2.9cqw', color: accent, letterSpacing: '0.3em' }}>Est. 2016</Micro>
       <div style={{ flex: 1 }} />
-      <RoundSeal size="26cqw" legend="HARBOR BOOKS · PORTLAND, ME · 1979 · " color={ink} center={<OpenBook color={ink} style={{ width: '100%' }} />} />
+      <Bunch color={ink} style={{ width: '30cqw', height: 'auto', opacity: 0.9 }} />
     </Sheet>
   )
 }
