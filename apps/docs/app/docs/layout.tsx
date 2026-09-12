@@ -7,6 +7,7 @@ import { baseOptions } from '@/lib/layout.shared'
 import { DocsSidebarSeparator } from '@/components/docs-sidebar'
 import { hideGridPages } from '@/lib/sidebar-tree'
 import { inter, jetbrainsMono } from '@/lib/fonts'
+import { asset } from '@/lib/base-path.mjs'
 import { SITE_URL, socialMetadata } from '@/lib/site'
 import './docs.css'
 import '../screens.css'
@@ -34,7 +35,14 @@ export default function DocsRootLayout({ children }: { children: ReactNode }) {
       suppressHydrationWarning
     >
       <body className="flex flex-col min-h-screen">
-        <RootProvider>
+        {/*
+          * fumadocs' fetch client defaults its endpoint to
+          * `join(BASE_PATH, '/api/search')`, where that `BASE_PATH` is
+          * `import.meta.env.BASE_URL` - a Vite variable, undefined under Next -
+          * so it resolves to a bare `/api/search` and misses our prefix
+          * entirely. Pointing it explicitly is the whole fix.
+          */}
+        <RootProvider search={{ options: { api: asset('/api/search') } }}>
           <DocsLayout
             tree={hideGridPages(source.getPageTree())}
             {...baseOptions()}

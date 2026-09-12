@@ -4,6 +4,7 @@ import type { CSSProperties, ReactNode } from 'react'
 import { epicentre } from 'tabbied/patterns'
 import { FONT, INK, Pattern, Sheet, type Tone } from './swiss-art'
 import { Ean13 } from './label-art'
+import { asset } from '@/lib/base-path.mjs'
 
 /**
  * The jacket on the carousel's hardcover: `봄은 늦게 온다` / *Spring Comes
@@ -121,7 +122,7 @@ function Portrait() {
   return (
     // eslint-disable-next-line @next/next/no-img-element
     <img
-      src="/art/halmoni.webp"
+      src={asset('/art/halmoni.webp')}
       alt=""
       draggable={false}
       style={{

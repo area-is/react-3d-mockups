@@ -3,6 +3,7 @@
 import type { CSSProperties, ReactNode } from 'react'
 import { FONT, INK, Micro, PAPER, Sheet, materialTone } from './swiss-art'
 import { JetPrint, NutritionFacts, Photo, Pill, RecycleMark, RoundSeal, SERIF, UpcA } from './label-art'
+import { asset } from '@/lib/base-path.mjs'
 
 /**
  * The packaging on the carousel, each modelled on the real thing it stands
@@ -200,7 +201,7 @@ export function CerealFront({ material }: { material: string }) {
         <Burst p={p} />
         {/* The hero: a photograph, as on every cereal box in the aisle. It is a
             cut-out, so the burst prints behind it and the board shows round it. */}
-        <Photo src="/art/cereal-bowl.webp" fit="contain" style={{ position: 'absolute', inset: '1% 3%', width: '94%', height: '98%' }} />
+        <Photo src={asset('/art/cereal-bowl.webp')} fit="contain" style={{ position: 'absolute', inset: '1% 3%', width: '94%', height: '98%' }} />
         <div
           style={{
             position: 'absolute',
@@ -325,7 +326,7 @@ export function CerealStory({ material }: { material: string }) {
         Every batch is toasted in ovens you could stand in, then poured straight into the box.
       </p>
       <div style={{ flex: 1, minHeight: 0, position: 'relative' }}>
-        <Photo src="/art/cereal-clusters.webp" fit="contain" />
+        <Photo src={asset('/art/cereal-clusters.webp')} fit="contain" />
       </div>
       <ol style={{ margin: 0, padding: 0, listStyle: 'none', display: 'grid', gap: '2.6cqw' }}>
         {steps.map(([name, how], i) => (

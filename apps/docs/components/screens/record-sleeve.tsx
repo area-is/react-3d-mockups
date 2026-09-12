@@ -3,6 +3,7 @@
 import type { CSSProperties, ReactNode } from 'react'
 import { chase } from 'tabbied/patterns'
 import { Pattern, Sheet, type Tone } from './swiss-art'
+import { asset } from '@/lib/base-path.mjs'
 
 /**
  * The carousel's LP: *Late Set at the Alhambra*, the Marcus Hale Trio, on
@@ -122,7 +123,7 @@ export function SleeveCover() {
     <Sheet tone={coverTone} style={{ flexDirection: 'column', padding: '7cqw', position: 'relative' }}>
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
-        src="/art/jazz-trio.webp"
+        src={asset('/art/jazz-trio.webp')}
         alt=""
         draggable={false}
         style={{
