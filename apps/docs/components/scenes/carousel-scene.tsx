@@ -91,12 +91,12 @@ import {
   SwissDialA,
   SwissEpicentre,
   SwissField,
-  SwissJacket,
   SwissRaster,
   SwissRhythm,
   SwissRotation,
-  SwissSleeve,
 } from '../screens/swiss-art'
+import { JacketBack, JacketCover, JacketSpine } from '../screens/book-jacket'
+import { SleeveBack, SleeveCover, SleeveLabelA, SleeveLabelB } from '../screens/record-sleeve'
 import { DEVICES as CATALOG_DEVICES, OBJECTS as CATALOG_OBJECTS } from '@/lib/mockup-catalog.mjs'
 
 /**
@@ -466,11 +466,24 @@ const OBJECTS: Entry[] = [
       ['oxblood', 'Oxblood', '#5b2230'],
       ['bone', 'Bone', '#e3dbcc']
     ),
-    material: true,
-    content: (color) => <SwissJacket material={color} />,
+    content: (color) => <JacketCover cloth={color} />,
+    // A jacket wraps the book, so all three faces are printed: a front board
+    // alone left the object a blank slab the moment the carousel turned it,
+    // and the spine is the only face a shelf ever shows. No `material` here -
+    // a dust jacket is its own printed sheet, not ink on the cloth.
     render: ({ color, screen, surface, surfaceStyle }) => (
       <Book color={color} surfaceBackground={surface} surfaceStyle={surfaceStyle}>
         {screen}
+        {screen != null && (
+          <>
+            <Book.Spine>
+              <JacketSpine cloth={color} />
+            </Book.Spine>
+            <Book.Back>
+              <JacketBack cloth={color} />
+            </Book.Back>
+          </>
+        )}
       </Book>
     ),
   },
@@ -485,10 +498,26 @@ const OBJECTS: Entry[] = [
       ['black', 'Black jacket', '#1b1b1e'],
       ['sunset', 'Sunset', '#d8663f']
     ),
-    content: () => <SwissSleeve />,
+    content: () => <SleeveCover />,
+    // The jacket's reverse and both centre labels, because a record is a
+    // four-sided print job and the disc peeks out past the sleeve edge - that
+    // label is on stage whether or not anything is printed on it.
     render: ({ color, screen, surface, surfaceStyle }) => (
       <VinylRecord color={color} surfaceBackground={surface} surfaceStyle={surfaceStyle}>
         {screen}
+        {screen != null && (
+          <>
+            <VinylRecord.Back>
+              <SleeveBack />
+            </VinylRecord.Back>
+            <VinylRecord.Label>
+              <SleeveLabelA />
+            </VinylRecord.Label>
+            <VinylRecord.BackLabel>
+              <SleeveLabelB />
+            </VinylRecord.BackLabel>
+          </>
+        )}
       </VinylRecord>
     ),
   },

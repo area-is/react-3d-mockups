@@ -2,7 +2,7 @@
 
 import type { CSSProperties, ReactNode } from 'react'
 import { TabbiedPattern } from 'tabbied/react'
-import { bauhaus, chase, damier, dipole, epicentre, gyre, halftone, ortho } from 'tabbied/patterns'
+import { chase, damier, dipole, epicentre, gyre, halftone, ortho } from 'tabbied/patterns'
 import type { PatternDefinition } from 'tabbied'
 
 /**
@@ -132,18 +132,6 @@ export function materialTone(material: string, accent: string = SIGNAL): Tone {
   const ink = luminance(material) < 0.35 ? PAPER : INK
   return { ground: 'transparent', text: ink, accent, palette: ['transparent', ink, accent] }
 }
-
-/**
- * What to set on a bar painted in the tone's own ink - the jacket's and the
- * sleeve's type band.
- *
- * The tone's own ground, for a sheet - a band painted in the ink takes the
- * ground back as its type. Not for a material tone, whose ground is
- * `transparent`: there the band came out as a cream bar with invisible type
- * on it, so what reads on it is simply the other ink.
- */
-const onInk = (tone: Tone): string =>
-  tone.ground === 'transparent' ? (tone.text === INK ? PAPER : INK) : tone.ground
 
 /* ------------------------------------------------------------------ */
 /*  Pieces                                                             */
@@ -402,51 +390,6 @@ export function SwissSplit({
 }
 
 /**
- * Full-bleed picture with the type on a solid band across the foot - the album
- * sleeve and the book jacket, where the artwork runs to the trim.
- */
-export function SwissFrame({
-  pattern,
-  seed,
-  live,
-  tone = 'paper',
-  material,
-  accent,
-  grid = '4x6',
-  index,
-  kicker,
-  title,
-  meta,
-}: SwissProps) {
-  const t = material ? materialTone(material, accent) : TONES[tone]
-  return (
-    <div style={{ ...sheet(t), flexDirection: 'column' }}>
-      <div style={{ flex: 1, minHeight: 0, position: 'relative' }}>
-        <Pattern pattern={pattern} seed={seed} live={live} palette={t.palette} grid={grid} />
-      </div>
-      <div
-        style={{
-          flex: 'none',
-          background: t.text,
-          color: onInk(t),
-          padding: '6cqmin',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '2.5cqmin',
-        }}
-      >
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-          <Micro style={{ color: t.accent }}>{index}</Micro>
-          <Micro>{kicker}</Micro>
-        </div>
-        <Title style={{ fontSize: '10cqmin' }}>{title}</Title>
-        <Micro style={{ opacity: 0.72 }}>{meta}</Micro>
-      </div>
-    </div>
-  )
-}
-
-/**
  * The watch face. A dial is barely a hundred pixels across on the carousel, so
  * it gets one coarse pattern and one number - anything with a hierarchy in it
  * would be mush at that size.
@@ -585,33 +528,6 @@ export const SwissRhythm = () => (
     kicker="Rhythmus"
     title={'Bar\nafter bar'}
     meta="Typografische Monatsblätter"
-  />
-)
-
-export const SwissJacket = ({ material }: { material: string }) => (
-  <SwissFrame
-    pattern={bauhaus}
-    seed="book-jacket"
-    material={material}
-    accent="#d9a441"
-    grid="4x6"
-    index="09"
-    kicker="Edition"
-    title={'Grid\nsystems'}
-    meta="Josef · Verlag Niggli"
-  />
-)
-
-export const SwissSleeve = () => (
-  <SwissFrame
-    pattern={gyre}
-    seed="vinyl-sleeve"
-    tone="gold"
-    grid="6x9"
-    index="10"
-    kicker="Long play"
-    title={'Concentric'}
-    meta="Side A · 33⅓"
   />
 )
 
