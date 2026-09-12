@@ -22,37 +22,54 @@ const ART_FILES = [
   'components/screens/music-player.tsx',
   'components/screens/stride-app.tsx',
   'components/screens/embedded-screen.tsx',
+  // The carousel's own artwork. The object pages stage exactly what the home
+  // page stages, so the surface tabs have to be able to show the source of
+  // the real thing rather than of a stand-in demo.
+  'components/screens/swiss-art.tsx',
+  'components/screens/book-jacket.tsx',
+  'components/screens/record-sleeve.tsx',
+  'components/screens/device-apps.tsx',
+  'components/screens/carton-art.tsx',
+  'components/screens/package-art.tsx',
 ]
 
 /**
- * Extract every top-level `function Name(...)` (exported or not) with its
- * leading jsdoc. Components in these files close with a lone `}` in column
- * 0, which keeps the scan simple and robust.
+ * Extract every top-level component with its leading jsdoc, in either shape
+ * these files use:
+ *
+ * - `function Name(...) {` … closing on a lone `}` in column 0;
+ * - `export const Name = (...) => (` … closing on a lone `)` in column 0,
+ *   or all on one line.
+ *
+ * The second shape is how the carousel's pieces are written - each is one
+ * call to a shared layout - so without it the object pages could stage that
+ * artwork but never show its source.
  */
 function extractComponents(source) {
   const lines = source.split('\n')
   const out = new Map()
+  /** The jsdoc block immediately above line `i`, if any. */
+  const withDoc = (i) => {
+    if (lines[i - 1]?.trim() !== '*/') return i
+    for (let j = i - 1; j >= 0; j--) if (lines[j].trimStart().startsWith('/**')) return j
+    return i
+  }
+  /** First line at or after `i` that is exactly `close` in column 0. */
+  const closeAt = (i, close) => {
+    for (let j = i + 1; j < lines.length; j++) if (lines[j] === close) return j
+    return i
+  }
   for (let i = 0; i < lines.length; i++) {
-    const m = lines[i].match(/^(?:export )?function ([A-Z][A-Za-z0-9_]*)\(/)
-    if (!m) continue
-    // include the jsdoc block immediately above, if any
-    let start = i
-    if (lines[i - 1]?.trim() === '*/') {
-      for (let j = i - 1; j >= 0; j--) {
-        if (lines[j].trimStart().startsWith('/**')) {
-          start = j
-          break
-        }
-      }
-    }
-    let end = i
-    for (let j = i + 1; j < lines.length; j++) {
-      if (lines[j] === '}') {
-        end = j
-        break
-      }
-    }
-    out.set(m[1], lines.slice(start, end + 1).join('\n'))
+    const line = lines[i]
+    const fn = line.match(/^(?:export )?function ([A-Z][A-Za-z0-9_]*)\(/)
+    const arrow = /=>\s*[(<]/.test(line)
+      ? line.match(/^(?:export )?const ([A-Z][A-Za-z0-9_]*) = \(/)
+      : null
+    if (!fn && !arrow) continue
+    const start = withDoc(i)
+    // An arrow body that does not open a group ends on its own line.
+    const end = fn ? closeAt(i, '}') : line.endsWith('(') ? closeAt(i, ')') : i
+    out.set((fn ?? arrow)[1], lines.slice(start, end + 1).join('\n'))
     i = end
   }
   return out

@@ -3,6 +3,7 @@
 import type { CSSProperties, ReactNode } from 'react'
 import { FONT, INK, Micro, PAPER, Sheet, materialTone } from './swiss-art'
 import { JetPrint, NutritionFacts, Photo, Pill, RecycleMark, RoundSeal, SERIF, UpcA } from './label-art'
+import { asset } from '@/lib/base-path.mjs'
 
 /**
  * The milk carton's print, modelled on the half-gallon of whole milk in a US
@@ -218,7 +219,7 @@ export function CartonFront({ material }: { material: string }) {
           <Micro style={{ fontSize: '2.7cqw', display: 'block', marginTop: '1.8cqw', letterSpacing: '0.24em' }}>3.25 % Milkfat · Ultra-pasteurized</Micro>
         </div>
         <div style={{ flex: 1, minHeight: 0, borderRadius: '3cqw', overflow: 'hidden', margin: '0.6cqw 0' }}>
-          <Photo src="/art/milk-farm.webp" position="50% 58%" />
+          <Photo src={asset('/art/milk-farm.webp')} position="50% 58%" />
         </div>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', gap: '3cqw' }}>
           <div>
@@ -327,7 +328,7 @@ export function CartonStory({ material }: { material: string }) {
       </p>
       <div style={{ flex: 1, minHeight: 0, borderRadius: '3cqw', overflow: 'hidden' }}>
         {/* The herd, zoomed out of the same painting the front shows the glass in. */}
-        <Photo src="/art/milk-farm.webp" position="50% 50%" style={{ transform: 'scale(1.75)', transformOrigin: '76% 47%' }} />
+        <Photo src={asset('/art/milk-farm.webp')} position="50% 50%" style={{ transform: 'scale(1.75)', transformOrigin: '76% 47%' }} />
       </div>
       <ul style={{ margin: 0, padding: 0, listStyle: 'none', display: 'grid', gap: '1.6cqw', ...body('3.3cqw', { fontWeight: 600 }) }}>
         <Tick color={RED}>No artificial growth hormones*</Tick>

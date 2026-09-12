@@ -2,19 +2,21 @@
  * Where this site lives, for everything that needs an absolute URL: canonical
  * links, Open Graph / Twitter cards, `sitemap.xml` and `robots.txt`.
  *
- * ⚠️ SET THIS FOR THE REAL DEPLOYMENT. Nothing else in the repo records the
- * production URL, so the fallback below is a placeholder built from the Worker
- * name in `wrangler.jsonc`. Point it at the actual origin (a custom domain if
- * there is one) by setting `NEXT_PUBLIC_SITE_URL` as a *build* variable
- * (Workers & Pages → area-3d-mockups-docs → Settings → Build → Variables),
+ * The fallback is the real production URL, so a plain checkout builds correct
+ * canonicals without anybody having to remember a dashboard setting.
+ * `NEXT_PUBLIC_SITE_URL` overrides it, and has to be a *build* variable
+ * (Workers & Pages → area-3d-mockups-docs → Settings → Build → Variables)
  * because `metadataBase` is baked in at build time, not read at runtime.
  *
- * Getting it wrong is not fatal but is visible: social cards would point their
- * image at a host that does not serve it, and canonical links would name the
- * wrong origin.
+ * It carries the `basePath` too. `metadataBase` keeps its own path when it
+ * resolves a relative one - Next joins them, `posix.join('/react-3d-mockups',
+ * '/og.png')` - and `app/sitemap.ts` builds every URL from this string, so the
+ * prefix has to be in it exactly once. Getting it wrong is not fatal but is
+ * visible: social cards would point their image at a path that does not serve
+ * it, and canonical links would name the wrong origin.
  */
 export const SITE_URL = (
-  process.env.NEXT_PUBLIC_SITE_URL ?? 'https://area-3d-mockups-docs.workers.dev'
+  process.env.NEXT_PUBLIC_SITE_URL ?? 'https://area.is/react-3d-mockups'
 ).replace(/\/$/, '')
 
 /** The social card shipped at `public/og.png` (1200×630, a real render). */

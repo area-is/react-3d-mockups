@@ -384,3 +384,75 @@ export function Pill({
     </span>
   )
 }
+
+/* ------------------------------------------------------------------ */
+/*  EAN-13                                                             */
+/* ------------------------------------------------------------------ */
+
+/** G-codes: the R-codes read backwards. EAN-13's left half mixes L and G. */
+const G = R.map((bits) => [...bits].reverse().join(''))
+
+/**
+ * Which of the left six digits are set in G rather than L. EAN-13 has no
+ * module of its own for the first digit - it is carried entirely by this
+ * parity pattern, which is the trick that fits thirteen digits into twelve
+ * digits' worth of bars.
+ */
+const PARITY = [
+  'LLLLLL', 'LLGLGG', 'LLGGLG', 'LLGGGL', 'LGLLGG',
+  'LGGLLG', 'LGGGLL', 'LGLGLG', 'LGLGGL', 'LGGLGL',
+]
+
+/** The check digit for the first twelve digits of an EAN-13. */
+function eanCheck(twelve: string): number {
+  let sum = 0
+  for (let i = 0; i < 12; i++) sum += Number(twelve[i]) * (i % 2 === 0 ? 1 : 3)
+  return (10 - (sum % 10)) % 10
+}
+
+/**
+ * A real, scannable EAN-13 - the symbol on the back of every book, where the
+ * first three digits are the `978`/`979` Bookland prefix and the rest is the
+ * ISBN without its own check digit.
+ *
+ * Same construction as `UpcA` above: guards at 101, a 01010 through the
+ * middle, and the human-readable digits under the bars - except that the
+ * leading digit sits outside the symbol in the left quiet zone, because it
+ * has no bars of its own.
+ */
+export function Ean13({ digits, color, style }: { digits: string; color: string; style?: CSSProperties }) {
+  const code = digits.slice(0, 12) + eanCheck(digits.slice(0, 12))
+  const parity = PARITY[Number(code[0])]!
+  let bits = '101'
+  for (let i = 1; i < 7; i++) bits += (parity[i - 1] === 'L' ? L : G)[Number(code[i])]
+  bits += '01010'
+  for (let i = 7; i < 13; i++) bits += R[Number(code[i])]
+  bits += '101'
+  // Eleven modules of quiet zone on the left, where the lead digit is set.
+  const X0 = 11
+  const guard = (i: number) => i < 3 || (i >= 45 && i < 50) || i >= 92
+  const bars: ReactNode[] = []
+  for (let i = 0; i < bits.length; ) {
+    if (bits[i] === '0') {
+      i++
+      continue
+    }
+    let j = i
+    while (j < bits.length && bits[j] === '1') j++
+    bars.push(<rect key={i} x={X0 + i} y={0} width={j - i} height={guard(i) ? 72 : 66} fill={color} />)
+    i = j
+  }
+  const digit = (d: string, x: number, key: string) => (
+    <text key={key} x={x} y={78} textAnchor="middle" fontSize={9} fontFamily={FONT} fill={color}>
+      {d}
+    </text>
+  )
+  return (
+    <svg viewBox="0 0 120 82" style={{ display: 'block', ...style }} aria-hidden>
+      {bars}
+      {digit(code[0]!, 5, 'lead')}
+      {[...code.slice(1, 7)].map((d, i) => digit(d, X0 + 3 + 7 * i + 3.5, `l${i}`))}
+      {[...code.slice(7)].map((d, i) => digit(d, X0 + 50 + 7 * i + 3.5, `r${i}`))}
+    </svg>
+  )
+}

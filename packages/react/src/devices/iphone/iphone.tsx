@@ -13,7 +13,12 @@ import {
   roundedRectShape,
 } from '../../core'
 import { DeviceScreen } from '../../screen/device-screen'
-import { renderStatusBar, type StatusBarOption } from '../../screen/status-bar'
+import {
+  renderStatusBar,
+  statusBarSafeAreaTop,
+  type StatusBarOption,
+  type StatusBarPlacement,
+} from '../../screen/status-bar'
 import { createLogoGeometry } from '../logos'
 import {
   SideKey,
@@ -290,6 +295,23 @@ function IPhoneImpl({
   const pxPerUnit = res / (landscape ? display.height : display.width)
   const px = (units: number) => units * pxPerUnit
 
+  /*
+   * The bar's placement, derived once. The overlay is drawn from it and the
+   * surface publishes the strip it costs as `--mockup-safe-area-top`, so the
+   * bar and the content underneath can never disagree about where the band
+   * ends. Landscape gets no cutout: the camera is off to the side there, and
+   * both systems set a plain strip along the top instead of clearing it.
+   */
+  const statusBarPlacement = {
+    platform: 'ios',
+    formFactor: 'phone',
+    width: res,
+    corner: px(display.radius),
+    cutout: landscape
+      ? undefined
+      : { halfWidth: px(island.width) / 2, centerY: px(island.offsetY), offsetX: 0 },
+  } satisfies StatusBarPlacement
+
   return (
     <group {...groupProps}>
       {/* landscape lays the body on its side (top edge to the left, the classic
@@ -496,24 +518,10 @@ function IPhoneImpl({
           // The Dynamic Island is part of the hardware, so it is always drawn:
           // it eats the same strip of your layout here that it eats on the real
           // panel, which is most of the point of looking at a mockup.
+          safeAreaTop={statusBarSafeAreaTop(statusBar, statusBarPlacement)}
           overlay={
             <>
-            {/* Landscape gets no cutout: the island is off to the side there,
-                so iOS sets a plain strip along the top instead of splitting the
-                bar around it. */}
-            {renderStatusBar(statusBar, {
-              platform: 'ios',
-              formFactor: 'phone',
-              width: res,
-              corner: px(display.radius),
-              cutout: landscape
-                ? undefined
-                : {
-                    halfWidth: px(island.width) / 2,
-                    centerY: px(island.offsetY),
-                    offsetX: 0,
-                  },
-            })}
+            {renderStatusBar(statusBar, statusBarPlacement)}
             <div
               aria-hidden
               style={{

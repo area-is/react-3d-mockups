@@ -17,7 +17,12 @@ import {
   roundedRectShape,
 } from '../../core'
 import { DeviceScreen } from '../../screen/device-screen'
-import { renderStatusBar, type StatusBarOption } from '../../screen/status-bar'
+import {
+  renderStatusBar,
+  statusBarSafeAreaTop,
+  type StatusBarOption,
+  type StatusBarPlacement,
+} from '../../screen/status-bar'
 import { createLogoGeometry } from '../logos'
 import { createWordmarkTexture } from '../wordmark'
 import { LensRing, UsbC, cutGeometry, stadiumCutter, USB_CUT_DEPTH } from '../details'
@@ -210,6 +215,21 @@ function TabletBody({
   const backZ = -body.depth / 2
 
   // Machined pill sunk into the frame (top edge or right edge).
+  /*
+   * Which bar depends on whose tablet it is, and the model already says: the
+   * etched rear logo is Apple's or Samsung's. Neither family puts a cutout in
+   * the status bar's way - the Tab Ultra's notch is on the landscape-top edge,
+   * away from the clock - so both get the plain fixed-height strip. Derived
+   * once, so the bar and the `--mockup-safe-area-top` it costs the content
+   * agree.
+   */
+  const statusBarPlacement = {
+    platform: logo?.mark === 'samsung' ? 'oneui' : 'ios',
+    formFactor: 'tablet',
+    width: res,
+    corner: px(display.radius),
+  } satisfies StatusBarPlacement
+
   const framePill = (key: React.Key, x: number, y: number, length: number, horizontal: boolean) => (
     <RoundedBox
       key={key}
@@ -535,21 +555,10 @@ function TabletBody({
             resolution: res,
             surfaceStyle,
           })}
+          safeAreaTop={statusBarSafeAreaTop(statusBar, statusBarPlacement)}
           overlay={
             <>
-            {/*
-              * Which bar depends on whose tablet it is, and the model already
-              * says: the etched rear logo is Apple's or Samsung's. Neither
-              * family puts a cutout in the status bar's way - the Tab Ultra's
-              * notch is on the landscape-top edge, away from the clock - so
-              * both get the plain fixed-height strip.
-              */}
-            {renderStatusBar(statusBar, {
-              platform: logo?.mark === 'samsung' ? 'oneui' : 'ios',
-              formFactor: 'tablet',
-              width: res,
-              corner: px(display.radius),
-            })}
+            {renderStatusBar(statusBar, statusBarPlacement)}
             {notch ? (
               <div
                 aria-hidden

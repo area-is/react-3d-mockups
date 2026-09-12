@@ -15,7 +15,12 @@ import {
   roundedRectShape,
 } from '../../core'
 import { DeviceScreen } from '../../screen/device-screen'
-import { renderStatusBar, type StatusBarOption } from '../../screen/status-bar'
+import {
+  renderStatusBar,
+  statusBarSafeAreaTop,
+  type StatusBarOption,
+  type StatusBarPlacement,
+} from '../../screen/status-bar'
 import { createLogoGeometry } from '../logos'
 import {
   SideKey,
@@ -494,7 +499,7 @@ function FlipImpl({
   // The main display only. Folded, the front is the cover screen, which runs
   // One UI's cover face - a clock widget, no status bar - so there is nothing
   // to draw there.
-  const statusBarOverlay = renderStatusBar(statusBar, {
+  const statusBarPlacement = {
     platform: 'oneui',
     formFactor: 'phone',
     width: res,
@@ -506,7 +511,10 @@ function FlipImpl({
           centerY: px(spec.open.punchHole.offsetY),
           offsetX: 0,
         },
-  })
+  } satisfies StatusBarPlacement
+  const statusBarOverlay = renderStatusBar(statusBar, statusBarPlacement)
+  /* The strip the bar costs the content, wherever that bar is drawn. */
+  const safeTop = statusBarSafeAreaTop(statusBar, statusBarPlacement)
 
   const screen = (
     <DeviceScreen
@@ -520,6 +528,7 @@ function FlipImpl({
         resolution: res,
         surfaceStyle,
       })}
+      safeAreaTop={mode === 'open' ? safeTop : 0}
       overlay={
         mode === 'open' ? (
           <>
@@ -630,6 +639,7 @@ function FlipImpl({
               : res,
             surfaceStyle,
           })}
+          safeAreaTop={upper ? safeTop : 0}
           overlay={
             <>
               {upper ? punchHoleOverlay : null}

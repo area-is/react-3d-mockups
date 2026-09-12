@@ -22,6 +22,7 @@ import { chromium } from 'playwright'
 import { mkdirSync, existsSync, readFileSync, writeFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
+import { BASE_PATH } from '../lib/base-path.mjs'
 
 const here = dirname(fileURLToPath(import.meta.url))
 const BASELINES = join(here, '..', 'visual-baselines')
@@ -30,7 +31,7 @@ const DIFFS = join(here, '..', '.visual-diffs')
 const args = process.argv.slice(2)
 const UPDATE = args.includes('--update')
 const ONLY = args.find((a) => a.startsWith('--only='))?.slice(7)
-const BASE = args.find((a) => a.startsWith('--base='))?.slice(7) ?? `http://localhost:${process.env.PORT ?? 3000}`
+const BASE = args.find((a) => a.startsWith('--base='))?.slice(7) ?? `http://localhost:${process.env.PORT ?? 3000}${BASE_PATH}`
 
 /**
  * One case per pose worth defending. Weighted toward the models whose geometry

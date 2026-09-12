@@ -4,6 +4,7 @@ import type { CSSProperties, ReactNode } from 'react'
 import { damier, gyre, halftone, ortho } from 'tabbied/patterns'
 import { FONT, Pattern } from './swiss-art'
 import { Photo, SERIF } from './label-art'
+import { asset } from '@/lib/base-path.mjs'
 
 /**
  * Three of the device screens carry a real product rather than a poster: a
@@ -253,7 +254,7 @@ const SECOND: Story[] = [
     title: 'Volunteers return four hundred rescued turtles to the surf',
     standfirst: 'After a cold snap stranded them along the cape, the last of the rehabilitated ridleys went back into the Atlantic at first light.',
     byline: 'Priya Desai',
-    photo: '/art/news-turtle.webp',
+    photo: asset('/art/news-turtle.webp'),
     position: '50% 60%',
   },
   {
@@ -261,14 +262,14 @@ const SECOND: Story[] = [
     title: 'After thirty years, the Aldous Quartet plays its last residency',
     standfirst: 'The ensemble that turned a shipyard hall into a concert venue bows out with the complete Beethoven cycle.',
     byline: 'Tomas Brandt',
-    photo: '/art/news-quartet.webp',
+    photo: asset('/art/news-quartet.webp'),
   },
   {
     kicker: 'Sport',
     title: 'Breakaway holds on the final climb as Marchetti takes the stage',
     standfirst: 'The 24-year-old survived a late chase to win alone on the Col de Vars and move into third overall.',
     byline: 'Leila Haddad',
-    photo: '/art/news-cycling.webp',
+    photo: asset('/art/news-cycling.webp'),
   },
 ]
 
@@ -308,6 +309,10 @@ export function Newspaper() {
         display: 'flex',
         flexDirection: 'column',
         padding: '54px 28px 22px',
+        // The Fold draws One UI's bar over the top of the inner display; this
+        // clears the band it actually occupies rather than a number tuned to
+        // one variant. `0px` off a device, where this also renders.
+        paddingTop: 'calc(var(--mockup-safe-area-top, 0px) + 18px)',
         overflow: 'hidden',
         userSelect: 'none',
       }}
@@ -345,7 +350,7 @@ export function Newspaper() {
         {/* the left page: the lead */}
         <article style={{ minWidth: 0, minHeight: 0, overflow: 'hidden' }}>
           <div style={{ height: 222, overflow: 'hidden' }}>
-            <Photo src="/art/news-lead.webp" position="50% 45%" />
+            <Photo src={asset('/art/news-lead.webp')} position="50% 45%" />
           </div>
           <div style={{ fontSize: 10.5, lineHeight: 1.35, color: NEWS_MUTED, marginTop: 6 }}>
             The first eastbound tram crosses Founders Bridge at 6:12 a.m. Photograph: Ana Ferreira for The Meridian

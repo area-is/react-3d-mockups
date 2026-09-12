@@ -1,3 +1,5 @@
+import { asset } from './base-path.mjs'
+
 /**
  * The catalog behind the docs sidebar grids, the per-variant docs pages and
  * the thumbnail generator: one entry per device VARIANT (not per family - the
@@ -20,7 +22,7 @@ const device = (id, label, component, variant, shot) => ({
   component,
   variant,
   href: `/docs/api/${id}`,
-  thumb: `/thumbs/${id}.png`,
+  thumb: asset(`/thumbs/${id}.png`),
   shot,
 })
 
@@ -60,7 +62,7 @@ const object = (id, label, component, shot) => ({
   component,
   variant: undefined,
   href: `/docs/api/${id}`,
-  thumb: `/thumbs/${id}.png`,
+  thumb: asset(`/thumbs/${id}.png`),
   shot,
 })
 

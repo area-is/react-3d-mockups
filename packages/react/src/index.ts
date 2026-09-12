@@ -66,8 +66,10 @@ export {
 export {
   StatusBar,
   renderStatusBar,
+  statusBarSafeAreaTop,
   type StatusBarProps,
   type StatusBarOption,
+  type StatusBarPlacement,
 } from './screen/status-bar'
 export {
   type StatusBarContent,

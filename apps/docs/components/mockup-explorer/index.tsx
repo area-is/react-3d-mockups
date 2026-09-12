@@ -5,6 +5,7 @@ import { MockupCanvas } from 'react-3d-mockups'
 import { ChromaSurface } from '../screens/chroma-surface'
 import { LiveCounter } from '../screens/live-counter'
 import { SurfaceArt } from '../screens/surface-art'
+import { carouselArtName, carouselArtNode } from './carousel-art'
 import { SCREEN_SOURCES } from '@/lib/demo-sources.generated'
 import { COMPONENT_PROPS, SHARED_PROPS, type PropDoc } from '@/lib/prop-tables.generated'
 import { ColorRow, NumberField, PanelGlyph, PropRow, ResetGlyph, Segmented, Switch } from './controls'
@@ -273,6 +274,8 @@ const KEBAB = (name: string) => name.replace(/([a-z])([A-Z])/g, '$1-$2').toLower
 
 /** `top` -> `Top`, the slot component on the mockup. */
 const SLOT_NAME = (name: string) => name.charAt(0).toUpperCase() + name.slice(1)
+/** `BackLabel` -> `backLabel`: back from a slot component to its region. */
+const REGION_OF = (slot: string) => slot.charAt(0).toLowerCase() + slot.slice(1)
 
 /**
  * The source behind one surface: the component that fills it, headed by the
@@ -703,15 +706,46 @@ function MockupExplorerImpl({
   const chroma = screen === 'chroma'
   /** Nothing on any surface - the unprinted state, which is a state worth showing. */
   const unprinted = screen === 'none'
-  const screenName = unprinted
-    ? null
-    : chroma
-      ? 'ChromaSurface'
-      : spec.print
-        ? 'SurfaceArt'
-        : 'LiveCounter'
-  const content = (label: string) =>
-    chroma ? <ChromaSurface label={label} /> : spec.print ? <SurfaceArt label={label} /> : <LiveCounter />
+  /*
+   * The finish the artwork is printed onto, as a colour the art can reason
+   * about. `p.color` is either a swatch id or a raw CSS colour, so the resolved
+   * preset comes first; a page that sets no colour at all falls back to the
+   * first swatch, which is the finish the object is standing in anyway. The
+   * pieces that print onto the material flip their ink on this, so handing
+   * them an id would have printed dark ink on a dark board.
+   */
+  const rawColor = typeof p.color === 'string' ? p.color : undefined
+  const finish =
+    preset?.color ??
+    (rawColor?.startsWith('#') ? rawColor : undefined) ??
+    colorways[0]?.color ??
+    '#f2efe8'
+
+  /**
+   * What is staged on one region.
+   *
+   * `auto` prefers the artwork the home page's carousel puts on this object,
+   * so the reference page is the carousel's own claim rather than a stand-in -
+   * see `carousel-art.tsx`. Objects and faces the carousel does not stage keep
+   * the generic demos, which is also what `screen="chroma"` and `"none"` ask
+   * for explicitly.
+   */
+  const artFor = (region: string) => (chroma || unprinted ? null : carouselArtName(spec.kind, region))
+  const nameFor = (region: string): string | null =>
+    unprinted
+      ? null
+      : chroma
+        ? 'ChromaSurface'
+        : (artFor(region) ?? (spec.print ? 'SurfaceArt' : 'LiveCounter'))
+  /** The primary face's name, which is what the `demo.tsx` snippet prints. */
+  const screenName = nameFor(regions[0]?.name ?? 'screen')
+  const content = (region: string, labelOverride?: string) => {
+    const label = labelOverride ?? REGION_LABEL(region)
+    if (chroma) return <ChromaSurface label={label} />
+    const art = artFor(region)
+    if (art) return carouselArtNode(art, finish)
+    return spec.print ? <SurfaceArt label={label} /> : <LiveCounter />
+  }
 
   // Slots are the capitalized components the mockup carries, one per region.
   const slots = Object.entries(Component).filter(
@@ -781,7 +815,7 @@ function MockupExplorerImpl({
    */
   const source =
     view !== '3d'
-      ? surfaceSource(spec, view, screenName ?? '', flatPx)
+      ? surfaceSource(spec, view, nameFor(view) ?? '', flatPx)
       : arranged
         ? buildArrangedSource(spec, arranged, p, stageHeight, screenName ?? '', editable)
         : buildSource(spec, p, stageHeight, screenName, editable)
@@ -848,8 +882,8 @@ function MockupExplorerImpl({
                     return (
                       <Bare key={i} {...(item.component ? {} : objectProps)} {...item.props}>
                         {content(
-                          item.surface ??
-                            REGION_LABEL(itemSpec.Component.regions?.[0]?.name ?? 'children')
+                          itemSpec.Component.regions?.[0]?.name ?? 'children',
+                          item.surface
                         )}
                       </Bare>
                     )
@@ -867,7 +901,7 @@ function MockupExplorerImpl({
                   {unprinted
                     ? null
                     : slots.map(([name, Slot]) => (
-                        <Slot key={name}>{content(REGION_LABEL(name))}</Slot>
+                        <Slot key={name}>{content(REGION_OF(name))}</Slot>
                       ))}
                 </Component>
               )}
@@ -893,7 +927,7 @@ function MockupExplorerImpl({
                     transform: `scale(${flatSize.scale})`,
                   }}
                 >
-                  {content(REGION_LABEL(view))}
+                  {content(view)}
                 </div>
               </div>
               <span className="mx-readout">

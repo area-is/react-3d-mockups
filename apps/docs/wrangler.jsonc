@@ -19,6 +19,31 @@
     "binding": "ASSETS"
   },
 
+  /*
+   * Served at a path on the apex rather than on its own hostname.
+   *
+   * A Custom Domain cannot do this - it binds a whole hostname and has no path
+   * component - so these are Routes, and they only fire because `area.is` has
+   * a PROXIED (orange-cloud) DNS record: a route on a hostname Cloudflare does
+   * not terminate never matches, and the symptom is ERR_NAME_NOT_RESOLVED
+   * rather than a 404 you could debug.
+   *
+   * Two patterns, not one `…/react-3d-mockups*`: a single trailing wildcard
+   * would also swallow `/react-3d-mockups-anything-else`. The bare pattern
+   * catches the index, the `/*` one everything under it.
+   *
+   * Routes match most-specific-first, so these win over a broader `area.is/*`
+   * - and over a Custom Domain or a Pages project on the same hostname - which
+   * is what lets the apex app own everything except this path. Whoever sets
+   * that app up has to leave these alone and keep the apex record proxied.
+   *
+   * The prefix is `basePath` in `lib/base-path.mjs`; the two have to agree.
+   */
+  "routes": [
+    { "pattern": "area.is/react-3d-mockups", "zone_name": "area.is" },
+    { "pattern": "area.is/react-3d-mockups/*", "zone_name": "area.is" }
+  ],
+
   "observability": {
     "enabled": true
   }

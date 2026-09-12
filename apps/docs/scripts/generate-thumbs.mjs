@@ -19,6 +19,7 @@ import { mkdirSync, writeFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
 import { DEVICES, OBJECTS } from '../lib/mockup-catalog.mjs'
+import { BASE_PATH } from '../lib/base-path.mjs'
 
 const here = dirname(fileURLToPath(import.meta.url))
 const OUT = join(here, '..', 'public', 'thumbs')
@@ -26,7 +27,7 @@ const OUT = join(here, '..', 'public', 'thumbs')
 const args = process.argv.slice(2)
 const ONLY = args.find((a) => a.startsWith('--only='))?.slice(7)
 const BASE =
-  args.find((a) => a.startsWith('--base='))?.slice(7) ?? `http://localhost:${process.env.PORT ?? 3000}`
+  args.find((a) => a.startsWith('--base='))?.slice(7) ?? `http://localhost:${process.env.PORT ?? 3000}${BASE_PATH}`
 
 const ENTRIES = [...DEVICES, ...OBJECTS].filter((e) => !ONLY || e.id.includes(ONLY))
 

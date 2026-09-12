@@ -9,6 +9,7 @@ import {
   VinylRecordMockup,
 } from 'react-3d-mockups'
 import { LazyScene } from './lazy-scene'
+import { asset } from '@/lib/base-path.mjs'
 
 /**
  * The live half of the Images guide: one mockup per example, each carrying a
@@ -27,22 +28,22 @@ const cover: CSSProperties = { width: '100%', height: '100%', objectFit: 'cover'
 const EXAMPLES = {
   poster: () => (
     <PosterFrameMockup float>
-      <img src="/art/poster.webp" alt="" style={cover} />
+      <img src={asset('/art/poster.webp')} alt="" style={cover} />
     </PosterFrameMockup>
   ),
   wallpaper: () => (
     <IPhoneMockup variant="pro" color="deepblue" statusBar float>
-      <img src="/art/wallpaper.webp" alt="" style={cover} />
+      <img src={asset('/art/wallpaper.webp')} alt="" style={cover} />
     </IPhoneMockup>
   ),
   album: () => (
     <VinylRecordMockup float>
-      <img src="/art/album.webp" alt="" style={cover} />
+      <img src={asset('/art/album.webp')} alt="" style={cover} />
     </VinylRecordMockup>
   ),
   laptop: () => (
     <LaptopMockup variant="air15" float>
-      <img src="/art/coffee.webp" alt="" style={cover} />
+      <img src={asset('/art/coffee.webp')} alt="" style={cover} />
     </LaptopMockup>
   ),
   bag: () => (
@@ -60,7 +61,7 @@ const EXAMPLES = {
           boxSizing: 'border-box',
         }}
       >
-        <img src="/art/fox.webp" alt="" style={{ width: '100%', height: 'auto', display: 'block' }} />
+        <img src={asset('/art/fox.webp')} alt="" style={{ width: '100%', height: 'auto', display: 'block' }} />
       </div>
     </ShoppingBagMockup>
   ),

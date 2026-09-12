@@ -49,7 +49,7 @@ export function Hero() {
 }
 ```
 
-**[Documentation and live demos →](https://area-3d-mockups-docs.workers.dev)**
+**[Documentation and live demos →](https://area.is/react-3d-mockups)**
 Every device and object has its own page with a live prop explorer.
 
 ## Monorepo layout

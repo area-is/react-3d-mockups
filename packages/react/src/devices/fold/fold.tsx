@@ -14,7 +14,12 @@ import {
   roundedRectShape,
 } from '../../core'
 import { DeviceScreen } from '../../screen/device-screen'
-import { renderStatusBar, type StatusBarOption } from '../../screen/status-bar'
+import {
+  renderStatusBar,
+  statusBarSafeAreaTop,
+  type StatusBarOption,
+  type StatusBarPlacement,
+} from '../../screen/status-bar'
 import { createLogoGeometry } from '../logos'
 import {
   SideKey,
@@ -471,7 +476,7 @@ function FoldImpl({
    * the inner display, so its signed offset is passed through and the bar
    * clears it rather than assuming a centred camera.
    */
-  const statusBarOverlay = renderStatusBar(statusBar, {
+  const statusBarPlacement = {
     platform: 'oneui',
     formFactor: isOpenFace ? 'tablet' : 'phone',
     width: res,
@@ -479,7 +484,10 @@ function FoldImpl({
     cutout: landscape
       ? undefined
       : { halfWidth: px(holeR), centerY: px(holeOffsetY), offsetX: px(holeX) },
-  })
+  } satisfies StatusBarPlacement
+  const statusBarOverlay = renderStatusBar(statusBar, statusBarPlacement)
+  /* The strip the bar costs the content on whichever face is being drawn. */
+  const safeTop = statusBarSafeAreaTop(statusBar, statusBarPlacement)
   const punchHoleOverlay = (
     <div
       aria-hidden
@@ -519,6 +527,7 @@ function FoldImpl({
         resolution: res,
         surfaceStyle,
       })}
+      safeAreaTop={safeTop}
       overlay={
         <>
           {mode === 'open' && creaseOverlay}
@@ -602,6 +611,7 @@ function FoldImpl({
             resolution: landscape ? res : (res * (display.width / 2 + CREASE_OVERLAP)) / display.width,
             surfaceStyle,
           })}
+          safeAreaTop={safeTop}
         >
           {/* one full-size window onto the shared virtual display, offset so
               this pane shows its own half plus the overhang's continuation.

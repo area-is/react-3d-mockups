@@ -1,5 +1,7 @@
 'use client'
 
+import { asset } from '@/lib/base-path.mjs'
+
 /**
  * The artwork the prop explorer prints onto a mockup's surfaces: the area
  * wordmark over a green field, labelled with whichever region it fills. Print
@@ -11,7 +13,7 @@ export function SurfaceArt({ label }: { label: string }) {
     <div className="mx-surface-art">
       <span className="mx-surface-art-label">{label}</span>
       {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img className="mx-surface-art-mark" src="/assets/area_ag_white.svg" alt="area" />
+      <img className="mx-surface-art-mark" src={asset('/assets/area_ag_white.svg')} alt="area" />
     </div>
   )
 }
