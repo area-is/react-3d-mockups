@@ -332,12 +332,23 @@ export function SwissStack({
 }: SwissProps) {
   const t = material ? materialTone(material, accent) : TONES[tone]
   return (
-    <Sheet tone={t} style={{ flexDirection: 'column', padding: '7cqmin', gap: '4cqmin' }}>
+    <Sheet
+      tone={t}
+      style={{
+        flexDirection: 'column',
+        padding: '7cqmin',
+        /* Clear the system bar, then the sheet's own margin again below it, so
+           the colophon is never merely touching the band. The custom property
+           is the device's - `0px` on a printed face, which is what makes one
+           layout right on a phone and on a poster. */
+        paddingTop: 'calc(var(--mockup-safe-area-top, 0px) + 7cqmin)',
+        gap: '4cqmin',
+      }}
+    >
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
         <Micro style={{ color: t.accent }}>{index}</Micro>
         <Micro>{kicker}</Micro>
       </div>
-      <div style={rule(t.text)} />
       <div style={{ flex: 1, minHeight: 0, position: 'relative' }}>
         <Pattern pattern={pattern} seed={seed} live={live} palette={t.palette} grid={grid} />
       </div>
@@ -371,6 +382,7 @@ export function SwissSplit({
         style={{
           width: '34%',
           padding: '6cqmin',
+          paddingTop: 'calc(var(--mockup-safe-area-top, 0px) + 6cqmin)',
           display: 'flex',
           flexDirection: 'column',
           gap: '3cqmin',

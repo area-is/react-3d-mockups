@@ -66,15 +66,6 @@ export function StrideApp() {
 
   return (
     <div className="screen std">
-      <div className="screen-statusbar">
-        <span>9:41</span>
-        <span className="screen-statusicons">
-          <i className="si si-signal" />
-          <i className="si si-wifi" />
-          <i className="si si-battery" />
-        </span>
-      </div>
-
       <header className="std-head">
         <div>
           <p className="std-date">Sunday, July 12</p>

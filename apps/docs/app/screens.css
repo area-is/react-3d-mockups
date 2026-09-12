@@ -38,55 +38,18 @@
   container-type: size;
 }
 
-.screen-statusbar {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 12px 24px 0;
-  font-size: 14px;
-  font-weight: 600;
-  z-index: 5;
-}
-
-.screen-statusicons {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-}
-
-.si {
-  display: inline-block;
-  background: currentColor;
-  opacity: 0.92;
-}
-
-.si-signal {
-  width: 13px;
-  height: 10px;
-  clip-path: polygon(0 100%, 100% 0, 100% 100%);
-}
-
-.si-wifi {
-  width: 13px;
-  height: 10px;
-  clip-path: polygon(50% 100%, 0 22%, 12% 8%, 50% 0, 88% 8%, 100% 22%);
-  border-radius: 40% 40% 0 0;
-}
-
-.si-battery {
-  width: 19px;
-  height: 9.5px;
-  background:
-    linear-gradient(to right, currentColor 0 68%, rgba(255, 255, 255, 0.25) 68%) padding-box;
-  border: 1px solid rgba(255, 255, 255, 0.55);
-  border-radius: 3px;
-  background-clip: padding-box;
-  opacity: 1;
-}
+/*
+ * These screens used to draw their own "9:41" strip, from before the library
+ * had a real status bar. The devices draw it now - placed against each one's
+ * actual camera cutout - so the hand-rolled one is gone and what is left is
+ * clearing the band it occupies.
+ *
+ * `--mockup-safe-area-top` is published by the surface the content is
+ * rendered into: the height of the strip the system draws over, in the same
+ * CSS px this layout is written in. It is `0px` outside a mockup and on any
+ * face without a bar, so these rules are also correct on a bare page - which
+ * is how the same components render in the docs' own example frames.
+ */
 
 .screen-homebar {
   position: absolute;
@@ -111,6 +74,7 @@
   justify-content: center;
   gap: 22px;
   padding: 56px 30px 64px;
+  padding-top: calc(var(--mockup-safe-area-top, 0px) + 20px);
 }
 
 .mp-art {
@@ -263,6 +227,7 @@
   .mp {
     gap: 10px;
     padding: 40px 30px 44px;
+    padding-top: calc(var(--mockup-safe-area-top, 0px) + 12px);
   }
 
   .mp-art {
@@ -311,6 +276,7 @@
     radial-gradient(rgba(255, 255, 255, 0.055) 1px, transparent 1px) 0 0 / 22px 22px,
     #06070b;
   justify-content: center;
+  padding-top: var(--mockup-safe-area-top, 0px);
 }
 
 .live-body {
@@ -392,7 +358,7 @@
     radial-gradient(70% 34% at 22% 104%, rgba(139, 124, 248, 0.5) 0%, transparent 70%),
     radial-gradient(70% 30% at 82% 102%, rgba(34, 211, 238, 0.34) 0%, transparent 70%),
     #020308;
-  padding-top: 118px;
+  padding-top: calc(var(--mockup-safe-area-top, 0px) + 64px);
 }
 
 .lock-time {
@@ -739,6 +705,7 @@
     radial-gradient(70% 34% at 50% 112%, rgba(34, 211, 238, 0.12) 0%, transparent 70%),
     #070a0f;
   padding: 58px 22px 74px;
+  padding-top: calc(var(--mockup-safe-area-top, 0px) + 16px);
   gap: 14px;
   align-items: stretch;
   justify-content: flex-start;

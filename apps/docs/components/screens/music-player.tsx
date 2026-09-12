@@ -18,15 +18,6 @@ export function MusicPlayer() {
 
   return (
     <div className="screen mp" data-playing={playing}>
-      <div className="screen-statusbar">
-        <span>9:41</span>
-        <span className="screen-statusicons">
-          <i className="si si-signal" />
-          <i className="si si-wifi" />
-          <i className="si si-battery" />
-        </span>
-      </div>
-
       <div className="mp-art" style={{ ['--hue' as string]: track.hue }}>
         <div className="mp-art-disc" />
       </div>

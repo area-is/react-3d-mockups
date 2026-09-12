@@ -33,8 +33,8 @@ matched by teaching the app that it lives under a prefix, which in Next.js is
 ### A Custom Domain cannot do this
 
 Workers **Custom Domains** bind a whole hostname and have no path component -
-which is almost certainly what `3d-mockups.area.is` is today. A path prefix
-must be a **Route**. The differences that matter:
+which is what `3d-mockups.area.is` is today. A path prefix must be a **Route**.
+The differences that matter:
 
 | | Custom Domain | Route |
 | --- | --- | --- |
@@ -42,8 +42,48 @@ must be a **Route**. The differences that matter:
 | DNS | creates its own record | needs an existing **proxied** record |
 | Certificate | issued for you | uses the zone's |
 
-So `area.is` must already have a proxied (orange-cloud) record on the apex. If
-area.is is a live site, it does.
+A route is only consulted for requests Cloudflare is already terminating:
+"all domains and subdomains must have a DNS record to be proxied on Cloudflare
+and used to invoke a Worker." So the apex needs a **proxied** (orange-cloud)
+record before any of this does anything.
+
+### The apex has no record yet - that is the first step
+
+As of this writing `area.is` answers with no `A`, `AAAA` or `CNAME` at all
+(`NODATA`), and `www.area.is` does not exist (`NXDOMAIN`); only
+`3d-mockups.area.is` resolves, to Cloudflare's proxy. The zone itself is on
+Cloudflare (`betty.ns.cloudflare.com`), so there is nothing to migrate - there
+is simply nothing at the apex to attach a route to.
+
+Until the apex app exists, give it a proxied placeholder so Cloudflare
+terminates the request and the route can match:
+
+- **Type** `AAAA`, **Name** `@`, **Content** `100::`, **Proxy** on.
+
+`100::` is the reserved discard prefix, the conventional Cloudflare
+black-hole target. With it in place `area.is/react-3d-mockups*` reaches this
+Worker and every other apex path errors (there is no origin behind it yet) -
+which is the correct state for an apex that is not live. Swap it for the real
+record when the Next.js app ships; the route keeps working across the change.
+
+### Whether this works at all depends on where the apex app is hosted
+
+`area.is` is to be served by a separate Next.js app in another repo, and that
+choice - not anything in this repo - decides whether a Worker route on the
+apex can fire:
+
+| The apex app runs on | Apex DNS | Does the route fire? |
+| --- | --- | --- |
+| Cloudflare Workers (OpenNext, like this one) | its Custom Domain, proxied | **Yes.** A route with a path takes precedence over a Custom Domain on the same hostname |
+| Cloudflare Pages | proxied, managed by Pages | **Yes.** A Worker route wins over a Pages project on the same hostname |
+| Vercel / Netlify / any external origin | must be **proxied** (orange) | **Only if proxied.** Grey-cloud (DNS-only) is what those platforms recommend, and it bypasses Workers entirely - the route never runs |
+
+That last row is the trap. If area.is ends up on Vercel with a DNS-only
+record, this whole plan is inert and the alternative is to let the apex app
+own the path instead - a Next.js `rewrite` from `/react-3d-mockups/:path*` to
+`https://3d-mockups.area.is/:path*`, keeping this Worker on its own hostname.
+That works from any host, at the cost of a proxy hop and of making this site's
+availability depend on the apex app's.
 
 ### Add the routes
 
@@ -66,10 +106,19 @@ redirected.
 
 ### Precedence over whatever serves the apex
 
-Routes are matched most-specific-first, so these win over a broader
-`area.is/*` route serving the rest of the site. A Worker route also takes
-precedence over a Cloudflare Pages project on the same hostname, so an apex
-served by Pages keeps working and only this path is carved out of it.
+Routes are matched most-specific-first - Cloudflare's own example is that
+`example.com/hello/*` takes precedence over `example.com/*` - so these win
+over a broader `area.is/*` route serving the rest of the site. The same holds
+against a Custom Domain, which is a whole-hostname binding with no path: a
+route with a path is matched first, and the route's Worker can even
+`fetch(request)` through to the Worker on the Custom Domain. A Worker route
+likewise takes precedence over a Cloudflare Pages project on the same
+hostname, so an apex served by Pages keeps working and only this path is
+carved out of it.
+
+None of that is automatic in the other direction: whoever sets up the apex app
+must leave this route alone. A Custom Domain on `area.is` is fine; deleting
+the route, or pointing the apex record grey-cloud, is what breaks it.
 
 ### Keep the old URLs alive
 
@@ -180,6 +229,11 @@ root-absolute string is invisible to it:
 
 Nothing here is atomic, so sequence it to keep the live site up:
 
+0. Create the proxied apex record (the `AAAA` to `100::` above, or the real
+   one if the Next.js app is already up). Nothing below can be verified until
+   `area.is` resolves through Cloudflare - a route on a hostname with no
+   record simply never matches, and the symptom is `ERR_NAME_NOT_RESOLVED`
+   rather than a 404 you could debug.
 1. Make the app changes locally. Run `npm run preview:docs` from the repo root
    - that is the real Worker, not `next dev`, so it is the first honest test -
    and click through the docs, the sidebar thumbnails, the search dialog and an

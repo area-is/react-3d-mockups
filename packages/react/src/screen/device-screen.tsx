@@ -153,6 +153,14 @@ export interface DeviceScreenProps {
   screenStyle?: React.CSSProperties
   /** Device-specific overlay (punch hole, notch…) rendered above the content. */
   overlay?: React.ReactNode
+  /**
+   * The strip of the surface that overlay covers at the top, in the surface's
+   * own CSS px - see `statusBarSafeAreaTop`. Published to the content as
+   * `--mockup-safe-area-top` and as `useSurface().safeAreaTop`; never applied
+   * here, because a wallpaper and a lock screen are supposed to run under the
+   * bar and only a layout knows which it is.
+   */
+  safeAreaTop?: number
   children?: React.ReactNode
 }
 
@@ -182,6 +190,7 @@ export function DeviceScreen({
   occluderGeometry,
   screenStyle,
   overlay,
+  safeAreaTop = 0,
   children,
 }: DeviceScreenProps) {
   const gl = useThree((state) => state.gl)
@@ -325,6 +334,9 @@ export function DeviceScreen({
       ref={rasterScale === 1 ? contentRef : undefined}
       style={{
         ...screenSurfaceStyle({ width, height, radius, resolution, background }),
+        // The inset the system UI costs the content, for CSS to pick up. Set
+        // before `screenStyle` so a device can still override it.
+        ...({ '--mockup-safe-area-top': `${safeAreaTop}px` } as React.CSSProperties),
         ...screenStyle,
         ...(rasterScale === 1
           ? null
@@ -348,6 +360,7 @@ export function DeviceScreen({
         radius={radius}
         resolution={resolution}
         background={background}
+        safeAreaTop={safeAreaTop}
       >
         {children}
       </SurfaceProvider>

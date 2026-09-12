@@ -609,17 +609,45 @@ export function StatusBar({
  */
 export type StatusBarOption = boolean | (StatusBarContent & { color?: string })
 
+/**
+ * Where a device puts its bar: the platform whose bar it is, plus the geometry
+ * only the model knows. Named because two things are derived from it - the bar
+ * itself and the strip it costs the content underneath - and they must be
+ * derived from the same numbers.
+ */
+export interface StatusBarPlacement {
+  platform: StatusBarPlatform
+  formFactor: StatusBarFormFactor
+  /** Surface width in CSS px. */
+  width: number
+  cutout?: StatusBarCutout
+  corner?: number
+}
+
 /** Resolve the prop into the element the device overlays, or nothing. */
 export function renderStatusBar(
   option: StatusBarOption | undefined,
-  base: {
-    platform: StatusBarPlatform
-    formFactor: StatusBarFormFactor
-    width: number
-    cutout?: StatusBarCutout
-    corner?: number
-  }
+  base: StatusBarPlacement
 ): React.ReactNode {
   if (!option) return null
   return <StatusBar {...base} {...(option === true ? {} : option)} />
+}
+
+/**
+ * The strip at the top of the surface that the system draws over, in the
+ * surface's own CSS px - what `env(safe-area-inset-top)` answers on the real
+ * device. `DeviceScreen` publishes it to content as `--mockup-safe-area-top`
+ * and as `useSurface().safeAreaTop`.
+ *
+ * The cutout counts even with the bar switched off: an island or a punch hole
+ * is hardware, drawn either way, and it eats the same strip of the layout
+ * either way. A device with no cutout reserves only what the bar itself
+ * occupies, so turning the bar off there gives the content the whole panel.
+ */
+export function statusBarSafeAreaTop(
+  option: StatusBarOption | undefined,
+  base: StatusBarPlacement
+): number {
+  if (!option && !base.cutout) return 0
+  return statusBarLayout(base).bandHeight
 }

@@ -17,15 +17,6 @@ export function LiveCounter() {
 
   return (
     <div className="screen live">
-      <div className="screen-statusbar">
-        <span>9:41</span>
-        <span className="screen-statusicons">
-          <i className="si si-signal" />
-          <i className="si si-wifi" />
-          <i className="si si-battery" />
-        </span>
-      </div>
-
       <div className="live-body">
         <p className="live-label">seconds on screen</p>
         <p className="live-count" key={seconds}>

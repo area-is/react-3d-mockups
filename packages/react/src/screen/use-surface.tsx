@@ -34,6 +34,16 @@ export interface SurfaceInfo {
   radius: ScreenRadius
   /** The CSS background painted behind this content. */
   background?: string
+  /**
+   * The strip at the top of the surface the system draws over - the status
+   * bar's band, and the camera cutout it is centred on - in this surface's own
+   * CSS px. `env(safe-area-inset-top)`, for a mockup.
+   *
+   * `0` on a surface with neither, which is every print face. Also published
+   * as the `--mockup-safe-area-top` custom property, so content can inset
+   * itself in plain CSS without reading this hook.
+   */
+  safeAreaTop: number
 }
 
 const SurfaceContext = React.createContext<SurfaceInfo | null>(null)
@@ -45,6 +55,7 @@ export interface SurfaceProviderProps {
   radius: ScreenRadius
   resolution: number
   background?: string
+  safeAreaTop?: number
   children?: React.ReactNode
 }
 
@@ -59,6 +70,7 @@ export function SurfaceProvider({
   radius,
   resolution,
   background,
+  safeAreaTop = 0,
   children,
 }: SurfaceProviderProps) {
   const value = React.useMemo<SurfaceInfo>(
@@ -71,8 +83,9 @@ export function SurfaceProvider({
       resolution,
       radius,
       background,
+      safeAreaTop,
     }),
-    [region, width, height, radius, resolution, background]
+    [region, width, height, radius, resolution, background, safeAreaTop]
   )
   return <SurfaceContext.Provider value={value}>{children}</SurfaceContext.Provider>
 }

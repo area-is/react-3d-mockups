@@ -308,6 +308,10 @@ export function Newspaper() {
         display: 'flex',
         flexDirection: 'column',
         padding: '54px 28px 22px',
+        // The Fold draws One UI's bar over the top of the inner display; this
+        // clears the band it actually occupies rather than a number tuned to
+        // one variant. `0px` off a device, where this also renders.
+        paddingTop: 'calc(var(--mockup-safe-area-top, 0px) + 18px)',
         overflow: 'hidden',
         userSelect: 'none',
       }}
