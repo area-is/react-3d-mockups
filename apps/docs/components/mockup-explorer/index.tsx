@@ -1,12 +1,12 @@
 'use client'
 
-import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
+import { isValidElement, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { MockupCanvas } from 'react-3d-mockups'
 import { ChromaSurface } from '../screens/chroma-surface'
 import { LiveCounter } from '../screens/live-counter'
 import { SurfaceArt } from '../screens/surface-art'
 import { carouselArtName, carouselArtNode } from './carousel-art'
-import { SCREEN_SOURCES } from '@/lib/demo-sources.generated'
+import { SCREEN_SOURCES, SOURCE_PARTS } from '@/lib/demo-sources.generated'
 import { COMPONENT_PROPS, SHARED_PROPS, type PropDoc } from '@/lib/prop-tables.generated'
 import { ColorRow, NumberField, PanelGlyph, PropRow, ResetGlyph, Segmented, Switch } from './controls'
 import { editableProp, propAttribute, same, type EditableProp } from './prop-controls'
@@ -269,8 +269,20 @@ function useStageSize(ref: React.RefObject<HTMLElement | null>) {
 const REGION_LABEL = (name: string) => name.replace(/([a-z])([A-Z])/g, '$1 $2').toLowerCase()
 /** `coverInner` -> `cover-inner.tsx`, the name the tab carries. */
 const REGION_FILE = (name: string) => `${name.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase()}.tsx`
-/** `ChromaSurface` -> `chroma-surface`, the module the snippet imports from. */
+/** `ChromaSurface` -> `chroma-surface`, for a screen whose module is unknown. */
 const KEBAB = (name: string) => name.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase()
+
+/**
+ * The module a screen component is written in, as the demo would import it.
+ *
+ * Read off the source rather than spelled from the name, so the import line in
+ * `demo.tsx` names the same file the surface tab prints - `./swiss-art` for
+ * the watch face, not a `./swiss-dial-a` that does not exist.
+ */
+const screenModule = (screen: string) => {
+  const home = SCREEN_SOURCES[screen]?.at(-1)?.file
+  return `./${home ? home.replace(/^.*\//, '').replace(/\.tsx?$/, '') : KEBAB(screen)}`
+}
 
 /** `top` -> `Top`, the slot component on the mockup. */
 const SLOT_NAME = (name: string) => name.charAt(0).toUpperCase() + name.slice(1)
@@ -278,25 +290,37 @@ const SLOT_NAME = (name: string) => name.charAt(0).toUpperCase() + name.slice(1)
 const REGION_OF = (slot: string) => slot.charAt(0).toLowerCase() + slot.slice(1)
 
 /**
- * The source behind one surface: the component that fills it, headed by the
- * slot it is mounted through and the size that slot gives it. Every surface of
- * an object shares one component, so the header is what distinguishes the
- * panel you are looking at.
+ * The source behind one surface: headed by the slot it is mounted through, the
+ * size that slot gives it and the call the stage really makes, then the WHOLE
+ * of what the component is built from - the layout it calls, the helpers that
+ * layout uses, the palette it indexes - file by file, in reading order.
+ *
+ * All of it rather than the component alone, because most of these pieces are
+ * one call to something shared - the watch face is a single `<SwissDial …/>`.
+ * A panel that printed the piece by itself named the thing and then showed
+ * none of it, leaving the reader to guess at everything doing the work.
+ *
+ * Every surface of an object shares one component, so the header is what
+ * distinguishes the panel you are looking at.
  */
 function surfaceSource(
   spec: ExplorerSpec,
   region: string,
   screen: string,
+  attributes: string[],
   px?: { width: number; height: number }
 ): Line[] {
   const size = px ? ` - ${px.width} x ${px.height} px` : ''
-  const header = [
-    { text: `// <${spec.name}.${SLOT_NAME(region)}>${size}` },
-    { text: `//   <${screen} label="${REGION_LABEL(region)}" />` },
-    { text: '' },
+  const lines = [
+    `// <${spec.name}.${SLOT_NAME(region)}>${size}`,
+    `//   <${[screen, ...attributes].join(' ')} />`,
   ]
-  const body = (SCREEN_SOURCES[screen] ?? '').split('\n').map((text) => ({ text }))
-  return [...header, ...body]
+  for (const group of SCREEN_SOURCES[screen] ?? []) {
+    lines.push('', `// ${group.file}`)
+    if (group.head.length) lines.push('', ...group.head)
+    for (const key of group.parts) lines.push('', ...(SOURCE_PARTS[key]?.split('\n') ?? []))
+  }
+  return lines.map((text) => ({ text }))
 }
 
 /* ------------------------------------------------------------------ */
@@ -406,7 +430,7 @@ const preamble = (imports: string[], screen: string | null, stageHeight: number)
   { text: `'use client'` },
   { text: '' },
   { text: `import { ${imports.join(', ')} } from 'react-3d-mockups'` },
-  ...(screen ? [{ text: `import { ${screen} } from './${KEBAB(screen)}'` }] : []),
+  ...(screen ? [{ text: `import { ${screen} } from '${screenModule(screen)}'` }] : []),
   { text: '' },
   { text: 'export function Demo() {' },
   { text: '  return (' },
@@ -488,8 +512,11 @@ function buildArrangedSource(
   ]
 }
 
-/** Light syntax colouring: tags, attributes, strings and braces. */
+/** Light syntax colouring: comments, tags, attributes, strings and braces. */
 function Code({ text }: { text: string }) {
+  // The screen sources are as much documentation as code, so a line that is
+  // all comment is coloured as one rather than tokenized as if it were JSX.
+  if (/^\s*(\/\/|\{?\/\*|\*)/.test(text)) return <span className="tok-comment">{text}</span>
   const tokens = text.split(/(<\/?[A-Za-z][\w.]*|"[^"]*"|\{[^}]*\}|\b(?:import|from|export|function|return|const)\b|[a-zA-Z]+(?==))/g)
   return (
     <>
@@ -746,6 +773,20 @@ function MockupExplorerImpl({
     if (art) return carouselArtNode(art, finish)
     return spec.print ? <SurfaceArt label={label} /> : <LiveCounter />
   }
+  /**
+   * The props the surface is really mounted with, read off the element the
+   * stage builds rather than restated. The pieces that print onto the object
+   * take its finish and the generic demos take a label, so a header written
+   * by hand would have been wrong for one or the other - and was: it printed
+   * `label` on artwork that has never had one.
+   */
+  const surfaceAttributes = (region: string) => {
+    const node = content(region)
+    if (!isValidElement(node)) return []
+    return Object.entries(node.props as Record<string, unknown>).map(([name, value]) =>
+      literalAttribute(name, value)
+    )
+  }
 
   // Slots are the capitalized components the mockup carries, one per region.
   const slots = Object.entries(Component).filter(
@@ -815,7 +856,7 @@ function MockupExplorerImpl({
    */
   const source =
     view !== '3d'
-      ? surfaceSource(spec, view, nameFor(view) ?? '', flatPx)
+      ? surfaceSource(spec, view, nameFor(view) ?? '', surfaceAttributes(view), flatPx)
       : arranged
         ? buildArrangedSource(spec, arranged, p, stageHeight, screenName ?? '', editable)
         : buildSource(spec, p, stageHeight, screenName, editable)

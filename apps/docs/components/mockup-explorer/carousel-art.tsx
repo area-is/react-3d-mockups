@@ -46,10 +46,15 @@ import { ChalkHoursArt, ChalkMenuArt } from '../screens/print-art'
  *
  * The map holds component *names* rather than elements, because a name is
  * worth two things here: `ART` below turns it into the live surface, and
- * `SCREEN_SOURCES` (generated from these same files by
- * `scripts/extract-demo-sources.mjs`) turns it into the source the tab shows.
- * Keying on the element would have meant a second table for the label, free
- * to disagree with the first.
+ * `SCREEN_SOURCES` turns it into the source the tab shows. Keying on the
+ * element would have meant a second table for the label, free to disagree
+ * with the first.
+ *
+ * That second half is generated: `scripts/extract-demo-sources.mjs` reads the
+ * imports at the top of THIS file to learn which components can be staged,
+ * then walks each one's own imports and collects everything it is built from.
+ * So a piece added to the carousel is a piece whose whole source the tab
+ * already knows how to print - there is no list of art files to keep up.
  *
  * ### It is a second list, and that is the cost
  *
