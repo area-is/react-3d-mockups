@@ -934,6 +934,7 @@
   white-space: pre;
 }
 
+.mx-code .tok-comment { color: var(--color-fd-muted-foreground); opacity: 0.85; }
 .mx-code .tok-component { color: var(--mx-accent); }
 .mx-code .tok-tag { color: var(--color-fd-muted-foreground); }
 .mx-code .tok-string { color: #c98a3b; }

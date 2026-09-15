@@ -44,6 +44,31 @@
     { "pattern": "area.is/react-3d-mockups/*", "zone_name": "area.is" }
   ],
 
+  /*
+   * Both halves of the workers.dev subdomain, stated rather than left to
+   * default - because the default is derived from `routes` above and is
+   * re-applied on EVERY deploy.
+   *
+   * `wrangler deploy` POSTs this Worker's subdomain state each time it runs.
+   * `workers_dev` defaults to `routes.length === 0`, so configuring routes
+   * silently resolves it to `false`; and with `preview_urls` absent from this
+   * file wrangler sends no value for it, which has the API disable Preview
+   * URLs alongside the production hostname. Enabling them in the dashboard
+   * therefore lasts exactly until the next Workers Build, which is what makes
+   * it look like something is switching itself back off.
+   *
+   * What we actually want is the mixed state: no production workers.dev
+   * hostname, because the site is served at the routes above, but Preview URLs
+   * ON - Workers Builds publishes one per commit and
+   * `.github/workflows/cloudflare-build-pr-comments.yml` posts it on the pull
+   * request, so without them every build comment links nowhere. Wrangler warns
+   * about this pair interactively (a Worker with no production URL is still
+   * reachable at its preview one - that is the point here); it stays quiet in
+   * CI, which is where this deploys from.
+   */
+  "workers_dev": false,
+  "preview_urls": true,
+
   "observability": {
     "enabled": true
   }
