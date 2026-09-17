@@ -40,6 +40,41 @@ export function Photo({ src, position = '50% 50%', fit = 'cover', style }: { src
   )
 }
 
+/**
+ * A one-colour plate: an engraving printed in the ink.
+ *
+ * The illustration files under `/art/` that this takes are alpha-only -
+ * black at the ink's density, clear where the paper shows - so the picture
+ * is used as a mask over a block of the ink colour rather than drawn as an
+ * image. That is what a screen print or a one-colour litho does with an
+ * engraving, and it is why the same plate prints dark on kraft, cream on
+ * charcoal and terracotta on white without three files: the ink is the
+ * caller's, the plate only says where it goes. `style` sets the box; the
+ * plate fits inside it, centred.
+ */
+export function Plate({ src, ink, style }: { src: string; ink: string; style?: CSSProperties }) {
+  const mask = `url(${src})`
+  return (
+    <div
+      aria-hidden
+      style={{
+        background: ink,
+        WebkitMaskImage: mask,
+        maskImage: mask,
+        WebkitMaskSize: 'contain',
+        maskSize: 'contain',
+        WebkitMaskRepeat: 'no-repeat',
+        maskRepeat: 'no-repeat',
+        WebkitMaskPosition: 'center',
+        maskPosition: 'center',
+        flex: 'none',
+        pointerEvents: 'none',
+        ...style,
+      }}
+    />
+  )
+}
+
 /* ------------------------------------------------------------------ */
 /*  UPC-A                                                              */
 /* ------------------------------------------------------------------ */
@@ -546,6 +581,59 @@ export function Ean13({ digits, color, style }: { digits: string; color: string;
       {digit(code[0]!, 5, 'lead')}
       {[...code.slice(1, 7)].map((d, i) => digit(d, X0 + 3 + 7 * i + 3.5, `l${i}`))}
       {[...code.slice(7)].map((d, i) => digit(d, X0 + 50 + 7 * i + 3.5, `r${i}`))}
+    </svg>
+  )
+}
+
+/* ------------------------------------------------------------------ */
+/*  EAN-5                                                              */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Which of the five digits are set in G rather than L, by the checksum. Like
+ * EAN-13's lead digit, the add-on's check is carried in the parity alone.
+ */
+const ADDON_PARITY = ['GGLLL', 'GLGLL', 'GLLGL', 'GLLLG', 'LGGLL', 'LLGGL', 'LLLGG', 'LGLGL', 'LGLLG', 'LLGLG']
+
+/**
+ * The five-digit add-on that sits to the right of a book's EAN-13. In the US
+ * it carries the price; in Korea it is the 부가기호, the five digits every
+ * book prints beside its ISBN - reader, format, and a subject class - which
+ * is what this one encodes. Same modules as the main symbol, but a `01011`
+ * start, a `01` between digits, and the human-readable line ABOVE the bars
+ * rather than under them, which is the one thing that says "add-on" at a
+ * glance. Scannable, like everything else on the carousel with bars on it.
+ */
+export function Ean5({ digits, color, style }: { digits: string; color: string; style?: CSSProperties }) {
+  const d = [...digits.slice(0, 5)].map(Number)
+  const check = (3 * (d[0]! + d[2]! + d[4]!) + 9 * (d[1]! + d[3]!)) % 10
+  const parity = ADDON_PARITY[check]!
+  let bits = '01011'
+  d.forEach((n, i) => {
+    bits += (parity[i] === 'L' ? L : G)[n]
+    if (i < 4) bits += '01'
+  })
+  // A 5-module gap on the left, where the symbol clears the main code's quiet zone.
+  const X0 = 5
+  const bars: ReactNode[] = []
+  for (let i = 0; i < bits.length; ) {
+    if (bits[i] === '0') {
+      i++
+      continue
+    }
+    let j = i
+    while (j < bits.length && bits[j] === '1') j++
+    bars.push(<rect key={i} x={X0 + i} y={12} width={j - i} height={60} fill={color} />)
+    i = j
+  }
+  return (
+    <svg viewBox="0 0 58 82" style={{ display: 'block', ...style }} aria-hidden>
+      {bars}
+      {d.map((n, i) => (
+        <text key={i} x={X0 + 5 + 9 * i + 5} y={8.5} textAnchor="middle" fontSize={9} fontFamily={FONT} fill={color}>
+          {n}
+        </text>
+      ))}
     </svg>
   )
 }

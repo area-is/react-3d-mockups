@@ -2,7 +2,8 @@
 
 import type { CSSProperties, ReactNode } from 'react'
 import { chase } from 'tabbied/patterns'
-import { Pattern, Sheet, type Tone } from './swiss-art'
+import { FONT, Pattern, Sheet, type Tone } from './swiss-art'
+import { SERIF } from './label-art'
 import { asset } from '@/lib/base-path.mjs'
 
 /**
@@ -29,8 +30,8 @@ import { asset } from '@/lib/base-path.mjs'
  * The milk carton and the book both carry a real scannable symbol, because a
  * carton and a book do. A 1961 jacket does not: retail barcodes reached
  * records in the late seventies. The back carries what this sleeve's own
- * decade printed instead - `STEREO`, the catalogue number set twice, and the
- * label's street address.
+ * decade printed instead - the stereo notice in its box, the catalogue number
+ * set twice, and the label's street address.
  *
  * Measurements are in `cqw` against each face's own width, so the jacket's
  * 313 mm square and the disc's 100 mm label set their type at the same
@@ -190,87 +191,251 @@ export function SleeveCover() {
 /*  Back                                                              */
 /* ------------------------------------------------------------------ */
 
-const note = (size = '2.5cqw'): CSSProperties => ({
-  margin: 0,
-  fontSize: size,
-  lineHeight: 1.5,
-  letterSpacing: '-0.005em',
-})
+/**
+ * The jacket's reverse, built to the scale a real one is printed at.
+ *
+ * What makes an LP back look like an LP back is that the type is SMALL. A
+ * 12" jacket is a big sheet - 313 mm on a side - and the notes on it were
+ * set at eight to ten point. 1cqw here is 3.1 mm, so the liner notes at
+ * 1.28cqw are a real 11 pt, the track titles at 1.35cqw about 12, and the
+ * title at 4.6cqw is 40 pt, which is as large as a Blue Note back ever went.
+ * The first draft set everything three times that size and read as a flyer.
+ * Seen on the carousel the notes are a grey texture with a title over it,
+ * and that IS what a record looks like from across the room.
+ *
+ * The layout is the one the label's backs used from 1957 on: title and
+ * artist across the head with the stereo notice and the catalogue number in
+ * the corner; a photograph and the two sides' programmes under it; the notes
+ * in three justified columns; the session credit and the label's address
+ * across the foot. The notes are set in a serif and everything else in the
+ * sans. That mix is period-correct - the headings were Franklin or Standard
+ * and the notes were Times or Century, because those were the cases the
+ * typesetter had - and it is half of why a real back reads as printed matter
+ * rather than a web page.
+ */
 
-/** One side's track list: number, title, time, with the time flush right. */
-function Side({ label, tracks }: { label: string; tracks: string[][] }) {
+/** Who wrote what, for the programme's parentheses. */
+const COMPOSER: Record<string, string> = {
+  A1: 'M. Hale',
+  A2: 'M. Hale',
+  A3: 'M. Hale',
+  B1: 'R. Diallo',
+  B2: 'Hale-Brandt',
+  B3: 'M. Hale',
+}
+
+/** The liner notes, as T. Brandt filed them. */
+const NOTES = [
+  'The Alhambra is a room on the second floor of a building on Bleecker Street that has been, in its time, a dance hall, a union office and a place to buy hats. It seats a hundred and ten people if the fire marshal is not counting. The late set begins at half past midnight, and by then most of the audience has been in the room for hours; they have heard the tune they came in humming, and what they want now is to be surprised.',
+  'Marcus Hale has played that set every Thursday for the better part of a year. He is thirty-one, a Detroit man by way of two years in an Army band and a long apprenticeship in the section of a big band that shall go nameless here. He does not play many notes. What he plays is time - the placement of a chord a hair behind the beat, so that the whole trio seems to lean back on its heels - and the men he plays with have learned to lean with him.',
+  'Reuben Diallo is the bassist, and the one member of this group who has recorded before, on two dates for this label with the Winslow quintet. His sound is large and dry and unhurried. Clifford Nance came to New York from Kansas City eighteen months ago with a cymbal, a snare drum and a letter of introduction, and has since been heard with everybody. He uses brushes for most of this record, which was his idea, and the right one.',
+  'The title piece is Hale’s, a long blues in F that the trio opens most nights and had never played the same way twice until Anton Ferrier’s tape machine made it hold still. Cold Water Blues and Bongcheon Walk are his as well. Eleven Past was written by Diallo on the night the club’s clock stopped. For Someone Leaving is the ballad, taken at a walk, and Second Chorus is exactly what it says: the trio played the first chorus on the first night, listened back, and went out and played the second.',
+  'These sides were recorded over three nights in March of this year at Ferrier’s studio in Newark, in front of a small invited audience whose presence you may occasionally detect. Nothing has been edited. What you hear is the late set, as it was played, by the people who play it.',
+]
+
+/**
+ * The stereo notice, as the early stereo issues carried it: a box in the
+ * corner, the word set wide, and the warning underneath in the smallest type
+ * on the sleeve, because in 1961 a stereo groove could still ruin a mono
+ * cartridge and the label was obliged to say so.
+ */
+function StereoBox() {
   return (
-    <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: '1.4cqw' }}>
-      <Micro style={{ color: FIELD }}>{label}</Micro>
-      {tracks.map(([no, name, time]) => (
-        <div
-          key={no}
-          style={{ display: 'flex', alignItems: 'baseline', gap: '1.4cqw', fontSize: '2.6cqw', lineHeight: 1.28 }}
-        >
-          <span style={{ fontWeight: 700, opacity: 0.45, minWidth: '4cqw' }}>{no}</span>
-          <span style={{ fontWeight: 600, letterSpacing: '-0.01em', flex: 1, minWidth: 0 }}>{name}</span>
-          <span style={{ fontVariantNumeric: 'tabular-nums', opacity: 0.6 }}>{time}</span>
+    <div
+      style={{
+        flex: 'none',
+        width: '15cqw',
+        border: `0.22cqw solid ${INK}`,
+        padding: '0.9cqw 1cqw 0.8cqw',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '0.55cqw',
+      }}
+    >
+      <span style={{ fontSize: '2.1cqw', fontWeight: 800, letterSpacing: '0.34em', lineHeight: 1, textTransform: 'uppercase' }}>
+        Stereo
+      </span>
+      <span style={{ fontSize: '0.78cqw', lineHeight: 1.3, letterSpacing: '0.01em' }}>
+        A stereophonic recording. Play only on equipment made for stereo reproduction; a monaural pickup
+        will damage the groove.
+      </span>
+    </div>
+  )
+}
+
+/**
+ * The photograph on the back: the same session as the front, cropped to the
+ * pianist. The cut-out sits in a box painted the grey of a studio wall, so
+ * it reads as a print pasted up rather than a figure floating on the board,
+ * and the box is `overflow: hidden` with the image set twice its width - a
+ * crop, not a shrink.
+ */
+function Snapshot({ style }: { style?: CSSProperties }) {
+  return (
+    <div
+      style={{
+        position: 'relative',
+        flex: 'none',
+        width: '30cqw',
+        height: '22cqw',
+        overflow: 'hidden',
+        background: 'linear-gradient(160deg, #4a4643 0%, #2a2724 60%, #1c1a18 100%)',
+        ...style,
+      }}
+    >
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={asset('/art/jazz-trio.webp')}
+        alt=""
+        draggable={false}
+        style={{
+          position: 'absolute',
+          width: '64cqw',
+          aspectRatio: '1000 / 993',
+          left: '-33.5cqw',
+          top: '-19.5cqw',
+          filter: 'grayscale(1) contrast(1.08)',
+          pointerEvents: 'none',
+        }}
+      />
+    </div>
+  )
+}
+
+/** One side's programme: numbered, with the composer in parentheses and the time flush right. */
+function Programme({ side, tracks }: { side: string; tracks: string[][] }) {
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.95cqw', minWidth: 0 }}>
+      <span style={{ fontSize: '1.45cqw', fontWeight: 800, letterSpacing: '0.22em', textTransform: 'uppercase', color: FIELD, lineHeight: 1 }}>
+        {side}
+      </span>
+      {tracks.map(([no, name, time], i) => (
+        <div key={no} style={{ display: 'flex', alignItems: 'baseline', gap: '1cqw', fontSize: '1.35cqw', lineHeight: 1.25 }}>
+          <span style={{ fontWeight: 700, minWidth: '1.7cqw', fontVariantNumeric: 'tabular-nums' }}>{i + 1}.</span>
+          <span style={{ flex: 1, minWidth: 0 }}>
+            <span style={{ fontWeight: 700, letterSpacing: '-0.01em' }}>{name}</span>{' '}
+            <span style={{ opacity: 0.62, whiteSpace: 'nowrap' }}>({COMPOSER[no!]})</span>
+          </span>
+          <span style={{ fontVariantNumeric: 'tabular-nums', opacity: 0.7 }}>{time}</span>
         </div>
       ))}
     </div>
   )
 }
 
-/** The reverse: track lists, liner note, personnel, and the session credit. */
+/** The label's mark: a record, in the two inks. */
+function LabelMark({ size }: { size: string }) {
+  return (
+    <svg viewBox="0 0 40 40" style={{ width: size, height: size, display: 'block', flex: 'none' }} aria-hidden>
+      <circle cx={20} cy={20} r={19} fill={INK} />
+      <circle cx={20} cy={20} r={12} fill="none" stroke={BOARD} strokeWidth={0.8} opacity={0.5} />
+      <circle cx={20} cy={20} r={15.5} fill="none" stroke={BOARD} strokeWidth={0.8} opacity={0.35} />
+      <circle cx={20} cy={20} r={7} fill={FIELD} />
+      <circle cx={20} cy={20} r={1.4} fill={BOARD} />
+    </svg>
+  )
+}
+
+const hairline: CSSProperties = { height: '0.18cqw', background: INK, opacity: 0.55, flex: 'none' }
+
+/** The reverse: head, programme, notes, credits, foot - at nine point. */
 export function SleeveBack() {
   return (
-    <Sheet tone={backTone} style={{ flexDirection: 'column', padding: '6cqw', gap: '3cqw' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-        <span style={{ fontSize: '5.2cqw', fontWeight: 700, letterSpacing: '-0.035em', lineHeight: 1 }}>
-          {TITLE.join(' ')}
-        </span>
-        <Micro style={{ opacity: 0.6 }}>{CATALOG}</Micro>
-      </div>
-      <div style={{ height: '0.4cqw', background: INK, flex: 'none', opacity: 0.35 }} />
-
-      <div style={{ display: 'flex', gap: '6cqw' }}>
-        <Side label="Side A" tracks={SIDE_A} />
-        <Side label="Side B" tracks={SIDE_B} />
-      </div>
-
-      <div style={{ display: 'flex', gap: '6cqw', alignItems: 'flex-start' }}>
-        <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: '2cqw' }}>
-          <p style={note()}>
-            Hale booked the room for one night and kept it for three. The trio had been playing the
-            Alhambra&apos;s late set for a year by then - the second show, the one that starts at
-            half past midnight, when nobody is listening for the tune they came in humming.
-          </p>
-          <p style={{ ...note('2.25cqw'), opacity: 0.66 }}>
-            Recorded 14-16 March 1961 at Ferrier Studio, Newark, New Jersey. Engineer: A. Ferrier.
-            Cover photograph: uncredited. Notes: T. Brandt.
-          </p>
-        </div>
-
-        <div style={{ flex: 'none', width: '28cqw', display: 'flex', flexDirection: 'column', gap: '1.6cqw' }}>
-          <Micro style={{ color: FIELD }}>Personnel</Micro>
-          {PERSONNEL.map(([who, what]) => (
-            <div key={who} style={{ fontSize: '2.6cqw', lineHeight: 1.25 }}>
-              <div style={{ fontWeight: 700, letterSpacing: '-0.01em' }}>{who}</div>
-              <div style={{ opacity: 0.6 }}>{what}</div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <div style={{ flex: 1, minHeight: 0 }} />
-
-      {/* A 1961 sleeve's foot: no barcode, because there were none. */}
-      <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: '4cqw' }}>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.2cqw' }}>
-          <span style={{ fontSize: '4.4cqw', fontWeight: 700, letterSpacing: '-0.03em', lineHeight: 1 }}>
-            {LABEL_NAME}
-            <span style={{ color: FIELD }}> Records</span>
+    <Sheet tone={backTone} style={{ flexDirection: 'column', padding: '5cqw 5cqw 4.4cqw', gap: '2.3cqw' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '4cqw' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.4cqw', minWidth: 0, paddingTop: '0.4cqw' }}>
+          <span style={{ fontSize: '4.6cqw', fontWeight: 700, letterSpacing: '-0.035em', lineHeight: 1, whiteSpace: 'nowrap' }}>
+            {TITLE.join(' ')}
           </span>
-          <Micro style={{ fontSize: '2.1cqw', opacity: 0.55 }}>
-            41 Bleecker Street · New York 12 · N.Y.
-          </Micro>
+          <span style={{ fontSize: '2.1cqw', fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', lineHeight: 1 }}>
+            {ARTIST}
+          </span>
         </div>
-        <Micro style={{ fontSize: '3.4cqw', letterSpacing: '0.3em' }}>Stereo</Micro>
+        <div style={{ display: 'flex', alignItems: 'flex-start', gap: '2.2cqw', flex: 'none' }}>
+          <StereoBox />
+          <span style={{ fontSize: '1.7cqw', fontWeight: 800, letterSpacing: '0.16em', lineHeight: 1, paddingTop: '0.5cqw' }}>{CATALOG}</span>
+        </div>
+      </div>
+
+      <div style={{ height: '0.35cqw', background: INK, flex: 'none' }} />
+
+      <div style={{ display: 'flex', gap: '3.6cqw', alignItems: 'flex-start' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8cqw', flex: 'none' }}>
+          <Snapshot />
+          <span style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: '0.95cqw', lineHeight: 1.3, opacity: 0.75, width: '30cqw' }}>
+            Hale at the Alhambra, the third night. Photograph: Ilse Marr.
+          </span>
+        </div>
+        <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: '1.8cqw' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '2cqw' }}>
+            <Programme side="Side One" tracks={SIDE_A} />
+            <Programme side="Side Two" tracks={SIDE_B} />
+          </div>
+          <div style={{ fontSize: '1.15cqw', lineHeight: 1.4 }}>
+            {PERSONNEL.map(([who, what], i) => (
+              <span key={who}>
+                <span style={{ fontWeight: 700, letterSpacing: '0.04em', textTransform: 'uppercase' }}>{who}</span>, {what}
+                {i < PERSONNEL.length - 1 ? ' · ' : '.'}
+              </span>
+            ))}
+            <span style={{ opacity: 0.65 }}> All compositions Obsidian Music Co., BMI. Total playing time 40:17.</span>
+          </div>
+        </div>
+      </div>
+
+      <div style={hairline} />
+
+      {/* the notes: three columns of nine-point serif, justified, first lines indented */}
+      <div
+        style={{
+          flex: 1,
+          minHeight: 0,
+          overflow: 'hidden',
+          columnCount: 3,
+          columnGap: '3.2cqw',
+          fontFamily: SERIF,
+          fontSize: '1.28cqw',
+          lineHeight: 1.42,
+          textAlign: 'justify',
+          hyphens: 'auto',
+        }}
+      >
+        {NOTES.map((para, i) => (
+          <p key={i} style={{ margin: 0, textIndent: i === 0 ? 0 : '1.6em' }}>
+            {i === 0 && (
+              <span style={{ fontFamily: FONT, fontWeight: 800, letterSpacing: '0.08em', fontSize: '1.05em' }}>THE ALHAMBRA</span>
+            )}
+            {i === 0 ? para.replace(/^The Alhambra/, '') : para}
+          </p>
+        ))}
+        <p style={{ margin: 0, textIndent: '1.6em', fontFamily: FONT, fontWeight: 700, fontSize: '0.95em', letterSpacing: '0.1em', textAlign: 'right' }}>
+          — T. BRANDT
+        </p>
+      </div>
+
+      <div style={{ fontSize: '1.05cqw', lineHeight: 1.4, opacity: 0.8 }}>
+        Recorded March 14, 15 &amp; 16, 1961, at Ferrier Studio, Newark, New Jersey. Recording engineer: Anton Ferrier.
+        Supervision: E. Wolfe. Cover photograph: Ilse Marr. Cover design: R. Lund. Liner notes: T. Brandt.
+      </div>
+
+      <div style={hairline} />
+
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', gap: '3cqw' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1.5cqw' }}>
+          <LabelMark size="4.6cqw" />
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.7cqw' }}>
+            <span style={{ fontSize: '2.7cqw', fontWeight: 700, letterSpacing: '-0.03em', lineHeight: 1 }}>
+              {LABEL_NAME}
+              <span style={{ color: FIELD }}> Records</span>
+            </span>
+            <span style={{ fontSize: '0.95cqw', fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase', lineHeight: 1, opacity: 0.7 }}>
+              Obsidian Records Inc. · 41 Bleecker Street · New York 12, N.Y.
+            </span>
+          </div>
+        </div>
+        <span style={{ fontSize: '0.95cqw', fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase', lineHeight: 1, opacity: 0.7, textAlign: 'right' }}>
+          {CATALOG} · Printed in U.S.A.
+        </span>
       </div>
     </Sheet>
   )
