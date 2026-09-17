@@ -827,14 +827,31 @@
 }
 
 /*
- * The flat view's zoom: the 3D stage's controls, in the explorer's own
- * chrome. Pinned to the stage's corner like the readout, so it stays put
- * while the surface scrolls under it.
+ * The library's zoom pill, dressed in the explorer's chrome: the same card,
+ * border, ink and mono as the flat view's control below, so the two views
+ * carry one control. The pill reads these custom properties before its own
+ * defaults (see `ZOOM_PILL_STYLE` in the library).
+ */
+.mx-stage {
+  --mockup-overlay-bg: var(--color-fd-card);
+  --mockup-overlay-border: var(--color-fd-border);
+  --mockup-overlay-fg: var(--color-fd-foreground);
+  --mockup-overlay-font: var(--font-mono);
+}
+
+.mx-stage [data-mockup-zoom] button:hover {
+  background: var(--color-fd-accent);
+}
+
+/*
+ * The flat view's zoom: the 3D stage's control, rebuilt in the explorer's
+ * own chrome and pinned to the same corner, so switching views does not
+ * move it. It stays put while the surface scrolls under it.
  */
 .mx-zoom {
   position: absolute;
-  right: 12px;
-  top: 12px;
+  right: 10px;
+  bottom: 10px;
   display: inline-flex;
   align-items: stretch;
   border: 1px solid var(--color-fd-border);
@@ -852,7 +869,8 @@
   color: var(--color-fd-foreground);
   font: inherit;
   font-weight: 600;
-  padding: 6px 9px;
+  padding: 0 10px;
+  height: 28px;
   cursor: pointer;
 }
 
@@ -868,7 +886,8 @@
 
 .mx-zoom .mx-zoom-level {
   min-width: 52px;
-  color: var(--color-fd-muted-foreground);
+  color: var(--color-fd-foreground);
+  opacity: 0.85;
   font-weight: 500;
   font-variant-numeric: tabular-nums;
   border-left: 1px solid var(--color-fd-border);

@@ -47,7 +47,7 @@ the way a second object in a scene of your own would.
 | `controls` | `boolean` | `true` | Drag-to-rotate controls with the axis fixed at the stage center (pan is always disabled). Vertical rotation stays within the classic orbit clamp by default. |
 | `freeRotation` | `boolean` | `false` | Allow the camera to rotate a full 360° vertically - vertical drags continue straight over the top and bottom of the device instead of clamping. |
 | `autoRotate` | `boolean \| number` | `false` | Slowly spin the camera around the device. `true` is one revolution a minute; a number multiplies that (`autoRotate={2}` twice as fast, `autoRotate={0.5}` half). Held still under [reduced motion](#reduced-motion). |
-| `zoom` | `boolean` | `false` | Pinch zoom on touch, scroll-wheel zoom on desktop, plus overlay +/− buttons. Off by default so embedded mockups never hijack page scroll; on, the canvas owns two-finger gestures. |
+| `zoom` | `boolean` | `false` | Pinch zoom on touch, scroll-wheel zoom on desktop, plus an overlay control: −, the level, +. Off by default so embedded mockups never hijack page scroll; on, the canvas owns two-finger gestures. |
 | `fullscreen` | `boolean` | `false` | Adds an overlay button that expands the mockup to fill the screen via the Fullscreen API (and collapses it back). Off by default. |
 | `shadows` | `boolean` | `true` | Soft contact shadow under the device. |
 | `shadowY` | `number` | `-2.05` | Y position (world units) of the shadow plane. Grounds the device on its shadow. The mockup wrappers compute this per device. |
@@ -60,9 +60,14 @@ the way a second object in a scene of your own would.
 
 ### Zoom controls
 
-`zoom` enables pinch on touch, the scroll wheel on desktop, and overlay
-+/− buttons on both. Zooming clamps to the same distance range as the
-orbit controls.
+`zoom` enables pinch on touch, the scroll wheel on desktop, and an overlay
+control on both: zoom out, the level, zoom in. The level reads against where
+the camera started, and pressing it puts the camera back there. Zooming
+clamps to the same distance range as the orbit controls. The control is
+self-contained, and it takes its colours and its face from
+`--mockup-overlay-bg`, `--mockup-overlay-border`, `--mockup-overlay-fg` and
+`--mockup-overlay-font` when the page sets them, so it can wear the page's
+own chrome.
 
 <MockupExplorer component="BookMockup" props={{ zoom: true, float: true, color: '#4a2c3f' }} />
 
