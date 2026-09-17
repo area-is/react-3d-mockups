@@ -12,9 +12,9 @@ import { asset } from '@/lib/base-path.mjs'
  * - the product box is a cereal box - the 190 × 265 × 55 mm blank IS the
  *   cereal-box proportion - with the brand tab, the bowl, the seals, the net
  *   weight across the foot and the Nutrition Facts down the side;
- * - the mailer box is a direct-to-consumer shipper, one colour of ink on
- *   corrugate: a fern engraving stamped across the lid's corner, the brand
- *   under it, the handling pictograms along the foot and down the ends, the
+ * - the mailer box is a coffee roaster's shipper, one colour of ink on
+ *   corrugate: the name set black and tight across the lid, the roast date
+ *   jetted on, the handling pictograms along the foot and down the ends, the
  *   tape crossing the middle the way tape does;
  * - the shopping bag is a florist's carrier done the way an expensive shop
  *   does one: a botanical plate, the name in letterspaced serif capitals,
@@ -23,9 +23,9 @@ import { asset } from '@/lib/base-path.mjs'
  * All of them print straight onto the material (`materialTone`), so the
  * carousel's finish swatches change the board under the print: white board,
  * kraft, a black box with white ink. The brand colours are solid inks and
- * stay put; the type flips to white ink on a dark board. The two engravings
- * (`/art/marigold.webp`, `/art/fern.webp`) are alpha-only plates printed
- * through `Plate`, so they flip with the type.
+ * stay put; the type flips to white ink on a dark board. The bag's engraving
+ * (`/art/marigold.webp`) is an alpha-only plate printed through `Plate`, so
+ * it flips with the type.
  *
  * Measurements are in `cqw` against each face's own width, so a side panel
  * a third as wide as the front sets its type a third the size - which is
@@ -359,52 +359,68 @@ export function CerealStory({ material }: { material: string }) {
   )
 }
 
-/** The top: the name along the flap, the best-by jetted on, "open here" at the front edge. */
+/**
+ * The top: what a carton's tuck flap carries - the tab and the name at the
+ * left, the best-by jetted on at the right, the opening instruction and the
+ * net weight along the front edge. The panel is 190 × 55 mm, so it is laid
+ * out as two columns that can each shrink, and nothing on it is a line
+ * that cannot wrap: the first draft set the name and the jet as fixed-width
+ * lines that added up to more than the panel, and printed one over the
+ * other.
+ */
 export function CerealTop({ material }: { material: string }) {
   const p = mill(material)
   return (
-    <BoxFace material={material} style={{ flexDirection: 'row', alignItems: 'stretch', justifyContent: 'space-between', padding: '3.2cqw 4.5cqw', gap: '3cqw' }}>
-      <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', gap: '1cqw', minWidth: 0 }}>
-        <BrandTab p={p} size={2.4} />
-        <div style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: '6.4cqw', lineHeight: 1, color: p.amber, whiteSpace: 'nowrap' }}>
-          Honey Oat <span style={{ fontFamily: FONT, fontStyle: 'normal', fontWeight: 900, color: p.title, letterSpacing: '-0.04em' }}>CLUSTERS</span>
+    <BoxFace material={material} style={{ padding: '3cqw 4.5cqw 2.6cqw', gap: '1.6cqw', justifyContent: 'space-between' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '4cqw', minHeight: 0 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.6cqw', minWidth: 0 }}>
+          <BrandTab p={p} size={2.2} />
+          <div style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: '4.6cqw', lineHeight: 1, color: p.amber }}>
+            Honey Oat{' '}
+            <span style={{ fontFamily: FONT, fontStyle: 'normal', fontWeight: 900, color: p.title, letterSpacing: '-0.04em' }}>CLUSTERS</span>
+          </div>
         </div>
-        <Micro style={{ fontSize: '2.3cqw', opacity: 0.75 }}>▲ Lift tab to open · press to reclose</Micro>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', textAlign: 'right', gap: '1cqw', flex: 'none' }}>
+          <Micro style={{ fontSize: '1.9cqw', opacity: 0.75 }}>Best if used by</Micro>
+          <JetPrint color={p.ink} size="3.2cqw">
+            {'14 MAR 2027\nLOT 3A7 K2 06:31'}
+          </JetPrint>
+        </div>
       </div>
-      <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', alignItems: 'flex-end', textAlign: 'right', flex: 'none' }}>
-        <Micro style={{ fontSize: '2.3cqw', opacity: 0.75 }}>Best if used by</Micro>
-        <JetPrint color={p.ink} size="4.6cqw">
-          {'14 MAR 2027\nLOT 3A7 K2 06:31'}
-        </JetPrint>
-        <Micro style={{ fontSize: '2.3cqw', opacity: 0.75 }}>Net wt 18 oz (510g)</Micro>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: '4cqw' }}>
+        <Micro style={{ fontSize: '1.9cqw', opacity: 0.75 }}>▲ Lift tab to open · press to reclose</Micro>
+        <Micro style={{ fontSize: '1.9cqw', opacity: 0.75, whiteSpace: 'nowrap' }}>Net wt 18 oz (510g)</Micro>
       </div>
     </BoxFace>
   )
 }
 
 /**
- * One of the range on the back: a small front, built from the same parts as
- * the big one - the tab, the flavour in the two faces, the bowl - so the
- * three read as this box's siblings rather than as three icons. It brings
- * its own cream board, because on the ink colourway the range is still a
- * row of cream boxes; that is what a photograph of them would show.
+ * One of the range: a small front, built from the same parts as the big
+ * one - the tab, the flavour in the two faces, the bowl - so the three read
+ * as this box's siblings rather than as three icons. It brings its own cream
+ * board, because on the ink colourway the range is still a row of cream
+ * boxes; that is what a photograph of them would show. `width` is the box's
+ * width in cqw and everything inside scales with it; at the small width the
+ * caption is dropped, because the box names itself.
  */
-function MiniBox({ p, name, sub, band }: { p: Mill; name: [string, string]; sub: string; band: string }) {
+function MiniBox({ p, name, sub, band, width = 19, caption = true }: { p: Mill; name: [string, string]; sub: string; band: string; width?: number; caption?: boolean }) {
+  const u = (n: number) => `${((n * width) / 19).toFixed(2)}cqw`
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1.4cqw', minWidth: 0 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: u(1.4), minWidth: 0 }}>
       <div
         style={{
-          width: '19cqw',
+          width: `${width}cqw`,
           aspectRatio: '190 / 265',
           background: '#fff8ea',
-          border: `0.25cqw solid ${p.dark ? '#fff8ea' : '#3a2412'}`,
-          borderRadius: '0.7cqw',
+          border: `${u(0.25)} solid ${p.dark ? '#fff8ea' : '#3a2412'}`,
+          borderRadius: u(0.7),
           boxSizing: 'border-box',
-          padding: '1.3cqw 1.2cqw 0.9cqw',
+          padding: `${u(1.3)} ${u(1.2)} ${u(0.9)}`,
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
-          gap: '0.6cqw',
+          gap: u(0.6),
           color: '#3a2412',
           overflow: 'hidden',
         }}
@@ -415,44 +431,51 @@ function MiniBox({ p, name, sub, band }: { p: Mill; name: [string, string]; sub:
             background: p.green,
             color: '#fff4dc',
             fontFamily: FONT,
-            fontSize: '1cqw',
+            fontSize: u(1),
             fontWeight: 800,
             letterSpacing: '0.12em',
-            padding: '0.45cqw 0.7cqw',
-            borderRadius: '1cqw',
+            padding: `${u(0.45)} ${u(0.7)}`,
+            borderRadius: u(1),
             lineHeight: 1,
             whiteSpace: 'nowrap',
           }}
         >
           RIDGEWAY MILLS
         </span>
-        <span style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: '2.2cqw', lineHeight: 1, color: band, marginTop: '0.4cqw', whiteSpace: 'nowrap' }}>
+        <span style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: u(2.2), lineHeight: 1, color: band, marginTop: u(0.4), whiteSpace: 'nowrap' }}>
           {name[0]}
         </span>
-        <span style={{ fontFamily: FONT, fontWeight: 900, fontSize: '2.6cqw', lineHeight: 0.95, letterSpacing: '-0.04em', whiteSpace: 'nowrap' }}>
+        <span style={{ fontFamily: FONT, fontWeight: 900, fontSize: u(2.6), lineHeight: 0.95, letterSpacing: '-0.04em', whiteSpace: 'nowrap' }}>
           {name[1]}
         </span>
-        <div style={{ flex: 1, minHeight: 0, width: '100%', position: 'relative', marginTop: '0.3cqw' }}>
+        <div style={{ flex: 1, minHeight: 0, width: '100%', position: 'relative', marginTop: u(0.3) }}>
           <div style={{ position: 'absolute', inset: '6% 10% 2%', borderRadius: '50%', background: band, opacity: 0.18 }} />
           <Photo src={asset('/art/cereal-bowl.webp')} fit="contain" style={{ position: 'absolute', inset: 0 }} />
         </div>
       </div>
-      <Micro style={{ fontSize: '1.9cqw', textAlign: 'center', lineHeight: 1.4, whiteSpace: 'nowrap' }}>
-        {name.join(' ')}
-        <br />
-        <span style={{ opacity: 0.7, fontWeight: 500, letterSpacing: '0.08em', fontSize: '0.85em' }}>{sub}</span>
-      </Micro>
+      {caption && (
+        <Micro style={{ fontSize: u(1.9), textAlign: 'center', lineHeight: 1.4, whiteSpace: 'nowrap' }}>
+          {name.join(' ')}
+          <br />
+          <span style={{ opacity: 0.7, fontWeight: 500, letterSpacing: '0.08em', fontSize: '0.85em' }}>{sub}</span>
+        </Micro>
+      )}
     </div>
   )
 }
 
 /**
- * The back: a recipe with its photograph, the rest of the range, the small
- * print. Laid out to the panel, which is the whole discipline of a box back:
- * the recipe card is a fixed height so the photograph cannot stretch it, the
- * range row is sized by its boxes, and the small print sits on the foot with
- * the slack above it - so the address is on the board whatever font the
- * viewer's machine sets the copy in.
+ * The back, laid out the way a cereal back is: a band of the mill's green
+ * across the head with its name and its line; the parfait as the hero,
+ * standing on the board at full height and off the left edge, on a plate of
+ * honey; the serving suggestion beside it with the range under that; and the
+ * small print in a second band of green across the foot.
+ *
+ * The bands are the discipline. Head and foot are fixed, and everything
+ * between them lives in a block that gives way (`flex: 1`, `overflow:
+ * hidden`), so the address prints on the board whatever the viewer's font
+ * rasteriser does to the copy - the first draft of this back had its small
+ * print pushed off the bottom by a line of wrapping.
  */
 export function CerealBack({ material }: { material: string }) {
   const p = mill(material)
@@ -462,78 +485,94 @@ export function CerealBack({ material }: { material: string }) {
     'Repeat, then finish with a drizzle of honey.',
     'Eat it before the clusters go soft. They won’t take long.',
   ]
+  const band: CSSProperties = { background: p.green, color: '#fff4dc', padding: '0 4.5cqw', flex: 'none' }
   return (
-    <BoxFace material={material} style={{ gap: '2.2cqw' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '2cqw' }}>
-        <BrandTab p={p} size={2.7} />
-        <Micro style={{ fontSize: '2.1cqw', opacity: 0.75, whiteSpace: 'nowrap' }}>Est. 1962 · Lewiston, Idaho</Micro>
+    <Sheet tone={materialTone(material)} style={{ flexDirection: 'column', color: p.ink }}>
+      {/* the head band */}
+      <div style={{ ...band, height: '23cqw', display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: '2.4cqw' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '2cqw' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1.6cqw' }}>
+            <Wheat color={p.honey} style={{ height: '5cqw', width: 'auto' }} />
+            <span style={{ fontFamily: FONT, fontWeight: 800, letterSpacing: '0.18em', fontSize: '3cqw', lineHeight: 1, whiteSpace: 'nowrap' }}>
+              RIDGEWAY MILLS
+            </span>
+          </div>
+          <Micro style={{ fontSize: '1.9cqw', opacity: 0.85, whiteSpace: 'nowrap' }}>Est. 1962 · Lewiston, Idaho</Micro>
+        </div>
+        <div style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: '5cqw', lineHeight: 1.05, letterSpacing: '-0.01em' }}>
+          Real oats. Real honey. Since 1962.
+        </div>
       </div>
 
-      <div style={{ fontFamily: SERIF, fontSize: '7.4cqw', lineHeight: 1.02, letterSpacing: '-0.015em' }}>
-        Breakfast, sorted.
-        <br />
-        <span style={{ fontStyle: 'italic', color: p.amber }}>Try it layered.</span>
-      </div>
-
-      {/* the recipe card: the photograph on the left, the method on the right, at a height that is the card's and not the picture's */}
-      <div
-        style={{
-          border: `0.4cqw solid ${p.ink}`,
-          borderRadius: '2.2cqw',
-          padding: '2.6cqw 3.2cqw 2.6cqw 2.6cqw',
-          display: 'grid',
-          gridTemplateColumns: '25cqw 1fr',
-          gap: '3cqw',
-          height: '43cqw',
-          boxSizing: 'border-box',
-          flex: 'none',
-        }}
-      >
-        <div style={{ position: 'relative', minHeight: 0 }}>
+      {/* the middle, which gives way */}
+      <div style={{ flex: 1, minHeight: 0, position: 'relative', overflow: 'hidden' }}>
+        {/* the plate of honey the glass stands on, bleeding off the foot */}
+        <div style={{ position: 'absolute', left: '0', bottom: '-8cqw', width: '46cqw', aspectRatio: '1', borderRadius: '50%', background: p.honey, opacity: 0.26 }} />
+        <div style={{ position: 'absolute', left: '-3cqw', top: '4cqw', width: '48cqw', bottom: '2.5cqw' }}>
           <Photo src={asset('/art/parfait.webp')} fit="contain" position="50% 100%" style={{ position: 'absolute', inset: 0 }} />
         </div>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5cqw', minWidth: 0 }}>
-          <Micro style={{ fontSize: '2.2cqw', color: p.red }}>Recipe · 5 minutes · serves 1</Micro>
-          <div style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: '5.6cqw', lineHeight: 1, color: p.amber }}>Honey Oat Parfait</div>
-          <ol style={{ margin: 0, padding: 0, listStyle: 'none', display: 'grid', gap: '1.1cqw' }}>
+
+        <div
+          style={{
+            position: 'absolute',
+            left: '47cqw',
+            right: '4.5cqw',
+            top: '4cqw',
+            bottom: '2.5cqw',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '1.5cqw',
+            overflow: 'hidden',
+          }}
+        >
+          <Micro style={{ fontSize: '2.1cqw', color: p.red }}>Serving suggestion</Micro>
+          <div style={{ fontFamily: FONT, fontWeight: 900, fontSize: '7.2cqw', lineHeight: 0.94, letterSpacing: '-0.045em', color: p.title }}>
+            Try it
+            <br />
+            layered.
+          </div>
+          <div style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: '3.6cqw', lineHeight: 1.1, color: p.amber }}>
+            Honey Oat Parfait{' '}
+            <span style={{ fontFamily: FONT, fontStyle: 'normal', fontWeight: 600, fontSize: '1.9cqw', color: p.ink, opacity: 0.7, letterSpacing: '0.06em', whiteSpace: 'nowrap' }}>
+              5 MIN · SERVES 1
+            </span>
+          </div>
+          <ol style={{ margin: 0, padding: 0, listStyle: 'none', display: 'grid', gap: '1cqw' }}>
             {steps.map((step, i) => (
-              <li key={step} style={{ display: 'flex', gap: '1.8cqw', ...copy('2.55cqw', { lineHeight: 1.3 }) }}>
+              <li key={step} style={{ display: 'flex', gap: '1.6cqw', ...copy('2.35cqw', { lineHeight: 1.3 }) }}>
                 <span style={{ color: p.red, fontWeight: 900, fontVariantNumeric: 'tabular-nums', flex: 'none' }}>{i + 1}</span>
                 <span>{step}</span>
               </li>
             ))}
           </ol>
-          <Micro style={{ fontSize: '1.8cqw', opacity: 0.7, marginTop: 'auto' }}>More at ridgewaymills.com/recipes</Micro>
+
+          <div style={{ height: '0.25cqw', background: p.ink, opacity: 0.25, flex: 'none', marginTop: '1cqw' }} />
+
+          <Micro style={{ fontSize: '2.1cqw', color: p.red }}>Also from Ridgeway Mills</Micro>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1.4cqw' }}>
+            <MiniBox p={p} width={13} caption={false} name={['Cinnamon', 'CRUNCH']} sub="Oats · cinnamon" band="#c8322b" />
+            <MiniBox p={p} width={13} caption={false} name={['Berry', 'CLUSTERS']} sub="Blueberry · cranberry" band="#6b3fa0" />
+            <MiniBox p={p} width={13} caption={false} name={['Maple', 'PECAN']} sub="Maple · pecans" band="#7a4a1e" />
+          </div>
         </div>
       </div>
 
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginTop: '0.6cqw' }}>
-        <Micro style={{ fontSize: '2.4cqw', color: p.red }}>Also from Ridgeway Mills</Micro>
-        <Micro style={{ fontSize: '2cqw', opacity: 0.72 }}>Look for the green tab</Micro>
-      </div>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '2.4cqw', padding: '0 2cqw', flex: 'none' }}>
-        <MiniBox p={p} name={['Cinnamon', 'CRUNCH']} sub="Oats · cinnamon" band="#c8322b" />
-        <MiniBox p={p} name={['Berry', 'CLUSTERS']} sub="Blueberry · cranberry" band="#6b3fa0" />
-        <MiniBox p={p} name={['Maple', 'PECAN']} sub="Real maple · pecans" band="#7a4a1e" />
-      </div>
-
-      <div style={{ flex: 1, minHeight: 0 }} />
-
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', gap: '3cqw', flex: 'none' }}>
-        <Micro style={{ fontSize: '1.8cqw', opacity: 0.75, lineHeight: 1.5, letterSpacing: '0.1em', whiteSpace: 'nowrap' }}>
+      {/* the foot band */}
+      <div style={{ ...band, padding: '2.6cqw 4.5cqw', minHeight: '15cqw', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '3cqw' }}>
+        <Micro style={{ fontSize: '1.65cqw', lineHeight: 1.55, letterSpacing: '0.1em', opacity: 0.92, minWidth: 0 }}>
           Questions? Call 1-800-555-0142 weekdays
           <br />
           hello@ridgewaymills.com · ridgewaymills.com
           <br />
-          Ridgeway Mills · Lewiston, ID 83501 · Made in the USA
+          Ridgeway Mills · Lewiston, ID 83501
           <br />
-          with domestic and imported ingredients
+          Made in the USA with domestic and imported ingredients
         </Micro>
         <RecycleMark
-          color={p.ink}
-          size="6cqw"
+          color="#fff4dc"
+          size="5.5cqw"
           label={
-            <Micro style={{ fontSize: '1.9cqw', lineHeight: 1.35, whiteSpace: 'nowrap' }}>
+            <Micro style={{ fontSize: '1.7cqw', lineHeight: 1.35, whiteSpace: 'nowrap' }}>
               Recycle carton
               <br />
               discard liner
@@ -541,7 +580,7 @@ export function CerealBack({ material }: { material: string }) {
           }
         />
       </div>
-    </BoxFace>
+    </Sheet>
   )
 }
 
@@ -559,8 +598,69 @@ function ShipperFace({ material, style, children }: { material: string; style?: 
   )
 }
 
-/** The candle company's mark: a fern frond, an engraving printed in the one ink (see `Plate`). */
-const FERN = asset('/art/fern.webp')
+/**
+ * The roaster's box: Halyard Coffee Roasters, Portland, Maine. One ink on
+ * corrugate and one family - Inter, set black and tight for the name and
+ * in tracked capitals for everything else - because a roaster's shipper is
+ * a production object printed in one pass, and what it has to say from
+ * across a room is the name and the roast date. The date is jetted on by
+ * the line rather than typeset (`JetPrint`), which is the detail that makes
+ * a subscription box look shipped rather than designed.
+ *
+ * Nothing on these faces is a long line that cannot wrap. The candle box
+ * this replaces set its small print in single lines two-thirds of the lid
+ * wide, and a font rasteriser that ran a few per cent wide pushed them off
+ * the board; here the lines are short, the blocks can shrink, and the one
+ * wide thing - the wordmark - is sized to two-thirds of the face.
+ */
+
+/** The jetted roast stamp, as the line prints it. */
+const ROAST = 'ROASTED 12 SEP 2026\nLOT 0912-3 · 2 × 340 G'
+
+/** The roaster's mark: a halyard cleat, in one stroke of the ink. */
+function Cleat({ color, size }: { color: string; size: string }) {
+  return (
+    <svg viewBox="0 0 64 36" style={{ width: size, height: 'auto', display: 'block', flex: 'none' }} aria-hidden>
+      <g fill="none" stroke={color} strokeWidth={5.5} strokeLinecap="round" strokeLinejoin="round">
+        <path d="M6 18C6 9 19 7 32 11c13-4 26-2 26 7" />
+        <path d="M32 11v21" />
+        <path d="M21 32h22" />
+      </g>
+    </svg>
+  )
+}
+
+/** The name: Inter black, tightened. `size` is the cap height's cqw. */
+function Halyard({ size, style }: { size: string; style?: CSSProperties }) {
+  return (
+    <span
+      style={{
+        fontFamily: FONT,
+        fontWeight: 900,
+        fontSize: size,
+        letterSpacing: '-0.055em',
+        lineHeight: 0.86,
+        whiteSpace: 'nowrap',
+        display: 'block',
+        ...style,
+      }}
+    >
+      HALYARD
+    </span>
+  )
+}
+
+/** The roast-date box: the one typeset frame on the box, with the jet inside it. */
+function RoastStamp({ ink, size }: { ink: string; size: number }) {
+  return (
+    <div style={{ border: `${size * 0.11}cqw solid ${ink}`, padding: `${size * 0.6}cqw ${size * 0.8}cqw ${size * 0.55}cqw`, display: 'flex', flexDirection: 'column', gap: `${size * 0.45}cqw`, flex: 'none' }}>
+      <Micro style={{ fontSize: `${size * 0.62}cqw`, opacity: 0.7, whiteSpace: 'nowrap' }}>Roast date</Micro>
+      <JetPrint color={ink} size={`${size}cqw`}>
+        {ROAST}
+      </JetPrint>
+    </div>
+  )
+}
 
 /** ISO handling pictograms, drawn in the ink: the glass, the arrows, the umbrella. */
 function Pictogram({ kind, color, size }: { kind: 'fragile' | 'up' | 'dry'; color: string; size: string }) {
@@ -597,46 +697,38 @@ function materialToneInverse(ink: string): string {
   return ink === PAPER ? INK : PAPER
 }
 
+/** A pictogram with its word under it. */
+function Mark({ kind, ink, size, label }: { kind: 'fragile' | 'up' | 'dry' | 'recycle'; ink: string; size: number; label: string }) {
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: `${size * 0.2}cqw` }}>
+      {kind === 'recycle' ? <RecycleMark color={ink} size={`${size * 0.96}cqw`} /> : <Pictogram kind={kind} color={ink} size={`${size}cqw`} />}
+      <Micro style={{ fontSize: `${size * 0.24}cqw`, whiteSpace: 'nowrap' }}>{label}</Micro>
+    </div>
+  )
+}
+
 /**
- * The lid: three zones with air between them, and nothing drawn as a line.
- * The frond is stamped across the top-left corner and bleeds off both edges,
- * the way a one-colour plate lands on a shipper that was printed before it
- * was cut; the brand sits beside it above the tape, the care line and the
- * handling marks below it, and the small print keeps to the foot - the way a
- * real shipper is laid out around the tape it knows is coming.
+ * The lid: the name across the top zone at two-thirds of the width, the
+ * tape's lane left clear through the middle, and the bottom zone split
+ * between the line every roaster prints and the roast stamp with the
+ * handling marks under it. Three zones, air between them, no rules.
  */
 export function MailerLid({ material }: { material: string }) {
   const ink = materialTone(material).text
-  const marks = [
-    ['fragile', 'Fragile'],
-    ['up', 'This way up'],
-    ['dry', 'Keep dry'],
-  ] as const
   return (
-    <ShipperFace material={material} style={{ display: 'grid', gridTemplateRows: '1fr 30% 1fr', padding: '4.4cqw 6cqw 4.2cqw', position: 'relative' }}>
-      <Plate
-        src={FERN}
-        ink={ink}
-        style={{
-          position: 'absolute',
-          left: '-3cqw',
-          top: '-7cqw',
-          width: '24cqw',
-          height: '40cqw',
-          transform: 'rotate(-30deg)',
-          transformOrigin: '50% 50%',
-          opacity: 0.94,
-        }}
-      />
-      <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', minHeight: 0, minWidth: 0, paddingLeft: '19cqw' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: '3cqw' }}>
-          <Micro style={{ fontSize: '1.7cqw', whiteSpace: 'nowrap', letterSpacing: '0.24em' }}>Fernhaven Candle Co.</Micro>
-          <Micro style={{ fontSize: '1.7cqw', whiteSpace: 'nowrap', letterSpacing: '0.24em', opacity: 0.7 }}>Burlington, Vermont</Micro>
+    <ShipperFace material={material} style={{ display: 'grid', gridTemplateRows: '1fr 30% 1fr', padding: '4.4cqw 6cqw 4.2cqw' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', minHeight: 0, minWidth: 0 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '3cqw' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1.6cqw', minWidth: 0 }}>
+            <Cleat color={ink} size="4.2cqw" />
+            <Micro style={{ fontSize: '1.6cqw', letterSpacing: '0.22em' }}>Halyard Coffee Roasters</Micro>
+          </div>
+          <Micro style={{ fontSize: '1.6cqw', letterSpacing: '0.22em', opacity: 0.7 }}>Portland, Maine</Micro>
         </div>
         <div>
-          <div style={{ fontFamily: SERIF, fontSize: '12.5cqw', lineHeight: 0.88, letterSpacing: '-0.02em' }}>Fernhaven</div>
-          <Micro style={{ fontSize: '1.7cqw', display: 'block', marginTop: '2cqw', whiteSpace: 'nowrap', letterSpacing: '0.3em' }}>
-            Hand-poured soy candles · Since 2019
+          <Halyard size="15cqw" />
+          <Micro style={{ fontSize: '1.7cqw', display: 'block', marginTop: '1.6cqw', letterSpacing: '0.26em' }}>
+            Whole bean coffee · Roasted to order
           </Micro>
         </div>
       </div>
@@ -646,69 +738,59 @@ export function MailerLid({ material }: { material: string }) {
       <div />
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'stretch', gap: '4cqw', minHeight: 0 }}>
         <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', flex: 1, minWidth: 0, gap: '1.5cqw' }}>
-          <div style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: '4.8cqw', lineHeight: 1.02, letterSpacing: '-0.01em', whiteSpace: 'nowrap' }}>
-            Light one. Slow down.
+          <div style={{ fontFamily: FONT, fontWeight: 800, fontSize: '4.8cqw', lineHeight: 0.98, letterSpacing: '-0.04em' }}>
+            Roasted this week.
+            <br />
+            Open within 14 days.
           </div>
-          <Micro style={{ fontSize: '1.45cqw', lineHeight: 1.65, opacity: 0.78, letterSpacing: '0.12em', whiteSpace: 'nowrap' }}>
-            Inside: one hand-poured soy candle.
+          <Micro style={{ fontSize: '1.45cqw', lineHeight: 1.65, opacity: 0.78, letterSpacing: '0.12em' }}>
+            Store cool and dry, in the bag, valve out.
             <br />
-            Trim the wick to ¼ in. before each burn.
-            <br />
-            100% recycled corrugate · Soy ink · Reuse me
+            Grind just before you brew · halyard.coffee
           </Micro>
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', alignItems: 'flex-end', flex: 'none', gap: '1.5cqw' }}>
-          <div style={{ display: 'flex', gap: '3.6cqw' }}>
-            {marks.map(([kind, label]) => (
-              <div key={kind} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1.1cqw' }}>
-                <Pictogram kind={kind} color={ink} size="5.4cqw" />
-                <Micro style={{ fontSize: '1.3cqw', whiteSpace: 'nowrap' }}>{label}</Micro>
-              </div>
-            ))}
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1.1cqw' }}>
-              <RecycleMark color={ink} size="5.2cqw" />
-              <Micro style={{ fontSize: '1.3cqw', whiteSpace: 'nowrap' }}>Recycle</Micro>
-            </div>
+          <RoastStamp ink={ink} size={2} />
+          <div style={{ display: 'flex', gap: '3.4cqw' }}>
+            <Mark kind="up" ink={ink} size={5} label="This way up" />
+            <Mark kind="dry" ink={ink} size={5} label="Keep dry" />
+            <Mark kind="recycle" ink={ink} size={5} label="Recycle" />
           </div>
-          <Micro style={{ fontSize: '1.5cqw', whiteSpace: 'nowrap', opacity: 0.7, letterSpacing: '0.3em' }}>fernhaven.co</Micro>
         </div>
       </div>
     </ShipperFace>
   )
 }
 
-/** The long front: the frond, the name and the mark, at shelf height. */
+/** The long front: the mark and the name at shelf height, the contents beside them. */
 export function MailerFront({ material }: { material: string }) {
   const ink = materialTone(material).text
   return (
-    <ShipperFace material={material} style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: '3cqw 5cqw', gap: '3cqw' }}>
+    <ShipperFace material={material} style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: '3cqw 5cqw', gap: '4cqw' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: '2.2cqw', flex: 'none' }}>
-        <Plate src={FERN} ink={ink} style={{ width: '9cqw', height: '26cqw', transform: 'rotate(-16deg)' }} />
-        <div style={{ fontFamily: SERIF, fontSize: '8cqw', lineHeight: 0.9, letterSpacing: '-0.02em', whiteSpace: 'nowrap' }}>Fernhaven</div>
+        <Cleat color={ink} size="8cqw" />
+        <Halyard size="9cqw" />
       </div>
-      <div style={{ textAlign: 'right', display: 'grid', gap: '1.3cqw', minWidth: 0, flex: 1 }}>
-        <Micro style={{ fontSize: '1.5cqw', letterSpacing: '0.16em' }}>Hand-poured soy candles &amp; home goods</Micro>
-        <Micro style={{ fontSize: '1.5cqw', letterSpacing: '0.16em', opacity: 0.72 }}>fernhaven.co · Burlington, Vermont</Micro>
-        <Micro style={{ fontSize: '1.4cqw', opacity: 0.72, letterSpacing: '0.26em' }}>Fragile · Glass inside · This way up</Micro>
+      <div style={{ textAlign: 'right', display: 'grid', gap: '1.2cqw', minWidth: 0, flex: 1, justifyItems: 'end' }}>
+        <Micro style={{ fontSize: '1.5cqw', letterSpacing: '0.2em' }}>Whole bean · 2 × 340 g</Micro>
+        <Micro style={{ fontSize: '1.5cqw', letterSpacing: '0.2em', opacity: 0.72 }}>Portland, Maine</Micro>
+        <Micro style={{ fontSize: '1.4cqw', letterSpacing: '0.2em', opacity: 0.72 }}>halyard.coffee</Micro>
       </div>
     </ShipperFace>
   )
 }
 
-/** An end panel: the pictograms either side of where the tape wraps down, the frond between them. */
+/** An end panel: the marks either side of where the tape wraps down, the name between them. */
 export function MailerEnd({ material }: { material: string }) {
   const ink = materialTone(material).text
   return (
     <ShipperFace material={material} style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: '4cqw 6cqw' }}>
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1.8cqw' }}>
-        <Pictogram kind="fragile" color={ink} size="15cqw" />
-        <Micro style={{ fontSize: '2.8cqw' }}>Fragile</Micro>
+      <Mark kind="up" ink={ink} size={13} label="This way up" />
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1.6cqw' }}>
+        <Cleat color={ink} size="10cqw" />
+        <Halyard size="6.5cqw" />
       </div>
-      <Plate src={FERN} ink={ink} style={{ width: '16cqw', height: '34cqw', transform: 'rotate(-12deg)', opacity: 0.94 }} />
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1.8cqw' }}>
-        <Pictogram kind="up" color={ink} size="15cqw" />
-        <Micro style={{ fontSize: '2.8cqw' }}>This way up</Micro>
-      </div>
+      <Mark kind="dry" ink={ink} size={13} label="Keep dry" />
     </ShipperFace>
   )
 }

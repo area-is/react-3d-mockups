@@ -16,8 +16,16 @@ import { FONT } from './swiss-art'
  * on a 95 mm carton side and at a hair smaller on a 55 mm cereal-box side.
  */
 
-/** A dairy or a mill sets its name in something with serifs; Inter is for the small print. */
-export const SERIF = 'Georgia, "Iowan Old Style", "Palatino Linotype", "Book Antiqua", "Times New Roman", serif'
+/**
+ * A dairy or a mill sets its name in something with serifs; Inter is for the
+ * small print. Fraunces (see `lib/fonts.ts`) rather than Georgia: a serif
+ * drawn for screens reads as a screen in a photograph of a box, and its
+ * optical-size axis lets the same face set a flavour name and nine-point
+ * notes. The fallbacks are book faces, not Georgia.
+ */
+export const SERIF = 'var(--font-fraunces), Fraunces, "Iowan Old Style", "Palatino Linotype", "Book Antiqua", serif'
+/** The chalk on the A-frame: a neat, legible hand. */
+export const HAND = 'var(--font-caveat), Caveat, "Segoe Print", "Bradley Hand", cursive'
 /** The filling line's ink-jet: the one face of a package that is not typeset. */
 export const MONO = 'var(--font-jetbrains-mono), "JetBrains Mono", ui-monospace, Menlo, Consolas, monospace'
 

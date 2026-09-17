@@ -1,5 +1,7 @@
 'use client'
 
+import { HAND, SERIF } from './label-art'
+
 /**
  * Full-bleed artwork for the object mockups (book, magazine, brochure, card,
  * poster, billboard, van). Self-contained inline styles so the demos don't
@@ -7,7 +9,8 @@
  * 100%.
  */
 
-const serif = 'Georgia, "Times New Roman", serif'
+/** The serif every printed piece here sets its display in - Fraunces, see `label-art`. */
+const serif = SERIF
 
 /** Hardcover novel jacket. */
 export function BookCoverArt() {
@@ -766,7 +769,7 @@ export function TVShowArt() {
   )
 }
 
-/** Chalkboard menu for the A-frame. */
+/** Chalkboard menu for the A-frame: a neat hand (`HAND`), not a scribble, and not a serif pretending to be chalk. */
 export function ChalkMenuArt() {
   return (
     <div
@@ -780,25 +783,28 @@ export function ChalkMenuArt() {
         display: 'flex',
         flexDirection: 'column',
         textAlign: 'center',
-        fontFamily: serif,
+        fontFamily: HAND,
+        fontWeight: 500,
       }}
     >
-      <div style={{ fontSize: 30, fontStyle: 'italic' }}>Ridgeline Café</div>
-      <svg viewBox="0 0 100 8" style={{ width: '80%', margin: '8px auto 14px' }} aria-hidden>
+      <div style={{ fontSize: 50, fontWeight: 600, lineHeight: 1 }}>Ridgeline Café</div>
+      <svg viewBox="0 0 100 8" style={{ width: '80%', margin: '10px auto 18px' }} aria-hidden>
         <path d="M2 5 Q 25 1, 50 4 T 98 3" fill="none" stroke="#e8b64c" strokeWidth="1.6" strokeLinecap="round" />
       </svg>
       {[
         ['flat white', '4.5'],
         ['batch brew', '3.5'],
+        ['oat latte', '5'],
         ['cardamom bun', '5'],
         ['trail toastie', '9'],
+        ['soup of the day', '8'],
       ].map(([item, price]) => (
-        <div key={item} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 17, padding: '7px 8px', borderBottom: '1px dashed rgba(240,237,228,0.25)' }}>
+        <div key={item} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 27, padding: '9px 8px', borderBottom: '1px dashed rgba(240,237,228,0.25)' }}>
           <span>{item}</span>
           <span style={{ color: '#e8b64c' }}>{price}</span>
         </div>
       ))}
-      <div style={{ marginTop: 'auto', fontSize: 14, color: '#b9c4b4' }}>open till dusk ☀</div>
+      <div style={{ marginTop: 'auto', fontSize: 22, color: '#b9c4b4' }}>open till dusk ☀</div>
     </div>
   )
 }
@@ -824,11 +830,12 @@ export function ChalkHoursArt() {
         display: 'flex',
         flexDirection: 'column',
         textAlign: 'center',
-        fontFamily: serif,
+        fontFamily: HAND,
+        fontWeight: 500,
       }}
     >
-      <div style={{ fontSize: 26, fontStyle: 'italic' }}>Open</div>
-      <svg viewBox="0 0 100 8" style={{ width: '80%', margin: '8px auto 14px' }} aria-hidden>
+      <div style={{ fontSize: 50, fontWeight: 600, lineHeight: 1 }}>Open</div>
+      <svg viewBox="0 0 100 8" style={{ width: '80%', margin: '10px auto 18px' }} aria-hidden>
         <path d="M2 4 Q 28 7, 52 3 T 98 5" fill="none" stroke="#e8b64c" strokeWidth="1.6" strokeLinecap="round" />
       </svg>
       {[
@@ -837,12 +844,16 @@ export function ChalkHoursArt() {
         ['sat', '8 – 6'],
         ['sun', '8 – 2'],
       ].map(([days, hours]) => (
-        <div key={days} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 17, padding: '7px 8px', borderBottom: '1px dashed rgba(240,237,228,0.25)' }}>
+        <div key={days} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 27, padding: '9px 8px', borderBottom: '1px dashed rgba(240,237,228,0.25)' }}>
           <span>{days}</span>
           <span style={{ color: '#e8b64c' }}>{hours}</span>
         </div>
       ))}
-      <div style={{ marginTop: 'auto', fontSize: 14, color: '#b9c4b4' }}>dogs welcome ❧</div>
+      <div style={{ marginTop: 'auto', fontSize: 22, color: '#b9c4b4', lineHeight: 1.5 }}>
+        kitchen closes half an hour before
+        <br />
+        dogs welcome ❧
+      </div>
     </div>
   )
 }

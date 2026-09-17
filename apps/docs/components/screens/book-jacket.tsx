@@ -291,10 +291,10 @@ export function JacketSpine({ cloth }: { cloth: string }) {
   )
 }
 
-const blurb = (size = '3.1cqw'): CSSProperties => ({
+const blurb = (size = '2.95cqw'): CSSProperties => ({
   margin: 0,
   fontSize: size,
-  lineHeight: 1.5,
+  lineHeight: 1.46,
   letterSpacing: '-0.005em',
 })
 
@@ -370,68 +370,79 @@ function IsbnBlock() {
  * author, with her photograph, where every back cover puts her; and the foot
  * every book has - the imprint's colophon on the left, the barcode block on
  * the right.
+ *
+ * The foot is pinned. The copy is the one thing on the board whose height
+ * the design does not control - it wraps a line longer or shorter with the
+ * viewer's font rasteriser - so everything above the foot sits in a block
+ * that gives way (`flex: 1`, `overflow: hidden`) and the foot keeps its own
+ * height. A barcode pushed off the bottom of a board is the one thing a
+ * back cover must never do; a bio clipped by a line, in the worst case, is
+ * something a reader would not notice. The sizes leave the block a good
+ * fifteen per cent of slack, so on any real machine neither happens.
  */
 export function JacketBack({ cloth }: { cloth: string }) {
   const t = jacketTone(cloth)
   return (
-    <Sheet tone={t} style={{ flexDirection: 'column', padding: '7cqw', gap: '3.4cqw' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: '3cqw' }}>
+    <Sheet tone={t} style={{ flexDirection: 'column', padding: '6.5cqw 7cqw 7cqw', gap: '3cqw' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: '3cqw', flex: 'none' }}>
         <Micro style={{ color: t.accent }}>Memoir · 344 pages</Micro>
         <Micro style={{ fontSize: '2.6cqw', opacity: 0.55 }}>{AUTHOR_KO} 지음</Micro>
       </div>
 
-      <p
-        style={{
-          margin: 0,
-          fontSize: '5.8cqw',
-          fontWeight: 600,
-          letterSpacing: '-0.03em',
-          lineHeight: 1.16,
-          maxWidth: '78cqw',
-        }}
-      >
-        “I was sixty before I learned to say the word I wanted.”
-      </p>
-
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '2.4cqw' }}>
-        <p style={blurb()}>
-          Kim Soon-ja was born in a market town in 1938, the fourth daughter in a house that had
-          wanted sons. She was nine when the country divided, nineteen when she married a man she
-          had met twice, and forty-one when she opened the shop on Bongcheon-ro that fed her family
-          for thirty years.
+      {/* the part that gives way - see above */}
+      <div style={{ flex: 1, minHeight: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column', gap: '3cqw' }}>
+        <p
+          style={{
+            margin: 0,
+            fontSize: '5.4cqw',
+            fontWeight: 600,
+            letterSpacing: '-0.03em',
+            lineHeight: 1.16,
+            maxWidth: '78cqw',
+            flex: 'none',
+          }}
+        >
+          “I was sixty before I learned to say the word I wanted.”
         </p>
-        <p style={blurb()}>
-          She began writing this book at eighty-two, in a school notebook, in the hour before the
-          shop opened. It is an account of a century in one woman&apos;s hands: what the war took,
-          what the winters cost, what she refused to hand on to her daughters.
-        </p>
-      </div>
 
-      {/* one line of praise, set the way a jacket sets it: the quote, then the name */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '1.4cqw', borderLeft: `0.5cqw solid ${t.accent}`, paddingLeft: '3cqw' }}>
-        <p style={{ ...blurb('3.2cqw'), fontWeight: 600, letterSpacing: '-0.015em', lineHeight: 1.4 }}>
-          “A century in one woman&apos;s hands, told without a wasted word.”
-        </p>
-        <Micro style={{ fontSize: '2.3cqw', opacity: 0.6 }}>Yoon Mi-rae · author of The Salt Years</Micro>
-      </div>
-
-      {/* the author, where a reader looks for her: after the copy, with a face */}
-      <div style={{ display: 'flex', gap: '3.4cqw', alignItems: 'flex-start', paddingTop: '1cqw' }}>
-        <AuthorPhoto size="15cqw" />
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.4cqw', minWidth: 0 }}>
-          <span style={{ fontSize: '3.3cqw', fontWeight: 700, letterSpacing: '-0.015em', lineHeight: 1.1 }}>
-            {AUTHOR} <span style={{ fontWeight: 500, opacity: 0.6 }}>{AUTHOR_KO}</span>
-          </span>
-          <p style={{ ...blurb('2.75cqw'), opacity: 0.72, lineHeight: 1.42 }}>
-            Lives in Seoul, two streets from the shop. This is her first and, she insists, her only
-            book. Translated from the Korean by Han Ji-eun.
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '2.2cqw', flex: 'none' }}>
+          <p style={blurb()}>
+            Kim Soon-ja was born in a market town in 1938, the fourth daughter in a house that had
+            wanted sons. She was nine when the country divided, nineteen when she married a man she
+            had met twice, and forty-one when she opened the shop on Bongcheon-ro that fed her family
+            for thirty years.
           </p>
+          <p style={blurb()}>
+            She began writing this book at eighty-two, in a school notebook, in the hour before the
+            shop opened. It is an account of a century in one woman&apos;s hands: what the war took,
+            what the winters cost, what she refused to hand on to her daughters.
+          </p>
+        </div>
+
+        {/* one line of praise, set the way a jacket sets it: the quote, then the name */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.3cqw', borderLeft: `0.5cqw solid ${t.accent}`, paddingLeft: '3cqw', flex: 'none' }}>
+          <p style={{ ...blurb('3cqw'), fontWeight: 600, letterSpacing: '-0.015em', lineHeight: 1.38 }}>
+            “A century in one woman&apos;s hands, told without a wasted word.”
+          </p>
+          <Micro style={{ fontSize: '2.2cqw', opacity: 0.6 }}>Yoon Mi-rae · author of The Salt Years</Micro>
+        </div>
+
+        {/* the author, where a reader looks for her: after the copy, with a face */}
+        <div style={{ display: 'flex', gap: '3.2cqw', alignItems: 'flex-start', paddingTop: '0.6cqw', flex: 'none' }}>
+          <AuthorPhoto size="13.5cqw" />
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.3cqw', minWidth: 0 }}>
+            <span style={{ fontSize: '3.2cqw', fontWeight: 700, letterSpacing: '-0.015em', lineHeight: 1.1 }}>
+              {AUTHOR} <span style={{ fontWeight: 500, opacity: 0.6 }}>{AUTHOR_KO}</span>
+            </span>
+            <p style={{ ...blurb('2.65cqw'), opacity: 0.72, lineHeight: 1.4 }}>
+              Lives in Seoul, two streets from the shop. This is her first and, she insists, her only
+              book.
+            </p>
+          </div>
         </div>
       </div>
 
-      <div style={{ flex: 1, minHeight: 0 }} />
-
-      <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: '3cqw' }}>
+      <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: '3cqw', flex: 'none', paddingTop: '1cqw' }}>
         {/* the colophon: the mark, the name, and the Latin form under it */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '2.2cqw', minWidth: 0 }}>
           <ImprintMark color={t.accent} size="9cqw" />

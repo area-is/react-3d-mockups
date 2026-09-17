@@ -757,8 +757,15 @@
   position: absolute;
   inset: 0;
   display: flex;
-  align-items: center;
-  justify-content: center;
+  /*
+   * Scrolls once the surface is zoomed past the stage. The frame centres
+   * itself with auto margins rather than the container's alignment, because
+   * a flex item centred by `justify-content` that outgrows its container
+   * loses its leading edge past the scroll origin - `margin: auto` centres
+   * while it fits and starts at the origin once it does not.
+   */
+  overflow: auto;
+  scrollbar-width: thin;
 }
 
 /*
@@ -770,6 +777,8 @@
   border: 1px dashed color-mix(in oklab, var(--mx-accent) 45%, transparent);
   border-radius: 12px;
   padding: 9px;
+  margin: auto;
+  flex: none;
 }
 
 /*
@@ -815,6 +824,69 @@
   opacity: 0.7;
   margin: 0 2px;
   font-weight: 400;
+}
+
+/*
+ * The flat view's zoom: the 3D stage's controls, in the explorer's own
+ * chrome. Pinned to the stage's corner like the readout, so it stays put
+ * while the surface scrolls under it.
+ */
+.mx-zoom {
+  position: absolute;
+  right: 12px;
+  top: 12px;
+  display: inline-flex;
+  align-items: stretch;
+  border: 1px solid var(--color-fd-border);
+  border-radius: 7px;
+  background: var(--color-fd-card);
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  line-height: 1;
+  overflow: hidden;
+}
+
+.mx-zoom button {
+  border: 0;
+  background: none;
+  color: var(--color-fd-foreground);
+  font: inherit;
+  font-weight: 600;
+  padding: 6px 9px;
+  cursor: pointer;
+}
+
+.mx-zoom button:hover {
+  background: var(--color-fd-accent);
+}
+
+.mx-zoom button:disabled {
+  opacity: 0.35;
+  cursor: default;
+  background: none;
+}
+
+.mx-zoom .mx-zoom-level {
+  min-width: 52px;
+  color: var(--color-fd-muted-foreground);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  border-left: 1px solid var(--color-fd-border);
+  border-right: 1px solid var(--color-fd-border);
+}
+
+/*
+ * Keyboard focus: a hairline of the accent, offset from the control, and
+ * only on `:focus-visible`. The browser's default ring is a two-pixel blue
+ * box that reads as an error on chrome this quiet.
+ */
+.mx button:focus {
+  outline: none;
+}
+
+.mx button:focus-visible {
+  outline: 1.5px solid color-mix(in oklab, var(--mx-accent) 55%, transparent);
+  outline-offset: 1px;
 }
 
 /* Generic artwork for a print / packaging surface */
