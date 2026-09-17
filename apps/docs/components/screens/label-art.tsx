@@ -106,7 +106,8 @@ export function UpcA({ digits, color, style }: { digits: string; color: string; 
 
 export interface NutrientRow {
   label: string
-  amount: string
+  /** The figure after the label. A classic panel's vitamin block prints none. */
+  amount?: string
   /** Percent daily value; omitted where the FDA format prints none (trans fat, total sugars). */
   dv?: string
   /** Indented under its parent: saturated fat under total fat, added sugars two deep. */
@@ -115,6 +116,20 @@ export interface NutrientRow {
   bold?: boolean
 }
 
+/**
+ * Which of the FDA's two panels to print.
+ *
+ * `current` is the 2016 rule everything on a shelf has carried since 2021:
+ * servings per container above a bold serving size, calories set enormous,
+ * added sugars, and vitamins with their amounts as well as their percentages.
+ *
+ * `classic` is the 1993 panel - the one most people picture when they picture
+ * a nutrition label, and the one the milk carton prints: serving size first,
+ * "Calories from Fat" beside the calories, "Sugars" with nothing under it, and
+ * the vitamins as bare percentages two to a line with a bullet between.
+ */
+export type NutritionFormat = 'current' | 'classic'
+
 export interface NutritionFactsProps {
   servings: string
   servingSize: string
@@ -122,6 +137,9 @@ export interface NutritionFactsProps {
   rows: NutrientRow[]
   /** The vitamin and mineral block under the thick rule. */
   micros: NutrientRow[]
+  format?: NutritionFormat
+  /** `classic` only: the figure printed beside the calories. */
+  caloriesFromFat?: string
   /** Ink and the label ground: a nutrition panel is black on white wherever the package is printed. */
   color?: string
   background?: string
@@ -133,12 +151,22 @@ export interface NutritionFactsProps {
 }
 
 /**
- * The FDA's 2020 Nutrition Facts panel, rule for rule: the heavy title, the
- * servings line, the 7pt bar over "Amount per serving", calories set at
- * three times the body, the % Daily Value column, the thick bar before the
- * vitamins and the footnote. What a US package prints is regulated down to
- * the rule weights, which is what makes it instantly recognisable - and why
- * an approximation reads as a table, not as a label.
+ * The FDA's Nutrition Facts panel, rule for rule: the heavy title, the
+ * servings, the 7pt bar over "Amount per serving", the % Daily Value column,
+ * the thick bar before the vitamins and the footnote. What a US package
+ * prints is regulated down to the rule weights, which is what makes it
+ * instantly recognisable - and why an approximation reads as a table, not as
+ * a label.
+ *
+ * Both published formats are here, because a shelf has both on it: see
+ * `NutritionFormat`. They share the ink, the rules and the row, and differ in
+ * the order of the head, what sits beside the calories and how the vitamins
+ * are set.
+ *
+ * One detail worth naming, because it is the tell on a fake: the hairline
+ * above an indented row starts at the indent, not at the border. So a row
+ * draws its own rule rather than the one under it, and the inset falls out of
+ * where the row begins.
  */
 export function NutritionFacts({
   servings,
@@ -146,13 +174,25 @@ export function NutritionFacts({
   calories,
   rows,
   micros,
+  format = 'current',
+  caloriesFromFat,
   color = '#111111',
   background = '#ffffff',
   fontSize,
   compact,
   style,
 }: NutritionFactsProps) {
+  const classic = format === 'classic'
   const line = (weight: string): CSSProperties => ({ borderTop: `${weight} solid ${color}`, flex: 'none' })
+  const hair = `0.07em solid ${color}`
+  const pad = compact ? '0.16em 0' : '0.22em 0'
+  const figure = (r: NutrientRow) => (
+    <span>
+      <span style={{ fontWeight: r.bold ? 700 : 400 }}>{r.label}</span>
+      {r.amount ? ` ${r.amount}` : ''}
+    </span>
+  )
+  /** The 2020 panel's row: rules run the full width, under each entry. */
   const row = (r: NutrientRow, i: number, last: boolean) => (
     <div
       key={`${r.label}-${i}`}
@@ -160,18 +200,45 @@ export function NutritionFacts({
         display: 'flex',
         justifyContent: 'space-between',
         gap: '0.6em',
-        padding: compact ? '0.16em 0' : '0.22em 0',
+        padding: pad,
         paddingLeft: `${(r.indent ?? 0) * 1.1}em`,
-        borderBottom: last ? 'none' : `0.07em solid ${color}`,
+        borderBottom: last ? 'none' : hair,
         lineHeight: 1.15,
       }}
     >
-      <span>
-        <span style={{ fontWeight: r.bold ? 700 : 400 }}>{r.label}</span> {r.amount}
-      </span>
+      {figure(r)}
       {r.dv != null && <span style={{ fontWeight: 700, whiteSpace: 'nowrap' }}>{r.dv}</span>}
     </div>
   )
+  /** The 1993 panel's row: its own rule above it, starting at the indent. */
+  const insetRow = (r: NutrientRow, i: number) => (
+    <div key={`${r.label}-${i}`} style={{ paddingLeft: `${(r.indent ?? 0) * 1.15}em`, flex: 'none' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', gap: '0.6em', padding: pad, borderTop: hair, lineHeight: 1.15 }}>
+        {figure(r)}
+        {r.dv != null && <span style={{ fontWeight: 700, whiteSpace: 'nowrap' }}>{r.dv}</span>}
+      </div>
+    </div>
+  )
+  /** The classic vitamin block: percentages, two to a line, a bullet between. */
+  const microPairs = () => {
+    const pairs: NutrientRow[][] = []
+    for (let i = 0; i < micros.length; i += 2) pairs.push(micros.slice(i, i + 2))
+    return pairs.map(([a, b], i) => (
+      <div key={a!.label} style={{ display: 'flex', alignItems: 'baseline', padding: pad, borderTop: i === 0 ? 'none' : hair, lineHeight: 1.15 }}>
+        <span style={{ flex: 1 }}>
+          {a!.label} {a!.dv}
+        </span>
+        {b && (
+          <>
+            <span style={{ flex: 'none', padding: '0 0.7em' }}>•</span>
+            <span style={{ flex: 1 }}>
+              {b.label} {b.dv}
+            </span>
+          </>
+        )}
+      </div>
+    ))
+  }
   return (
     <div
       style={{
@@ -189,49 +256,75 @@ export function NutritionFacts({
         ...style,
       }}
     >
-      <div style={{ fontWeight: 900, fontSize: '2.15em', lineHeight: 0.95, letterSpacing: '-0.03em' }}>
+      <div style={{ fontWeight: 900, fontSize: classic ? '2.6em' : '2.15em', lineHeight: 0.95, letterSpacing: '-0.03em' }}>
         Nutrition Facts
       </div>
-      <div style={{ padding: '0.35em 0 0.2em', borderBottom: `0.07em solid ${color}` }}>{servings} servings per container</div>
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          gap: '0.6em',
-          fontWeight: 700,
-          fontSize: '1.15em',
-          padding: '0.25em 0',
-        }}
-      >
-        <span>Serving size</span>
-        <span style={{ textAlign: 'right' }}>{servingSize}</span>
-      </div>
-      <div style={line('0.7em')} />
-      <div style={{ fontWeight: 700, fontSize: '0.82em', paddingTop: '0.3em' }}>Amount per serving</div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', gap: '0.6em' }}>
-        <span style={{ fontWeight: 900, fontSize: '1.9em', lineHeight: 1 }}>Calories</span>
-        <span style={{ fontWeight: 900, fontSize: '3em', lineHeight: 0.85 }}>{calories}</span>
-      </div>
-      <div style={{ ...line('0.35em'), marginTop: '0.3em' }} />
-      <div
-        style={{
-          textAlign: 'right',
-          fontWeight: 700,
-          fontSize: '0.9em',
-          padding: '0.25em 0',
-          borderBottom: `0.07em solid ${color}`,
-        }}
-      >
-        % Daily Value*
-      </div>
-      {rows.map((r, i) => row(r, i, i === rows.length - 1))}
-      <div style={line('0.7em')} />
-      {micros.map((r, i) => row(r, i, i === micros.length - 1))}
-      <div style={{ ...line('0.35em'), marginTop: '0.1em' }} />
-      <p style={{ margin: 0, paddingTop: '0.3em', fontSize: '0.78em', lineHeight: 1.25 }}>
-        * The % Daily Value (DV) tells you how much a nutrient in a serving of food contributes to a daily
-        diet. 2,000 calories a day is used for general nutrition advice.
-      </p>
+      {classic ? (
+        <>
+          <div style={{ paddingTop: '0.25em' }}>Serving Size {servingSize}</div>
+          <div style={{ paddingBottom: '0.3em' }}>Servings Per Container {servings}</div>
+          <div style={line('0.62em')} />
+          <div style={{ fontWeight: 700, padding: '0.28em 0', borderBottom: hair }}>Amount Per Serving</div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: '0.6em', padding: '0.2em 0 0.28em' }}>
+            <span style={{ fontSize: '1.5em', lineHeight: 1 }}>
+              <span style={{ fontWeight: 900 }}>Calories</span> {calories}
+            </span>
+            {caloriesFromFat != null && <span style={{ fontSize: '1.15em' }}>Calories from Fat {caloriesFromFat}</span>}
+          </div>
+          <div style={line('0.35em')} />
+          <div style={{ textAlign: 'right', fontWeight: 700, padding: '0.25em 0' }}>% Daily Value*</div>
+          {rows.map(insetRow)}
+          <div style={{ ...line('0.62em'), marginTop: '0.1em' }} />
+          {microPairs()}
+          <div style={{ ...line('0.12em'), marginTop: '0.1em' }} />
+          <p style={{ margin: 0, paddingTop: '0.3em', fontSize: '0.88em', lineHeight: 1.25 }}>
+            *Percent Daily Values are based on a 2,000 calorie diet.
+          </p>
+        </>
+      ) : (
+        <>
+          <div style={{ padding: '0.35em 0 0.2em', borderBottom: hair }}>{servings} servings per container</div>
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              gap: '0.6em',
+              fontWeight: 700,
+              fontSize: '1.15em',
+              padding: '0.25em 0',
+            }}
+          >
+            <span>Serving size</span>
+            <span style={{ textAlign: 'right' }}>{servingSize}</span>
+          </div>
+          <div style={line('0.7em')} />
+          <div style={{ fontWeight: 700, fontSize: '0.82em', paddingTop: '0.3em' }}>Amount per serving</div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', gap: '0.6em' }}>
+            <span style={{ fontWeight: 900, fontSize: '1.9em', lineHeight: 1 }}>Calories</span>
+            <span style={{ fontWeight: 900, fontSize: '3em', lineHeight: 0.85 }}>{calories}</span>
+          </div>
+          <div style={{ ...line('0.35em'), marginTop: '0.3em' }} />
+          <div
+            style={{
+              textAlign: 'right',
+              fontWeight: 700,
+              fontSize: '0.9em',
+              padding: '0.25em 0',
+              borderBottom: hair,
+            }}
+          >
+            % Daily Value*
+          </div>
+          {rows.map((r, i) => row(r, i, i === rows.length - 1))}
+          <div style={line('0.7em')} />
+          {micros.map((r, i) => row(r, i, i === micros.length - 1))}
+          <div style={{ ...line('0.35em'), marginTop: '0.1em' }} />
+          <p style={{ margin: 0, paddingTop: '0.3em', fontSize: '0.78em', lineHeight: 1.25 }}>
+            * The % Daily Value (DV) tells you how much a nutrient in a serving of food contributes to a daily
+            diet. 2,000 calories a day is used for general nutrition advice.
+          </p>
+        </>
+      )}
     </div>
   )
 }
