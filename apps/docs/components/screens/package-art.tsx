@@ -546,10 +546,12 @@ export function CerealBack({ material }: { material: string }) {
             ))}
           </ol>
 
-          <div style={{ height: '0.25cqw', background: p.ink, opacity: 0.25, flex: 'none', marginTop: '1cqw' }} />
+          <div style={{ height: '0.25cqw', background: p.ink, opacity: 0.25, flex: 'none', marginTop: '2.8cqw' }} />
 
           <Micro style={{ fontSize: '2.1cqw', color: p.red }}>Also from Ridgeway Mills</Micro>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1.4cqw' }}>
+          {/* Spaced out rather than centred in columns, so the first box sits
+              on the heading's left edge and the last on the column's right. */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', gap: '1.4cqw' }}>
             <MiniBox p={p} width={13} caption={false} name={['Cinnamon', 'CRUNCH']} sub="Oats · cinnamon" band="#c8322b" />
             <MiniBox p={p} width={13} caption={false} name={['Berry', 'CLUSTERS']} sub="Blueberry · cranberry" band="#6b3fa0" />
             <MiniBox p={p} width={13} caption={false} name={['Maple', 'PECAN']} sub="Maple · pecans" band="#7a4a1e" />

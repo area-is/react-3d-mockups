@@ -964,6 +964,12 @@ function MockupExplorerImpl({
               )}
             </LazyScene>
           ) : (
+            <>
+            {/* The scrolling box holds only the frame. The readout and the
+                zoom pill are siblings of it, pinned to the stage: anything
+                absolutely positioned INSIDE a box that scrolls scrolls with
+                it, which is how the pill first went for a ride under a
+                zoomed surface. */}
             <div className="mx-flat">
               {/* The frame is sized from the SCALED surface, not the surface.
                   `transform` only changes what a box looks like, never how much
@@ -987,6 +993,7 @@ function MockupExplorerImpl({
                   {content(view)}
                 </div>
               </div>
+            </div>
               <span className="mx-readout">
                 {flatPx?.width ?? '?'}
                 <span>×</span>
@@ -1007,7 +1014,7 @@ function MockupExplorerImpl({
                   +
                 </button>
               </span>
-            </div>
+            </>
           )}
         </div>
 

@@ -342,9 +342,15 @@ export function NutritionFacts({
           </div>
           <div style={line('0.7em')} />
           <div style={{ fontWeight: 700, fontSize: '0.82em', paddingTop: '0.3em' }}>Amount per serving</div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', gap: '0.6em' }}>
-            <span style={{ fontWeight: 900, fontSize: '1.9em', lineHeight: 1 }}>Calories</span>
-            <span style={{ fontWeight: 900, fontSize: '3em', lineHeight: 0.85 }}>{calories}</span>
+          {/* The one row that can outgrow a narrow panel: two words of display
+              type that cannot wrap. Compact takes them down a step - the FDA's
+              own narrow formats do the same - and the figure carries an auto
+              margin rather than `space-between`, so if a panel is narrower
+              still it drops to its own line and stays flush right instead of
+              running off the edge. */}
+          <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'flex-end', gap: '0.1em 0.6em' }}>
+            <span style={{ fontWeight: 900, fontSize: compact ? '1.55em' : '1.9em', lineHeight: 1 }}>Calories</span>
+            <span style={{ fontWeight: 900, fontSize: compact ? '2.4em' : '3em', lineHeight: 0.85, marginLeft: 'auto' }}>{calories}</span>
           </div>
           <div style={{ ...line('0.35em'), marginTop: '0.3em' }} />
           <div

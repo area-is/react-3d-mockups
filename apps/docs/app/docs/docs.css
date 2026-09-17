@@ -795,7 +795,9 @@
 /*
  * The surface's true pixel size. It is the one number this view exists to
  * tell you, so it reads as a label on the accent rather than another chip in
- * the chrome - no border, white on green, at both ends of the theme.
+ * the chrome - no border, white on green, at both ends of the theme. It and
+ * the zoom pill are positioned against the stage, not the scrolling box, so
+ * they hold still while a zoomed surface scrolls under them.
  */
 .mx-readout {
   position: absolute;
