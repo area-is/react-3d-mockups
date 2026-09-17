@@ -2,47 +2,103 @@
 
 import type { CSSProperties, ReactNode } from 'react'
 import { FONT, INK, Micro, PAPER, Sheet, materialTone } from './swiss-art'
-import { JetPrint, NutritionFacts, Photo, Pill, RecycleMark, RoundSeal, SERIF, UpcA } from './label-art'
+import { JetPrint, NutritionFacts, Photo, RecycleMark, RoundSeal, UpcA } from './label-art'
 import { asset } from '@/lib/base-path.mjs'
 
 /**
- * The milk carton's print, modelled on the half-gallon of whole milk in a US
- * grocery case: the red band a shelf reads as "whole" (blue is 2 %, green 1 %,
- * purple fat-free), the dairy's badge on it, "Vitamin D" in a pill, the farm
- * painting every carton has had since the fifties (a generated gouache, see
- * `/art/milk-farm.webp`), "HALF GALLON (1.89 L)" set large across the foot. The sides carry what the FDA and the co-op put
- * there: the Nutrition Facts panel rule for rule, the ingredient line, the
- * rBST pledge and its mandatory disclaimer, a scannable UPC-A, and on the
- * other side the story of the farms. The back sells the rest of the range
- * and the roof carries the sell-by date the filling line jets on next to the
- * cap. Nothing here is a poster stuck to a carton; it is what the carton is.
+ * The milk carton's print, modelled on the organic half-gallon the Nordic
+ * dairies put on a shelf: white board, no photograph and no badge on the
+ * front, one word set in a chartreuse green, and under it the only graphic
+ * the pack has - a column of flat green steps running from that chartreuse
+ * down to a bottle green at the foot. The fat content is jetted large and
+ * pale on the roof panel beside the fill code, which is where a Tetra Rex
+ * carton carries it, and everything else a carton has to say is said on the
+ * three faces nobody photographs.
+ *
+ * The front is nearly empty on purpose. A pack this quiet is a real style -
+ * the argument is that the milk is the product and the ink is not - and it is
+ * the harder thing for a mockup to carry off, because with the farm painting
+ * and the seals gone there is nothing to hide a mis-set line behind. What is
+ * left on it is the word, the ramp and the net quantity the FDA requires on
+ * the principal display panel; the brand itself only appears on the sides.
+ *
+ * The ramp is the pack's whole identity, so the back prints the rest of the
+ * range as the same block in another hue rather than as three little
+ * cartons: green for the 3.5 %, blue for the 1.5 %, teal for the 0.5 %. And
+ * the Nutrition Facts panel down the right side is the FDA's *classic*
+ * format - serving size first, "Calories from Fat" beside the calories,
+ * vitamins as bare percentages two to a line - which is the label most
+ * people picture, and the one a dairy this size still prints.
  *
  * Every panel prints straight onto the board (`materialTone`), so the
  * carousel's finish swatches change the carton the print sits on, the way a
- * brand's white and kraft variants do. The brand colours are solid inks and
- * stay put; the small print flips to white ink on a dark board.
+ * brand's white and kraft variants do. The greens are solid inks and stay
+ * put; the type flips to white ink on a dark board and the pale grey follows
+ * the board it is mixed with.
  *
  * Measurements are in `cqw` against the panel's own width: 3cqw on a 95 mm
  * face is 2.9 mm of type, which is what a carton's small print is set at.
  */
 
-/** The dairy's inks. Red is the US whole-milk band; navy is the house colour. */
-const RED = '#c2182f'
-const NAVY = '#1d3557'
-const CREAM = '#fff8ea'
+/* ------------------------------------------------------------------ */
+/*  Ink                                                                */
+/* ------------------------------------------------------------------ */
 
-/** Ink for the small print: the house navy on a light board, white ink on a dark one. */
-function dairyInk(material: string): { ink: string; onInk: string; dark: boolean } {
-  const dark = materialTone(material).text !== INK
-  return { ink: dark ? PAPER : NAVY, onInk: dark ? INK : CREAM, dark }
+/** The ramp's ends: the chartreuse ORGANIC is set in, down to a bottle green. */
+const RAMP: readonly [string, string] = ['#8cc21c', '#2e8b10']
+/** The rest of the range - the same block, another hue. */
+const RAMP_BLUE: readonly [string, string] = ['#7fc5e8', '#16528f']
+const RAMP_TEAL: readonly [string, string] = ['#a5dbcf', '#0f6b63']
+/** The green everything typographic is set in: the ramp's own first step. */
+const GREEN = RAMP[0]
+
+/** A hex colour's three channels, `#abc` or `#aabbcc`. */
+function channels(hex: string): [number, number, number] {
+  const h = hex.replace('#', '')
+  const n =
+    h.length === 3
+      ? [...h].map((c) => Number.parseInt(c + c, 16))
+      : [0, 2, 4].map((i) => Number.parseInt(h.slice(i, i + 2), 16))
+  return [n[0] ?? 0, n[1] ?? 0, n[2] ?? 0]
 }
+
+/** `t` of the way from one ink to another, in sRGB - these are flat bands, not a blend. */
+function mix(from: string, to: string, t: number): string {
+  const [a, b] = [channels(from), channels(to)]
+  const v = a.map((c, i) => Math.round(c + (b[i]! - c) * t))
+  return `#${v.map((c) => c.toString(16).padStart(2, '0')).join('')}`
+}
+
+/** The ramp as `n` flat steps, light at the top - the pack's one graphic device. */
+function steps(from: string, to: string, n: number): string[] {
+  return Array.from({ length: n }, (_, i) => mix(from, to, n === 1 ? 0 : i / (n - 1)))
+}
+
+/**
+ * Ink for the print: the type colour on this board, and the two greys under
+ * it - `quiet` for the small print, `pale` for the fat content, which on a
+ * carton like this is set almost to the edge of legibility on purpose.
+ *
+ * Both greys are mixed with the board rather than faded with opacity, because
+ * the same value has to work as a `color` on a face that prints on kraft as
+ * readily as on white - and on a dark board "pale grey" means mixing the
+ * white ink *down*, which an alpha would get backwards.
+ */
+function press(material: string): { ink: string; quiet: string; pale: string } {
+  const ink = materialTone(material).text === INK ? INK : PAPER
+  return { ink, quiet: mix(ink, material, 0.52), pale: mix(ink, material, 0.74) }
+}
+
+/* ------------------------------------------------------------------ */
+/*  Pieces                                                             */
+/* ------------------------------------------------------------------ */
 
 /** A wall of the carton: the board as the container, the print laid out inside it. */
 function Face({ material, style, children }: { material: string; style?: CSSProperties; children: ReactNode }) {
   return (
     <Sheet
       tone={materialTone(material)}
-      style={{ flexDirection: 'column', padding: '5cqw', gap: '2.4cqw', color: dairyInk(material).ink, ...style }}
+      style={{ flexDirection: 'column', padding: '5cqw', gap: '2.4cqw', color: press(material).ink, ...style }}
     >
       {children}
     </Sheet>
@@ -56,103 +112,73 @@ const body = (size = '3.3cqw', extra?: CSSProperties): CSSProperties => ({
   ...extra,
 })
 
-/* ------------------------------------------------------------------ */
-/*  Pieces                                                             */
-/* ------------------------------------------------------------------ */
+/**
+ * The block: flat steps from one green to another, top to bottom. `bands` is
+ * a count rather than a gradient because the steps are the point - a real
+ * one is printed as solid areas, and a CSS gradient across the same span
+ * bands itself in the render anyway, at whatever pitch the texture happens
+ * to have.
+ */
+function Ramp({
+  from = RAMP[0],
+  to = RAMP[1],
+  bands = 8,
+  style,
+}: {
+  from?: string
+  to?: string
+  bands?: number
+  style?: CSSProperties
+}) {
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', flex: 'none', ...style }} aria-hidden>
+      {steps(from, to, bands).map((color, i) => (
+        <div key={i} style={{ flex: 1, background: color }} />
+      ))}
+    </div>
+  )
+}
+
+/** The one line of display type a face gets: light, tight, and never bold. */
+function Display({ children, size = '8.2cqw', style }: { children: ReactNode; size?: string; style?: CSSProperties }) {
+  return (
+    <div style={{ fontFamily: FONT, fontWeight: 300, fontSize: size, lineHeight: 1.1, letterSpacing: '-0.02em', ...style }}>
+      {children}
+    </div>
+  )
+}
 
 /**
- * The dairy's badge: an oval, the name in serifs and "DAIRY" spaced out under
- * it - the shape a co-op has had on its trucks since before it had a website.
- * `size` is the width in cqw; everything inside is a fraction of it.
+ * The dairy's name, which on this pack is a line of type and nothing else -
+ * no oval, no serifs, no est. 1948. A brand that prints a bare ramp on the
+ * front does not put a crest on the side.
  */
-function Badge({ size, onBand }: { size: number; onBand?: boolean }) {
+function Wordmark({ size = '3.2cqw', style }: { size?: string; style?: CSSProperties }) {
   return (
-    <div
-      style={{
-        width: `${size}cqw`,
-        height: `${size * 0.52}cqw`,
-        borderRadius: '50%',
-        background: CREAM,
-        border: `${size * 0.016}cqw solid ${onBand ? CREAM : RED}`,
-        boxShadow: onBand ? `0 0 0 ${size * 0.02}cqw ${RED}` : `inset 0 0 0 ${size * 0.012}cqw ${CREAM}, inset 0 0 0 ${size * 0.024}cqw ${RED}`,
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        color: NAVY,
-        flex: 'none',
-        lineHeight: 1,
-      }}
-    >
-      <span style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: `${size * 0.19}cqw`, letterSpacing: '-0.01em', whiteSpace: 'nowrap' }}>
-        Harlow Valley
-      </span>
-      <span style={{ fontFamily: FONT, fontWeight: 700, fontSize: `${size * 0.075}cqw`, letterSpacing: '0.34em', marginTop: `${size * 0.05}cqw`, color: RED }}>
-        DAIRY
-      </span>
-      <span style={{ fontFamily: FONT, fontWeight: 600, fontSize: `${size * 0.055}cqw`, letterSpacing: '0.18em', marginTop: `${size * 0.035}cqw`, opacity: 0.75 }}>
-        EST. 1948 · VERMONT
-      </span>
-    </div>
+    <span style={{ fontSize: size, fontWeight: 600, letterSpacing: '0.3em', textTransform: 'uppercase', lineHeight: 1, ...style }}>
+      Harlow Valley
+    </span>
   )
 }
 
-/** One of the range on the back: a gable-top with the band colour a shelf sorts by. */
-function MiniCarton({ color, pct, label, ink }: { color: string; pct: string; label: string; ink: string }) {
+/** A pledge: a step of the ramp for a bullet, the line set beside it. */
+function Pledge({ children }: { children: ReactNode }) {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1.6cqw', minWidth: 0 }}>
-      <svg viewBox="0 0 60 104" style={{ width: '70%', display: 'block' }} aria-hidden>
-        <path d="M8 30L30 12l22 18v72H8z" fill="#fbfaf5" stroke={ink} strokeWidth={1.4} strokeLinejoin="round" />
-        <path d="M8 30h44" stroke={ink} strokeWidth={1} />
-        <rect x={26} y={7} width={8} height={6} rx={1} fill="#fbfaf5" stroke={ink} strokeWidth={1.2} />
-        <rect x={8.7} y={30.7} width={42.6} height={17} fill={color} />
-        <text x={30} y={72} textAnchor="middle" fontFamily={FONT} fontWeight={800} fontSize={20} fill={color} letterSpacing={-1}>
-          {pct}
-        </text>
-        <text x={30} y={86} textAnchor="middle" fontFamily={FONT} fontWeight={700} fontSize={7} fill={ink} letterSpacing={1.4}>
-          MILK
-        </text>
-      </svg>
-      <Micro style={{ fontSize: '2.5cqw', textAlign: 'center', lineHeight: 1.2 }}>{label}</Micro>
-    </div>
-  )
-}
-
-/** A mug of cocoa, steaming - the back's serving suggestion. */
-function Mug({ ink }: { ink: string }) {
-  return (
-    <svg viewBox="0 0 80 90" style={{ display: 'block', width: '100%', height: '100%' }} aria-hidden>
-      <g fill="none" stroke={ink} strokeWidth={2.2} strokeLinecap="round">
-        <path d="M30 6c-4 6 4 10 0 16" opacity={0.55} />
-        <path d="M42 4c-4 6 4 10 0 16" opacity={0.55} />
-        <path d="M54 8c-4 6 4 10 0 16" opacity={0.55} />
-      </g>
-      <path d="M14 30h52v34a14 14 0 0 1-14 14H28a14 14 0 0 1-14-14z" fill="#fbfaf5" stroke={ink} strokeWidth={2.4} strokeLinejoin="round" />
-      <path d="M66 38h6a8 8 0 0 1 0 16h-6" fill="none" stroke={ink} strokeWidth={2.4} />
-      <path d="M17 33h46v6H17z" fill="#6b3a1e" />
-      <g fill="#fffdf6" stroke="#d8d2c4" strokeWidth={0.8}>
-        <circle cx={30} cy={36} r={4.2} />
-        <circle cx={40} cy={35} r={4.6} />
-        <circle cx={50} cy={36.5} r={4} />
-      </g>
-      <rect x={20} y={48} width={40} height={18} rx={2} fill={RED} opacity={0.9} />
-      <text x={40} y={60} textAnchor="middle" fontFamily={FONT} fontWeight={800} fontSize={8} fill={CREAM} letterSpacing={1}>
-        HARLOW
-      </text>
-    </svg>
-  )
-}
-
-/** A tick-list line: the pledges a carton makes on its side. */
-function Tick({ children, color }: { children: ReactNode; color: string }) {
-  return (
-    <li style={{ display: 'flex', gap: '2.2cqw', alignItems: 'baseline' }}>
-      <svg viewBox="0 0 20 20" style={{ width: '3.6cqw', height: '3.6cqw', flex: 'none', transform: 'translateY(0.3cqw)' }} aria-hidden>
-        <circle cx={10} cy={10} r={9} fill={color} />
-        <path d="M5.5 10.5l3 3 6-7" fill="none" stroke={CREAM} strokeWidth={2.4} strokeLinecap="round" strokeLinejoin="round" />
-      </svg>
+    <li style={{ display: 'flex', gap: '2.4cqw', alignItems: 'baseline' }}>
+      <span style={{ width: '2.4cqw', height: '2.4cqw', background: GREEN, flex: 'none', transform: 'translateY(0.2cqw)' }} />
       <span>{children}</span>
     </li>
+  )
+}
+
+/** One of the range on the back: the same block, its own hue, the fat under it. */
+function Variant({ ramp, pct, label, quiet }: { ramp: readonly [string, string]; pct: string; label: string; quiet: string }) {
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '2cqw', minWidth: 0 }}>
+      <Ramp from={ramp[0]} to={ramp[1]} bands={6} style={{ height: '52cqw' }} />
+      <div style={{ fontSize: '5cqw', fontWeight: 300, letterSpacing: '-0.02em', lineHeight: 1 }}>{pct}</div>
+      <Micro style={{ fontSize: '2.4cqw', color: quiet, lineHeight: 1.2 }}>{label}</Micro>
+    </div>
   )
 }
 
@@ -160,131 +186,94 @@ function Tick({ children, color }: { children: ReactNode; color: string }) {
 /*  Faces                                                              */
 /* ------------------------------------------------------------------ */
 
-/** The front: the red band and badge, "Whole Milk", the farm, the size. */
+/**
+ * The front: white board, the word, the ramp, and the net quantity. The
+ * ramp is held off the foot by the same margin it keeps at the sides, so the
+ * block sits in the panel rather than bleeding off a fold that, on a real
+ * carton, is glued.
+ */
 export function CartonFront({ material }: { material: string }) {
-  const { ink, onInk } = dairyInk(material)
+  const { quiet } = press(material)
   return (
-    <Face material={material} style={{ padding: 0, gap: 0 }}>
+    <Face material={material} style={{ padding: '6cqw 4cqw 4cqw', gap: 0 }}>
+      <div style={{ flex: 1, minHeight: 0 }} />
       <div
         style={{
-          background: RED,
-          color: CREAM,
-          padding: '3.6cqw 6cqw 4.4cqw',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          gap: '2.6cqw',
-          flex: 'none',
+          fontFamily: FONT,
+          fontSize: '9.4cqw',
+          fontWeight: 400,
+          letterSpacing: '0.06em',
+          lineHeight: 1,
+          color: GREEN,
+          paddingBottom: '3cqw',
         }}
       >
-        <Micro style={{ fontSize: '2.6cqw', letterSpacing: '0.26em' }}>Grade A · Pasteurized · Homogenized</Micro>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '3.5cqw' }}>
-          <RoundSeal
-            size="13cqw"
-            legend="GRADE A · PASTEURIZED · "
-            color={CREAM}
-            ring={false}
-            center={<span style={{ fontFamily: SERIF, fontSize: '6cqw', lineHeight: 1 }}>A</span>}
-          />
-          <Badge size={52} onBand />
-          <RoundSeal
-            size="13cqw"
-            legend="FARMER OWNED · VERMONT · "
-            color={CREAM}
-            ring={false}
-            center={<span style={{ fontSize: '2.2cqw', fontWeight: 800, letterSpacing: '0.08em' }}>CO-OP</span>}
-          />
-        </div>
+        ORGANIC
       </div>
-      <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', padding: '4cqw 6cqw 4.5cqw', gap: '2.4cqw' }}>
-        <div style={{ textAlign: 'center' }}>
-          <Pill color={ink} ink={onInk} size="2.9cqw">
-            Vitamin D
-          </Pill>
-          <div
-            style={{
-              fontFamily: FONT,
-              fontWeight: 800,
-              fontSize: '19.5cqw',
-              lineHeight: 0.9,
-              letterSpacing: '-0.045em',
-              color: RED,
-              marginTop: '2.2cqw',
-            }}
-          >
-            Whole
-            <br />
-            Milk
-          </div>
-          <Micro style={{ fontSize: '2.7cqw', display: 'block', marginTop: '1.8cqw', letterSpacing: '0.24em' }}>3.25 % Milkfat · Ultra-pasteurized</Micro>
-        </div>
-        <div style={{ flex: 1, minHeight: 0, borderRadius: '3cqw', overflow: 'hidden', margin: '0.6cqw 0' }}>
-          <Photo src={asset('/art/milk-farm.webp')} position="50% 58%" />
-        </div>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', gap: '3cqw' }}>
-          <div>
-            <div style={{ fontWeight: 800, fontSize: '8.6cqw', letterSpacing: '-0.035em', lineHeight: 1 }}>HALF GALLON</div>
-            <div style={{ fontSize: '3.6cqw', fontWeight: 600, marginTop: '1.2cqw', letterSpacing: '0.02em' }}>(1.89 L) · 64 FL OZ</div>
-          </div>
-          <RoundSeal
-            size="17cqw"
-            legend="FARMER OWNED · SINCE 1948 · "
-            color={ink}
-            center={
-              <span style={{ fontSize: '3cqw', fontWeight: 800, letterSpacing: '0.02em' }}>
-                rBST
-                <br />
-                FREE*
-              </span>
-            }
-          />
-        </div>
-        <Micro style={{ fontSize: '2.4cqw', opacity: 0.72, textAlign: 'center' }}>Keep refrigerated · Sell by date on top</Micro>
-      </div>
+      <Ramp style={{ height: '59%' }} />
+      <Micro style={{ fontSize: '2.4cqw', color: quiet, paddingTop: '2.6cqw' }}>Half gallon · 1.89 L · 64 fl oz</Micro>
     </Face>
   )
 }
 
-/** The right side: Nutrition Facts, ingredients, storage, the pledge, the UPC. */
+/**
+ * The right side: the Nutrition Facts panel in the FDA's classic format, the
+ * ingredient line, the storage line, the certifier - organic milk names the
+ * body that certified it, which is the pledge that replaced the rBST
+ * disclaimer this pack used to carry - and a scannable UPC-A.
+ */
 export function CartonFacts({ material }: { material: string }) {
-  const { ink } = dairyInk(material)
+  const { ink, quiet } = press(material)
   return (
-    <Face material={material} style={{ gap: '2cqw' }}>
+    <Face material={material} style={{ gap: '2.2cqw' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: '2cqw' }}>
+        <Wordmark size="2.9cqw" />
+        <Micro style={{ fontSize: '2.6cqw', color: quiet }}>3.5 % milkfat</Micro>
+      </div>
       <NutritionFacts
-        fontSize="2.6cqw"
+        format="classic"
+        fontSize="3cqw"
         servings="8"
         servingSize="1 cup (240mL)"
         calories="150"
+        caloriesFromFat="70"
         rows={[
-          { label: 'Total Fat', amount: '8g', dv: '10%', bold: true },
+          { label: 'Total Fat', amount: '8g', dv: '12%', bold: true },
           { label: 'Saturated Fat', amount: '5g', dv: '25%', indent: 1 },
           { label: 'Trans Fat', amount: '0g', indent: 1 },
           { label: 'Cholesterol', amount: '35mg', dv: '12%', bold: true },
           { label: 'Sodium', amount: '125mg', dv: '5%', bold: true },
           { label: 'Total Carbohydrate', amount: '12g', dv: '4%', bold: true },
           { label: 'Dietary Fiber', amount: '0g', dv: '0%', indent: 1 },
-          { label: 'Total Sugars', amount: '12g', indent: 1 },
-          { label: 'Includes 0g Added Sugars', amount: '', dv: '0%', indent: 2 },
+          { label: 'Sugars', amount: '12g', indent: 1 },
           { label: 'Protein', amount: '8g', dv: '16%', bold: true },
         ]}
         micros={[
-          { label: 'Vitamin D', amount: '2.5mcg', dv: '15%' },
-          { label: 'Calcium', amount: '300mg', dv: '25%' },
-          { label: 'Iron', amount: '0mg', dv: '0%' },
-          { label: 'Potassium', amount: '380mg', dv: '8%' },
-          { label: 'Vitamin A', amount: '90mcg', dv: '10%' },
+          { label: 'Vitamin A', dv: '10%' },
+          { label: 'Vitamin C', dv: '4%' },
+          { label: 'Calcium', dv: '25%' },
+          { label: 'Iron', dv: '0%' },
+          { label: 'Vitamin D', dv: '15%' },
         ]}
       />
-      <p style={body('3cqw')}>
-        <strong>INGREDIENTS:</strong> GRADE A MILK, VITAMIN D3.
+      <p style={body('3.2cqw')}>
+        <strong>INGREDIENTS:</strong> ORGANIC GRADE A MILK, VITAMIN D3.
       </p>
-      <p style={body('3cqw')}>
+      <p style={body('3.2cqw')}>
         <strong>KEEP REFRIGERATED.</strong> Sell by date on top. For best taste use within 7 days of opening.
       </p>
-      <p style={body('2.5cqw', { opacity: 0.8 })}>
-        *Our farmers pledge not to use artificial growth hormones. No significant difference has been shown
-        between milk derived from rBST-treated and non-rBST-treated cows.
-      </p>
+      <div style={{ display: 'flex', gap: '3cqw', alignItems: 'center' }}>
+        <RoundSeal
+          size="15cqw"
+          legend="VERMONT ORGANIC FARMERS · CERTIFIED · "
+          color={GREEN}
+          center={<span style={{ fontSize: '2.2cqw', fontWeight: 700, letterSpacing: '0.06em' }}>100%</span>}
+        />
+        <p style={body('2.9cqw', { color: quiet })}>
+          Certified organic by Vermont Organic Farmers, LLC · VOF-0148. Produced without antibiotics, added
+          hormones or synthetic pesticides.
+        </p>
+      </div>
       <div style={{ flex: 1 }} />
       <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: '3cqw' }}>
         {/* A scanner wants dark bars on a light ground whatever the board, so the
@@ -296,7 +285,7 @@ export function CartonFacts({ material }: { material: string }) {
           color={ink}
           size="7.5cqw"
           label={
-            <Micro style={{ fontSize: '2.3cqw', lineHeight: 1.25 }}>
+            <Micro style={{ fontSize: '2.3cqw', lineHeight: 1.25, color: quiet }}>
               Please
               <br />
               recycle
@@ -304,117 +293,97 @@ export function CartonFacts({ material }: { material: string }) {
           }
         />
       </div>
-      <Micro style={{ fontSize: '2.35cqw', opacity: 0.78 }}>Distributed by Harlow Valley Dairy Co-op · Harlow, VT 05468 · Plant 50-2117</Micro>
+      <Micro style={{ fontSize: '2.3cqw', letterSpacing: '0.1em', color: quiet, lineHeight: 1.35 }}>
+        Harlow Valley Dairy Co-op · Harlow, VT 05468
+        <br />
+        Plant 50-2117 · harlowvalleydairy.com
+      </Micro>
     </Face>
   )
 }
 
-/** The left side: where the milk is from, and what the farmers promise. */
+/**
+ * The left side: where the milk is from. The photograph sits in the block the
+ * ramp occupies on the front, at the same width and the same margin, because
+ * on a pack this bare the one place a picture can go is the place the graphic
+ * already goes.
+ */
 export function CartonStory({ material }: { material: string }) {
-  const { ink } = dairyInk(material)
+  const { quiet } = press(material)
   return (
-    <Face material={material} style={{ gap: '2.6cqw' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-        <Micro style={{ color: RED, fontSize: '2.8cqw' }}>Our farmers&apos; pledge</Micro>
-        <Micro style={{ fontSize: '2.8cqw', opacity: 0.72 }}>Harlow, Vermont</Micro>
-      </div>
-      <div style={{ fontFamily: SERIF, fontSize: '9cqw', lineHeight: 1.05, letterSpacing: '-0.015em' }}>
-        From 60 family farms, all within 100 miles of our creamery.
-      </div>
-      <p style={body('3.4cqw')}>
-        Every drop in this carton comes from cows raised on pasture by families we know by name. Our trucks
-        make the rounds each morning and the milk is bottled the same day, so it reaches your table the way
-        it left the farm.
-      </p>
-      <div style={{ flex: 1, minHeight: 0, borderRadius: '3cqw', overflow: 'hidden' }}>
-        {/* The herd, zoomed out of the same painting the front shows the glass in. */}
-        <Photo src={asset('/art/milk-farm.webp')} position="50% 50%" style={{ transform: 'scale(1.75)', transformOrigin: '76% 47%' }} />
-      </div>
-      <ul style={{ margin: 0, padding: 0, listStyle: 'none', display: 'grid', gap: '1.6cqw', ...body('3.3cqw', { fontWeight: 600 }) }}>
-        <Tick color={RED}>No artificial growth hormones*</Tick>
-        <Tick color={RED}>Pasture-raised, Grade A</Tick>
-        <Tick color={RED}>Farmer owned since 1948</Tick>
-      </ul>
-      <p style={body('2.5cqw', { opacity: 0.8 })}>
-        *No significant difference has been shown between milk derived from rBST-treated and non-rBST-treated
-        cows.
-      </p>
+    <Face material={material} style={{ padding: '6cqw 4cqw 4cqw', gap: '3cqw' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: '2cqw' }}>
-        <Micro style={{ fontSize: '2.5cqw' }}>harlowvalleydairy.com</Micro>
-        <Micro style={{ fontSize: '2.5cqw', opacity: 0.72 }}>Questions? 1-800-555-0148</Micro>
+        <Micro style={{ color: GREEN, fontSize: '2.6cqw' }}>Certified organic</Micro>
+        <Micro style={{ fontSize: '2.6cqw', color: quiet }}>Harlow, Vermont</Micro>
+      </div>
+      <Display>Sixty family farms, none more than a hundred miles from the creamery.</Display>
+      <p style={body('3.3cqw')}>
+        Every drop in this carton comes from cows out on organic pasture from April to October, on farms we
+        buy from by the year rather than by the tanker. The milk is collected each morning and filled the
+        same day, so what you pour is a day off the farm.
+      </p>
+      <div style={{ flex: 1, minHeight: 0, overflow: 'hidden' }}>
+        {/* The herd and the fence line. The painting has a glass of milk standing
+            in the left third, and a tall block crops it to a sliver of glass, so
+            the crop is pulled off it rather than centred. */}
+        <Photo src={asset('/art/milk-farm.webp')} position="74% 50%" />
+      </div>
+      <ul style={{ margin: 0, padding: 0, listStyle: 'none', display: 'grid', gap: '1.8cqw', ...body('3.2cqw') }}>
+        <Pledge>Organic pasture, at least 120 days a year</Pledge>
+        <Pledge>No antibiotics, no added hormones</Pledge>
+        <Pledge>Farmer owned since 1948</Pledge>
+      </ul>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: '2cqw' }}>
+        <Wordmark size="2.8cqw" />
+        <Micro style={{ fontSize: '2.4cqw', color: quiet }}>harlowvalleydairy.com</Micro>
       </div>
     </Face>
   )
 }
 
-/** The back: the rest of the range, and the fun facts for whoever is reading at breakfast. */
+/** The back: the rest of the range as the same block in another hue, and the reading at breakfast. */
 export function CartonBack({ material }: { material: string }) {
-  const { ink } = dairyInk(material)
+  const { ink, quiet } = press(material)
   const facts = [
-    'A dairy cow drinks up to 50 gallons of water a day - a bathtub’s worth.',
-    'One glass of milk has as much calcium as ten cups of raw spinach.',
+    'Organic pasture holds more carbon than the same field cropped - the herd is part of how the farm keeps it.',
     'Milk is about 87 % water. The other 13 % is the fat, protein, sugar and minerals you drink it for.',
+    'One glass has as much calcium as ten cups of raw spinach, and your body keeps far more of it.',
   ]
   return (
-    <Face material={material} style={{ gap: '2.6cqw' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-        <Micro style={{ color: RED, fontSize: '2.8cqw' }}>Also from Harlow Valley</Micro>
-        <Micro style={{ fontSize: '2.8cqw', opacity: 0.72 }}>Look for the colour</Micro>
+    <Face material={material} style={{ padding: '6cqw 4cqw 4cqw', gap: '3cqw' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: '2cqw' }}>
+        <Micro style={{ color: GREEN, fontSize: '2.6cqw' }}>Also from Harlow Valley</Micro>
+        <Micro style={{ fontSize: '2.6cqw', color: quiet }}>Look for the block</Micro>
       </div>
-      <div style={{ fontFamily: SERIF, fontSize: '9cqw', lineHeight: 1.05, letterSpacing: '-0.015em' }}>
-        Something for everyone at the table.
+      <Display>Three strengths, and every one of them organic.</Display>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '3.5cqw' }}>
+        <Variant ramp={RAMP} pct="3.5%" label="Whole" quiet={quiet} />
+        <Variant ramp={RAMP_BLUE} pct="1.5%" label="Reduced fat" quiet={quiet} />
+        <Variant ramp={RAMP_TEAL} pct="0.5%" label="Lowfat" quiet={quiet} />
       </div>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '3cqw', alignItems: 'end', padding: '1cqw 2cqw 0' }}>
-        <MiniCarton color="#1a5fb4" pct="2%" label="Reduced fat" ink={ink} />
-        <MiniCarton color="#2e8b57" pct="1%" label="Lowfat" ink={ink} />
-        <MiniCarton color="#6b3fa0" pct="0%" label="Fat free" ink={ink} />
-      </div>
-      <div
-        style={{
-          border: `0.5cqw solid ${ink}`,
-          borderRadius: '3cqw',
-          padding: '3.4cqw 4cqw 3.8cqw',
-          display: 'grid',
-          gap: '2cqw',
-        }}
-      >
-        <Micro style={{ color: RED, fontSize: '2.8cqw' }}>Did you know?</Micro>
-        <ol style={{ margin: 0, padding: 0, listStyle: 'none', display: 'grid', gap: '1.8cqw' }}>
+      <p style={body('3.1cqw', { color: quiet })}>
+        The block is the pack: one colour per strength, printed the same way on every carton in the range.
+      </p>
+      <div style={{ flex: 1, minHeight: '2cqw' }} />
+      <div style={{ borderTop: `0.4cqw solid ${GREEN}`, paddingTop: '3cqw', display: 'grid', gap: '2.4cqw' }}>
+        <Micro style={{ color: GREEN, fontSize: '2.6cqw' }}>Did you know?</Micro>
+        <ol style={{ margin: 0, padding: 0, listStyle: 'none', display: 'grid', gap: '2cqw' }}>
           {facts.map((fact, i) => (
-            <li key={fact} style={{ display: 'flex', gap: '2.4cqw', ...body('3.2cqw') }}>
-              <span style={{ color: RED, fontWeight: 800, fontVariantNumeric: 'tabular-nums', flex: 'none' }}>{i + 1}</span>
+            <li key={fact} style={{ display: 'flex', gap: '2.4cqw', ...body('3.1cqw') }}>
+              <span style={{ color: GREEN, fontWeight: 600, fontVariantNumeric: 'tabular-nums', flex: 'none' }}>{i + 1}</span>
               <span>{fact}</span>
             </li>
           ))}
         </ol>
       </div>
-      <div style={{ display: 'flex', gap: '3.5cqw', alignItems: 'stretch', padding: '0.6cqw 0.5cqw 0' }}>
-        <div style={{ flex: 1, display: 'grid', gap: '1.8cqw', alignContent: 'start' }}>
-          <Micro style={{ color: RED, fontSize: '2.8cqw' }}>Serving suggestion</Micro>
-          <div style={{ fontFamily: SERIF, fontSize: '6.6cqw', lineHeight: 1, letterSpacing: '-0.01em' }}>Hot cocoa for two</div>
-          <ol style={{ margin: 0, padding: 0, listStyle: 'none', display: 'grid', gap: '1.4cqw' }}>
-            {[
-              'Warm 2 cups of whole milk over low heat. Never let it boil.',
-              'Whisk in 3 tbsp cocoa and 2 tbsp sugar until smooth.',
-              'Pour, top with marshmallows, and hand one over.',
-            ].map((step, i) => (
-              <li key={step} style={{ display: 'flex', gap: '2.2cqw', ...body('3.1cqw') }}>
-                <span style={{ color: RED, fontWeight: 800, fontVariantNumeric: 'tabular-nums', flex: 'none' }}>{i + 1}</span>
-                <span>{step}</span>
-              </li>
-            ))}
-          </ol>
-        </div>
-        <div style={{ width: '24cqw', flex: 'none' }}>
-          <Mug ink={ink} />
-        </div>
-      </div>
-      <div style={{ flex: 1 }} />
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', gap: '3cqw' }}>
-        <Badge size={34} />
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '1.4cqw', textAlign: 'right' }}>
+        <div style={{ display: 'grid', gap: '1.8cqw' }}>
+          <Wordmark size="2.8cqw" />
+          <Micro style={{ fontSize: '2.2cqw', letterSpacing: '0.1em', color: quiet }}>Questions? 1-800-555-0148</Micro>
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '1.6cqw', textAlign: 'right' }}>
           <RecycleMark color={ink} size="6cqw" />
-          <Micro style={{ fontSize: '2.3cqw', opacity: 0.78, lineHeight: 1.3 }}>
+          <Micro style={{ fontSize: '2.2cqw', letterSpacing: '0.1em', color: quiet, lineHeight: 1.35 }}>
             Paperboard carton · Cap 2 HDPE
             <br />
             Recycle where facilities exist
@@ -426,28 +395,23 @@ export function CartonBack({ material }: { material: string }) {
 }
 
 /**
- * The front roof panel, the cap sitting in the middle of it: the sell-by
- * date and the plant code, jetted on above the cap in the dot-matrix the
- * filling line prints with, and the carton's name along the eave below it.
+ * The front roof panel: the fill code jetted along the top, up under the fin
+ * where the filling line sprays it, and the fat content large and pale at the
+ * eave. Both sit clear of the middle of the panel, because that is where the
+ * screw cap is moulded on and a cap masks whatever is printed under it.
  */
 export function CartonRoof({ material }: { material: string }) {
-  const { ink } = dairyInk(material)
+  const { ink, pale } = press(material)
   return (
-    <Sheet tone={materialTone(material)} style={{ color: ink, flexDirection: 'column', justifyContent: 'space-between', padding: '3cqw 5cqw 3.2cqw' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-        <div>
-          <Micro style={{ fontSize: '2.4cqw', opacity: 0.72 }}>Sell by</Micro>
-          <JetPrint color={ink} size="4.8cqw" style={{ marginTop: '0.6cqw' }}>
-            OCT 03 26
-          </JetPrint>
-        </div>
-        <JetPrint color={ink} size="3.4cqw" style={{ textAlign: 'right' }}>
-          {'PLT 50-2117\n04:12 A'}
-        </JetPrint>
-      </div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
-        <Micro style={{ fontSize: '2.4cqw' }}>Harlow Valley · Vitamin D Whole Milk</Micro>
-        <Micro style={{ fontSize: '2.4cqw', opacity: 0.72 }}>Twist cap to open</Micro>
+    <Sheet
+      tone={materialTone(material)}
+      style={{ color: ink, flexDirection: 'column', justifyContent: 'space-between', alignItems: 'flex-start', padding: '3cqw 4cqw 3.4cqw' }}
+    >
+      <JetPrint color={ink} size="2.8cqw">
+        08 JUL 11:30 O100
+      </JetPrint>
+      <div style={{ fontFamily: FONT, fontSize: '9cqw', fontWeight: 300, letterSpacing: '-0.02em', lineHeight: 1, color: pale }}>
+        3.5%
       </div>
     </Sheet>
   )
