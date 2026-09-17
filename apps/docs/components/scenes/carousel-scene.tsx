@@ -152,6 +152,25 @@ const RIG_DROP = 0.6
 const ROW_SURFACE =
   'radial-gradient(120% 90% at 30% 18%, rgba(80,224,66,0.55) 0%, rgba(49,211,34,0.22) 45%, transparent 78%), #0d1016'
 /**
+ * Virtual display width for a picker-row thumbnail, in CSS px.
+ *
+ * A painted screen still costs a composited DOM layer, and a screen paints at
+ * the resolution it DECLARES: left at their own, the row's ten thumbnails
+ * rasterized nineteen device-megapixels between them - the iPad alone
+ * 2064x2752 - to draw a forty-pixel sliver of gradient each. That is about
+ * eighty megabytes of texture the compositor is holding for the strip, and it
+ * comes out of the same budget as the model you are actually looking at: the
+ * tiles that lose it composite as blank rectangles over the glass, which is
+ * what a staged screen blinking is.
+ *
+ * `screenRasterScale` in the library caps a screen against the CANVAS size,
+ * which is the right guard for a mockup filling the frame and no help at all
+ * for one drawn at a sixth of it - it cannot know the projected size. So the
+ * row asks for a thumbnail-sized display outright. 96 px is wider than the
+ * strip ever draws one at 2x, and there is no detail in a gradient to lose.
+ */
+const ROW_RESOLUTION = 96
+/**
  * Hinge angle the foldables are posed at on the carousel.
  *
  * Flat, they read as one more slab in a row of slabs; a little short of it and
@@ -232,16 +251,19 @@ interface Entry {
   material?: boolean
   /**
    * The bare object. `screen` is live DOM for the staged models; the picker
-   * row passes `surface` instead - a painted screen costs no DOM layer. The
-   * packaging prints its other faces too, and gates them on `screen` for the
-   * same reason: five DOM panels on a seventeen-per-cent thumbnail are five
-   * layers nobody can see.
+   * row passes `surface` instead - a gradient costs no DOM to lay out, though
+   * it still costs the layer it paints on, which is what `resolution` below is
+   * for. The packaging prints its other faces too, and gates them on `screen`:
+   * five DOM panels on a seventeen-per-cent thumbnail are five layers nobody
+   * can see.
    */
   render: (props: {
     color: string
     screen: ReactNode
     surface?: string
     surfaceStyle?: Record<string, unknown>
+    /** Thumbnail-sized on the picker row (`ROW_RESOLUTION`); the device's own on stage. */
+    resolution?: number
     /**
      * The system status bar, on the staged models only. The picker row is
      * seventeen per cent scale - a clock and three meters there would be four
@@ -321,8 +343,8 @@ const DEVICES: Entry[] = [
     lift: 0,
     colorways: GALAXY_COLORWAYS.s26,
     content: () => <SwissRotation />,
-    render: ({ color, screen, surface, surfaceStyle, statusBar }) => (
-      <Galaxy variant="s26" color={color} surfaceBackground={surface} surfaceStyle={surfaceStyle} statusBar={statusBar}>
+    render: ({ color, screen, surface, surfaceStyle, statusBar, resolution }) => (
+      <Galaxy variant="s26" color={color} surfaceBackground={surface} surfaceStyle={surfaceStyle} resolution={resolution} statusBar={statusBar}>
         {screen}
       </Galaxy>
     ),
@@ -336,8 +358,8 @@ const DEVICES: Entry[] = [
     lift: 0,
     colorways: IPHONE_COLORWAYS.pro,
     content: () => <SwissRaster />,
-    render: ({ color, screen, surface, surfaceStyle, statusBar }) => (
-      <IPhone variant="pro" color={color} surfaceBackground={surface} surfaceStyle={surfaceStyle} statusBar={statusBar}>
+    render: ({ color, screen, surface, surfaceStyle, statusBar, resolution }) => (
+      <IPhone variant="pro" color={color} surfaceBackground={surface} surfaceStyle={surfaceStyle} resolution={resolution} statusBar={statusBar}>
         {screen}
       </IPhone>
     ),
@@ -351,8 +373,8 @@ const DEVICES: Entry[] = [
     lift: 0,
     colorways: FOLD_COLORWAYS.fold7,
     content: () => <Newspaper />,
-    render: ({ color, screen, surface, surfaceStyle, statusBar }) => (
-      <Fold openAngle={CAROUSEL_OPEN_ANGLE} color={color} surfaceBackground={surface} surfaceStyle={surfaceStyle} statusBar={statusBar}>
+    render: ({ color, screen, surface, surfaceStyle, statusBar, resolution }) => (
+      <Fold openAngle={CAROUSEL_OPEN_ANGLE} color={color} surfaceBackground={surface} surfaceStyle={surfaceStyle} resolution={resolution} statusBar={statusBar}>
         {screen}
       </Fold>
     ),
@@ -366,8 +388,8 @@ const DEVICES: Entry[] = [
     lift: 0,
     colorways: FLIP_COLORWAYS.flip7,
     content: () => <SwissField />,
-    render: ({ color, screen, surface, surfaceStyle, statusBar }) => (
-      <Flip openAngle={CAROUSEL_OPEN_ANGLE} color={color} surfaceBackground={surface} surfaceStyle={surfaceStyle} statusBar={statusBar}>
+    render: ({ color, screen, surface, surfaceStyle, statusBar, resolution }) => (
+      <Flip openAngle={CAROUSEL_OPEN_ANGLE} color={color} surfaceBackground={surface} surfaceStyle={surfaceStyle} resolution={resolution} statusBar={statusBar}>
         {screen}
       </Flip>
     ),
@@ -380,8 +402,8 @@ const DEVICES: Entry[] = [
     lift: 0.55,
     colorways: LAPTOP_COLORWAYS.air13,
     content: () => <SwissSite />,
-    render: ({ color, screen, surface, surfaceStyle }) => (
-      <Laptop variant="air13" color={color} surfaceBackground={surface} surfaceStyle={surfaceStyle}>
+    render: ({ color, screen, surface, surfaceStyle, resolution }) => (
+      <Laptop variant="air13" color={color} surfaceBackground={surface} surfaceStyle={surfaceStyle} resolution={resolution}>
         {screen}
       </Laptop>
     ),
@@ -395,8 +417,8 @@ const DEVICES: Entry[] = [
     lift: 0,
     colorways: IPAD_COLORWAYS.ipadpro13,
     content: () => <SwissEpicentre />,
-    render: ({ color, screen, surface, surfaceStyle, statusBar }) => (
-      <IPad variant="ipadpro13" color={color} surfaceBackground={surface} surfaceStyle={surfaceStyle} statusBar={statusBar}>
+    render: ({ color, screen, surface, surfaceStyle, statusBar, resolution }) => (
+      <IPad variant="ipadpro13" color={color} surfaceBackground={surface} surfaceStyle={surfaceStyle} resolution={resolution} statusBar={statusBar}>
         {screen}
       </IPad>
     ),
@@ -410,8 +432,8 @@ const DEVICES: Entry[] = [
     lift: 0,
     colorways: GALAXY_TAB_COLORWAYS.tabs11,
     content: () => <SwissChecker />,
-    render: ({ color, screen, surface, surfaceStyle, statusBar }) => (
-      <GalaxyTab variant="tabs11" color={color} surfaceBackground={surface} surfaceStyle={surfaceStyle} statusBar={statusBar}>
+    render: ({ color, screen, surface, surfaceStyle, statusBar, resolution }) => (
+      <GalaxyTab variant="tabs11" color={color} surfaceBackground={surface} surfaceStyle={surfaceStyle} resolution={resolution} statusBar={statusBar}>
         {screen}
       </GalaxyTab>
     ),
@@ -424,7 +446,7 @@ const DEVICES: Entry[] = [
     lift: 0,
     colorways: APPLE_WATCH_COLORWAYS.series11,
     content: () => <SwissDialA />,
-    render: ({ color, screen, surface, surfaceStyle }) => <AppleWatch color={color} surfaceBackground={surface} surfaceStyle={surfaceStyle}>{screen}</AppleWatch>,
+    render: ({ color, screen, surface, surfaceStyle, resolution }) => <AppleWatch color={color} surfaceBackground={surface} surfaceStyle={surfaceStyle} resolution={resolution}>{screen}</AppleWatch>,
   },
   {
     id: 'galaxy-watch-8',
@@ -434,7 +456,7 @@ const DEVICES: Entry[] = [
     lift: 0,
     colorways: GALAXY_WATCH_COLORWAYS.watch8,
     content: () => <WatchFace />,
-    render: ({ color, screen, surface, surfaceStyle }) => <GalaxyWatch color={color} surfaceBackground={surface} surfaceStyle={surfaceStyle}>{screen}</GalaxyWatch>,
+    render: ({ color, screen, surface, surfaceStyle, resolution }) => <GalaxyWatch color={color} surfaceBackground={surface} surfaceStyle={surfaceStyle} resolution={resolution}>{screen}</GalaxyWatch>,
   },
   {
     id: 'studio-display',
@@ -444,7 +466,7 @@ const DEVICES: Entry[] = [
     lift: 0.1,
     colorways: STUDIO_DISPLAY_COLORWAYS,
     content: () => <SwissRhythm />,
-    render: ({ color, screen, surface, surfaceStyle }) => <StudioDisplay color={color} surfaceBackground={surface} surfaceStyle={surfaceStyle}>{screen}</StudioDisplay>,
+    render: ({ color, screen, surface, surfaceStyle, resolution }) => <StudioDisplay color={color} surfaceBackground={surface} surfaceStyle={surfaceStyle} resolution={resolution}>{screen}</StudioDisplay>,
   },
 ]
 
@@ -471,8 +493,8 @@ const OBJECTS: Entry[] = [
     // alone left the object a blank slab the moment the carousel turned it,
     // and the spine is the only face a shelf ever shows. No `material` here -
     // a dust jacket is its own printed sheet, not ink on the cloth.
-    render: ({ color, screen, surface, surfaceStyle }) => (
-      <Book color={color} surfaceBackground={surface} surfaceStyle={surfaceStyle}>
+    render: ({ color, screen, surface, surfaceStyle, resolution }) => (
+      <Book color={color} surfaceBackground={surface} surfaceStyle={surfaceStyle} resolution={resolution}>
         {screen}
         {screen != null && (
           <>
@@ -502,8 +524,8 @@ const OBJECTS: Entry[] = [
     // The jacket's reverse and both centre labels, because a record is a
     // four-sided print job and the disc peeks out past the sleeve edge - that
     // label is on stage whether or not anything is printed on it.
-    render: ({ color, screen, surface, surfaceStyle }) => (
-      <VinylRecord color={color} surfaceBackground={surface} surfaceStyle={surfaceStyle}>
+    render: ({ color, screen, surface, surfaceStyle, resolution }) => (
+      <VinylRecord color={color} surfaceBackground={surface} surfaceStyle={surfaceStyle} resolution={resolution}>
         {screen}
         {screen != null && (
           <>
@@ -538,8 +560,8 @@ const OBJECTS: Entry[] = [
     // Every face is printed, because that is what a carton is: the front is
     // the `screen`, and the sides, the back and the roof carry what a dairy
     // puts there, all on the same board.
-    render: ({ color, screen, surface, surfaceStyle }) => (
-      <MilkCarton color={color} surfaceBackground={surface} surfaceStyle={surfaceStyle}>
+    render: ({ color, screen, surface, surfaceStyle, resolution }) => (
+      <MilkCarton color={color} surfaceBackground={surface} surfaceStyle={surfaceStyle} resolution={resolution}>
         {screen}
         {screen != null && (
           <>
@@ -577,8 +599,8 @@ const OBJECTS: Entry[] = [
     // A cereal box, which is what a 190 × 265 × 55 mm carton is: the bowl on
     // the front, the Nutrition Facts down one side, the mill's story down the
     // other, the best-by jetted on the top and a recipe on the back.
-    render: ({ color, screen, surface, surfaceStyle }) => (
-      <ProductBox color={color} surfaceBackground={surface} surfaceStyle={surfaceStyle}>
+    render: ({ color, screen, surface, surfaceStyle, resolution }) => (
+      <ProductBox color={color} surfaceBackground={surface} surfaceStyle={surfaceStyle} resolution={resolution}>
         {screen}
         {screen != null && (
           <>
@@ -614,8 +636,8 @@ const OBJECTS: Entry[] = [
     content: (color) => <MailerLid material={color} />,
     // A shipper: the brand on the lid under the tape, the pictograms down
     // the ends where the tape wraps, the name along the front.
-    render: ({ color, screen, surface, surfaceStyle }) => (
-      <MailerBox color={color} surfaceBackground={surface} surfaceStyle={surfaceStyle}>
+    render: ({ color, screen, surface, surfaceStyle, resolution }) => (
+      <MailerBox color={color} surfaceBackground={surface} surfaceStyle={surfaceStyle} resolution={resolution}>
         {screen}
         {screen != null && (
           <>
@@ -647,8 +669,8 @@ const OBJECTS: Entry[] = [
     ),
     material: true,
     content: (color) => <BagFront material={color} />,
-    render: ({ color, screen, surface, surfaceStyle }) => (
-      <ShoppingBag color={color} surfaceBackground={surface} surfaceStyle={surfaceStyle}>
+    render: ({ color, screen, surface, surfaceStyle, resolution }) => (
+      <ShoppingBag color={color} surfaceBackground={surface} surfaceStyle={surfaceStyle} resolution={resolution}>
         {screen}
         {screen != null && (
           <ShoppingBag.Back>
@@ -671,8 +693,8 @@ const OBJECTS: Entry[] = [
       ['white', 'White', '#e9e7e2']
     ),
     content: () => <SwissBill />,
-    render: ({ color, screen, surface, surfaceStyle }) => (
-      <PosterFrame color={color} surfaceBackground={surface} surfaceStyle={surfaceStyle}>
+    render: ({ color, screen, surface, surfaceStyle, resolution }) => (
+      <PosterFrame color={color} surfaceBackground={surface} surfaceStyle={surfaceStyle} resolution={resolution}>
         {screen}
       </PosterFrame>
     ),
@@ -700,8 +722,8 @@ const OBJECTS: Entry[] = [
         </AFrameSign.Back>
       </>
     ),
-    render: ({ color, screen, surface, surfaceStyle }) => (
-      <AFrameSign color={color} surfaceBackground={surface} surfaceStyle={surfaceStyle}>
+    render: ({ color, screen, surface, surfaceStyle, resolution }) => (
+      <AFrameSign color={color} surfaceBackground={surface} surfaceStyle={surfaceStyle} resolution={resolution}>
         {screen}
       </AFrameSign>
     ),
@@ -906,7 +928,7 @@ function RowSlot({
         hovered.current = false
       }}
     >
-      {entry.render({ color, screen: null, surface: ROW_SURFACE })}
+      {entry.render({ color, screen: null, surface: ROW_SURFACE, resolution: ROW_RESOLUTION })}
     </group>
   )
 }
