@@ -311,7 +311,7 @@ code {
   display: flex;
   flex-direction: column;
   gap: 2px;
-  background: #101319;
+  background: var(--bg);
   border: 1px solid var(--border-strong);
   border-radius: 11px;
   box-shadow: 0 24px 50px -18px rgba(0, 0, 0, 0.8);
@@ -319,20 +319,22 @@ code {
   z-index: 20;
 }
 
-.nav-menu-item {
+/* Plain rows on the page's own background: white type, and a faint lift on
+   hover - the same treatment as the header's icon buttons. */
+.site-nav .nav-menu-item {
   display: block;
   flex: none;
   padding: 7px 11px;
   border-radius: 7px;
   font-size: 14px;
-  font-weight: 600;
-  color: var(--text);
-  background: rgba(80, 224, 66, 0.07);
+  font-weight: 500;
+  color: #fff;
   transition: background 0.15s ease;
 }
 
-.nav-menu-item:hover {
-  background: rgba(80, 224, 66, 0.14);
+.site-nav .nav-menu-item:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.06);
 }
 
 .site-footer {
