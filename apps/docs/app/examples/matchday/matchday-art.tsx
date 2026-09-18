@@ -69,8 +69,8 @@ export function CoachSide({ doors }: { doors?: boolean }) {
       <div
         style={{
           position: 'absolute',
-          left: doors ? '49cqw' : '36cqw',
-          width: doors ? '34cqw' : '58cqw',
+          left: doors ? '55cqw' : '36cqw',
+          width: doors ? '27cqw' : '58cqw',
           top: 0,
           bottom: '7cqh',
           display: 'flex',
@@ -79,8 +79,11 @@ export function CoachSide({ doors }: { doors?: boolean }) {
           gap: '7cqh',
         }}
       >
-        <span style={{ ...HEAVY, fontSize: doors ? '5.3cqw' : '8.6cqw', whiteSpace: 'nowrap' }}>{CLUB.name}</span>
-        <span style={{ fontSize: doors ? '2cqw' : '2.8cqw', fontWeight: 700, letterSpacing: '-0.02em', color: CLUB.gold, whiteSpace: 'nowrap' }}>
+        {/* Between the doors there is room for the name on two lines, not one. */}
+        <span style={{ ...HEAVY, fontSize: doors ? '4.8cqw' : '8.6cqw', whiteSpace: doors ? 'pre-line' : 'nowrap' }}>
+          {doors ? CLUB.name.replace(' ', '\n') : CLUB.name}
+        </span>
+        <span style={{ fontSize: doors ? '1.9cqw' : '2.8cqw', fontWeight: 700, letterSpacing: '-0.02em', color: CLUB.gold, whiteSpace: 'nowrap' }}>
           {CLUB.motto} · Since {CLUB.founded}
         </span>
       </div>
