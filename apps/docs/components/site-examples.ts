@@ -19,4 +19,14 @@ export const SITE_EXAMPLES: SiteExample[] = [
     title: 'Hero Phone',
     description: 'Product hero with a giant, draggable phone',
   },
+  {
+    href: '/examples/print-shop',
+    title: 'Print Shop',
+    description: 'A poster configurator that reprints the sheet in its frame',
+  },
+  {
+    href: '/examples/campaign',
+    title: 'Campaign',
+    description: 'One generative identity across the city, billboard to crew pass',
+  },
 ]
