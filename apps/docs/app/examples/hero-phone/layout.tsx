@@ -1,4 +1,4 @@
-import { fraunces, inter, jetbrainsMono } from '@/lib/fonts'
+import { fraunces, inter, jetbrainsMono, notoSansKR } from '@/lib/fonts'
 import '../../globals.css'
 import '../../screens.css'
 import './hero-phone.css'
@@ -8,7 +8,7 @@ import './hero-phone.css'
 // example, sharing only the site stylesheet and fonts.
 export default function HeroPhoneExampleLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${inter.variable} ${jetbrainsMono.variable} ${fraunces.variable}`}>
+    <html lang="en" className={`${inter.variable} ${jetbrainsMono.variable} ${fraunces.variable} ${notoSansKR.variable}`}>
       <body>{children}</body>
     </html>
   )

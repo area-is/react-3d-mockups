@@ -117,13 +117,13 @@ function Micro({ children, style }: { children: ReactNode; style?: CSSProperties
 }
 
 /**
- * The imprint's name, in Hangul. Latin micro-type takes a fifth of an em of
- * tracking; Hangul, whose syllables are already square and evenly set, takes
- * half that or the word falls apart into letters.
+ * The imprint's name, in Hangul - Noto Sans KR, through the font stack.
+ * Set tight like the Latin: Hangul syllables are square and evenly spaced
+ * already, and tracking them out reads as letters, not a word.
  */
 function Imprint({ style }: { style?: CSSProperties }) {
   return (
-    <span style={{ fontSize: '3cqw', fontWeight: 600, letterSpacing: '0.1em', lineHeight: 1, whiteSpace: 'nowrap', ...style }}>
+    <span style={{ fontSize: '3cqw', fontWeight: 600, letterSpacing: '-0.01em', lineHeight: 1, whiteSpace: 'nowrap', ...style }}>
       {IMPRINT}
     </span>
   )
@@ -284,7 +284,7 @@ export function JacketSpine({ cloth }: { cloth: string }) {
         <span style={{ fontSize: '25cqw', fontWeight: 700, letterSpacing: '-0.02em' }}>
           {TITLE.join(' ')}
         </span>
-        <span style={{ fontSize: '15cqw', fontWeight: 600, letterSpacing: '0.08em', color: t.accent }}>{IMPRINT}</span>
+        <span style={{ fontSize: '15cqw', fontWeight: 600, letterSpacing: '0.02em', color: t.accent }}>{IMPRINT}</span>
       </div>
     </Sheet>
   )
@@ -446,7 +446,7 @@ export function JacketBack({ cloth }: { cloth: string }) {
         <div style={{ display: 'flex', alignItems: 'center', gap: '2.2cqw', minWidth: 0 }}>
           <ImprintMark color={t.accent} size="9cqw" />
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1.3cqw' }}>
-            <Imprint style={{ fontSize: '4cqw', fontWeight: 700, letterSpacing: '0.04em' }} />
+            <Imprint style={{ fontSize: '4cqw', fontWeight: 700 }} />
             <Micro style={{ fontSize: '2.2cqw', opacity: 0.6, whiteSpace: 'nowrap' }}>{IMPRINT_LATIN}</Micro>
           </div>
         </div>

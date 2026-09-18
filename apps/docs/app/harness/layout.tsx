@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { fraunces, inter, jetbrainsMono } from '@/lib/fonts'
+import { fraunces, inter, jetbrainsMono, notoSansKR } from '@/lib/fonts'
 import '../globals.css'
 
 export const metadata: Metadata = {
@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 // URL params (see page.tsx). Not linked from the site.
 export default function HarnessLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${inter.variable} ${jetbrainsMono.variable} ${fraunces.variable}`}>
+    <html lang="en" className={`${inter.variable} ${jetbrainsMono.variable} ${fraunces.variable} ${notoSansKR.variable}`}>
       <body style={{ margin: 0 }}>{children}</body>
     </html>
   )
