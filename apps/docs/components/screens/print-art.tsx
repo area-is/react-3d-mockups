@@ -1,6 +1,7 @@
 'use client'
 
-import { HAND, SERIF } from './label-art'
+import { SERIF } from './label-art'
+import { FONT } from './swiss-art'
 
 /**
  * Full-bleed artwork for the object mockups (book, magazine, brochure, card,
@@ -30,7 +31,7 @@ export function BookCoverArt() {
       }}
     >
       <div style={{ border: '1px solid #b89b5e', flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '36px 20px 28px' }}>
-        <div style={{ fontSize: 11, letterSpacing: 4, color: '#b89b5e' }}>A NOVEL</div>
+        <div style={{ fontSize: 11, letterSpacing: '-0.01em', color: '#b89b5e' }}>A Novel</div>
         {/* explicit color: the docs site's global heading styles would
             otherwise override the cover's inherited cream and render the
             title near-black on the navy jacket */}
@@ -42,7 +43,7 @@ export function BookCoverArt() {
           <path d="M43 13v60M13 43h60M22 22l42 42M64 22L22 64" stroke="#b89b5e" strokeWidth="0.8" />
           <circle cx="43" cy="43" r="5" fill="#b89b5e" />
         </svg>
-        <div style={{ fontSize: 15, letterSpacing: 5 }}>MIRA HALVORSEN</div>
+        <div style={{ fontSize: 15, letterSpacing: '-0.01em' }}>Mira Halvorsen</div>
       </div>
     </div>
   )
@@ -73,9 +74,9 @@ export function MagazineCoverArt() {
       </svg>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
         <div style={{ fontSize: 64, fontWeight: 800, letterSpacing: -2 }}>AREA</div>
-        <div style={{ fontSize: 12, letterSpacing: 2 }}>NO. 07 - JUL 2026</div>
+        <div style={{ fontSize: 12, letterSpacing: '-0.01em' }}>No. 07 - Jul 2026</div>
       </div>
-      <div style={{ fontSize: 13, letterSpacing: 3, marginTop: -6 }}>THE DESIGN QUARTERLY</div>
+      <div style={{ fontSize: 13, letterSpacing: '-0.01em', marginTop: -6 }}>The Design Quarterly</div>
       <div style={{ marginTop: 'auto', display: 'grid', gap: 10, maxWidth: '70%' }}>
         <div style={{ fontSize: 30, fontWeight: 700, lineHeight: 1.1 }}>Print is a live surface now</div>
         <div style={{ fontSize: 14, opacity: 0.9 }}>Mockups that click · 3D on the newsstand · 24 pages of type</div>
@@ -105,8 +106,8 @@ export function MagazineSpineArt() {
       }}
     >
       <div style={{ fontSize: 23, fontWeight: 800, letterSpacing: 1, whiteSpace: 'nowrap' }}>AREA</div>
-      <div style={{ fontSize: 14, letterSpacing: 5, opacity: 0.85, whiteSpace: 'nowrap' }}>THE DESIGN QUARTERLY · PRINT IS A LIVE SURFACE NOW</div>
-      <div style={{ fontSize: 14, letterSpacing: 2, whiteSpace: 'nowrap' }}>NO. 07 - JUL 2026</div>
+      <div style={{ fontSize: 14, letterSpacing: '-0.01em', opacity: 0.85, whiteSpace: 'nowrap' }}>The Design Quarterly · Print Is A Live Surface Now</div>
+      <div style={{ fontSize: 14, letterSpacing: '-0.01em', whiteSpace: 'nowrap' }}>No. 07 - Jul 2026</div>
     </div>
   )
 }
@@ -126,7 +127,7 @@ export function BrochureFrontArt() {
         flexDirection: 'column',
       }}
     >
-      <div style={{ fontSize: 10, letterSpacing: 3 }}>RIDGELINE NATIONAL PARK</div>
+      <div style={{ fontSize: 10, letterSpacing: '-0.01em' }}>Ridgeline National Park</div>
       <svg viewBox="0 0 100 44" aria-hidden style={{ width: '100%', marginTop: 'auto' }}>
         <path d="M0 40 L22 12 L34 26 L52 4 L70 30 L82 18 L100 40" fill="none" stroke="#e8b64c" strokeWidth="2" strokeLinejoin="round" />
         <circle cx="78" cy="8" r="5" fill="#f0ead6" />
@@ -162,7 +163,7 @@ export function BrochureTrailsArt() {
         gap: 12,
       }}
     >
-      <div style={{ fontSize: 10, letterSpacing: 3, color: '#8a6a2f' }}>PICK YOUR DAY</div>
+      <div style={{ fontSize: 10, letterSpacing: '-0.01em', color: '#8a6a2f' }}>Pick Your Day</div>
       <div style={{ fontSize: 22, fontWeight: 700 }}>Five trails, one ridge</div>
       <div style={{ display: 'grid', gap: 8, marginTop: 6 }}>
         {trails.map(([name, dist, grade]) => (
@@ -197,7 +198,7 @@ export function BrochureVisitArt() {
         gap: 10,
       }}
     >
-      <div style={{ fontSize: 10, letterSpacing: 3, color: '#e8b64c' }}>PLAN YOUR VISIT</div>
+      <div style={{ fontSize: 10, letterSpacing: '-0.01em', color: '#e8b64c' }}>Plan Your Visit</div>
       <div style={{ fontSize: 20, fontWeight: 700 }}>Open dawn to dusk, all year</div>
       <svg viewBox="0 0 100 62" aria-hidden style={{ width: '100%', background: '#20452f', borderRadius: 6 }}>
         <path d="M8 52 C 26 44, 30 20, 52 18 S 88 28, 94 10" fill="none" stroke="#e8b64c" strokeWidth="1.6" strokeDasharray="4 3" />
@@ -275,7 +276,7 @@ export function CardBackArt() {
       >
         A
       </div>
-      <div style={{ fontSize: 12, letterSpacing: 3, color: '#9aa1ab' }}>AREA.STUDIO</div>
+      <div style={{ fontSize: 12, letterSpacing: '-0.01em', color: '#9aa1ab' }}>area.studio</div>
     </div>
   )
 }
@@ -296,7 +297,7 @@ export function PosterArt() {
         overflow: 'hidden',
       }}
     >
-      <div style={{ fontSize: 12, letterSpacing: 4 }}>LIVE AT THE FOUNDRY</div>
+      <div style={{ fontSize: 12, letterSpacing: '-0.01em' }}>Live At The Foundry</div>
       <div style={{ fontSize: 76, fontWeight: 800, lineHeight: 0.94, letterSpacing: -3, marginTop: 18 }}>
         SIGNAL
         <br />
@@ -369,7 +370,7 @@ export function BadgeFrontArt() {
       <div style={{ height: 8, background: '#b3223a' }} />
       <div style={{ padding: '18px 20px 0', display: 'flex', alignItems: 'center', gap: 8 }}>
         <div style={{ width: 22, height: 22, borderRadius: 7, background: '#b3223a', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, fontWeight: 800 }}>A</div>
-        <div style={{ fontSize: 12, letterSpacing: 2, fontWeight: 700 }}>AREA LABS</div>
+        <div style={{ fontSize: 12, letterSpacing: '-0.01em', fontWeight: 700 }}>Area Labs</div>
       </div>
       <div style={{ margin: '18px auto 0', width: 108, height: 108, borderRadius: '50%', background: 'linear-gradient(160deg, #cdd6e2, #9fb0c4)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 40, fontWeight: 700, color: '#5b6a7e' }}>
         YP
@@ -523,7 +524,7 @@ export function BoxFrontArt() {
         textAlign: 'center',
       }}
     >
-      <div style={{ fontSize: 12, letterSpacing: 4, color: '#8fb4d9' }}>AREA LABS</div>
+      <div style={{ fontSize: 12, letterSpacing: '-0.01em', color: '#8fb4d9' }}>Area Labs</div>
       <div style={{ fontSize: 34, fontWeight: 800, letterSpacing: -0.5, marginTop: 6 }}>Deep Focus</div>
       <div style={{ fontSize: 12.5, color: '#b9cfe4', marginTop: 4 }}>single-origin whole bean · 340 g</div>
       <svg viewBox="0 0 80 80" style={{ width: 150, margin: 'auto 0' }} aria-hidden>
@@ -554,8 +555,8 @@ export function BoxSideArt() {
         gap: 10,
       }}
     >
-      <div style={{ fontSize: 10, letterSpacing: 2, writingMode: 'vertical-rl', margin: 'auto', transform: 'rotate(180deg)' }}>
-        DEEP FOCUS · SINGLE ORIGIN · 340 G
+      <div style={{ fontSize: 10, letterSpacing: '-0.01em', writingMode: 'vertical-rl', margin: 'auto', transform: 'rotate(180deg)' }}>
+        Deep Focus · Single Origin · 340 G
       </div>
       <div style={{ width: 34, height: 34, borderRadius: 10, background: '#f4c534' }} />
     </div>
@@ -601,7 +602,7 @@ export function BannerArt() {
         alignItems: 'center',
       }}
     >
-      <div style={{ fontSize: 13, letterSpacing: 4, color: '#e8b64c' }}>RIDGELINE TOURS</div>
+      <div style={{ fontSize: 13, letterSpacing: '-0.01em', color: '#e8b64c' }}>Ridgeline Tours</div>
       <div style={{ fontSize: 42, fontWeight: 800, lineHeight: 1.05, marginTop: 14 }}>
         Walk the ridge.
         <br />
@@ -646,7 +647,7 @@ export function GreetingCoverArt() {
       <div style={{ fontFamily: serif, fontSize: 34, lineHeight: 1.1, marginTop: 'auto' }}>
         oh happy day
       </div>
-      <div style={{ fontSize: 11, letterSpacing: 3, margin: '10px 0 16px' }}>A LITTLE SUNSHINE, POST-HASTE</div>
+      <div style={{ fontSize: 11, letterSpacing: '-0.01em', margin: '10px 0 16px' }}>A Little Sunshine, Post-haste</div>
     </div>
   )
 }
@@ -703,7 +704,7 @@ export function VinylCoverArt() {
           <circle key={r} cx="50" cy="50" r={r} fill="none" stroke="#5ad0a6" strokeWidth="0.8" />
         ))}
       </svg>
-      <div style={{ fontSize: 12, letterSpacing: 4, color: '#8fa3c8' }}>AREA WAVES</div>
+      <div style={{ fontSize: 12, letterSpacing: '-0.01em', color: '#8fa3c8' }}>Area Waves</div>
       <div style={{ fontSize: 44, fontWeight: 800, letterSpacing: -1, lineHeight: 1.02, marginTop: 10 }}>
         Neon
         <br />
@@ -732,7 +733,7 @@ export function VinylLabelArt() {
         gap: 2,
       }}
     >
-      <div style={{ fontSize: 13, fontWeight: 800, letterSpacing: 2 }}>AREA WAVES</div>
+      <div style={{ fontSize: 13, fontWeight: 800, letterSpacing: '-0.01em' }}>Area Waves</div>
       <div style={{ fontSize: 9, letterSpacing: 1 }}>NEON SKYLINE · SIDE A</div>
       <div style={{ fontSize: 8, marginTop: 4 }}>33⅓ RPM · STEREO</div>
     </div>
@@ -769,7 +770,7 @@ export function TVShowArt() {
   )
 }
 
-/** Chalkboard menu for the A-frame: a neat hand (`HAND`), not a scribble, and not a serif pretending to be chalk. */
+/** Chalkboard menu for the A-frame: Inter, regular casing, tightened - the way a café that owns a stencil letters a board. */
 export function ChalkMenuArt() {
   return (
     <div
@@ -783,11 +784,12 @@ export function ChalkMenuArt() {
         display: 'flex',
         flexDirection: 'column',
         textAlign: 'center',
-        fontFamily: HAND,
+        fontFamily: FONT,
         fontWeight: 500,
+        letterSpacing: '-0.02em',
       }}
     >
-      <div style={{ fontSize: 50, fontWeight: 600, lineHeight: 1 }}>Ridgeline Café</div>
+      <div style={{ fontSize: 44, fontWeight: 700, lineHeight: 1, letterSpacing: '-0.035em' }}>Ridgeline Café</div>
       <svg viewBox="0 0 100 8" style={{ width: '80%', margin: '10px auto 18px' }} aria-hidden>
         <path d="M2 5 Q 25 1, 50 4 T 98 3" fill="none" stroke="#e8b64c" strokeWidth="1.6" strokeLinecap="round" />
       </svg>
@@ -799,12 +801,12 @@ export function ChalkMenuArt() {
         ['trail toastie', '9'],
         ['soup of the day', '8'],
       ].map(([item, price]) => (
-        <div key={item} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 27, padding: '9px 8px', borderBottom: '1px dashed rgba(240,237,228,0.25)' }}>
+        <div key={item} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 22, padding: '10px 8px', borderBottom: '1px dashed rgba(240,237,228,0.25)' }}>
           <span>{item}</span>
           <span style={{ color: '#e8b64c' }}>{price}</span>
         </div>
       ))}
-      <div style={{ marginTop: 'auto', fontSize: 22, color: '#b9c4b4' }}>open till dusk ☀</div>
+      <div style={{ marginTop: 'auto', fontSize: 17, color: '#b9c4b4' }}>open till dusk ☀</div>
     </div>
   )
 }
@@ -830,11 +832,12 @@ export function ChalkHoursArt() {
         display: 'flex',
         flexDirection: 'column',
         textAlign: 'center',
-        fontFamily: HAND,
+        fontFamily: FONT,
         fontWeight: 500,
+        letterSpacing: '-0.02em',
       }}
     >
-      <div style={{ fontSize: 50, fontWeight: 600, lineHeight: 1 }}>Open</div>
+      <div style={{ fontSize: 44, fontWeight: 700, lineHeight: 1, letterSpacing: '-0.035em' }}>Open</div>
       <svg viewBox="0 0 100 8" style={{ width: '80%', margin: '10px auto 18px' }} aria-hidden>
         <path d="M2 4 Q 28 7, 52 3 T 98 5" fill="none" stroke="#e8b64c" strokeWidth="1.6" strokeLinecap="round" />
       </svg>
@@ -844,12 +847,12 @@ export function ChalkHoursArt() {
         ['sat', '8 – 6'],
         ['sun', '8 – 2'],
       ].map(([days, hours]) => (
-        <div key={days} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 27, padding: '9px 8px', borderBottom: '1px dashed rgba(240,237,228,0.25)' }}>
+        <div key={days} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 22, padding: '10px 8px', borderBottom: '1px dashed rgba(240,237,228,0.25)' }}>
           <span>{days}</span>
           <span style={{ color: '#e8b64c' }}>{hours}</span>
         </div>
       ))}
-      <div style={{ marginTop: 'auto', fontSize: 22, color: '#b9c4b4', lineHeight: 1.5 }}>
+      <div style={{ marginTop: 'auto', fontSize: 17, color: '#b9c4b4', lineHeight: 1.5 }}>
         kitchen closes half an hour before
         <br />
         dogs welcome ❧
@@ -880,7 +883,7 @@ export function VanRearArt() {
       <div style={{ fontSize: 40, fontWeight: 800, letterSpacing: -1 }}>
         BLOOM<span style={{ color: '#2a8f68' }}>&amp;CO.</span>
       </div>
-      <div style={{ fontSize: 15, letterSpacing: 3 }}>HOW&apos;S MY DRIVING?</div>
+      <div style={{ fontSize: 15, letterSpacing: '-0.01em' }}>How&apos;s my driving?</div>
       <div style={{ fontSize: 20, fontWeight: 700, color: '#2a8f68' }}>(555) 010-7788</div>
       <div style={{ marginTop: 12, width: '70%', height: 8, background: '#7fd6b2', borderRadius: 4 }} />
     </div>
@@ -913,7 +916,7 @@ export function VanLiveryArt() {
         <div style={{ fontSize: 44, fontWeight: 800, letterSpacing: -1 }}>
           BLOOM<span style={{ color: '#2a8f68' }}>&amp;CO.</span>
         </div>
-        <div style={{ fontSize: 16, letterSpacing: 4, marginTop: 2 }}>SAME-DAY FLOWER DELIVERY</div>
+        <div style={{ fontSize: 16, letterSpacing: '-0.01em', marginTop: 2 }}>Same-day Flower Delivery</div>
         <div style={{ display: 'flex', gap: 22, fontSize: 15, fontWeight: 600, marginTop: 16 }}>
           <span>bloomand.co</span>
           <span>(555) 010-7788</span>
@@ -940,11 +943,11 @@ export function StoreSignArt() {
         gap: 18,
       }}
     >
-      <div style={{ fontSize: 12, letterSpacing: 3, color: '#a8b8a0', whiteSpace: 'nowrap' }}>EST. 1987</div>
+      <div style={{ fontSize: 12, letterSpacing: '-0.01em', color: '#a8b8a0', whiteSpace: 'nowrap' }}>Est. 1987</div>
       <div style={{ fontFamily: serif, fontSize: 34, letterSpacing: 6, whiteSpace: 'nowrap' }}>
         PARCEL &amp; PINE
       </div>
-      <div style={{ fontSize: 12, letterSpacing: 3, color: '#a8b8a0', whiteSpace: 'nowrap' }}>GENERAL GOODS</div>
+      <div style={{ fontSize: 12, letterSpacing: '-0.01em', color: '#a8b8a0', whiteSpace: 'nowrap' }}>General Goods</div>
     </div>
   )
 }
@@ -966,14 +969,14 @@ export function StorePosterArt() {
         textAlign: 'center',
       }}
     >
-      <div style={{ fontSize: 9, letterSpacing: 3, marginTop: 6 }}>THIS WEEK ONLY</div>
+      <div style={{ fontSize: 9, letterSpacing: '-0.01em', marginTop: 6 }}>This Week Only</div>
       <div style={{ fontFamily: serif, fontSize: 44, lineHeight: 1, marginTop: 'auto' }}>
         Winter
         <br />
         Sale
       </div>
       <div style={{ fontSize: 26, fontWeight: 800, color: '#b0532f', margin: '10px 0 auto' }}>30% off</div>
-      <div style={{ fontSize: 9, letterSpacing: 2, marginBottom: 4 }}>EVERYTHING IN STORE</div>
+      <div style={{ fontSize: 9, letterSpacing: '-0.01em', marginBottom: 4 }}>Everything In Store</div>
     </div>
   )
 }
@@ -998,13 +1001,13 @@ export function StoreMuralArt() {
         border: '6px solid #e8c476',
       }}
     >
-      <div style={{ fontSize: 13, letterSpacing: 5, color: '#a8b8a0' }}>PARCEL &amp; PINE</div>
+      <div style={{ fontSize: 13, letterSpacing: '-0.01em', color: '#a8b8a0' }}>Parcel &amp; Pine</div>
       <div style={{ fontFamily: serif, fontSize: 54, lineHeight: 1.05 }}>
         Good goods,
         <br />
         every day.
       </div>
-      <div style={{ fontSize: 14, letterSpacing: 3, color: '#e8c476', marginTop: 6 }}>
+      <div style={{ fontSize: 14, letterSpacing: '-0.01em', color: '#e8c476', marginTop: 6 }}>
         CORNER OF 5TH &amp; MAIN
       </div>
     </div>
@@ -1039,7 +1042,7 @@ export function TrailerWrapArt() {
         }}
       >
         <div style={{ fontSize: 34, fontWeight: 800, letterSpacing: 1, lineHeight: 1 }}>NORTHWIND</div>
-        <div style={{ fontSize: 15, letterSpacing: 6, color: '#7fc4e8' }}>FREIGHT CO.</div>
+        <div style={{ fontSize: 15, letterSpacing: '-0.01em', color: '#7fc4e8' }}>Freight Co.</div>
       </div>
       <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 36, padding: '0 44px' }}>
         <div style={{ flex: 1, display: 'grid', gap: 10 }}>
@@ -1076,7 +1079,7 @@ export function TrailerRearArt() {
       }}
     >
       <div style={{ fontSize: 30, fontWeight: 800, lineHeight: 1 }}>NORTHWIND</div>
-      <div style={{ fontSize: 11, letterSpacing: 5, color: '#4a7ea6' }}>FREIGHT CO.</div>
+      <div style={{ fontSize: 11, letterSpacing: '-0.01em', color: '#4a7ea6' }}>Freight Co.</div>
       <div style={{ width: 46, height: 3, background: '#b0532f', margin: '6px 0' }} />
       <div style={{ fontSize: 12, fontWeight: 700 }}>How&apos;s our driving?</div>
       <div style={{ fontSize: 12, color: '#4a7ea6' }}>800-555-0177 · unit 4482</div>
@@ -1110,7 +1113,7 @@ export function BoxLidArt() {
         </svg>
         <div>
           <div style={{ fontSize: 30, fontWeight: 800, letterSpacing: 3 }}>LOAM</div>
-          <div style={{ fontSize: 10, letterSpacing: 4 }}>SEED CLUB · NO. 08</div>
+          <div style={{ fontSize: 10, letterSpacing: '-0.01em' }}>Seed Club · No. 08</div>
         </div>
       </div>
       <div style={{ fontSize: 11, color: '#5b4630' }}>sow within 12 months · loam.example</div>
@@ -1136,7 +1139,7 @@ export function BoxPanelArt() {
       }}
     >
       <div style={{ fontSize: 22, fontWeight: 800, letterSpacing: 3 }}>LOAM</div>
-      <div style={{ fontSize: 12, letterSpacing: 2, color: '#5b4630' }}>GROW SOMETHING GOOD</div>
+      <div style={{ fontSize: 12, letterSpacing: '-0.01em', color: '#5b4630' }}>Grow Something Good</div>
       <div style={{ fontSize: 12, fontWeight: 700 }}>loam.example</div>
     </div>
   )
@@ -1159,7 +1162,7 @@ export function BagArt() {
         textAlign: 'center',
       }}
     >
-      <div style={{ fontSize: 10, letterSpacing: 5, marginTop: 18 }}>ATELIER</div>
+      <div style={{ fontSize: 10, letterSpacing: '-0.01em', marginTop: 18 }}>Atelier</div>
       <div
         style={{
           fontFamily: serif,
@@ -1173,7 +1176,7 @@ export function BagArt() {
       >
         M
       </div>
-      <div style={{ fontSize: 11, letterSpacing: 4, marginBottom: 14 }}>MARROW &amp; CO · SINCE 2009</div>
+      <div style={{ fontSize: 11, letterSpacing: '-0.01em', marginBottom: 14 }}>Marrow &amp; Co · Since 2009</div>
     </div>
   )
 }
@@ -1251,7 +1254,7 @@ function Barcode({ light = false }: { light?: boolean }) {
             'repeating-linear-gradient(90deg, #111 0 2px, #fff 2px 4px, #111 4px 5px, #fff 5px 8px, #111 8px 11px, #fff 11px 13px)',
         }}
       />
-      <div style={{ fontSize: 7, letterSpacing: 2, color: '#111' }}>0 723488 100072</div>
+      <div style={{ fontSize: 7, letterSpacing: '-0.01em', color: '#111' }}>0 723488 100072</div>
     </div>
   )
 }
@@ -1276,14 +1279,14 @@ export function BookBackArt() {
         &ldquo;A voyage told in soundings and star fixes - the rare atlas that reads like a
         novel.&rdquo;
       </div>
-      <div style={{ fontSize: 10, letterSpacing: 2, color: '#8fb0cc' }}>- THE COASTAL REVIEW</div>
+      <div style={{ fontSize: 10, letterSpacing: '-0.01em', color: '#8fb0cc' }}>- The Coastal Review</div>
       <div style={{ fontSize: 11.5, lineHeight: 1.6, color: '#b6c9da', marginTop: 6 }}>
         Charted across four oceans and twelve years, this collection follows the survey ship
         Meridian from her first anchorage to her last. Includes 40 pages of original charts.
       </div>
       <div style={{ marginTop: 'auto', display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between' }}>
-        <div style={{ fontSize: 10, letterSpacing: 2, color: '#8fb0cc' }}>
-          AREA PRESS
+        <div style={{ fontSize: 10, letterSpacing: '-0.01em', color: '#8fb0cc' }}>
+          Area Press
           <br />
           $32.00 US
         </div>
@@ -1343,7 +1346,7 @@ export function MagazineBackArt() {
         textAlign: 'center',
       }}
     >
-      <div style={{ fontSize: 11, letterSpacing: 5, color: '#7f93ab' }}>ADVERTISEMENT</div>
+      <div style={{ fontSize: 11, letterSpacing: '-0.01em', color: '#7f93ab' }}>Advertisement</div>
       <div style={{ fontFamily: serif, fontSize: 40, lineHeight: 1.1, marginTop: 46 }}>
         Hear the city
         <br />
@@ -1355,7 +1358,7 @@ export function MagazineBackArt() {
         ))}
       </svg>
       <div style={{ marginTop: 'auto', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
-        <div style={{ fontSize: 15, fontWeight: 700, letterSpacing: 3 }}>AREA WAVES · NEON SKYLINE</div>
+        <div style={{ fontSize: 15, fontWeight: 700, letterSpacing: '-0.01em' }}>Area Waves · Neon Skyline</div>
         <div style={{ fontSize: 10.5, color: '#7f93ab' }}>ON TOUR THIS FALL · AREAWAVES.EXAMPLE</div>
       </div>
     </div>
@@ -1378,7 +1381,7 @@ export function BoxBackArt() {
         gap: 12,
       }}
     >
-      <div style={{ fontSize: 12, letterSpacing: 3, color: '#8fb4d9' }}>HOW TO BREW</div>
+      <div style={{ fontSize: 12, letterSpacing: '-0.01em', color: '#8fb4d9' }}>How To Brew</div>
       {[
         ['01', 'Grind 20 g medium-fine.'],
         ['02', 'Pour 300 g water at 94°C.'],
@@ -1394,8 +1397,8 @@ export function BoxBackArt() {
         light; best within four weeks of the roast date stamped below.
       </div>
       <div style={{ marginTop: 'auto', display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between' }}>
-        <div style={{ fontSize: 10, letterSpacing: 2, color: '#8fb4d9' }}>
-          AREA LABS ROASTWORKS
+        <div style={{ fontSize: 10, letterSpacing: '-0.01em', color: '#8fb4d9' }}>
+          Area Labs Roastworks
           <br />
           340 G · DARK ROAST
         </div>
@@ -1421,8 +1424,8 @@ export function BoxBottomArt() {
         justifyContent: 'space-between',
       }}
     >
-      <div style={{ fontSize: 11, letterSpacing: 2, lineHeight: 1.7 }}>
-        ROASTED 2026-07-14
+      <div style={{ fontSize: 11, letterSpacing: '-0.01em', lineHeight: 1.7 }}>
+        Roasted 2026-07-14
         <br />
         LOT 26-195 · BBE 2026-08-11
       </div>
@@ -1467,8 +1470,8 @@ export function MailerEndArt() {
       <svg viewBox="0 0 40 24" aria-hidden style={{ width: 52 }}>
         <path d="M14 22 V10 H8 L20 0 L32 10 h-6 v12 Z" fill="none" stroke="#e8e4dd" strokeWidth="2" />
       </svg>
-      <div style={{ fontSize: 11, letterSpacing: 3 }}>THIS SIDE UP</div>
-      <div style={{ fontSize: 9, letterSpacing: 2, color: '#9aa0a8' }}>HANDLE WITH CARE</div>
+      <div style={{ fontSize: 11, letterSpacing: '-0.01em' }}>This Side Up</div>
+      <div style={{ fontSize: 9, letterSpacing: '-0.01em', color: '#9aa0a8' }}>Handle With Care</div>
     </div>
   )
 }
@@ -1489,8 +1492,8 @@ export function MailerBottomArt() {
         justifyContent: 'space-between',
       }}
     >
-      <div style={{ fontSize: 11, letterSpacing: 2, lineHeight: 1.8 }}>
-        100% RECYCLED B-FLUTE
+      <div style={{ fontSize: 11, letterSpacing: '-0.01em', lineHeight: 1.8 }}>
+        100% Recycled B-flute
         <br />
         PACKED IN PORTLAND, OR
       </div>
@@ -1516,14 +1519,14 @@ export function VinylBackArt() {
         flexDirection: 'column',
       }}
     >
-      <div style={{ fontSize: 11, letterSpacing: 4, color: '#8fa3c8' }}>AREA WAVES · NEON SKYLINE</div>
+      <div style={{ fontSize: 11, letterSpacing: '-0.01em', color: '#8fa3c8' }}>Area Waves · Neon Skyline</div>
       <div style={{ display: 'flex', gap: 34, marginTop: 26 }}>
         {[
-          ['SIDE A', ['Overpass', 'Sodium Glow', 'Last Train Home', 'Antenna Park']],
-          ['SIDE B', ['Neon Skyline', 'Harbor Lights', 'Static Bloom', 'Dawn Chorus']],
+          ['Side A', ['Overpass', 'Sodium Glow', 'Last Train Home', 'Antenna Park']],
+          ['Side B', ['Neon Skyline', 'Harbor Lights', 'Static Bloom', 'Dawn Chorus']],
         ].map(([side, tracks]) => (
           <div key={side as string} style={{ flex: 1 }}>
-            <div style={{ fontSize: 11, letterSpacing: 3, color: '#5ad0a6', marginBottom: 10 }}>{side}</div>
+            <div style={{ fontSize: 11, letterSpacing: '-0.01em', color: '#5ad0a6', marginBottom: 10 }}>{side}</div>
             {(tracks as string[]).map((t, i) => (
               <div key={t} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, lineHeight: 2 }}>
                 <span>
@@ -1565,7 +1568,7 @@ export function VinylLabelBArt() {
         gap: 2,
       }}
     >
-      <div style={{ fontSize: 13, fontWeight: 800, letterSpacing: 2 }}>AREA WAVES</div>
+      <div style={{ fontSize: 13, fontWeight: 800, letterSpacing: '-0.01em' }}>Area Waves</div>
       <div style={{ fontSize: 9, letterSpacing: 1 }}>NEON SKYLINE · SIDE B</div>
       <div style={{ fontSize: 8, marginTop: 4 }}>33⅓ RPM · STEREO</div>
     </div>
@@ -1589,11 +1592,11 @@ export function CartonFrontArt() {
         textAlign: 'center',
       }}
     >
-      <div style={{ fontSize: 11, letterSpacing: 5, color: '#5b86ae' }}>EST. 1948</div>
+      <div style={{ fontSize: 11, letterSpacing: '-0.01em', color: '#5b86ae' }}>Est. 1948</div>
       <div style={{ fontFamily: serif, fontSize: 40, lineHeight: 1.05, marginTop: 6, fontWeight: 500 }}>
         Kettle Hill
       </div>
-      <div style={{ fontSize: 12, letterSpacing: 4, color: '#5b86ae', marginTop: 2 }}>CREAMERY</div>
+      <div style={{ fontSize: 12, letterSpacing: '-0.01em', color: '#5b86ae', marginTop: 2 }}>Creamery</div>
       <svg viewBox="0 0 120 70" style={{ width: '78%', margin: 'auto 0' }} aria-hidden>
         {/* rolling pasture the herd stands on */}
         <path d="M0 52 Q30 38 58 48 T120 42 L120 70 L0 70 Z" fill="#bcd9c2" />
@@ -1656,7 +1659,7 @@ export function CartonSideArt() {
         </div>
       ))}
       <div style={{ marginTop: 'auto', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
-        <div style={{ fontSize: 10, letterSpacing: 2, color: '#4b7ba6' }}>KEEP REFRIGERATED</div>
+        <div style={{ fontSize: 10, letterSpacing: '-0.01em', color: '#4b7ba6' }}>Keep Refrigerated</div>
         <Barcode />
       </div>
     </div>
@@ -1680,8 +1683,8 @@ export function CartonGableArt() {
         gap: 6,
       }}
     >
-      <div style={{ fontSize: 15, letterSpacing: 6, fontWeight: 700 }}>PASTEURIZED</div>
-      <div style={{ fontSize: 10, letterSpacing: 3, color: '#9dc2e2' }}>HOMOGENIZED · SELL BY 09 SEP</div>
+      <div style={{ fontSize: 15, letterSpacing: '-0.01em', fontWeight: 700 }}>Pasteurized</div>
+      <div style={{ fontSize: 10, letterSpacing: '-0.01em', color: '#9dc2e2' }}>Homogenized · Sell By 09 Sep</div>
     </div>
   )
 }

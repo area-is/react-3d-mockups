@@ -6,7 +6,7 @@ import { source } from '@/lib/source'
 import { baseOptions } from '@/lib/layout.shared'
 import { DocsSidebarSeparator } from '@/components/docs-sidebar'
 import { hideGridPages } from '@/lib/sidebar-tree'
-import { caveat, fraunces, inter, jetbrainsMono } from '@/lib/fonts'
+import { fraunces, inter, jetbrainsMono } from '@/lib/fonts'
 import { asset } from '@/lib/base-path.mjs'
 import { SITE_URL, socialMetadata } from '@/lib/site'
 import './docs.css'
@@ -31,7 +31,7 @@ export default function DocsRootLayout({ children }: { children: ReactNode }) {
   return (
     <html
       lang="en"
-      className={`${inter.variable} ${jetbrainsMono.variable} ${fraunces.variable} ${caveat.variable}`}
+      className={`${inter.variable} ${jetbrainsMono.variable} ${fraunces.variable}`}
       suppressHydrationWarning
     >
       <body className="flex flex-col min-h-screen">

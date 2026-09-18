@@ -99,15 +99,14 @@ const ISBN_TEXT = 'ISBN 978-89-94963-01-3'
 const ADDON = '03810'
 const PRICE = '값 18,000원'
 
-/** Uppercase micro-type, set in the jacket's own tracking. */
+/** The jacket's small type: regular casing, tightened. */
 function Micro({ children, style }: { children: ReactNode; style?: CSSProperties }) {
   return (
     <span
       style={{
         fontSize: '3.2cqw',
         fontWeight: 600,
-        letterSpacing: '0.2em',
-        textTransform: 'uppercase',
+        letterSpacing: '-0.01em',
         lineHeight: 1,
         ...style,
       }}
@@ -281,7 +280,7 @@ export function JacketSpine({ cloth }: { cloth: string }) {
           lineHeight: 1,
         }}
       >
-        <span style={{ fontSize: '20cqw', fontWeight: 600, letterSpacing: '0.02em' }}>{AUTHOR}</span>
+        <span style={{ fontSize: '20cqw', fontWeight: 600, letterSpacing: '-0.01em' }}>{AUTHOR}</span>
         <span style={{ fontSize: '25cqw', fontWeight: 700, letterSpacing: '-0.02em' }}>
           {TITLE.join(' ')}
         </span>
@@ -350,14 +349,14 @@ function IsbnBlock() {
         gap: '0.8cqw',
       }}
     >
-      <span style={{ fontSize: '1.9cqw', fontWeight: 600, letterSpacing: '0.04em', whiteSpace: 'nowrap', lineHeight: 1 }}>
+      <span style={{ fontSize: '1.9cqw', fontWeight: 600, letterSpacing: '0.01em', whiteSpace: 'nowrap', lineHeight: 1 }}>
         {ISBN_TEXT}
       </span>
       <div style={{ display: 'flex', alignItems: 'flex-end', gap: '0.4cqw' }}>
         <Ean13 digits={ISBN_DIGITS} color={INK} style={{ width: '22.5cqw', height: 'auto' }} />
         <Ean5 digits={ADDON} color={INK} style={{ width: '10.5cqw', height: 'auto' }} />
       </div>
-      <span style={{ fontSize: '1.9cqw', fontWeight: 700, letterSpacing: '0.02em', whiteSpace: 'nowrap', lineHeight: 1, textAlign: 'right' }}>
+      <span style={{ fontSize: '1.9cqw', fontWeight: 700, letterSpacing: 0, whiteSpace: 'nowrap', lineHeight: 1, textAlign: 'right' }}>
         {PRICE}
       </span>
     </div>

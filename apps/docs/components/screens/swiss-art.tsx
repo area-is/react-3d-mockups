@@ -195,15 +195,18 @@ export function Pattern({
   )
 }
 
-/** Uppercase micro-type: the index, the section, the colophon. */
+/**
+ * Micro-type: the index, the section, the colophon. Regular casing and
+ * tightened, never letterspaced capitals: a line of tracked caps is the one
+ * thing that makes a printed surface read as a web page.
+ */
 export function Micro({ children, style }: { children: ReactNode; style?: CSSProperties }) {
   return (
     <span
       style={{
         fontSize: '3.1cqmin',
         fontWeight: 600,
-        letterSpacing: '0.18em',
-        textTransform: 'uppercase',
+        letterSpacing: '-0.01em',
         lineHeight: 1,
         ...style,
       }}

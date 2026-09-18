@@ -17,8 +17,8 @@ import { asset } from '@/lib/base-path.mjs'
  *   jetted on, the handling pictograms along the foot and down the ends, the
  *   tape crossing the middle the way tape does;
  * - the shopping bag is a florist's carrier done the way an expensive shop
- *   does one: a botanical plate, the name in letterspaced serif capitals,
- *   the address in a line of small capitals, and nothing else.
+ *   does one: a botanical plate, the name set heavy and tight, one quiet
+ *   line, the address at the foot, and nothing else.
  *
  * All of them print straight onto the material (`materialTone`), so the
  * carousel's finish swatches change the board under the print: white board,
@@ -108,8 +108,8 @@ function BrandTab({ p, size }: { p: Mill; size: number }) {
       }}
     >
       <Wheat color={p.honey} style={{ height: `${size * 1.55}cqw`, width: 'auto' }} />
-      <span style={{ fontFamily: FONT, fontWeight: 800, letterSpacing: '0.16em', fontSize: `${size}cqw`, lineHeight: 1, whiteSpace: 'nowrap' }}>
-        RIDGEWAY MILLS
+      <span style={{ fontFamily: FONT, fontWeight: 800, letterSpacing: '-0.01em', fontSize: `${size}cqw`, lineHeight: 1, whiteSpace: 'nowrap' }}>
+        Ridgeway Mills
       </span>
     </div>
   )
@@ -170,7 +170,7 @@ function FactsUpFront({ p }: { p: Mill }) {
             }}
           >
             <div style={{ fontWeight: 800, fontSize: '3cqw', letterSpacing: '-0.02em' }}>{value}</div>
-            <div style={{ fontSize: '1.65cqw', fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', marginTop: '0.7cqw' }}>{label}</div>
+            <div style={{ fontSize: '1.65cqw', fontWeight: 700, letterSpacing: '0.02em', textTransform: 'uppercase', marginTop: '0.7cqw' }}>{label}</div>
             <div style={{ fontSize: '1.55cqw', opacity: dv ? 0.75 : 0, marginTop: '0.4cqw' }}>{dv || '\u00a0'}</div>
           </div>
         ))}
@@ -195,9 +195,9 @@ export function CerealFront({ material }: { material: string }) {
           Honey Oat
         </div>
         <div style={{ fontFamily: FONT, fontWeight: 900, fontSize: '16cqw', lineHeight: 0.92, letterSpacing: '-0.045em', color: p.title, marginTop: '-0.6cqw' }}>
-          CLUSTERS
+          Clusters
         </div>
-        <div style={{ fontSize: '3cqw', fontWeight: 600, marginTop: '1.4cqw', letterSpacing: '0.01em' }}>
+        <div style={{ fontSize: '3cqw', fontWeight: 600, marginTop: '1.4cqw', letterSpacing: '-0.005em' }}>
           Toasted whole grain oat clusters with a touch of real honey
         </div>
       </div>
@@ -215,8 +215,7 @@ export function CerealFront({ material }: { material: string }) {
             color: '#fff4dc',
             fontWeight: 800,
             fontSize: '2.4cqw',
-            letterSpacing: '0.08em',
-            textTransform: 'uppercase',
+            letterSpacing: '-0.01em',
             padding: '1.2cqw 2cqw',
             borderRadius: '0.6cqw',
             transform: 'rotate(-6deg)',
@@ -226,7 +225,7 @@ export function CerealFront({ material }: { material: string }) {
         >
           New!
           <br />
-          <span style={{ fontWeight: 600, letterSpacing: '0.02em', textTransform: 'none', fontSize: '2.2cqw' }}>Bigger clusters</span>
+          <span style={{ fontWeight: 600, letterSpacing: 0, fontSize: '2.2cqw' }}>Bigger clusters</span>
         </div>
       </div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', gap: '2cqw' }}>
@@ -257,7 +256,7 @@ export function CerealFront({ material }: { material: string }) {
         </div>
       </div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginTop: '0.4cqw' }}>
-        <div style={{ fontSize: '3cqw', fontWeight: 800, letterSpacing: '0.03em', whiteSpace: 'nowrap' }}>NET WT 18 OZ (1 LB 2 OZ) 510g</div>
+        <div style={{ fontSize: '3cqw', fontWeight: 800, letterSpacing: 0, whiteSpace: 'nowrap' }}>NET WT 18 OZ (1 LB 2 OZ) 510g</div>
         <Micro style={{ fontSize: '2.1cqw', opacity: 0.72, whiteSpace: 'nowrap' }}>No artificial flavors</Micro>
       </div>
     </BoxFace>
@@ -377,7 +376,7 @@ export function CerealTop({ material }: { material: string }) {
           <BrandTab p={p} size={2.2} />
           <div style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: '4.6cqw', lineHeight: 1, color: p.amber }}>
             Honey Oat{' '}
-            <span style={{ fontFamily: FONT, fontStyle: 'normal', fontWeight: 900, color: p.title, letterSpacing: '-0.04em' }}>CLUSTERS</span>
+            <span style={{ fontFamily: FONT, fontStyle: 'normal', fontWeight: 900, color: p.title, letterSpacing: '-0.04em' }}>Clusters</span>
           </div>
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', textAlign: 'right', gap: '1cqw', flex: 'none' }}>
@@ -433,14 +432,14 @@ function MiniBox({ p, name, sub, band, width = 19, caption = true }: { p: Mill; 
             fontFamily: FONT,
             fontSize: u(1),
             fontWeight: 800,
-            letterSpacing: '0.12em',
+            letterSpacing: '-0.01em',
             padding: `${u(0.45)} ${u(0.7)}`,
             borderRadius: u(1),
             lineHeight: 1,
             whiteSpace: 'nowrap',
           }}
         >
-          RIDGEWAY MILLS
+          Ridgeway Mills
         </span>
         <span style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: u(2.2), lineHeight: 1, color: band, marginTop: u(0.4), whiteSpace: 'nowrap' }}>
           {name[0]}
@@ -457,7 +456,7 @@ function MiniBox({ p, name, sub, band, width = 19, caption = true }: { p: Mill; 
         <Micro style={{ fontSize: u(1.9), textAlign: 'center', lineHeight: 1.4, whiteSpace: 'nowrap' }}>
           {name.join(' ')}
           <br />
-          <span style={{ opacity: 0.7, fontWeight: 500, letterSpacing: '0.08em', fontSize: '0.85em' }}>{sub}</span>
+          <span style={{ opacity: 0.7, fontWeight: 500, fontSize: '0.85em' }}>{sub}</span>
         </Micro>
       )}
     </div>
@@ -493,8 +492,8 @@ export function CerealBack({ material }: { material: string }) {
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '2cqw' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '1.6cqw' }}>
             <Wheat color={p.honey} style={{ height: '5cqw', width: 'auto' }} />
-            <span style={{ fontFamily: FONT, fontWeight: 800, letterSpacing: '0.18em', fontSize: '3cqw', lineHeight: 1, whiteSpace: 'nowrap' }}>
-              RIDGEWAY MILLS
+            <span style={{ fontFamily: FONT, fontWeight: 800, letterSpacing: '-0.01em', fontSize: '3.2cqw', lineHeight: 1, whiteSpace: 'nowrap' }}>
+              Ridgeway Mills
             </span>
           </div>
           <Micro style={{ fontSize: '1.9cqw', opacity: 0.85, whiteSpace: 'nowrap' }}>Est. 1962 · Lewiston, Idaho</Micro>
@@ -533,8 +532,8 @@ export function CerealBack({ material }: { material: string }) {
           </div>
           <div style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: '3.6cqw', lineHeight: 1.1, color: p.amber }}>
             Honey Oat Parfait{' '}
-            <span style={{ fontFamily: FONT, fontStyle: 'normal', fontWeight: 600, fontSize: '1.9cqw', color: p.ink, opacity: 0.7, letterSpacing: '0.06em', whiteSpace: 'nowrap' }}>
-              5 MIN · SERVES 1
+            <span style={{ fontFamily: FONT, fontStyle: 'normal', fontWeight: 600, fontSize: '1.9cqw', color: p.ink, opacity: 0.7, letterSpacing: 0, whiteSpace: 'nowrap' }}>
+              5 min · serves 1
             </span>
           </div>
           <ol style={{ margin: 0, padding: 0, listStyle: 'none', display: 'grid', gap: '1cqw' }}>
@@ -552,16 +551,16 @@ export function CerealBack({ material }: { material: string }) {
           {/* Spaced out rather than centred in columns, so the first box sits
               on the heading's left edge and the last on the column's right. */}
           <div style={{ display: 'flex', justifyContent: 'space-between', gap: '1.4cqw' }}>
-            <MiniBox p={p} width={13} caption={false} name={['Cinnamon', 'CRUNCH']} sub="Oats · cinnamon" band="#c8322b" />
-            <MiniBox p={p} width={13} caption={false} name={['Berry', 'CLUSTERS']} sub="Blueberry · cranberry" band="#6b3fa0" />
-            <MiniBox p={p} width={13} caption={false} name={['Maple', 'PECAN']} sub="Maple · pecans" band="#7a4a1e" />
+            <MiniBox p={p} width={13} caption={false} name={['Cinnamon', 'Crunch']} sub="Oats · cinnamon" band="#c8322b" />
+            <MiniBox p={p} width={13} caption={false} name={['Berry', 'Clusters']} sub="Blueberry · cranberry" band="#6b3fa0" />
+            <MiniBox p={p} width={13} caption={false} name={['Maple', 'Pecan']} sub="Maple · pecans" band="#7a4a1e" />
           </div>
         </div>
       </div>
 
       {/* the foot band */}
       <div style={{ ...band, padding: '2.6cqw 4.5cqw', minHeight: '15cqw', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '3cqw' }}>
-        <Micro style={{ fontSize: '1.65cqw', lineHeight: 1.55, letterSpacing: '0.1em', opacity: 0.92, minWidth: 0 }}>
+        <Micro style={{ fontSize: '1.7cqw', lineHeight: 1.55, opacity: 0.92, minWidth: 0 }}>
           Questions? Call 1-800-555-0142 weekdays
           <br />
           hello@ridgewaymills.com · ridgewaymills.com
@@ -603,7 +602,7 @@ function ShipperFace({ material, style, children }: { material: string; style?: 
 /**
  * The roaster's box: Halyard Coffee Roasters, Portland, Maine. One ink on
  * corrugate and one family - Inter, set black and tight for the name and
- * in tracked capitals for everything else - because a roaster's shipper is
+ * small and plain for everything else - because a roaster's shipper is
  * a production object printed in one pass, and what it has to say from
  * across a room is the name and the roast date. The date is jetted on by
  * the line rather than typeset (`JetPrint`), which is the detail that makes
@@ -632,7 +631,7 @@ function Cleat({ color, size }: { color: string; size: string }) {
   )
 }
 
-/** The name: Inter black, tightened. `size` is the cap height's cqw. */
+/** The name: Inter black, tightened, in regular casing. `size` is its cqw. */
 function Halyard({ size, style }: { size: string; style?: CSSProperties }) {
   return (
     <span
@@ -647,7 +646,7 @@ function Halyard({ size, style }: { size: string; style?: CSSProperties }) {
         ...style,
       }}
     >
-      HALYARD
+      Halyard
     </span>
   )
 }
@@ -723,13 +722,13 @@ export function MailerLid({ material }: { material: string }) {
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '3cqw' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '1.6cqw', minWidth: 0 }}>
             <Cleat color={ink} size="4.2cqw" />
-            <Micro style={{ fontSize: '1.6cqw', letterSpacing: '0.22em' }}>Halyard Coffee Roasters</Micro>
+            <Micro style={{ fontSize: '1.8cqw' }}>Halyard Coffee Roasters</Micro>
           </div>
-          <Micro style={{ fontSize: '1.6cqw', letterSpacing: '0.22em', opacity: 0.7 }}>Portland, Maine</Micro>
+          <Micro style={{ fontSize: '1.8cqw', opacity: 0.7 }}>Portland, Maine</Micro>
         </div>
         <div>
           <Halyard size="15cqw" />
-          <Micro style={{ fontSize: '1.7cqw', display: 'block', marginTop: '1.6cqw', letterSpacing: '0.26em' }}>
+          <Micro style={{ fontSize: '2cqw', display: 'block', marginTop: '1.6cqw' }}>
             Whole bean coffee · Roasted to order
           </Micro>
         </div>
@@ -745,7 +744,7 @@ export function MailerLid({ material }: { material: string }) {
             <br />
             Open within 14 days.
           </div>
-          <Micro style={{ fontSize: '1.45cqw', lineHeight: 1.65, opacity: 0.78, letterSpacing: '0.12em' }}>
+          <Micro style={{ fontSize: '1.6cqw', lineHeight: 1.65, opacity: 0.78 }}>
             Store cool and dry, in the bag, valve out.
             <br />
             Grind just before you brew · halyard.coffee
@@ -774,9 +773,9 @@ export function MailerFront({ material }: { material: string }) {
         <Halyard size="9cqw" />
       </div>
       <div style={{ textAlign: 'right', display: 'grid', gap: '1.2cqw', minWidth: 0, flex: 1, justifyItems: 'end' }}>
-        <Micro style={{ fontSize: '1.5cqw', letterSpacing: '0.2em' }}>Whole bean · 2 × 340 g</Micro>
-        <Micro style={{ fontSize: '1.5cqw', letterSpacing: '0.2em', opacity: 0.72 }}>Portland, Maine</Micro>
-        <Micro style={{ fontSize: '1.4cqw', letterSpacing: '0.2em', opacity: 0.72 }}>halyard.coffee</Micro>
+        <Micro style={{ fontSize: '1.7cqw' }}>Whole bean · 2 × 340 g</Micro>
+        <Micro style={{ fontSize: '1.7cqw', opacity: 0.72 }}>Portland, Maine</Micro>
+        <Micro style={{ fontSize: '1.6cqw', opacity: 0.72 }}>halyard.coffee</Micro>
       </div>
     </ShipperFace>
   )
@@ -811,88 +810,84 @@ function shop(material: string): { ink: string; accent: string } {
 const MARIGOLD = asset('/art/marigold.webp')
 
 /**
- * The name, the way an expensive shop sets it: serif capitals, letterspaced
- * a third of an em, one line. The tracking is compensated on the left so the
- * line sits on the centre rather than a third of an em to the right of it,
- * which is the tell of letterspacing done in a hurry.
+ * The name: Inter, heavy and tightened, in regular casing, the ampersand in
+ * the second ink. An expensive carrier's restraint is in what is left off
+ * the bag, not in letterspaced capitals.
  */
 function Wordmark({ accent, size }: { accent: string; size: string }) {
   return (
-    <div
-      style={{
-        fontFamily: SERIF,
-        fontSize: size,
-        letterSpacing: '0.32em',
-        paddingLeft: '0.32em',
-        textTransform: 'uppercase',
-        lineHeight: 1,
-        whiteSpace: 'nowrap',
-      }}
-    >
-      Marigold <span style={{ color: accent, fontStyle: 'italic', textTransform: 'none' }}>&amp;</span> Moss
+    <div style={{ fontFamily: FONT, fontSize: size, fontWeight: 700, letterSpacing: '-0.035em', lineHeight: 1, whiteSpace: 'nowrap' }}>
+      Marigold <span style={{ color: accent }}>&amp;</span> Moss
     </div>
   )
 }
 
+/** A line of the bag's small type: regular casing, tightened, quiet. */
+function Line({ children, style }: { children: ReactNode; style?: CSSProperties }) {
+  return (
+    <span style={{ fontFamily: FONT, fontSize: '2.2cqw', fontWeight: 500, letterSpacing: '-0.01em', lineHeight: 1.45, whiteSpace: 'nowrap', ...style }}>
+      {children}
+    </span>
+  )
+}
+
 /**
- * The front, and the discipline of a luxury carrier: the plate at the top,
- * the name under it, one line of small capitals, and the address at the
- * foot - and between them the board, which is most of the bag. Everything
- * is centred and there are no rules, because what makes a bag look
- * expensive is the restraint, not the ornament: two inks, four things, air.
+ * The front, and the discipline of a luxury carrier: the plate, the name
+ * under it, one quiet line, and the address at the foot - and between them
+ * the board, which is most of the bag. The block sits a little below the
+ * sheet's centre: the handles and the mouth pull the eye to the top, so a
+ * carrier's optical centre is lower than its geometric one, and a block on
+ * the geometric centre reads as riding high.
  */
 export function BagFront({ material }: { material: string }) {
   const { ink, accent } = shop(material)
   const t = materialTone(material)
   return (
-    <Sheet tone={t} style={{ flexDirection: 'column', alignItems: 'center', padding: '13cqw 10cqw 7cqw', color: ink, textAlign: 'center' }}>
+    <Sheet tone={t} style={{ flexDirection: 'column', alignItems: 'center', padding: '8cqw 10cqw 7cqw', color: ink, textAlign: 'center' }}>
+      <div style={{ flex: 1.3 }} />
       {/* 800 x 1302 in the file */}
       <Plate src={MARIGOLD} ink={ink} style={{ width: '36cqw', height: '58.6cqw' }} />
-      <div style={{ marginTop: '7cqw' }}>
-        <Wordmark accent={accent} size="5cqw" />
+      <div style={{ marginTop: '6cqw' }}>
+        <Wordmark accent={accent} size="7cqw" />
       </div>
-      <div style={{ width: '6cqw', height: '0.28cqw', background: accent, marginTop: '4cqw', flex: 'none' }} />
-      <Micro style={{ fontSize: '2cqw', letterSpacing: '0.44em', paddingLeft: '0.44em', marginTop: '3.6cqw', fontWeight: 500, whiteSpace: 'nowrap' }}>
-        Fleuriste · Est. 2016
-      </Micro>
+      <div style={{ width: '6cqw', height: '0.28cqw', background: accent, marginTop: '3.6cqw', flex: 'none' }} />
+      <Line style={{ marginTop: '3cqw', opacity: 0.8 }}>Fleuriste · Est. 2016</Line>
       <div style={{ flex: 1, minHeight: '6cqw' }} />
-      <Micro style={{ fontSize: '1.8cqw', letterSpacing: '0.36em', paddingLeft: '0.36em', opacity: 0.72, fontWeight: 500, whiteSpace: 'nowrap' }}>
-        34 Elm Street · Northampton · Massachusetts
-      </Micro>
+      <Line style={{ fontSize: '2cqw', opacity: 0.7 }}>34 Elm Street · Northampton, Massachusetts</Line>
     </Sheet>
   )
 }
 
 /**
- * The back: the shop's seal - the plate inside a ring of small capitals -
- * with the name under it and the one line the shop allows itself, in
- * italics. A seal is what the expensive bags carry on the reverse when they
- * carry anything at all.
+ * The back: the shop's seal - the plate inside a ring of small type - with
+ * the name under it and the one line the shop allows itself. A seal is what
+ * the expensive bags carry on the reverse when they carry anything at all.
+ * The legend is short enough to leave a gap at the join whatever the
+ * viewer's rasteriser does to Inter's widths.
  */
 export function BagBack({ material }: { material: string }) {
   const { ink, accent } = shop(material)
   const t = materialTone(material)
   return (
-    <Sheet tone={t} style={{ flexDirection: 'column', alignItems: 'center', padding: '17cqw 10cqw 7cqw', color: ink, textAlign: 'center' }}>
+    <Sheet tone={t} style={{ flexDirection: 'column', alignItems: 'center', padding: '8cqw 10cqw 7cqw', color: ink, textAlign: 'center' }}>
+      <div style={{ flex: 1.3 }} />
       <RoundSeal
         size="34cqw"
-        legend="MARIGOLD & MOSS · FLEURISTE · EST. 2016 · "
+        legend="Marigold & Moss · Fleuriste · "
         color={ink}
         ring={false}
         center={<Plate src={MARIGOLD} ink={ink} style={{ width: '100%', height: '100%' }} />}
       />
-      <div style={{ marginTop: '7cqw' }}>
-        <Wordmark accent={accent} size="3.6cqw" />
+      <div style={{ marginTop: '6cqw' }}>
+        <Wordmark accent={accent} size="5cqw" />
       </div>
-      <div style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: '3.8cqw', lineHeight: 1.3, marginTop: '5cqw', opacity: 0.85 }}>
+      <Line style={{ marginTop: '4cqw', fontSize: '2.8cqw', opacity: 0.85 }}>
         Grown slow. Cut this morning.
         <br />
         Wrapped by hand.
-      </div>
+      </Line>
       <div style={{ flex: 1, minHeight: '6cqw' }} />
-      <Micro style={{ fontSize: '1.8cqw', letterSpacing: '0.36em', paddingLeft: '0.36em', opacity: 0.72, fontWeight: 500, whiteSpace: 'nowrap' }}>
-        Flowers · Plants · Workshops · marigoldandmoss.com
-      </Micro>
+      <Line style={{ fontSize: '2cqw', opacity: 0.7 }}>Flowers · Plants · Workshops · marigoldandmoss.com</Line>
     </Sheet>
   )
 }

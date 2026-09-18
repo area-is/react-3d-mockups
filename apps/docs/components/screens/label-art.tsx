@@ -24,8 +24,7 @@ import { FONT } from './swiss-art'
  * notes. The fallbacks are book faces, not Georgia.
  */
 export const SERIF = 'var(--font-fraunces), Fraunces, "Iowan Old Style", "Palatino Linotype", "Book Antiqua", serif'
-/** The chalk on the A-frame: a neat, legible hand. */
-export const HAND = 'var(--font-caveat), Caveat, "Segoe Print", "Bradley Hand", cursive'
+
 /** The filling line's ink-jet: the one face of a package that is not typeset. */
 export const MONO = 'var(--font-jetbrains-mono), "JetBrains Mono", ui-monospace, Menlo, Consolas, monospace'
 
@@ -412,10 +411,14 @@ export function RoundSeal({
       <svg viewBox="0 0 100 100" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }} aria-hidden>
         <circle cx={50} cy={50} r={48} fill={fill} stroke={color} strokeWidth={2.4} />
         {ring && <circle cx={50} cy={50} r={33} fill="none" stroke={color} strokeWidth={1.2} />}
+        {/* The legend's baseline runs on a circle set so the capitals sit in
+            the middle of the band between the two rings: the band is r 33.6
+            to 46.8, and an 8-unit capital stands about 5.8 tall, so a
+            baseline at 37.3 centres it. At 40.5 the caps touched the rim. */}
         <defs>
-          <path id={rim} d="M50 50 m-40.5 0 a40.5 40.5 0 1 1 81 0 a40.5 40.5 0 1 1 -81 0" />
+          <path id={rim} d="M50 50 m-37.3 0 a37.3 37.3 0 1 1 74.6 0 a37.3 37.3 0 1 1 -74.6 0" />
         </defs>
-        <text fontFamily={FONT} fontSize={8.6} fontWeight={700} letterSpacing={1.4} fill={color}>
+        <text fontFamily={FONT} fontSize={8} fontWeight={700} letterSpacing={1.3} fill={color}>
           <textPath href={`#${rim}`} startOffset="0">
             {legend}
           </textPath>
@@ -513,7 +516,7 @@ export function Pill({
         fontFamily: FONT,
         fontSize: size,
         fontWeight: 800,
-        letterSpacing: '0.14em',
+        letterSpacing: '0.03em',
         textTransform: 'uppercase',
         lineHeight: 1,
         padding: '0.45em 0.9em 0.4em',

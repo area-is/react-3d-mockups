@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { Logo } from '@/components/logo'
 import { SiteNav } from '@/components/site-nav'
-import { caveat, fraunces, inter, jetbrainsMono } from '@/lib/fonts'
+import { fraunces, inter, jetbrainsMono } from '@/lib/fonts'
 import { SITE_URL, socialMetadata } from '@/lib/site'
 import '../globals.css'
 import '../screens.css'
@@ -23,7 +23,7 @@ export const metadata: Metadata = {
 // with the Fumadocs/Tailwind styles and vice versa.
 export default function SiteLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${inter.variable} ${jetbrainsMono.variable} ${fraunces.variable} ${caveat.variable}`}>
+    <html lang="en" className={`${inter.variable} ${jetbrainsMono.variable} ${fraunces.variable}`}>
       <body>
         <div className="site">
           <header className="site-header">

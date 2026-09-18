@@ -89,15 +89,14 @@ const backTone: Tone = {
   palette: [BOARD, FIELD, INK],
 }
 
-/** Uppercase micro-type - the catalogue numbers, the side marks, the credits. */
+/** The sleeve's small type - the label name, the catalogue number - regular casing, tightened. */
 function Micro({ children, style }: { children: ReactNode; style?: CSSProperties }) {
   return (
     <span
       style={{
         fontSize: '2.6cqw',
         fontWeight: 700,
-        letterSpacing: '0.18em',
-        textTransform: 'uppercase',
+        letterSpacing: '-0.01em',
         lineHeight: 1,
         ...style,
       }}
@@ -252,7 +251,9 @@ function StereoBox() {
         gap: '0.55cqw',
       }}
     >
-      <span style={{ fontSize: '2.1cqw', fontWeight: 800, letterSpacing: '0.34em', lineHeight: 1, textTransform: 'uppercase' }}>
+      {/* The one word on the sleeve in spaced capitals: it is the mark the
+          era printed, not a typographic choice of ours. */}
+      <span style={{ fontSize: '2.1cqw', fontWeight: 800, letterSpacing: '0.16em', lineHeight: 1, textTransform: 'uppercase' }}>
         Stereo
       </span>
       <span style={{ fontSize: '0.78cqw', lineHeight: 1.3, letterSpacing: '0.01em' }}>
@@ -306,7 +307,7 @@ function Snapshot({ style }: { style?: CSSProperties }) {
 function Programme({ side, tracks }: { side: string; tracks: string[][] }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.95cqw', minWidth: 0 }}>
-      <span style={{ fontSize: '1.45cqw', fontWeight: 800, letterSpacing: '0.22em', textTransform: 'uppercase', color: FIELD, lineHeight: 1 }}>
+      <span style={{ fontSize: '1.6cqw', fontWeight: 800, letterSpacing: '-0.01em', color: FIELD, lineHeight: 1 }}>
         {side}
       </span>
       {tracks.map(([no, name, time], i) => (
@@ -347,13 +348,13 @@ export function SleeveBack() {
           <span style={{ fontSize: '4.6cqw', fontWeight: 700, letterSpacing: '-0.035em', lineHeight: 1, whiteSpace: 'nowrap' }}>
             {TITLE.join(' ')}
           </span>
-          <span style={{ fontSize: '2.1cqw', fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', lineHeight: 1 }}>
+          <span style={{ fontSize: '2.3cqw', fontWeight: 700, letterSpacing: '-0.015em', lineHeight: 1 }}>
             {ARTIST}
           </span>
         </div>
         <div style={{ display: 'flex', alignItems: 'flex-start', gap: '2.2cqw', flex: 'none' }}>
           <StereoBox />
-          <span style={{ fontSize: '1.7cqw', fontWeight: 800, letterSpacing: '0.16em', lineHeight: 1, paddingTop: '0.5cqw' }}>{CATALOG}</span>
+          <span style={{ fontSize: '1.7cqw', fontWeight: 800, letterSpacing: '0.04em', lineHeight: 1, paddingTop: '0.5cqw' }}>{CATALOG}</span>
         </div>
       </div>
 
@@ -374,7 +375,7 @@ export function SleeveBack() {
           <div style={{ fontSize: '1.15cqw', lineHeight: 1.4 }}>
             {PERSONNEL.map(([who, what], i) => (
               <span key={who}>
-                <span style={{ fontWeight: 700, letterSpacing: '0.04em', textTransform: 'uppercase' }}>{who}</span>, {what}
+                <span style={{ fontWeight: 700 }}>{who}</span>, {what}
                 {i < PERSONNEL.length - 1 ? ' · ' : '.'}
               </span>
             ))}
@@ -403,13 +404,13 @@ export function SleeveBack() {
         {NOTES.map((para, i) => (
           <p key={i} style={{ margin: 0, textIndent: i === 0 ? 0 : '1.6em' }}>
             {i === 0 && (
-              <span style={{ fontFamily: FONT, fontWeight: 800, letterSpacing: '0.08em', fontSize: '1.05em' }}>THE ALHAMBRA</span>
+              <span style={{ fontFamily: FONT, fontWeight: 800, letterSpacing: '-0.01em', fontSize: '1.05em' }}>The Alhambra</span>
             )}
             {i === 0 ? para.replace(/^The Alhambra/, '') : para}
           </p>
         ))}
-        <p style={{ margin: 0, textIndent: '1.6em', fontFamily: FONT, fontWeight: 700, fontSize: '0.95em', letterSpacing: '0.1em', textAlign: 'right' }}>
-          — T. BRANDT
+        <p style={{ margin: 0, textIndent: '1.6em', fontFamily: FONT, fontWeight: 700, fontSize: '0.95em', letterSpacing: 0, textAlign: 'right' }}>
+          — T. Brandt
         </p>
       </div>
 
@@ -428,12 +429,12 @@ export function SleeveBack() {
               {LABEL_NAME}
               <span style={{ color: FIELD }}> Records</span>
             </span>
-            <span style={{ fontSize: '0.95cqw', fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase', lineHeight: 1, opacity: 0.7 }}>
+            <span style={{ fontSize: '1.05cqw', fontWeight: 600, letterSpacing: 0, lineHeight: 1, opacity: 0.75 }}>
               Obsidian Records Inc. · 41 Bleecker Street · New York 12, N.Y.
             </span>
           </div>
         </div>
-        <span style={{ fontSize: '0.95cqw', fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase', lineHeight: 1, opacity: 0.7, textAlign: 'right' }}>
+        <span style={{ fontSize: '1.05cqw', fontWeight: 600, letterSpacing: 0, lineHeight: 1, opacity: 0.75, textAlign: 'right' }}>
           {CATALOG} · Printed in U.S.A.
         </span>
       </div>
@@ -474,7 +475,7 @@ function Label({ side, tracks }: { side: string; tracks: string[][] }) {
         <span style={{ fontSize: '9cqw', fontWeight: 700, letterSpacing: '-0.04em', lineHeight: 1, color: FIELD }}>
           {LABEL_NAME}
         </span>
-        <span style={{ fontSize: '3.4cqw', fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase' }}>
+        <span style={{ fontSize: '3.4cqw', fontWeight: 700, letterSpacing: '0.02em' }}>
           {CATALOG} · {side}
         </span>
       </div>
@@ -487,8 +488,8 @@ function Label({ side, tracks }: { side: string; tracks: string[][] }) {
             {name} <span style={{ opacity: 0.5, fontVariantNumeric: 'tabular-nums' }}>{time}</span>
           </span>
         ))}
-        <span style={{ fontSize: '2.8cqw', fontWeight: 700, letterSpacing: '0.14em', opacity: 0.55, marginTop: '0.8cqw' }}>
-          33⅓ RPM
+        <span style={{ fontSize: '2.8cqw', fontWeight: 700, letterSpacing: '0.02em', opacity: 0.55, marginTop: '0.8cqw' }}>
+          33⅓ rpm
         </span>
       </div>
     </Sheet>
