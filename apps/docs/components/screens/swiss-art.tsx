@@ -1,6 +1,8 @@
 'use client'
 
+import { useSyncExternalStore } from 'react'
 import type { CSSProperties, ReactNode } from 'react'
+import { usePrefersReducedMotion } from 'react-3d-mockups'
 import { TabbiedPattern } from 'tabbied/react'
 import { chase, damier, dipole, epicentre, gyre, halftone, ortho } from 'tabbied/patterns'
 import type { PatternDefinition } from 'tabbied'
@@ -148,6 +150,78 @@ export function materialTone(material: string, accent: string = SIGNAL): Tone {
  */
 const RESEED_MS = 2600
 
+/*
+ * The clock the live surfaces read their seed from.
+ *
+ * A live pattern used to take a random seed per mount and roll its own timer,
+ * which is fine for one canvas and wrong for two: the Flip in its flexed pose
+ * paints the same children into two half-screens, and a picture that draws
+ * itself twice from two seeds meets itself at the hinge as two pictures. The
+ * explorer's flat view beside its 3D view has the same problem in milder
+ * form. So the seed is not a private choice but a reading of the wall clock,
+ * quantised to `RESEED_MS`: every instance of a pattern on the page shows the
+ * same composition and turns to the next one in the same instant, however
+ * many times it is mounted.
+ *
+ * One timer for the page, armed to the next period boundary rather than a
+ * fixed delay so it stays on the clock rather than drifting off it, and torn
+ * down with the last subscriber. Ticks are held while the tab is hidden and
+ * delivered when it comes back, which is what tabbied's own timer did.
+ *
+ * Read through `useSyncExternalStore` because the seed is rendered - tabbied
+ * writes it to a data attribute for its no-React hydration path - so the
+ * server has to render something: it renders tick zero, and React swaps in
+ * the real reading as part of hydration rather than as a mismatch.
+ */
+const listeners = new Set<() => void>()
+let timer: ReturnType<typeof setTimeout> | undefined
+
+const clockTick = () => Math.floor(Date.now() / RESEED_MS)
+const serverTick = () => 0
+
+const wake = () => {
+  if (document.visibilityState === 'hidden') return
+  for (const notify of listeners) notify()
+}
+
+const arm = () => {
+  timer = setTimeout(() => {
+    wake()
+    arm()
+  }, RESEED_MS - (Date.now() % RESEED_MS))
+}
+
+const subscribeClock = (onTick: () => void) => {
+  listeners.add(onTick)
+  if (listeners.size === 1) {
+    arm()
+    document.addEventListener('visibilitychange', wake)
+  }
+  return () => {
+    listeners.delete(onTick)
+    if (listeners.size === 0) {
+      clearTimeout(timer)
+      document.removeEventListener('visibilitychange', wake)
+    }
+  }
+}
+
+const subscribeNothing = () => () => {}
+
+/**
+ * The current reading of the clock, or a standing zero under
+ * `prefers-reduced-motion`: a reader who asked for stillness gets the first
+ * composition and keeps it, with no timer running on their behalf.
+ */
+function useClockTick(): number {
+  const still = usePrefersReducedMotion()
+  return useSyncExternalStore(
+    still ? subscribeNothing : subscribeClock,
+    still ? serverTick : clockTick,
+    serverTick,
+  )
+}
+
 /**
  * The pattern block.
  *
@@ -163,13 +237,15 @@ const RESEED_MS = 2600
  * get it - a milk carton that reprinted itself every two seconds would be
  * saying something false about what the library does to a milk carton.
  *
- * The two are mutually exclusive by construction, because `redrawInterval`
- * only drives the seed while the seed is uncontrolled: a live surface passes
- * no `seed` and takes a fresh one per mount, a printed one pins it so a slot
- * scrolling out of the render window and back comes back as the same picture.
- *
- * Tabbied drops ticks under `prefers-reduced-motion`, on a hidden tab, and for
- * anything scrolled out of view, so none of this runs when it should not.
+ * Both are controlled seeds. A printed face pins its own, so a slot scrolling
+ * out of the render window and back comes back as the same picture; a live
+ * one derives its seed from the shared clock above, keyed by the pattern (or
+ * by `seed`, when a caller wants two live surfaces of one pattern to differ),
+ * so every copy of it on the page - the two halves of a flexed Flip, the flat
+ * and 3D views of the explorer - is the same picture at the same moment.
+ * A seed change rides tabbied's normal update path, so the designs' cell
+ * transitions animate from one composition to the next exactly as its own
+ * timer did.
  */
 export function Pattern({
   pattern,
@@ -184,10 +260,11 @@ export function Pattern({
   grid: string
   live?: boolean
 }) {
+  const tick = useClockTick()
   return (
     <TabbiedPattern
       pattern={pattern}
-      {...(live ? { redrawInterval: RESEED_MS } : { seed })}
+      seed={live ? `${seed ?? pattern.slug}-${tick}` : seed}
       palette={palette}
       options={{ grid }}
       fit="cover"
@@ -283,7 +360,7 @@ export function Sheet({ tone, style, children }: { tone: Tone; style?: CSSProper
 
 export interface SwissProps {
   pattern: PatternDefinition
-  /** Pinned for a printed face; omitted on a live one, which reseeds itself. */
+  /** Pinned for a printed face; a live one reads the shared clock instead. */
   seed?: string
   /** A screen: repaints on a timer instead of holding one composition. */
   live?: boolean
