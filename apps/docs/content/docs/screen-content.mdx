@@ -160,5 +160,7 @@ color.
 
 On touch devices the mockup never traps page scrolling: vertical swipes over
 the canvas or the screen scroll the page natively, and horizontal drags rotate
-the device. Turning `zoom` on hands two-finger gestures to the canvas instead,
-so page scrolling then starts outside the mockup.
+the device. Turning `zoom` on hands two-finger gestures on a touch screen to
+the canvas instead, so page scrolling then starts outside the mockup. A
+trackpad is different: its two-finger scroll passes through to the page even
+with `zoom` on, and only a pinch zooms.

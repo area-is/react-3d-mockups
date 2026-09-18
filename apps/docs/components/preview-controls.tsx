@@ -442,7 +442,7 @@ const AUTO_ROTATE = toggle('autoRotate', 'spin', false, 'Slow auto-orbit')
 const STAGE_CONTROLS: Control[] = [
   toggle('controls', 'controls', true, 'Drag-to-rotate orbit controls'),
   { prop: 'autoRotate', label: 'spin', kind: 'range', min: 0, max: 6, step: 0.2, preset: 0 },
-  toggle('zoom', 'zoom', false, 'Pinch / wheel zoom plus overlay +/− buttons'),
+  toggle('zoom', 'zoom', false, 'Pinch zoom (a trackpad pinch, or ctrl-wheel) plus the overlay control; a plain scroll passes through'),
   toggle('fullscreen', 'fullscreen', false, 'Overlay button that fills the screen'),
   toggle('shadows', 'shadow', true, 'Soft contact shadow under the model'),
   { prop: 'background', label: 'canvas bg', kind: 'color', title: 'CSS background of the canvas (unset = transparent)' },

@@ -83,10 +83,12 @@ export interface MockupCanvasProps {
    */
   freeRotation?: boolean
   /**
-   * Zoom controls: pinch on touch, scroll wheel on desktop, plus overlay
-   * +/− buttons. Off by default so an embedded mockup never hijacks page
-   * scroll - turning it on gives the canvas the two-finger gesture (vertical
-   * page scrolling then starts outside the mockup).
+   * Zoom controls: pinch on touch, pinch on a trackpad (or ctrl/⌘ with a
+   * mouse wheel), plus the overlay control. A plain scroll - two fingers on
+   * a trackpad, a bare mouse wheel - is never captured: it scrolls the page
+   * under the mockup as it would anywhere else. Off by default; on, the
+   * canvas owns two-finger gestures on touch screens (vertical page
+   * scrolling then starts outside the mockup).
    */
   zoom?: boolean
   /**

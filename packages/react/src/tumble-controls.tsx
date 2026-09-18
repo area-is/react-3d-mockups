@@ -11,7 +11,7 @@ export interface TumbleControlsHandle {
 export interface TumbleControlsProps {
   /** Pointer-drag rotation (the tumble itself always keeps the target centered). */
   enabled?: boolean
-  /** Wheel / pinch zoom. */
+  /** Pinch zoom: two pointers on touch, a trackpad pinch (ctrl-wheel, or Safari's gesture events), ctrl/⌘ with a mouse wheel. A plain wheel passes through to the page. */
   zoom?: boolean
   /**
    * Slowly spin the stage: `true` for one revolution a minute, or a number for
@@ -140,10 +140,47 @@ export const TumbleControls = React.forwardRef<TumbleControlsHandle, TumbleContr
         if (enabled) event.preventDefault()
       }
 
+      // A trackpad pinch reaches the page as a wheel event with `ctrlKey` set
+      // (Chrome, Firefox, Edge; Safari sends gesture events, below), while a
+      // two-finger scroll is a plain wheel event. Only the pinch zooms. The
+      // plain scroll is left untouched - not even prevented - so a page with
+      // a mockup on it keeps scrolling under two fingers, which is what a
+      // reader expects a trackpad to do. A mouse wheel zooms with ctrl or ⌘
+      // held, for the same reason.
+      //
+      // The step follows the delta: a pinch reports a stream of small
+      // deltas and should feel continuous, a wheel notch reports one large
+      // delta and should still move. Clamped so a violent notch cannot jump
+      // the camera across its whole range.
+      let gesturing = false
       const onWheel = (event: WheelEvent) => {
+        if (!enabled || !zoom || gesturing || !(event.ctrlKey || event.metaKey)) return
+        event.preventDefault()
+        const delta = Math.max(-30, Math.min(30, event.deltaY))
+        orbit.zoomBy(camera, Math.exp(delta * 0.01))
+      }
+
+      // Safari's trackpad pinch: non-standard gesture events carrying the
+      // scale since the gesture began. Zoom by the change since the last one,
+      // and hold the wheel handler off while a gesture is in flight so a
+      // browser that sends both does not zoom twice.
+      let gestureScale = 1
+      const onGestureStart = (event: Event) => {
         if (!enabled || !zoom) return
         event.preventDefault()
-        orbit.zoomBy(camera, event.deltaY > 0 ? 1.1 : 1 / 1.1)
+        gesturing = true
+        gestureScale = 1
+      }
+      const onGestureChange = (event: Event) => {
+        if (!enabled || !zoom) return
+        event.preventDefault()
+        const scale = (event as Event & { scale?: number }).scale
+        if (typeof scale !== 'number' || scale <= 0) return
+        orbit.zoomBy(camera, gestureScale / scale)
+        gestureScale = scale
+      }
+      const onGestureEnd = () => {
+        gesturing = false
       }
 
       element.addEventListener('pointerdown', onPointerDown)
@@ -152,6 +189,9 @@ export const TumbleControls = React.forwardRef<TumbleControlsHandle, TumbleContr
       element.addEventListener('pointercancel', onPointerEnd)
       element.addEventListener('pointerleave', onPointerEnd)
       element.addEventListener('wheel', onWheel, { passive: false })
+      element.addEventListener('gesturestart', onGestureStart, { passive: false })
+      element.addEventListener('gesturechange', onGestureChange, { passive: false })
+      element.addEventListener('gestureend', onGestureEnd)
       element.addEventListener('contextmenu', onContextMenu)
       return () => {
         element.removeEventListener('pointerdown', onPointerDown)
@@ -160,6 +200,9 @@ export const TumbleControls = React.forwardRef<TumbleControlsHandle, TumbleContr
         element.removeEventListener('pointercancel', onPointerEnd)
         element.removeEventListener('pointerleave', onPointerEnd)
         element.removeEventListener('wheel', onWheel)
+        element.removeEventListener('gesturestart', onGestureStart)
+        element.removeEventListener('gesturechange', onGestureChange)
+        element.removeEventListener('gestureend', onGestureEnd)
         element.removeEventListener('contextmenu', onContextMenu)
       }
     }, [gl, enabled, zoom, orbit, camera])
