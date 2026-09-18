@@ -1,8 +1,8 @@
 /* ------------------------------------------------------------------ */
 /*  /examples/print-shop - an isolated product-configurator example.   */
 /*                                                                     */
-/*  A light page, deliberately: the site and the hero-phone example    */
-/*  are dark, and a print shop is a white wall with a frame on it.    */
+/*  A light page, deliberately: the site and most of the examples are  */
+/*  dark, and a print shop is a white wall with a frame on it.         */
 /*  The tokens below override the site's on `.ps` only, so the shared  */
 /*  stylesheet (fonts, resets, the WebGL fallback) still applies.      */
 /* ------------------------------------------------------------------ */
@@ -94,9 +94,18 @@
   transition: color 0.15s ease, border-color 0.15s ease;
 }
 
-.ps-badge:hover {
+.ps-badge a {
+  font-weight: 600;
+  transition: color 0.15s ease;
+}
+
+.ps-badge a:hover {
   color: var(--ps-ink);
-  border-color: var(--ps-line-strong);
+}
+
+.ps-foot a[href^='https://tabbied.com'] {
+  font-weight: 600;
+  color: var(--ps-ink);
 }
 
 .ps-bag {

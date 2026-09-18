@@ -75,9 +75,19 @@
   transition: color 0.15s ease, border-color 0.15s ease;
 }
 
-.cp-badge:hover {
+.cp-badge a {
+  font-weight: 600;
+  transition: color 0.15s ease;
+}
+
+.cp-badge a:hover {
   color: var(--text);
-  border-color: var(--border-strong);
+}
+
+.cp-part a,
+.cp-credits a {
+  color: var(--text);
+  border-bottom: 1px solid var(--cp-line);
 }
 
 /* ---- hero copy ----------------------------------------------------------- */

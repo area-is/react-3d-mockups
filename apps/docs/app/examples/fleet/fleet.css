@@ -1,0 +1,451 @@
+/* ------------------------------------------------------------------ */
+/*  /examples/fleet - an isolated vehicle-livery example.              */
+/*                                                                     */
+/*  Fleet white and one navy, with the livery's accent read from       */
+/*  `--fl-accent` so the page's own marks follow the swatch. The       */
+/*  tokens override the site's on `.fl` only.                          */
+/* ------------------------------------------------------------------ */
+
+.fl {
+  --fl-accent: #ff6a1a;
+  --fl-bg: #eef0f2;
+  --fl-panel: #e2e5ea;
+  --fl-ink: #14213d;
+  --fl-muted: #5f6675;
+  --fl-line: #cfd4dc;
+  position: relative;
+  isolation: isolate;
+  min-height: 100svh;
+  background: var(--fl-bg);
+  color: var(--fl-ink);
+}
+
+.fl a {
+  color: inherit;
+}
+
+.fl button {
+  font-family: inherit;
+  letter-spacing: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+.fl h1,
+.fl h2 {
+  font-weight: 800;
+  letter-spacing: -0.045em;
+  line-height: 0.98;
+}
+
+/* ---- top bar --------------------------------------------------------- */
+
+.fl-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 24px 32px 0;
+}
+
+.fl-brand {
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.05em;
+  text-transform: uppercase;
+}
+
+.fl-nav {
+  display: flex;
+  gap: 26px;
+  font-size: 14.5px;
+  font-weight: 600;
+  color: var(--fl-muted);
+}
+
+.fl-top-right {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.fl-badge {
+  font-size: 12.5px;
+  font-weight: 500;
+  white-space: nowrap;
+  color: var(--fl-muted);
+  border: 1px solid var(--fl-line);
+  border-radius: 999px;
+  padding: 6px 13px;
+  background: rgba(255, 255, 255, 0.5);
+}
+
+.fl-badge a {
+  font-weight: 600;
+  transition: color 0.15s ease;
+}
+
+.fl-badge a:hover {
+  color: var(--fl-ink);
+}
+
+.fl-cta {
+  font-size: 14px;
+  font-weight: 700;
+  color: #fff;
+  background: var(--fl-ink);
+  border-radius: 6px;
+  padding: 9px 16px;
+  white-space: nowrap;
+}
+
+/* ---- hero copy ----------------------------------------------------------- */
+
+.fl-hero {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: clamp(44px, 8vh, 84px) 32px 28px;
+}
+
+.fl-eyebrow {
+  margin: 0 0 14px;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--fl-accent);
+  transition: color 0.3s ease;
+}
+
+.fl-hero h1 {
+  max-width: 820px;
+  margin: 0 0 18px;
+  font-size: clamp(44px, 6.4vw, 88px);
+  text-transform: uppercase;
+}
+
+.fl-lede {
+  max-width: 600px;
+  margin: 0;
+  font-size: 18px;
+  line-height: 1.55;
+  color: var(--fl-muted);
+}
+
+/* ---- the trailer ---------------------------------------------------------- */
+
+.fl-trailer {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 0 32px;
+}
+
+/* A road: a definite, wide box with a darker floor. */
+.fl-trailer-stage {
+  position: relative;
+  height: min(66vh, 640px);
+  overflow: clip;
+  border-radius: 6px;
+  background: linear-gradient(to bottom, #e6e9ed 0%, #d7dbe1 100%);
+}
+
+.fl-stats {
+  display: flex;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 18px 44px;
+  padding: 20px 4px 0;
+}
+
+.fl-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.fl-stat strong {
+  font-size: 30px;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.fl-stat span {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--fl-muted);
+}
+
+.fl-caption {
+  margin: 0 0 0 auto;
+  font-size: 13px;
+  color: var(--fl-muted);
+}
+
+/* ---- the van and its controls ------------------------------------------- */
+
+.fl-van {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(320px, 440px);
+  gap: 40px;
+  align-items: center;
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: clamp(56px, 9vh, 104px) 32px 0;
+}
+
+.fl-van-stage {
+  position: relative;
+  height: min(68vh, 620px);
+  overflow: clip;
+  border-radius: 6px;
+  background: linear-gradient(to bottom, #e6e9ed 0%, #d7dbe1 100%);
+}
+
+.fl-van-copy h2,
+.fl-door-head h2 {
+  margin: 0 0 12px;
+  font-size: clamp(28px, 3.2vw, 40px);
+}
+
+.fl-van-copy > p,
+.fl-door-head p {
+  margin: 0 0 22px;
+  font-size: 16px;
+  line-height: 1.55;
+  color: var(--fl-muted);
+}
+
+.fl-van-copy a {
+  font-weight: 600;
+  color: var(--fl-ink);
+  border-bottom: 1px solid var(--fl-line);
+}
+
+.fl-control {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+
+.fl-control-label {
+  font-size: 12.5px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+.fl-liveries {
+  display: flex;
+  gap: 8px;
+}
+
+.fl-livery {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding: 7px 12px 7px 7px;
+  font-size: 13.5px;
+  font-weight: 600;
+  background: rgba(255, 255, 255, 0.5);
+  border: 1.5px solid var(--fl-line);
+  border-radius: 8px;
+  transition: border-color 0.15s ease;
+}
+
+.fl-livery[aria-pressed='true'] {
+  border-color: var(--fl-ink);
+  background: #fff;
+}
+
+.fl-livery-chip {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  width: 30px;
+  height: 22px;
+  padding: 3px;
+  box-sizing: border-box;
+  border-radius: 4px;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+}
+
+.fl-livery-chip span {
+  flex: 1;
+  height: 9px;
+  border-radius: 2px;
+}
+
+.fl-seg {
+  display: flex;
+  gap: 6px;
+}
+
+.fl-seg button {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 9px 11px;
+  font-size: 13.5px;
+  font-weight: 700;
+  text-align: left;
+  background: rgba(255, 255, 255, 0.5);
+  border: 1.5px solid var(--fl-line);
+  border-radius: 8px;
+  transition: border-color 0.15s ease;
+}
+
+.fl-seg button small {
+  font-size: 11.5px;
+  font-weight: 500;
+  line-height: 1.3;
+  color: var(--fl-muted);
+}
+
+.fl-seg button[aria-pressed='true'] {
+  border-color: var(--fl-ink);
+  background: #fff;
+}
+
+.fl-control-note {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--fl-muted);
+}
+
+/* ---- dock to door --------------------------------------------------------- */
+
+.fl-door {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: clamp(56px, 9vh, 104px) 32px 64px;
+}
+
+.fl-door-head {
+  max-width: 600px;
+  margin-bottom: 22px;
+}
+
+.fl-door-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.fl-card {
+  border-radius: 6px;
+  border: 1px solid var(--fl-line);
+  background: rgba(255, 255, 255, 0.4);
+  overflow: clip;
+}
+
+/* A definite height, so LazyScene has a box to hold while unmounted. */
+.fl-card-stage {
+  position: relative;
+  height: 460px;
+  background: linear-gradient(to bottom, #e6e9ed 0%, #d7dbe1 100%);
+}
+
+.fl-card-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 16px 20px 20px;
+}
+
+.fl-card-copy strong {
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.fl-card-copy span {
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--fl-muted);
+}
+
+/* ---- footer ------------------------------------------------------------ */
+
+.fl-foot {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 22px 32px 36px;
+  border-top: 1px solid var(--fl-line);
+  font-size: 13px;
+  color: var(--fl-muted);
+}
+
+.fl-foot a {
+  font-weight: 700;
+  color: var(--fl-ink);
+}
+
+/* ---- narrower ------------------------------------------------------------ */
+
+@media (max-width: 1000px) {
+  .fl-van {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
+  .fl-van-stage {
+    height: 56vh;
+  }
+
+  .fl-door-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 760px) {
+  .fl-top {
+    padding: 18px 20px 0;
+  }
+
+  .fl-badge,
+  .fl-nav {
+    display: none;
+  }
+
+  .fl-hero,
+  .fl-trailer,
+  .fl-van,
+  .fl-door,
+  .fl-foot {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+
+  .fl-hero h1 {
+    font-size: clamp(36px, 11vw, 52px);
+  }
+
+  .fl-lede {
+    font-size: 16.5px;
+  }
+
+  .fl-trailer-stage {
+    height: 46vh;
+  }
+
+  .fl-caption {
+    margin-left: 0;
+  }
+
+  .fl-seg {
+    flex-direction: column;
+  }
+
+  .fl-card-stage {
+    height: 420px;
+  }
+}

@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import { ExampleBadge, TabbiedLink } from '../_shared/badge'
 import { MarkSwatch, Stage, type SceneName } from './campaign-client'
 import { FESTIVAL, INKS } from './campaign-identity'
 
@@ -64,9 +65,7 @@ export default function CampaignExamplePage() {
         <span className="cp-crumb">
           Work <span aria-hidden>/</span> Aperture Festival 2026
         </span>
-        <Link className="cp-badge" href="/">
-          example · built with react-3d-mockups + tabbied
-        </Link>
+        <ExampleBadge className="cp-badge" />
       </header>
 
       <section className="cp-hero">
@@ -106,7 +105,7 @@ export default function CampaignExamplePage() {
             </div>
             <h3>The mark</h3>
             <p>
-              <em>Nutation</em>, from Tabbied: lines radiating from a point and turning slightly off it, the way
+              <em>Nutation</em>, from <TabbiedLink />: lines radiating from a point and turning slightly off it, the way
               light leaves an aperture. Seeded on paper, live on glass.
             </p>
           </article>
@@ -167,7 +166,7 @@ export default function CampaignExamplePage() {
             <strong>Identity</strong> Raster Studio, another
           </span>
           <span>
-            <strong>Patterns</strong> tabbied
+            <strong>Patterns</strong> <TabbiedLink>tabbied</TabbiedLink>
           </span>
           <span>
             <strong>Mockups</strong> react-3d-mockups

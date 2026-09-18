@@ -15,11 +15,6 @@ export interface SiteExample {
 
 export const SITE_EXAMPLES: SiteExample[] = [
   {
-    href: '/examples/hero-phone',
-    title: 'Hero Phone',
-    description: 'Product hero with a giant, draggable phone',
-  },
-  {
     href: '/examples/print-shop',
     title: 'Print Shop',
     description: 'A poster configurator that reprints the sheet in its frame',
@@ -28,5 +23,30 @@ export const SITE_EXAMPLES: SiteExample[] = [
     href: '/examples/campaign',
     title: 'Campaign',
     description: 'One generative identity across the city, billboard to crew pass',
+  },
+  {
+    href: '/examples/ledger',
+    title: 'Ledger',
+    description: 'A finance app on a laptop, a phone and a watch in one scene',
+  },
+  {
+    href: '/examples/cafe',
+    title: 'Café',
+    description: 'A coffee shop: storefront, chalkboard, oat-milk carton, loyalty card',
+  },
+  {
+    href: '/examples/fleet',
+    title: 'Fleet',
+    description: 'A freight livery on a trailer, a van, a box and a tracking app',
+  },
+  {
+    href: '/examples/stream',
+    title: 'Stream',
+    description: 'A streaming service on a TV, a Fold, a Flip and an iPad',
+  },
+  {
+    href: '/examples/packaging',
+    title: 'Packaging',
+    description: 'A box configurator rebuilt from millimetre sliders',
   },
 ]

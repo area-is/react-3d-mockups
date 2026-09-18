@@ -1,0 +1,559 @@
+/* ------------------------------------------------------------------ */
+/*  /examples/packaging - an isolated custom-size configurator.        */
+/*                                                                     */
+/*  Kraft-coloured paper and one orange, with the box on the left and  */
+/*  the sliders on the right. The tokens override the site's on `.pk`  */
+/*  only.                                                              */
+/* ------------------------------------------------------------------ */
+
+.pk {
+  --pk-bg: #f4efe6;
+  --pk-floor: #e7dfd1;
+  --pk-ink: #1f1c18;
+  --pk-muted: #6e675c;
+  --pk-line: #d9d0c1;
+  --pk-line-strong: #b9ad9a;
+  --pk-accent: #d9480f;
+  position: relative;
+  isolation: isolate;
+  min-height: 100svh;
+  background: var(--pk-bg);
+  color: var(--pk-ink);
+}
+
+.pk a {
+  color: inherit;
+}
+
+.pk button {
+  font-family: inherit;
+  letter-spacing: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+/* ---- top bar --------------------------------------------------------- */
+
+.pk-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 24px 32px 0;
+}
+
+.pk-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  white-space: nowrap;
+}
+
+.pk-brand-mark {
+  width: 16px;
+  height: 12px;
+  border: 2.5px solid var(--pk-accent);
+  border-radius: 2px;
+  box-sizing: border-box;
+}
+
+.pk-nav {
+  display: flex;
+  gap: 26px;
+  font-size: 14.5px;
+  font-weight: 500;
+  color: var(--pk-muted);
+}
+
+.pk-nav .is-active {
+  color: var(--pk-ink);
+  border-bottom: 2px solid var(--pk-ink);
+  padding-bottom: 2px;
+}
+
+.pk-top-right {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.pk-badge {
+  font-size: 12.5px;
+  font-weight: 500;
+  white-space: nowrap;
+  color: var(--pk-muted);
+  border: 1px solid var(--pk-line);
+  border-radius: 999px;
+  padding: 6px 13px;
+  background: rgba(255, 255, 255, 0.45);
+}
+
+.pk-badge a {
+  font-weight: 600;
+  transition: color 0.15s ease;
+}
+
+.pk-badge a:hover {
+  color: var(--pk-ink);
+}
+
+.pk-cta {
+  font-size: 14px;
+  font-weight: 700;
+  color: #fff;
+  background: var(--pk-ink);
+  border-radius: 999px;
+  padding: 9px 16px;
+  white-space: nowrap;
+}
+
+/* ---- the proof and the configurator ------------------------------------- */
+
+.pk-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(340px, 440px);
+  gap: 44px;
+  align-items: start;
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 28px 32px 56px;
+}
+
+/* The bench. Sticky, so the box stays in view while the sliders scroll. */
+.pk-stage {
+  position: sticky;
+  top: 24px;
+  height: min(82vh, 820px);
+  overflow: clip;
+  border-radius: 22px;
+  background:
+    radial-gradient(60% 50% at 50% 40%, rgba(255, 255, 255, 0.55) 0%, transparent 70%),
+    var(--pk-floor);
+}
+
+/* No bleed here, unlike the print shop: a box fills its frame more fully
+   than a poster does, and the camera above stands back instead. */
+.pk-stage-bleed {
+  position: absolute;
+  inset: 0;
+}
+
+.pk-readout {
+  position: absolute;
+  left: 18px;
+  bottom: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.7);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  pointer-events: none;
+  font-variant-numeric: tabular-nums;
+}
+
+.pk-readout strong {
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.pk-readout span {
+  font-size: 12px;
+  color: var(--pk-muted);
+}
+
+.pk-config {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding-top: 6px;
+}
+
+.pk-eyebrow {
+  margin: 0;
+  font-size: 12.5px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--pk-accent);
+}
+
+.pk-config h1 {
+  margin: 0;
+  font-size: clamp(34px, 3.6vw, 46px);
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  line-height: 1;
+}
+
+.pk-lede {
+  margin: -4px 0 4px;
+  font-size: 15.5px;
+  line-height: 1.5;
+  color: var(--pk-muted);
+}
+
+.pk-field {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  min-width: 0;
+}
+
+.pk-field-label {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 0;
+  margin: 0 0 8px;
+  font-size: 12.5px;
+  font-weight: 700;
+}
+
+.pk-field-label span {
+  font-weight: 500;
+  color: var(--pk-muted);
+}
+
+.pk-row {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 18px;
+}
+
+/* Styles: three cards. */
+.pk-styles {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.pk-style {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 10px 12px;
+  text-align: left;
+  background: rgba(255, 255, 255, 0.5);
+  border: 1.5px solid var(--pk-line);
+  border-radius: 12px;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.pk-style:hover {
+  border-color: var(--pk-line-strong);
+}
+
+.pk-style[aria-pressed='true'] {
+  border-color: var(--pk-ink);
+  background: #fff;
+}
+
+.pk-style strong {
+  font-size: 13.5px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.pk-style span {
+  font-size: 11.5px;
+  line-height: 1.3;
+  color: var(--pk-muted);
+}
+
+/* Sliders: the whole point of the page, so they get the accent. */
+.pk-sliders {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.pk-slider {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.pk-slider-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.pk-slider-label output {
+  font-variant-numeric: tabular-nums;
+  color: var(--pk-muted);
+}
+
+.pk-slider input[type='range'] {
+  width: 100%;
+  height: 22px;
+  margin: 0;
+  background: transparent;
+  accent-color: var(--pk-accent);
+  cursor: pointer;
+}
+
+/* Boards: a swatch and a name. */
+.pk-stocks {
+  display: flex;
+  gap: 6px;
+}
+
+.pk-stock {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 4px;
+  font-size: 11.5px;
+  font-weight: 600;
+  white-space: nowrap;
+  background: rgba(255, 255, 255, 0.5);
+  border: 1.5px solid var(--pk-line);
+  border-radius: 12px;
+  transition: border-color 0.15s ease;
+}
+
+.pk-stock span {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+}
+
+.pk-stock[aria-pressed='true'] {
+  border-color: var(--pk-ink);
+  background: #fff;
+}
+
+/* Segmented: quantity, print. */
+.pk-seg {
+  display: flex;
+  gap: 6px;
+}
+
+.pk-seg button {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 9px 8px;
+  font-size: 13px;
+  font-weight: 700;
+  background: rgba(255, 255, 255, 0.5);
+  border: 1.5px solid var(--pk-line);
+  border-radius: 12px;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.pk-seg button small {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--pk-muted);
+  line-height: 1.3;
+  text-align: center;
+}
+
+.pk-seg button:hover {
+  border-color: var(--pk-line-strong);
+}
+
+.pk-seg button[aria-pressed='true'] {
+  border-color: var(--pk-ink);
+  background: #fff;
+}
+
+/* The estimate and the action. */
+.pk-estimate {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 6px;
+  padding-top: 20px;
+  border-top: 1px solid var(--pk-line);
+}
+
+.pk-estimate-price {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-variant-numeric: tabular-nums;
+}
+
+.pk-estimate-price strong {
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1;
+}
+
+.pk-estimate-price span {
+  font-size: 12.5px;
+  color: var(--pk-muted);
+}
+
+.pk .pk-btn {
+  border: 0;
+  border-radius: 999px;
+  padding: 13px 22px;
+  font-size: 15px;
+  font-weight: 700;
+  color: #fff;
+  background: var(--pk-accent);
+  white-space: nowrap;
+  transition: transform 0.1s ease;
+}
+
+.pk .pk-btn:active {
+  transform: scale(0.96);
+}
+
+.pk-note {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--pk-muted);
+}
+
+.pk-note a {
+  font-weight: 600;
+  color: var(--pk-ink);
+  border-bottom: 1px solid var(--pk-line);
+}
+
+/* ---- the panel ------------------------------------------------------------ */
+
+.pk-panel {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(300px, 400px);
+  gap: 44px;
+  align-items: center;
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 8px 32px 64px;
+}
+
+/* A definite height, so LazyScene has a box to hold while unmounted. */
+.pk-panel-stage {
+  position: relative;
+  height: 460px;
+  border-radius: 22px;
+  overflow: clip;
+  background: var(--pk-floor);
+}
+
+.pk-panel-copy h2 {
+  margin: 0 0 10px;
+  font-size: 26px;
+  font-weight: 800;
+  letter-spacing: -0.035em;
+}
+
+.pk-panel-copy p {
+  margin: 0 0 12px;
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--pk-muted);
+}
+
+.pk-panel-price {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--pk-accent);
+}
+
+/* ---- footer ------------------------------------------------------------ */
+
+.pk-foot {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 22px 32px 36px;
+  border-top: 1px solid var(--pk-line);
+  font-size: 13px;
+  color: var(--pk-muted);
+}
+
+.pk-foot a {
+  font-weight: 600;
+  color: var(--pk-ink);
+}
+
+/* ---- narrower ------------------------------------------------------------ */
+
+@media (max-width: 1000px) {
+  .pk-hero,
+  .pk-panel {
+    grid-template-columns: 1fr;
+    gap: 28px;
+  }
+
+  .pk-stage {
+    position: relative;
+    top: auto;
+    height: min(64vh, 620px);
+  }
+
+  .pk-config {
+    max-width: 560px;
+  }
+}
+
+@media (max-width: 760px) {
+  .pk-top {
+    padding: 18px 20px 0;
+  }
+
+  .pk-badge,
+  .pk-nav {
+    display: none;
+  }
+
+  .pk-hero,
+  .pk-panel,
+  .pk-foot {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+
+  .pk-stage {
+    height: 58vh;
+    border-radius: 16px;
+  }
+
+  .pk-styles {
+    grid-template-columns: 1fr;
+  }
+
+  .pk-row {
+    grid-template-columns: 1fr;
+  }
+
+  .pk-seg-tall {
+    flex-direction: column;
+  }
+
+  .pk-estimate {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .pk-panel-stage {
+    height: 400px;
+  }
+}

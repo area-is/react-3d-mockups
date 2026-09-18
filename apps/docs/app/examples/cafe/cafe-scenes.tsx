@@ -1,0 +1,107 @@
+'use client'
+
+import { AFrameSignMockup, BusinessCardMockup, MilkCartonMockup, StorefrontMockup } from 'react-3d-mockups'
+import { BOARD, BoardBack, BoardFront, CREAM, CardBack, CardFront, CartonFace, CartonGable, Door, Fascia, WindowPoster } from './cafe-art'
+
+/**
+ * Ninefold's four objects, each on its own canvas. The storefront reads
+ * the page's two controls - whether the shop is open, and what colour it is
+ * painted - and the loyalty card's back is painted to match, because a
+ * shop that repaints its front reprints its cards.
+ */
+
+export function StorefrontScene({ open, paint }: { open: boolean; paint: string }) {
+  return (
+    <StorefrontMockup
+      float
+      color={paint}
+      // Darker glass once the lights are off: the panes are a reflection tint,
+      // so a shop that has closed reads as closed from across the street.
+      windowColor={open ? '#5a6d75' : '#3a4448'}
+      surfaceBackground={CREAM}
+      rotation={[0, -0.28, 0]}
+    >
+      <StorefrontMockup.Fascia surfaceBackground={paint}>
+        <Fascia paint={paint} />
+      </StorefrontMockup.Fascia>
+      <StorefrontMockup.FrontLeft>
+        <WindowPoster title="Oat latte" sub={'€4,20\nours, made to steam'} seed="ninefold-left" paint={paint} />
+      </StorefrontMockup.FrontLeft>
+      <StorefrontMockup.FrontRight>
+        <WindowPoster title="Bread daily" sub={'sourdough at 7:30\nbuns at 8, 11 and 3'} seed="ninefold-right" paint={paint} />
+      </StorefrontMockup.FrontRight>
+      <StorefrontMockup.Door surfaceBackground="transparent">
+        <Door open={open} paint={paint} />
+      </StorefrontMockup.Door>
+      <StorefrontMockup.LeftSign surfaceBackground={paint}>
+        <Fascia paint={paint} sub="Est. 2019" />
+      </StorefrontMockup.LeftSign>
+      <StorefrontMockup.RightSign surfaceBackground={paint}>
+        <Fascia paint={paint} sub="Bakery" />
+      </StorefrontMockup.RightSign>
+      <StorefrontMockup.RearSign surfaceBackground={paint}>
+        <Fascia paint={paint} sub="Roastery" />
+      </StorefrontMockup.RearSign>
+      <StorefrontMockup.Left>
+        <WindowPoster title="Filter" sub={'today Huila\n€3,20'} seed="ninefold-side-l" paint={paint} />
+      </StorefrontMockup.Left>
+      <StorefrontMockup.Right>
+        <WindowPoster title="Cold brew" sub={'on tap\n€4,00'} seed="ninefold-side-r" paint={paint} />
+      </StorefrontMockup.Right>
+      <StorefrontMockup.Rear>
+        <WindowPoster title="Beans" sub={'250 g · €11'} seed="ninefold-rear" paint={paint} />
+      </StorefrontMockup.Rear>
+    </StorefrontMockup>
+  )
+}
+
+export function BoardScene() {
+  return (
+    <AFrameSignMockup float color="#4a3826" rotation={[0, -0.22, 0]}>
+      <AFrameSignMockup.Front>
+        <BoardFront />
+      </AFrameSignMockup.Front>
+      <AFrameSignMockup.Back>
+        <BoardBack />
+      </AFrameSignMockup.Back>
+    </AFrameSignMockup>
+  )
+}
+
+export function CartonScene() {
+  return (
+    <MilkCartonMockup float color={BOARD} surfaceBackground={BOARD} capColor="#2e4638" rotation={[0, -0.3, 0]}>
+      <MilkCartonMockup.Front>
+        <CartonFace side="front" seed="ninefold-oat-front" />
+      </MilkCartonMockup.Front>
+      <MilkCartonMockup.Back>
+        <CartonFace side="back" seed="ninefold-oat-back" />
+      </MilkCartonMockup.Back>
+      <MilkCartonMockup.Left>
+        <CartonFace side="side" seed="ninefold-oat-left" />
+      </MilkCartonMockup.Left>
+      <MilkCartonMockup.Right>
+        <CartonFace side="side" seed="ninefold-oat-right" />
+      </MilkCartonMockup.Right>
+      <MilkCartonMockup.GableFront>
+        <CartonGable />
+      </MilkCartonMockup.GableFront>
+      <MilkCartonMockup.GableBack>
+        <CartonGable />
+      </MilkCartonMockup.GableBack>
+    </MilkCartonMockup>
+  )
+}
+
+export function CardScene({ paint }: { paint: string }) {
+  return (
+    <BusinessCardMockup float color={CREAM} edgeColor={paint} surfaceBackground={CREAM} rotation={[-0.1, -0.35, 0]}>
+      <BusinessCardMockup.Front>
+        <CardFront />
+      </BusinessCardMockup.Front>
+      <BusinessCardMockup.Back surfaceBackground={paint}>
+        <CardBack paint={paint} />
+      </BusinessCardMockup.Back>
+    </BusinessCardMockup>
+  )
+}

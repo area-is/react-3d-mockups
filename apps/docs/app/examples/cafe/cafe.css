@@ -1,0 +1,471 @@
+/* ------------------------------------------------------------------ */
+/*  /examples/cafe - an isolated local-business example.               */
+/*                                                                     */
+/*  Cream paper and the shop's own paint, which the page reads from    */
+/*  `--cf-paint` so the swatches recolour the site as they recolour    */
+/*  the shopfront. The tokens override the site's on `.cf` only.       */
+/* ------------------------------------------------------------------ */
+
+.cf {
+  --cf-paint: #2e4638;
+  --cf-cream: #f3ead9;
+  --cf-paper: #f7f1e6;
+  --cf-ink: #24201a;
+  --cf-muted: #6f675b;
+  --cf-line: #ded4c2;
+  --cf-oat: #d5a860;
+  position: relative;
+  isolation: isolate;
+  min-height: 100svh;
+  background: var(--cf-paper);
+  color: var(--cf-ink);
+  font-family: var(--font-sans);
+}
+
+.cf a {
+  color: inherit;
+}
+
+.cf button {
+  font-family: inherit;
+  letter-spacing: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+.cf h1,
+.cf h2 {
+  font-family: var(--font-fraunces), Fraunces, 'Iowan Old Style', 'Palatino Linotype', serif;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+}
+
+/* ---- top bar --------------------------------------------------------- */
+
+.cf-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 24px 32px 0;
+}
+
+.cf-brand {
+  font-family: var(--font-fraunces), Fraunces, serif;
+  font-size: 24px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  color: var(--cf-paint);
+  transition: color 0.4s ease;
+}
+
+.cf-nav {
+  display: flex;
+  gap: 26px;
+  font-size: 14.5px;
+  font-weight: 500;
+  color: var(--cf-muted);
+}
+
+.cf-top-right {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.cf-badge {
+  font-size: 12.5px;
+  font-weight: 500;
+  white-space: nowrap;
+  color: var(--cf-muted);
+  border: 1px solid var(--cf-line);
+  border-radius: 999px;
+  padding: 6px 13px;
+  background: rgba(255, 255, 255, 0.45);
+}
+
+.cf-badge a {
+  font-weight: 600;
+  transition: color 0.15s ease;
+}
+
+.cf-badge a:hover {
+  color: var(--cf-ink);
+}
+
+.cf-cta {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--cf-cream);
+  background: var(--cf-paint);
+  border-radius: 999px;
+  padding: 9px 16px;
+  white-space: nowrap;
+  transition: background 0.4s ease;
+}
+
+/* ---- hero copy ----------------------------------------------------------- */
+
+.cf-hero {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: clamp(44px, 8vh, 84px) 32px 28px;
+}
+
+.cf-eyebrow {
+  margin: 0 0 14px;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--cf-paint);
+  transition: color 0.4s ease;
+}
+
+.cf-hero h1 {
+  max-width: 760px;
+  margin: 0 0 18px;
+  font-size: clamp(40px, 5.4vw, 72px);
+  line-height: 1.02;
+}
+
+.cf-lede {
+  max-width: 600px;
+  margin: 0;
+  font-size: 18px;
+  line-height: 1.55;
+  color: var(--cf-muted);
+}
+
+/* ---- the shop ------------------------------------------------------------ */
+
+.cf-shop {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 0 32px;
+}
+
+/* A wide, definite box for a building. The pavement colour is a touch
+   darker than the page, so the shop stands on a street rather than on
+   paper. */
+.cf-shop-stage {
+  position: relative;
+  height: min(72vh, 700px);
+  overflow: clip;
+  border-radius: 22px;
+  background:
+    radial-gradient(70% 60% at 50% 45%, rgba(255, 255, 255, 0.5) 0%, transparent 70%),
+    #e9e0cd;
+}
+
+.cf-controls {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 18px 34px;
+  padding: 18px 22px;
+  margin-top: 14px;
+  border: 1px solid var(--cf-line);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.45);
+}
+
+.cf-control {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.cf-control-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--cf-muted);
+}
+
+.cf-seg {
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  border: 1px solid var(--cf-line);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.6);
+}
+
+.cf-seg button {
+  padding: 7px 16px;
+  font-size: 13.5px;
+  font-weight: 600;
+  background: transparent;
+  border: 0;
+  border-radius: 999px;
+  color: var(--cf-muted);
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.cf-seg button[aria-pressed='true'] {
+  background: var(--cf-ink);
+  color: var(--cf-cream);
+}
+
+.cf-paints {
+  display: flex;
+  gap: 8px;
+}
+
+.cf-paint {
+  padding: 3px;
+  background: transparent;
+  border: 1.5px solid transparent;
+  border-radius: 50%;
+  transition: border-color 0.15s ease;
+}
+
+.cf-paint span {
+  display: block;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+}
+
+.cf-paint[aria-pressed='true'] {
+  border-color: var(--cf-ink);
+}
+
+.cf-control-note {
+  margin: 0;
+  margin-left: auto;
+  max-width: 420px;
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--cf-muted);
+}
+
+/* ---- the board ----------------------------------------------------------- */
+
+.cf-board {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 40px;
+  align-items: center;
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: clamp(56px, 9vh, 104px) 32px 0;
+}
+
+.cf-board-copy h2,
+.cf-good-copy h2 {
+  margin: 0 0 10px;
+  font-size: clamp(28px, 3.2vw, 40px);
+  line-height: 1.05;
+}
+
+.cf-board-copy > p {
+  margin: 0 0 22px;
+  font-size: 16px;
+  line-height: 1.55;
+  color: var(--cf-muted);
+}
+
+.cf-menu {
+  margin-bottom: 18px;
+}
+
+.cf-menu h3 {
+  margin: 0 0 8px;
+  font-family: var(--font-fraunces), Fraunces, serif;
+  font-style: italic;
+  font-weight: 500;
+  font-size: 20px;
+  letter-spacing: -0.01em;
+  color: var(--cf-paint);
+  transition: color 0.4s ease;
+}
+
+.cf-menu-row {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  padding: 6px 0;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.cf-menu-name em {
+  margin-left: 8px;
+  font-style: normal;
+  font-size: 12.5px;
+  color: var(--cf-muted);
+}
+
+.cf-menu-dots {
+  flex: 1;
+  border-bottom: 1px dotted var(--cf-line);
+  transform: translateY(-4px);
+}
+
+.cf-menu-price {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+
+.cf-board-stage {
+  position: relative;
+  height: 600px;
+  border-radius: 22px;
+  overflow: clip;
+  background: #e9e0cd;
+}
+
+/* ---- the goods ------------------------------------------------------------ */
+
+.cf-goods {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: clamp(48px, 8vh, 88px) 32px 64px;
+}
+
+.cf-good {
+  border-radius: 22px;
+  border: 1px solid var(--cf-line);
+  background: rgba(255, 255, 255, 0.4);
+  overflow: clip;
+}
+
+/* A definite height, so LazyScene has a box to hold while unmounted. */
+.cf-good-stage {
+  position: relative;
+  height: 460px;
+  background: #e9e0cd;
+}
+
+.cf-good-copy {
+  padding: 22px 26px 26px;
+}
+
+.cf-good-copy p {
+  margin: 0 0 12px;
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--cf-muted);
+}
+
+.cf-good-copy a {
+  font-weight: 600;
+  color: var(--cf-ink);
+  border-bottom: 1px solid var(--cf-line);
+}
+
+.cf-good-price {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--cf-paint);
+  transition: color 0.4s ease;
+}
+
+/* ---- footer ------------------------------------------------------------ */
+
+.cf-foot {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 28px 32px 40px;
+  border-top: 1px solid var(--cf-line);
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--cf-muted);
+}
+
+.cf-foot-cols {
+  display: grid;
+  grid-template-columns: repeat(3, auto);
+  justify-content: start;
+  gap: 40px;
+  margin-bottom: 26px;
+}
+
+.cf-foot strong {
+  color: var(--cf-ink);
+  font-weight: 700;
+}
+
+.cf-foot-note {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px 24px;
+  font-size: 13px;
+}
+
+.cf-foot-note a {
+  font-weight: 600;
+  color: var(--cf-ink);
+}
+
+/* ---- narrower ------------------------------------------------------------ */
+
+@media (max-width: 1000px) {
+  .cf-board {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
+  .cf-board-stage {
+    height: 520px;
+  }
+
+  .cf-goods {
+    grid-template-columns: 1fr;
+  }
+
+  .cf-control-note {
+    margin-left: 0;
+    max-width: none;
+  }
+}
+
+@media (max-width: 760px) {
+  .cf-top {
+    padding: 18px 20px 0;
+  }
+
+  .cf-badge,
+  .cf-nav {
+    display: none;
+  }
+
+  .cf-hero,
+  .cf-shop,
+  .cf-board,
+  .cf-goods,
+  .cf-foot {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+
+  .cf-hero h1 {
+    font-size: clamp(34px, 10vw, 48px);
+  }
+
+  .cf-lede {
+    font-size: 16.5px;
+  }
+
+  .cf-shop-stage {
+    height: 56vh;
+    border-radius: 16px;
+  }
+
+  .cf-board-stage,
+  .cf-good-stage {
+    height: 440px;
+  }
+
+  .cf-foot-cols {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+}

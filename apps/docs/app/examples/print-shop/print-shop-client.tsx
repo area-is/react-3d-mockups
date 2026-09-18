@@ -7,6 +7,7 @@ import { Download, Shuffle } from 'lucide-react'
 import { TabbiedPattern, type TabbiedPatternHandle } from 'tabbied/react'
 import { LazyScene } from '@/components/lazy-scene'
 import { SceneBoundary } from '@/components/scene-boundary'
+import { ExampleBadge, TabbiedLink } from '../_shared/badge'
 import {
   BLEEDS,
   DEFAULT_ORDER,
@@ -95,9 +96,7 @@ export function PrintShop() {
           <span className="ps-nav-link">Studio</span>
         </nav>
         <div className="ps-top-right">
-          <Link className="ps-badge" href="/">
-            example · built with react-3d-mockups + tabbied
-          </Link>
+          <ExampleBadge className="ps-badge" />
           <span className="ps-bag" aria-live="polite">
             Bag · {bag}
           </span>
@@ -294,7 +293,9 @@ export function PrintShop() {
       </section>
 
       <footer className="ps-foot">
-        <span>Grid Editions is a fictional shop. The prints are real: every one is a Tabbied pattern rendered live.</span>
+        <span>
+          Grid Editions is a fictional shop. The prints are real: every one is a <TabbiedLink /> pattern rendered live.
+        </span>
         <Link href="/docs">Read the react-3d-mockups docs →</Link>
       </footer>
     </main>
