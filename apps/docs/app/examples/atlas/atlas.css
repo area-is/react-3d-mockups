@@ -1,0 +1,395 @@
+/* ------------------------------------------------------------------ */
+/*  /examples/atlas - an isolated editorial example.                   */
+/*                                                                     */
+/*  Uncoated paper, a serif masthead, red for the one accent. The      */
+/*  tokens override the site's on `.at` only.                          */
+/* ------------------------------------------------------------------ */
+
+.at {
+  --at-paper: #f6f3ec;
+  --at-panel: #ebe6dc;
+  --at-ink: #171512;
+  --at-muted: #6c675e;
+  --at-line: #dcd5c8;
+  --at-red: #c8321e;
+  position: relative;
+  isolation: isolate;
+  min-height: 100svh;
+  background: var(--at-paper);
+  color: var(--at-ink);
+}
+
+.at a {
+  color: inherit;
+}
+
+.at button {
+  font-family: inherit;
+  letter-spacing: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+.at h1,
+.at h2,
+.at-brand {
+  font-family: var(--font-fraunces), Fraunces, 'Iowan Old Style', 'Palatino Linotype', serif;
+  font-weight: 500;
+  letter-spacing: -0.025em;
+}
+
+/* ---- top bar --------------------------------------------------------- */
+
+.at-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 22px 32px 0;
+  border-bottom: 0;
+}
+
+.at-brand {
+  font-size: 30px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: -0.03em;
+}
+
+.at-nav {
+  display: flex;
+  gap: 26px;
+  font-size: 14.5px;
+  font-weight: 500;
+  color: var(--at-muted);
+}
+
+.at-top-right {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.at-badge {
+  font-size: 12.5px;
+  font-weight: 500;
+  white-space: nowrap;
+  color: var(--at-muted);
+  border: 1px solid var(--at-line);
+  border-radius: 999px;
+  padding: 6px 13px;
+  background: rgba(255, 255, 255, 0.45);
+}
+
+.at-badge a {
+  font-weight: 600;
+  transition: color 0.15s ease;
+}
+
+.at-badge a:hover {
+  color: var(--at-ink);
+}
+
+.at-cta {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--at-paper);
+  background: var(--at-ink);
+  padding: 9px 16px;
+  white-space: nowrap;
+}
+
+/* ---- the issue ----------------------------------------------------------- */
+
+.at-hero {
+  display: grid;
+  grid-template-columns: minmax(320px, 460px) minmax(0, 1fr);
+  gap: 44px;
+  align-items: center;
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: clamp(36px, 6vh, 64px) 32px 0;
+}
+
+.at-eyebrow {
+  margin: 0 0 14px;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--at-red);
+}
+
+.at-hero h1 {
+  margin: 0 0 16px;
+  font-size: clamp(36px, 4.4vw, 58px);
+  line-height: 1.02;
+}
+
+.at-lede {
+  margin: 0 0 24px;
+  font-size: 17px;
+  line-height: 1.55;
+  color: var(--at-muted);
+}
+
+.at-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px 28px;
+  padding: 16px 0;
+  border-top: 1px solid var(--at-line);
+  border-bottom: 1px solid var(--at-line);
+}
+
+.at-control {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.at-control-label {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--at-muted);
+}
+
+.at-covers {
+  display: flex;
+  gap: 8px;
+}
+
+.at-cover {
+  width: 64px;
+  height: 84px;
+  padding: 0;
+  overflow: hidden;
+  background: var(--at-panel);
+  border: 2px solid transparent;
+  transition: border-color 0.15s ease;
+}
+
+.at-cover[aria-pressed='true'] {
+  border-color: var(--at-ink);
+}
+
+.at-seg {
+  display: flex;
+  border: 1px solid var(--at-line);
+}
+
+.at-seg button {
+  padding: 9px 16px;
+  font-size: 13.5px;
+  font-weight: 600;
+  background: transparent;
+  border: 0;
+  color: var(--at-muted);
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.at-seg button[aria-pressed='true'] {
+  background: var(--at-ink);
+  color: var(--at-paper);
+}
+
+.at-control-note {
+  margin: 14px 0 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--at-muted);
+}
+
+.at-control-note em {
+  font-style: normal;
+  color: var(--at-ink);
+}
+
+.at-hero-stage {
+  position: relative;
+  height: min(78vh, 760px);
+  overflow: clip;
+  background: var(--at-panel);
+}
+
+/* ---- contents ------------------------------------------------------------ */
+
+.at-contents {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: clamp(48px, 8vh, 80px) 32px 0;
+}
+
+.at-contents h2,
+.at-shop-head h2 {
+  margin: 0 0 16px;
+  font-size: clamp(26px, 3vw, 36px);
+}
+
+.at-contents-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 40px;
+  border-top: 1px solid var(--at-ink);
+}
+
+.at-contents-row {
+  display: grid;
+  grid-template-columns: 40px 1fr auto;
+  gap: 14px;
+  align-items: baseline;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--at-line);
+  font-size: 15px;
+}
+
+.at-contents-page {
+  font-variant-numeric: tabular-nums;
+  color: var(--at-muted);
+}
+
+.at-contents-title {
+  font-family: var(--font-fraunces), Fraunces, serif;
+  font-size: 19px;
+  font-weight: 500;
+}
+
+.at-contents-by {
+  font-size: 13px;
+  color: var(--at-muted);
+}
+
+/* ---- the shop -------------------------------------------------------------- */
+
+.at-shop {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: clamp(48px, 8vh, 88px) 32px 64px;
+}
+
+.at-shop-head {
+  max-width: 600px;
+  margin-bottom: 22px;
+}
+
+.at-shop-head p {
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.55;
+  color: var(--at-muted);
+}
+
+.at-shop-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+.at-item {
+  border: 1px solid var(--at-line);
+  overflow: clip;
+}
+
+/* A definite height, so LazyScene has a box to hold while unmounted. */
+.at-item-stage {
+  position: relative;
+  height: 440px;
+  background: var(--at-panel);
+}
+
+.at-item-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 14px 18px 18px;
+}
+
+.at-item-meta strong {
+  font-family: var(--font-fraunces), Fraunces, serif;
+  font-size: 19px;
+  font-weight: 500;
+}
+
+.at-item-meta span {
+  font-size: 13px;
+  color: var(--at-muted);
+}
+
+/* ---- footer ------------------------------------------------------------ */
+
+.at-foot {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 22px 32px 36px;
+  border-top: 1px solid var(--at-ink);
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--at-muted);
+}
+
+.at-foot span {
+  max-width: 640px;
+}
+
+.at-foot a {
+  font-weight: 600;
+  color: var(--at-ink);
+  white-space: nowrap;
+}
+
+/* ---- narrower ------------------------------------------------------------ */
+
+@media (max-width: 1000px) {
+  .at-hero {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
+  .at-hero-stage {
+    height: min(64vh, 620px);
+  }
+
+  .at-contents-grid,
+  .at-shop-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 760px) {
+  .at-top {
+    padding: 18px 20px 0;
+  }
+
+  .at-badge,
+  .at-nav {
+    display: none;
+  }
+
+  .at-hero,
+  .at-contents,
+  .at-shop,
+  .at-foot {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+
+  .at-hero h1 {
+    font-size: clamp(32px, 9vw, 44px);
+  }
+
+  .at-hero-stage {
+    height: 60vh;
+  }
+
+  .at-item-stage {
+    height: 400px;
+  }
+}

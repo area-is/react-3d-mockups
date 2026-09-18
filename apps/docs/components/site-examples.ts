@@ -49,4 +49,29 @@ export const SITE_EXAMPLES: SiteExample[] = [
     title: 'Packaging',
     description: 'A box configurator rebuilt from millimetre sliders',
   },
+  {
+    href: '/examples/stationery',
+    title: 'Stationery',
+    description: 'A wedding suite typeset from the names you type',
+  },
+  {
+    href: '/examples/matchday',
+    title: 'Match day',
+    description: 'A football club: team coach, live broadcast, watch, season pass',
+  },
+  {
+    href: '/examples/atlas',
+    title: 'Atlas',
+    description: 'A magazine issue with generated photographs, print and annual',
+  },
+  {
+    href: '/examples/arcade',
+    title: 'Arcade',
+    description: 'An indie game running live on a TV, boxed, on vinyl, on a phone',
+  },
+  {
+    href: '/examples/ambient',
+    title: 'Ambient',
+    description: 'Living art on a Frame TV, a display, a tablet and a watch',
+  },
 ]

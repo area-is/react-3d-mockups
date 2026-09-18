@@ -1,0 +1,398 @@
+/* ------------------------------------------------------------------ */
+/*  /examples/arcade - an isolated game-launch example.                */
+/*                                                                     */
+/*  The level's night sky is the page's, read from `--ar-sky`, and its  */
+/*  lamp colour is the accent. Tokens override the site's on `.ar`.    */
+/* ------------------------------------------------------------------ */
+
+.ar {
+  --ar-sky: #0a0f1f;
+  --ar-lamp: #ffd27a;
+  --ar-panel: rgba(255, 255, 255, 0.04);
+  --ar-line: rgba(255, 255, 255, 0.1);
+  position: relative;
+  isolation: isolate;
+  min-height: 100svh;
+  background:
+    radial-gradient(50% 36% at 50% 32%, color-mix(in srgb, var(--ar-lamp) 14%, transparent) 0%, transparent 70%),
+    var(--ar-sky);
+  color: #f2efe6;
+  transition: background 0.6s ease;
+}
+
+.ar a {
+  color: inherit;
+}
+
+.ar button {
+  font-family: inherit;
+  letter-spacing: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+.ar h1,
+.ar h2 {
+  font-weight: 800;
+  letter-spacing: -0.05em;
+  line-height: 0.94;
+}
+
+.ar code {
+  font-size: 0.92em;
+  background: rgba(255, 255, 255, 0.1);
+  color: inherit;
+}
+
+/* ---- top bar --------------------------------------------------------- */
+
+.ar-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 24px 32px 0;
+}
+
+.ar-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: -0.05em;
+}
+
+.ar-nav {
+  display: flex;
+  gap: 26px;
+  font-size: 14.5px;
+  font-weight: 600;
+  color: rgba(242, 239, 230, 0.6);
+}
+
+.ar-top-right {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.ar-badge {
+  font-size: 12.5px;
+  font-weight: 500;
+  white-space: nowrap;
+  color: rgba(242, 239, 230, 0.6);
+  border: 1px solid var(--ar-line);
+  border-radius: 999px;
+  padding: 6px 13px;
+  background: rgba(0, 0, 0, 0.25);
+}
+
+.ar-badge a {
+  font-weight: 600;
+  transition: color 0.15s ease;
+}
+
+.ar-badge a:hover {
+  color: #fff;
+}
+
+.ar-cta {
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--ar-sky);
+  background: var(--ar-lamp);
+  border-radius: 999px;
+  padding: 9px 16px;
+  white-space: nowrap;
+  transition: background 0.6s ease, color 0.6s ease;
+}
+
+/* ---- hero copy ----------------------------------------------------------- */
+
+.ar-hero {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: clamp(44px, 8vh, 80px) 32px 12px;
+  text-align: center;
+}
+
+.ar-eyebrow {
+  margin: 0 0 16px;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--ar-lamp);
+  transition: color 0.6s ease;
+}
+
+.ar-hero h1 {
+  margin: 0 auto 18px;
+  max-width: 800px;
+  font-size: clamp(40px, 6vw, 80px);
+}
+
+.ar-lede {
+  max-width: 600px;
+  margin: 0 auto;
+  font-size: 18px;
+  line-height: 1.55;
+  color: rgba(242, 239, 230, 0.7);
+}
+
+/* ---- the TV and its panel ------------------------------------------------- */
+
+.ar-play {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 8px 32px 0;
+}
+
+.ar-tv-stage {
+  position: relative;
+  height: min(74vh, 720px);
+  overflow: clip;
+  border-radius: 24px;
+}
+
+.ar-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: -6px;
+  padding: 16px 20px 18px;
+  border: 1px solid var(--ar-line);
+  border-radius: 18px;
+  background: rgba(0, 0, 0, 0.35);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+}
+
+.ar-panel-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 14px 20px;
+}
+
+.ar-panel-label {
+  font-size: 13px;
+  font-weight: 700;
+  color: rgba(242, 239, 230, 0.6);
+}
+
+.ar-levels {
+  display: flex;
+  gap: 8px;
+}
+
+.ar-level {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 14px 7px 8px;
+  text-align: left;
+  background: var(--ar-panel);
+  border: 1.5px solid var(--ar-line);
+  border-radius: 12px;
+  transition: border-color 0.15s ease;
+}
+
+.ar-level[aria-pressed='true'] {
+  border-color: var(--ar-lamp);
+}
+
+.ar-level-chip {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  background: radial-gradient(circle at 60% 40%, var(--l-lamp) 0%, var(--l-lamp) 18%, transparent 50%), var(--l-sky);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.ar-level span {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+
+.ar-level strong {
+  font-size: 13.5px;
+  font-weight: 700;
+}
+
+.ar-level small {
+  font-size: 11.5px;
+  color: rgba(242, 239, 230, 0.6);
+}
+
+.ar-lamps {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+  font-size: 13.5px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--ar-lamp);
+}
+
+.ar-lamps-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--ar-lamp);
+  box-shadow: 0 0 12px var(--ar-lamp);
+}
+
+.ar-panel-note {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: rgba(242, 239, 230, 0.65);
+}
+
+/* ---- take it home ---------------------------------------------------------- */
+
+.ar-shop {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: clamp(56px, 9vh, 96px) 32px 64px;
+}
+
+.ar-shop-head {
+  max-width: 600px;
+  margin-bottom: 22px;
+}
+
+.ar-shop-head h2 {
+  margin: 0 0 10px;
+  font-size: clamp(26px, 3vw, 36px);
+}
+
+.ar-shop-head p {
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.55;
+  color: rgba(242, 239, 230, 0.7);
+}
+
+.ar-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+}
+
+.ar-card {
+  border-radius: 18px;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--ar-line);
+  overflow: clip;
+}
+
+/* A definite height, so LazyScene has a box to hold while unmounted. */
+.ar-card-stage {
+  position: relative;
+  height: 460px;
+}
+
+.ar-card-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 16px 20px 20px;
+  border-top: 1px solid var(--ar-line);
+}
+
+.ar-card-copy strong {
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.ar-card-copy span {
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: rgba(242, 239, 230, 0.65);
+}
+
+/* ---- footer ------------------------------------------------------------ */
+
+.ar-foot {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 22px 32px 36px;
+  border-top: 1px solid var(--ar-line);
+  font-size: 13px;
+  color: rgba(242, 239, 230, 0.65);
+}
+
+.ar-foot a {
+  font-weight: 700;
+  color: #fff;
+}
+
+/* ---- narrower ------------------------------------------------------------ */
+
+@media (max-width: 1000px) {
+  .ar-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 760px) {
+  .ar-top {
+    padding: 18px 20px 0;
+  }
+
+  .ar-badge,
+  .ar-nav {
+    display: none;
+  }
+
+  .ar-hero,
+  .ar-play,
+  .ar-shop,
+  .ar-foot {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+
+  .ar-hero {
+    text-align: left;
+  }
+
+  .ar-hero h1 {
+    margin-left: 0;
+    font-size: clamp(36px, 11vw, 52px);
+  }
+
+  .ar-lede {
+    margin-left: 0;
+    font-size: 16.5px;
+  }
+
+  .ar-tv-stage {
+    height: 50vh;
+    border-radius: 16px;
+  }
+
+  .ar-levels {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .ar-lamps {
+    margin-left: 0;
+  }
+
+  .ar-card-stage {
+    height: 420px;
+  }
+}
