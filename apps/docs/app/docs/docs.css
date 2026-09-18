@@ -757,8 +757,15 @@
   position: absolute;
   inset: 0;
   display: flex;
-  align-items: center;
-  justify-content: center;
+  /*
+   * Scrolls once the surface is zoomed past the stage. The frame centres
+   * itself with auto margins rather than the container's alignment, because
+   * a flex item centred by `justify-content` that outgrows its container
+   * loses its leading edge past the scroll origin - `margin: auto` centres
+   * while it fits and starts at the origin once it does not.
+   */
+  overflow: auto;
+  scrollbar-width: thin;
 }
 
 /*
@@ -770,6 +777,8 @@
   border: 1px dashed color-mix(in oklab, var(--mx-accent) 45%, transparent);
   border-radius: 12px;
   padding: 9px;
+  margin: auto;
+  flex: none;
 }
 
 /*
@@ -786,7 +795,9 @@
 /*
  * The surface's true pixel size. It is the one number this view exists to
  * tell you, so it reads as a label on the accent rather than another chip in
- * the chrome - no border, white on green, at both ends of the theme.
+ * the chrome - no border, white on green, at both ends of the theme. It and
+ * the zoom pill are positioned against the stage, not the scrolling box, so
+ * they hold still while a zoomed surface scrolls under them.
  */
 .mx-readout {
   position: absolute;
@@ -815,6 +826,88 @@
   opacity: 0.7;
   margin: 0 2px;
   font-weight: 400;
+}
+
+/*
+ * The library's zoom pill, dressed in the explorer's chrome: the same card,
+ * border, ink and mono as the flat view's control below, so the two views
+ * carry one control. The pill reads these custom properties before its own
+ * defaults (see `ZOOM_PILL_STYLE` in the library).
+ */
+.mx-stage {
+  --mockup-overlay-bg: var(--color-fd-card);
+  --mockup-overlay-border: var(--color-fd-border);
+  --mockup-overlay-fg: var(--color-fd-foreground);
+  --mockup-overlay-font: var(--font-mono);
+}
+
+.mx-stage [data-mockup-zoom] button:hover {
+  background: var(--color-fd-accent);
+}
+
+/*
+ * The flat view's zoom: the 3D stage's control, rebuilt in the explorer's
+ * own chrome and pinned to the same corner, so switching views does not
+ * move it. It stays put while the surface scrolls under it.
+ */
+.mx-zoom {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  display: inline-flex;
+  align-items: stretch;
+  border: 1px solid var(--color-fd-border);
+  border-radius: 7px;
+  background: var(--color-fd-card);
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  line-height: 1;
+  overflow: hidden;
+}
+
+.mx-zoom button {
+  border: 0;
+  background: none;
+  color: var(--color-fd-foreground);
+  font: inherit;
+  font-weight: 600;
+  padding: 0 10px;
+  height: 28px;
+  cursor: pointer;
+}
+
+.mx-zoom button:hover {
+  background: var(--color-fd-accent);
+}
+
+.mx-zoom button:disabled {
+  opacity: 0.35;
+  cursor: default;
+  background: none;
+}
+
+.mx-zoom .mx-zoom-level {
+  min-width: 52px;
+  color: var(--color-fd-foreground);
+  opacity: 0.85;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  border-left: 1px solid var(--color-fd-border);
+  border-right: 1px solid var(--color-fd-border);
+}
+
+/*
+ * Keyboard focus: a hairline of the accent, offset from the control, and
+ * only on `:focus-visible`. The browser's default ring is a two-pixel blue
+ * box that reads as an error on chrome this quiet.
+ */
+.mx button:focus {
+  outline: none;
+}
+
+.mx button:focus-visible {
+  outline: 1.5px solid color-mix(in oklab, var(--mx-accent) 55%, transparent);
+  outline-offset: 1px;
 }
 
 /* Generic artwork for a print / packaging surface */

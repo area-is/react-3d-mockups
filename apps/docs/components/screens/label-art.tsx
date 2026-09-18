@@ -16,8 +16,15 @@ import { FONT } from './swiss-art'
  * on a 95 mm carton side and at a hair smaller on a 55 mm cereal-box side.
  */
 
-/** A dairy or a mill sets its name in something with serifs; Inter is for the small print. */
-export const SERIF = 'Georgia, "Iowan Old Style", "Palatino Linotype", "Book Antiqua", "Times New Roman", serif'
+/**
+ * A dairy or a mill sets its name in something with serifs; Inter is for the
+ * small print. Fraunces (see `lib/fonts.ts`) rather than Georgia: a serif
+ * drawn for screens reads as a screen in a photograph of a box, and its
+ * optical-size axis lets the same face set a flavour name and nine-point
+ * notes. The fallbacks are book faces, not Georgia.
+ */
+export const SERIF = 'var(--font-fraunces), Fraunces, "Iowan Old Style", "Palatino Linotype", "Book Antiqua", serif'
+
 /** The filling line's ink-jet: the one face of a package that is not typeset. */
 export const MONO = 'var(--font-jetbrains-mono), "JetBrains Mono", ui-monospace, Menlo, Consolas, monospace'
 
@@ -36,6 +43,41 @@ export function Photo({ src, position = '50% 50%', fit = 'cover', style }: { src
       alt=""
       draggable={false}
       style={{ display: 'block', width: '100%', height: '100%', objectFit: fit, objectPosition: position, ...style }}
+    />
+  )
+}
+
+/**
+ * A one-colour plate: an engraving printed in the ink.
+ *
+ * The illustration files under `/art/` that this takes are alpha-only -
+ * black at the ink's density, clear where the paper shows - so the picture
+ * is used as a mask over a block of the ink colour rather than drawn as an
+ * image. That is what a screen print or a one-colour litho does with an
+ * engraving, and it is why the same plate prints dark on kraft, cream on
+ * charcoal and terracotta on white without three files: the ink is the
+ * caller's, the plate only says where it goes. `style` sets the box; the
+ * plate fits inside it, centred.
+ */
+export function Plate({ src, ink, style }: { src: string; ink: string; style?: CSSProperties }) {
+  const mask = `url(${src})`
+  return (
+    <div
+      aria-hidden
+      style={{
+        background: ink,
+        WebkitMaskImage: mask,
+        maskImage: mask,
+        WebkitMaskSize: 'contain',
+        maskSize: 'contain',
+        WebkitMaskRepeat: 'no-repeat',
+        maskRepeat: 'no-repeat',
+        WebkitMaskPosition: 'center',
+        maskPosition: 'center',
+        flex: 'none',
+        pointerEvents: 'none',
+        ...style,
+      }}
     />
   )
 }
@@ -299,9 +341,15 @@ export function NutritionFacts({
           </div>
           <div style={line('0.7em')} />
           <div style={{ fontWeight: 700, fontSize: '0.82em', paddingTop: '0.3em' }}>Amount per serving</div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', gap: '0.6em' }}>
-            <span style={{ fontWeight: 900, fontSize: '1.9em', lineHeight: 1 }}>Calories</span>
-            <span style={{ fontWeight: 900, fontSize: '3em', lineHeight: 0.85 }}>{calories}</span>
+          {/* The one row that can outgrow a narrow panel: two words of display
+              type that cannot wrap. Compact takes them down a step - the FDA's
+              own narrow formats do the same - and the figure carries an auto
+              margin rather than `space-between`, so if a panel is narrower
+              still it drops to its own line and stays flush right instead of
+              running off the edge. */}
+          <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'flex-end', gap: '0.1em 0.6em' }}>
+            <span style={{ fontWeight: 900, fontSize: compact ? '1.55em' : '1.9em', lineHeight: 1 }}>Calories</span>
+            <span style={{ fontWeight: 900, fontSize: compact ? '2.4em' : '3em', lineHeight: 0.85, marginLeft: 'auto' }}>{calories}</span>
           </div>
           <div style={{ ...line('0.35em'), marginTop: '0.3em' }} />
           <div
@@ -363,10 +411,14 @@ export function RoundSeal({
       <svg viewBox="0 0 100 100" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }} aria-hidden>
         <circle cx={50} cy={50} r={48} fill={fill} stroke={color} strokeWidth={2.4} />
         {ring && <circle cx={50} cy={50} r={33} fill="none" stroke={color} strokeWidth={1.2} />}
+        {/* The legend's baseline runs on a circle set so the capitals sit in
+            the middle of the band between the two rings: the band is r 33.6
+            to 46.8, and an 8-unit capital stands about 5.8 tall, so a
+            baseline at 37.3 centres it. At 40.5 the caps touched the rim. */}
         <defs>
-          <path id={rim} d="M50 50 m-40.5 0 a40.5 40.5 0 1 1 81 0 a40.5 40.5 0 1 1 -81 0" />
+          <path id={rim} d="M50 50 m-37.3 0 a37.3 37.3 0 1 1 74.6 0 a37.3 37.3 0 1 1 -74.6 0" />
         </defs>
-        <text fontFamily={FONT} fontSize={8.6} fontWeight={700} letterSpacing={1.4} fill={color}>
+        <text fontFamily={FONT} fontSize={8} fontWeight={700} letterSpacing={1.3} fill={color}>
           <textPath href={`#${rim}`} startOffset="0">
             {legend}
           </textPath>
@@ -464,7 +516,7 @@ export function Pill({
         fontFamily: FONT,
         fontSize: size,
         fontWeight: 800,
-        letterSpacing: '0.14em',
+        letterSpacing: '0.03em',
         textTransform: 'uppercase',
         lineHeight: 1,
         padding: '0.45em 0.9em 0.4em',
@@ -546,6 +598,59 @@ export function Ean13({ digits, color, style }: { digits: string; color: string;
       {digit(code[0]!, 5, 'lead')}
       {[...code.slice(1, 7)].map((d, i) => digit(d, X0 + 3 + 7 * i + 3.5, `l${i}`))}
       {[...code.slice(7)].map((d, i) => digit(d, X0 + 50 + 7 * i + 3.5, `r${i}`))}
+    </svg>
+  )
+}
+
+/* ------------------------------------------------------------------ */
+/*  EAN-5                                                              */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Which of the five digits are set in G rather than L, by the checksum. Like
+ * EAN-13's lead digit, the add-on's check is carried in the parity alone.
+ */
+const ADDON_PARITY = ['GGLLL', 'GLGLL', 'GLLGL', 'GLLLG', 'LGGLL', 'LLGGL', 'LLLGG', 'LGLGL', 'LGLLG', 'LLGLG']
+
+/**
+ * The five-digit add-on that sits to the right of a book's EAN-13. In the US
+ * it carries the price; in Korea it is the 부가기호, the five digits every
+ * book prints beside its ISBN - reader, format, and a subject class - which
+ * is what this one encodes. Same modules as the main symbol, but a `01011`
+ * start, a `01` between digits, and the human-readable line ABOVE the bars
+ * rather than under them, which is the one thing that says "add-on" at a
+ * glance. Scannable, like everything else on the carousel with bars on it.
+ */
+export function Ean5({ digits, color, style }: { digits: string; color: string; style?: CSSProperties }) {
+  const d = [...digits.slice(0, 5)].map(Number)
+  const check = (3 * (d[0]! + d[2]! + d[4]!) + 9 * (d[1]! + d[3]!)) % 10
+  const parity = ADDON_PARITY[check]!
+  let bits = '01011'
+  d.forEach((n, i) => {
+    bits += (parity[i] === 'L' ? L : G)[n]
+    if (i < 4) bits += '01'
+  })
+  // A 5-module gap on the left, where the symbol clears the main code's quiet zone.
+  const X0 = 5
+  const bars: ReactNode[] = []
+  for (let i = 0; i < bits.length; ) {
+    if (bits[i] === '0') {
+      i++
+      continue
+    }
+    let j = i
+    while (j < bits.length && bits[j] === '1') j++
+    bars.push(<rect key={i} x={X0 + i} y={12} width={j - i} height={60} fill={color} />)
+    i = j
+  }
+  return (
+    <svg viewBox="0 0 58 82" style={{ display: 'block', ...style }} aria-hidden>
+      {bars}
+      {d.map((n, i) => (
+        <text key={i} x={X0 + 5 + 9 * i + 5} y={8.5} textAnchor="middle" fontSize={9} fontFamily={FONT} fill={color}>
+          {n}
+        </text>
+      ))}
     </svg>
   )
 }

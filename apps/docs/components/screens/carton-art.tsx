@@ -155,7 +155,7 @@ function Display({ children, size = '8.2cqw', style }: { children: ReactNode; si
  */
 function Wordmark({ size = '3.2cqw', style }: { size?: string; style?: CSSProperties }) {
   return (
-    <span style={{ fontSize: size, fontWeight: 600, letterSpacing: '0.3em', textTransform: 'uppercase', lineHeight: 1, ...style }}>
+    <span style={{ fontSize: size, fontWeight: 700, letterSpacing: '-0.015em', lineHeight: 1, ...style }}>
       Harlow Valley
     </span>
   )
@@ -267,7 +267,7 @@ export function CartonFacts({ material }: { material: string }) {
           size="15cqw"
           legend="VERMONT ORGANIC FARMERS · CERTIFIED · "
           color={GREEN}
-          center={<span style={{ fontSize: '2.2cqw', fontWeight: 700, letterSpacing: '0.06em' }}>100%</span>}
+          center={<span style={{ fontSize: '2.2cqw', fontWeight: 700 }}>100%</span>}
         />
         <p style={body('2.9cqw', { color: quiet })}>
           Certified organic by Vermont Organic Farmers, LLC · VOF-0148. Produced without antibiotics, added
@@ -293,7 +293,7 @@ export function CartonFacts({ material }: { material: string }) {
           }
         />
       </div>
-      <Micro style={{ fontSize: '2.3cqw', letterSpacing: '0.1em', color: quiet, lineHeight: 1.35 }}>
+      <Micro style={{ fontSize: '2.3cqw', color: quiet, lineHeight: 1.35 }}>
         Harlow Valley Dairy Co-op · Harlow, VT 05468
         <br />
         Plant 50-2117 · harlowvalleydairy.com
@@ -379,11 +379,11 @@ export function CartonBack({ material }: { material: string }) {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', gap: '3cqw' }}>
         <div style={{ display: 'grid', gap: '1.8cqw' }}>
           <Wordmark size="2.8cqw" />
-          <Micro style={{ fontSize: '2.2cqw', letterSpacing: '0.1em', color: quiet }}>Questions? 1-800-555-0148</Micro>
+          <Micro style={{ fontSize: '2.2cqw', color: quiet }}>Questions? 1-800-555-0148</Micro>
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '1.6cqw', textAlign: 'right' }}>
           <RecycleMark color={ink} size="6cqw" />
-          <Micro style={{ fontSize: '2.2cqw', letterSpacing: '0.1em', color: quiet, lineHeight: 1.35 }}>
+          <Micro style={{ fontSize: '2.2cqw', color: quiet, lineHeight: 1.35 }}>
             Paperboard carton · Cap 2 HDPE
             <br />
             Recycle where facilities exist

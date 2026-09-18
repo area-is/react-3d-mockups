@@ -64,7 +64,27 @@ Notable changes to `react-3d-mockups`. This project follows
   + <FoldMockup openAngle={110} />
   ```
 
+### Changed
+
+- **The zoom control is one pill: −, the level, +.** It replaces the stack of
+  two round buttons with the percentage between them. The level is a button
+  now and puts the camera back to 100%. The pill keeps the overlay's dark
+  glass by default and reads `--mockup-overlay-bg`, `--mockup-overlay-border`,
+  `--mockup-overlay-fg` and `--mockup-overlay-font` first, so a page can dress
+  it in its own chrome without a stylesheet from the library.
+
+- **A plain scroll over a zoomable mockup scrolls the page.** With `zoom` on,
+  a two-finger scroll on a trackpad (or a bare mouse wheel) used to zoom the
+  camera and swallow the scroll. Now only a pinch zooms - on a trackpad, in
+  Safari's gesture events as well as the ctrl-wheel the other browsers send -
+  and ctrl or ⌘ with a mouse wheel does the same. The step follows the
+  delta, so a pinch is continuous and a wheel notch still moves.
+
 ### Fixed
+
+- **`<ProductBox>` prints its top panel.** The panel sat under the tuck flap's
+  mesh, so `<ProductBox.Top>` rendered as blank board whatever was passed to
+  it. It now sits on the flap.
 
 - **The phone cameras now match the retail hardware.** Every rear camera was
   reviewed against Apple's and Samsung's product photography and the

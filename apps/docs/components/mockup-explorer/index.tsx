@@ -368,6 +368,11 @@ const lastWins = (attributes: string[]): string[] => {
  * the individual instances - so neither the stage nor the snippet hands a bare
  * object something the page or the canvas already owns.
  */
+/** The flat view's zoom range, as factors over the fit, and the step a click takes. */
+const FLAT_ZOOM_MIN = 0.25
+const FLAT_ZOOM_MAX = 8
+const FLAT_ZOOM_STEP = 1.25
+
 const NOT_AN_ARRANGED_OBJECT_PROP = ['camera', 'position', 'rotation', 'scale']
 
 /** The object props in play - what a bare instance would take too. */
@@ -593,6 +598,16 @@ function MockupExplorerImpl({
   const [spinning, setSpinning] = useState(false)
   const firstColour = useRef(true)
   const [view, setView] = useState<string>('3d')
+  /**
+   * Zoom on the flat view, as a factor over the fit. Kept with the view it
+   * was set on rather than reset in an effect: switching surfaces starts the
+   * next one at fit, and coming back starts at fit too, which is what "the
+   * view fits by default" means.
+   */
+  const [flatZoom, setFlatZoom] = useState<{ view: string; value: number }>({ view: '3d', value: 1 })
+  const zoom = flatZoom.view === view ? flatZoom.value : 1
+  const zoomBy = (factor: number) =>
+    setFlatZoom({ view, value: Math.min(FLAT_ZOOM_MAX, Math.max(FLAT_ZOOM_MIN, zoom * factor)) })
   const [copied, setCopied] = useState(false)
 
   const set = <K extends keyof PropState>(key: K, value: PropState[K]) =>
@@ -841,11 +856,12 @@ function MockupExplorerImpl({
    */
   const flatSize = (() => {
     const px = { width: flatPx?.width ?? 320, height: flatPx?.height ?? 200 }
-    const scale = Math.min(
+    const fit = Math.min(
       ((stageSize.height || stageHeight) - 100) / px.height,
       ((stageSize.width || 640) - 60) / px.width,
       1
     )
+    const scale = fit * zoom
     return { px, scale, width: px.width * scale, height: px.height * scale }
   })()
   /*
@@ -948,6 +964,12 @@ function MockupExplorerImpl({
               )}
             </LazyScene>
           ) : (
+            <>
+            {/* The scrolling box holds only the frame. The readout and the
+                zoom pill are siblings of it, pinned to the stage: anything
+                absolutely positioned INSIDE a box that scrolls scrolls with
+                it, which is how the pill first went for a ride under a
+                zoomed surface. */}
             <div className="mx-flat">
               {/* The frame is sized from the SCALED surface, not the surface.
                   `transform` only changes what a box looks like, never how much
@@ -971,13 +993,28 @@ function MockupExplorerImpl({
                   {content(view)}
                 </div>
               </div>
+            </div>
               <span className="mx-readout">
                 {flatPx?.width ?? '?'}
                 <span>×</span>
                 {flatPx?.height ?? '?'}
                 <span>px</span>
               </span>
-            </div>
+              {/* Zoom, as the 3D stage has it. The middle button reads the
+                  scale against the surface's true pixels - 100% is one CSS
+                  pixel per pixel - and puts the view back to fit. */}
+              <span className="mx-zoom" role="group" aria-label="Zoom">
+                <button type="button" title="Zoom out" aria-label="Zoom out" disabled={zoom <= FLAT_ZOOM_MIN} onClick={() => zoomBy(1 / FLAT_ZOOM_STEP)}>
+                  −
+                </button>
+                <button type="button" className="mx-zoom-level" title="Fit to the stage" onClick={() => setFlatZoom({ view, value: 1 })}>
+                  {Math.round(flatSize.scale * 100)}%
+                </button>
+                <button type="button" title="Zoom in" aria-label="Zoom in" disabled={zoom >= FLAT_ZOOM_MAX} onClick={() => zoomBy(FLAT_ZOOM_STEP)}>
+                  +
+                </button>
+              </span>
+            </>
           )}
         </div>
 

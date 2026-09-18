@@ -33,7 +33,7 @@ export function WatchFace() {
   const stat = (value: string, label: string, color: string) => (
     <div key={label} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', lineHeight: 1 }}>
       <span style={{ fontSize: '6cqw', fontWeight: 700, color, letterSpacing: '-0.02em' }}>{value}</span>
-      <span style={{ fontSize: '3.2cqw', fontWeight: 600, letterSpacing: '0.1em', opacity: 0.6, marginTop: '1.4cqw' }}>{label}</span>
+      <span style={{ fontSize: '3.2cqw', fontWeight: 600, letterSpacing: '-0.01em', opacity: 0.6, marginTop: '1.4cqw' }}>{label}</span>
     </div>
   )
   return (
@@ -85,7 +85,7 @@ export function WatchFace() {
           textAlign: 'center',
         }}
       >
-        <span style={{ fontSize: '4.4cqw', fontWeight: 600, letterSpacing: '0.18em', opacity: 0.65 }}>MON 14</span>
+        <span style={{ fontSize: '4.4cqw', fontWeight: 600, letterSpacing: '-0.01em', opacity: 0.65 }}>Mon 14</span>
         <span style={{ fontSize: '21cqw', fontWeight: 800, letterSpacing: '-0.045em', lineHeight: 0.95, marginTop: '1cqw' }}>9:41</span>
         <div style={{ display: 'flex', gap: '6cqw', marginTop: '4.5cqw' }}>
           {stat('72', 'BPM', '#ff6b8b')}
@@ -170,7 +170,7 @@ export function SwissSite() {
 
       <section style={{ display: 'grid', gridTemplateColumns: '7fr 5fr', gap: 48, padding: '52px 48px 40px' }}>
         <div style={{ display: 'flex', flexDirection: 'column' }}>
-          <div style={{ display: 'flex', gap: 14, alignItems: 'baseline', fontSize: 13, fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase' }}>
+          <div style={{ display: 'flex', gap: 14, alignItems: 'baseline', fontSize: 13, fontWeight: 600, letterSpacing: '-0.01em' }}>
             <span style={{ color: SITE_ACCENT }}>01</span>
             <span style={{ color: SITE_MUTED }}>Design studio · Zürich — Lisbon</span>
           </div>
@@ -198,8 +198,7 @@ export function SwissSite() {
               color: SITE_PAPER,
               fontSize: 12,
               fontWeight: 600,
-              letterSpacing: '0.12em',
-              textTransform: 'uppercase',
+              letterSpacing: '-0.01em',
               opacity: 0.85,
             }}
           >
@@ -285,7 +284,7 @@ const rule = (weight = 1): CSSProperties => ({ borderTop: `${weight}px solid ${N
 
 function Kicker({ children }: { children: ReactNode }) {
   return (
-    <div style={{ fontSize: 10.5, fontWeight: 700, color: NEWS_RED, letterSpacing: '0.1em', textTransform: 'uppercase' }}>{children}</div>
+    <div style={{ fontSize: 10.5, fontWeight: 700, color: NEWS_RED, letterSpacing: '-0.01em' }}>{children}</div>
   )
 }
 
@@ -317,7 +316,7 @@ export function Newspaper() {
         userSelect: 'none',
       }}
     >
-      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10.5, letterSpacing: '0.06em', textTransform: 'uppercase', color: NEWS_MUTED }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10.5, letterSpacing: 0, color: NEWS_MUTED }}>
         <span>Tuesday, September 15, 2026 · Morning edition</span>
         <span>Partly sunny · 68° / 54° · Sign in</span>
       </div>
@@ -332,8 +331,7 @@ export function Newspaper() {
           borderBottom: `1px solid ${NEWS_INK}`,
           fontSize: 11.5,
           fontWeight: 600,
-          letterSpacing: '0.08em',
-          textTransform: 'uppercase',
+          letterSpacing: '-0.01em',
         }}
       >
         {['World', 'Politics', 'Business', 'Science', 'Culture', 'Sport', 'Opinion', 'Puzzles'].map((section) => (
@@ -409,7 +407,7 @@ export function Newspaper() {
             </article>
           ))}
           <div>
-            <div style={{ ...rule(2), paddingTop: 8, fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase' }}>Most read</div>
+            <div style={{ ...rule(2), paddingTop: 8, fontSize: 11, fontWeight: 700, letterSpacing: '-0.01em' }}>Most read</div>
             <ol style={{ margin: '6px 0 0', padding: 0, listStyle: 'none', display: 'grid', gap: 5 }}>
               {MOST_READ.map((item, i) => (
                 <li key={item} style={{ display: 'flex', gap: 10, fontSize: 12, lineHeight: 1.3 }}>

@@ -142,14 +142,17 @@ function ProductBoxImpl({
         </DeviceScreen>
       )}
 
-      {/* top panel - oriented so its content reads from the front */}
+      {/* top panel - oriented so its content reads from the front. It sits
+          on the tuck flap, which stands `flap.lift` proud of the carton's
+          top: laid on the carton itself it was under the flap's mesh, and
+          the flap painted over it - the printed top read as blank board. */}
       {regions.top != null && (
         <DeviceScreen
           {...shared}
           {...resolveSurface(regions.top, panelDefaults)}
           width={body.width}
           height={body.depth}
-          position={[0, body.height / 2 + 0.003, 0]}
+          position={[0, body.height / 2 + flap.lift + 0.003, 0]}
           rotation={[-Math.PI / 2, 0, 0]}
         >
           {regions.top.children}

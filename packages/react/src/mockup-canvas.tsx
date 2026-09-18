@@ -11,6 +11,9 @@ import {
   EXIT_FULLSCREEN_ICON_PATH,
   OVERLAY_BUTTON_STYLE,
   OVERLAY_ICON_VIEWBOX,
+  ZOOM_PILL_BUTTON_STYLE,
+  ZOOM_PILL_LEVEL_STYLE,
+  ZOOM_PILL_STYLE,
   STAGE_AMBIENT_LIGHT,
   STAGE_KEY_LIGHT,
   STUDIO_ENV_RESOLUTION,
@@ -80,10 +83,12 @@ export interface MockupCanvasProps {
    */
   freeRotation?: boolean
   /**
-   * Zoom controls: pinch on touch, scroll wheel on desktop, plus overlay
-   * +/− buttons. Off by default so an embedded mockup never hijacks page
-   * scroll - turning it on gives the canvas the two-finger gesture (vertical
-   * page scrolling then starts outside the mockup).
+   * Zoom controls: pinch on touch, pinch on a trackpad (or ctrl/⌘ with a
+   * mouse wheel), plus the overlay control. A plain scroll - two fingers on
+   * a trackpad, a bare mouse wheel - is never captured: it scrolls the page
+   * under the mockup as it would anywhere else. Off by default; on, the
+   * canvas owns two-finger gestures on touch screens (vertical page
+   * scrolling then starts outside the mockup).
    */
   zoom?: boolean
   /**
@@ -171,11 +176,17 @@ export function MockupCanvas({
   // settles on a new value (buttons, wheel and pinch alike).
   const [zoomPercent, setZoomPercent] = React.useState(100)
   const baseDistance = React.useRef<number | null>(null)
+  const lastDistance = React.useRef<number | null>(null)
   const handleDistanceChange = React.useCallback((distance: number) => {
     if (baseDistance.current === null) baseDistance.current = distance
+    lastDistance.current = distance
     const percent = Math.round((baseDistance.current / distance) * 100)
     setZoomPercent((previous) => (previous === percent ? previous : percent))
   }, [])
+  // Back to 100%: the factor that takes the current distance to the first one.
+  const zoomReset = () => {
+    if (baseDistance.current !== null && lastDistance.current) zoomBy(baseDistance.current / lastDistance.current)
+  }
 
   // The canvas's own container is a stacking context (see isolateCanvasStack
   // in device-screen), so the blending band is sealed inside it however large
@@ -278,34 +289,19 @@ export function MockupCanvas({
       )}
       {showZoomButtons && (
         <div
-          style={{
-            position: 'absolute',
-            right: 10,
-            bottom: 10,
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 6,
-            zIndex: overlayZ,
-          }}
+          role="group"
+          aria-label="Zoom"
+          data-mockup-zoom=""
+          style={{ ...ZOOM_PILL_STYLE, position: 'absolute', right: 10, bottom: 10, zIndex: overlayZ }}
         >
-          <button type="button" aria-label="Zoom in" style={OVERLAY_BUTTON_STYLE} onClick={() => zoomBy(0.8)}>
-            +
-          </button>
-          <div
-            aria-label="Zoom level"
-            style={{
-              alignSelf: 'center',
-              padding: '2px 0',
-              font: '600 10px/1 var(--font-mono, monospace)',
-              color: '#7c8492',
-              textAlign: 'center',
-              userSelect: 'none',
-            }}
-          >
-            {zoomPercent}%
-          </div>
-          <button type="button" aria-label="Zoom out" style={OVERLAY_BUTTON_STYLE} onClick={() => zoomBy(1.25)}>
+          <button type="button" aria-label="Zoom out" title="Zoom out" style={ZOOM_PILL_BUTTON_STYLE} onClick={() => zoomBy(1.25)}>
             −
+          </button>
+          <button type="button" aria-label="Zoom level" title="Back to 100%" style={ZOOM_PILL_LEVEL_STYLE} onClick={zoomReset}>
+            {zoomPercent}%
+          </button>
+          <button type="button" aria-label="Zoom in" title="Zoom in" style={ZOOM_PILL_BUTTON_STYLE} onClick={() => zoomBy(0.8)}>
+            +
           </button>
         </div>
       )}
