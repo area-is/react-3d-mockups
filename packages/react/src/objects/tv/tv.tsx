@@ -242,17 +242,27 @@ function TVSetImpl({
   const recessOutline = React.useMemo(() => {
     if (!backPanel) return null
     const { bay, groove, cover } = backPanel
-    const yBottom = -body.height / 2 + cover.height
-    const yGroove = yBottom + groove.height
-    const yBay = yBottom + bay.height
+    const ySeam = -body.height / 2 + cover.height
+    const yGroove = ySeam + groove.height
+    const yBay = ySeam + bay.height
+    const yDrop = ySeam - bay.drop
+    const l = bay.centerX - bay.width / 2
+    const r = bay.centerX + bay.width / 2
+    // Clockwise from the channel's left end: along the seam, down round the
+    // recess's foot, back to the seam, out to the right end, up the channel's
+    // top edge, round the recess's head, and back.
     const points: [number, number][] = [
-      [-groove.width / 2, yBottom],
-      [groove.width / 2, yBottom],
+      [-groove.width / 2, ySeam],
+      [l, ySeam],
+      [l, yDrop],
+      [r, yDrop],
+      [r, ySeam],
+      [groove.width / 2, ySeam],
       [groove.width / 2, yGroove],
-      [bay.centerX + bay.width / 2, yGroove],
-      [bay.centerX + bay.width / 2, yBay],
-      [bay.centerX - bay.width / 2, yBay],
-      [bay.centerX - bay.width / 2, yGroove],
+      [r, yGroove],
+      [r, yBay],
+      [l, yBay],
+      [l, yGroove],
       [-groove.width / 2, yGroove],
     ]
     return points
@@ -283,15 +293,35 @@ function TVSetImpl({
   }, [backPanel, recessOutline, body])
   React.useEffect(() => () => backSkinGeometry?.dispose(), [backSkinGeometry])
   // The cover band is extruded like the skin rather than boxed, so its UVs
-  // are in the same world units and the ribbing runs across both at one pitch.
+  // are in the same world units and the grid runs across both at one pitch.
+  // Its top edge is notched round the recess's foot, which drops below the
+  // seam into it.
   const coverGeometry = React.useMemo(() => {
     if (!backPanel) return null
     const bevel = 0.0025
-    const shape = roundedRectShape(
-      body.width - backPanel.inset * 2 - 0.012 - bevel * 2,
-      backPanel.cover.height - bevel * 2,
-      body.radius * 0.6
-    )
+    const w = body.width - backPanel.inset * 2 - 0.012 - bevel * 2
+    const h = backPanel.cover.height - bevel * 2
+    const r = body.radius * 0.6
+    const { bay } = backPanel
+    const nl = bay.centerX - bay.width / 2 + bevel
+    const nr = bay.centerX + bay.width / 2 - bevel
+    const nd = bay.drop - bevel
+    const x = -w / 2
+    const y = -h / 2
+    const shape = new THREE.Shape()
+    shape.moveTo(x + r, y)
+    shape.lineTo(x + w - r, y)
+    shape.quadraticCurveTo(x + w, y, x + w, y + r)
+    shape.lineTo(x + w, y + h - r)
+    shape.quadraticCurveTo(x + w, y + h, x + w - r, y + h)
+    shape.lineTo(nr, y + h)
+    shape.lineTo(nr, y + h - nd)
+    shape.lineTo(nl, y + h - nd)
+    shape.lineTo(nl, y + h)
+    shape.lineTo(x + r, y + h)
+    shape.quadraticCurveTo(x, y + h, x, y + h - r)
+    shape.lineTo(x, y + r)
+    shape.quadraticCurveTo(x, y, x + r, y)
     const core = backPanel.cover.lift + 0.004 - bevel * 2
     const geometry = new THREE.ExtrudeGeometry(shape, {
       depth: core,
@@ -313,30 +343,42 @@ function TVSetImpl({
     return new THREE.ShapeGeometry(shape)
   }, [recessOutline])
   React.useEffect(() => () => recessFloorGeometry?.dispose(), [recessFloorGeometry])
-  // The fine horizontal ribbing the whole back carries: one soft ridge drawn
-  // into a strip and repeated at the product's pitch. Extruded caps carry
-  // world-unit UVs, so the repeat is ridges per unit and both plates match.
-  const ribbing = React.useMemo(() => {
+  // The fine texture the whole back carries - up close, rows of small
+  // lighter dashes in dark gutters, a dashed grid at about a 2.5 x 2 mm cell;
+  // at arm's length it averages to the matte charcoal of the photograph.
+  // Drawn once as a 2 x 2 cell tile and repeated at the product's pitch:
+  // extruded caps carry world-unit UVs, so the repeat is cells per unit and
+  // the skin and the cover band match. It is the colour map, so it reads
+  // under any light, and the bump map, so the dashes catch the environment.
+  const grid = React.useMemo(() => {
     if (!backPanel || typeof document === 'undefined') return null
-    const size = 16
+    const cw = 12
+    const ch = 10
     const canvas = document.createElement('canvas')
-    canvas.width = 1
-    canvas.height = size
+    canvas.width = cw * 2
+    canvas.height = ch * 2
     const ctx = canvas.getContext('2d')
     if (!ctx) return null
-    const image = ctx.createImageData(1, size)
-    for (let i = 0; i < size; i++) {
-      const v = 128 + 127 * Math.cos((i / size) * Math.PI * 2)
-      image.data[i * 4] = image.data[i * 4 + 1] = image.data[i * 4 + 2] = v
-      image.data[i * 4 + 3] = 255
+    // Lighter than the photograph reads, on purpose: the map is multiplied by
+    // the light the back actually gets, which is the environment alone.
+    ctx.fillStyle = '#26292d'
+    ctx.fillRect(0, 0, canvas.width, canvas.height)
+    ctx.fillStyle = '#3b3f45'
+    for (let i = 0; i < 2; i++) {
+      for (let j = 0; j < 2; j++) ctx.fillRect(i * cw + 1, j * ch + 2, cw - 2, ch - 4)
     }
-    ctx.putImageData(image, 0, 0)
+    ctx.fillStyle = '#474c52'
+    for (let i = 0; i < 2; i++) {
+      for (let j = 0; j < 2; j++) ctx.fillRect(i * cw + 2, j * ch + 3, cw - 4, 2)
+    }
     const texture = new THREE.CanvasTexture(canvas)
     texture.wrapS = texture.wrapT = THREE.RepeatWrapping
-    texture.repeat.set(1, TV_MM_PER_UNIT / backPanel.ribPitch)
+    texture.colorSpace = THREE.SRGBColorSpace
+    texture.anisotropy = 4
+    texture.repeat.set(TV_MM_PER_UNIT / backPanel.grid.pitchX / 2, TV_MM_PER_UNIT / backPanel.grid.pitchY / 2)
     return texture
   }, [backPanel])
-  React.useEffect(() => () => ribbing?.dispose(), [ribbing])
+  React.useEffect(() => () => grid?.dispose(), [grid])
   // The faint SAMSUNG print on the upper back of the skin.
   const backLogoGeometry = React.useMemo(
     () => (backPanel ? createLogoGeometry('samsung', 0.62, 0.62 * 0.155) : null),
@@ -353,18 +395,20 @@ function TVSetImpl({
   // The matte black of the real back, and the near-black of everything sunk
   // into it. Fixed rather than the bezel colour on purpose: a teak or white
   // Frame is teak or white from the front and black from behind.
-  // Charcoal rather than pitch black: the stage lights the front, so the back
-  // sees mostly the environment, and a little metalness is what lets that
-  // read as a ribbed matte skin instead of a hole in the render.
+  // The photograph's charcoal, carried by the grid tile; a little metalness
+  // and a satin roughness let the environment give it the soft sheen the
+  // studio shot has, without the stage's front lights (which never reach the
+  // back) mattering. The fallback colour only shows where a canvas cannot be
+  // made - server rendering.
   const rearSkin = (
     <meshPhysicalMaterial
-      color="#33373c"
-      metalness={0.35}
-      roughness={0.42}
-      {...(ribbing ? { bumpMap: ribbing, bumpScale: 0.03 } : {})}
+      color={grid ? '#ffffff' : '#33373c'}
+      metalness={0.3}
+      roughness={0.5}
+      {...(grid ? { map: grid, bumpMap: grid, bumpScale: 0.012 } : {})}
     />
   )
-  const rearHollow = <meshPhysicalMaterial color="#0a0b0d" metalness={0.15} roughness={0.75} side={THREE.DoubleSide} />
+  const rearHollow = <meshPhysicalMaterial color="#0c0d0f" metalness={0.15} roughness={0.75} side={THREE.DoubleSide} />
 
   return (
     /* the stage lift centering the panel + feet ensemble on the group origin */
@@ -448,12 +492,12 @@ function TVSetImpl({
       </group>
 
       {/* the picture-frame set's rear (all it has - its electronics live in
-          the external connect box): the ribbed black skin, the cover band
-          proud of its lower third, the cable channel along the band's top
-          seam with the connector recess standing up from it, the VESA
-          points either side, the label plate and controller on the band,
-          and the faint wordmark up top. Wall-mount hardware deliberately
-          absent. */}
+          the external connect box): the grid-textured black skin, the cover
+          band proud of its lower third, the cable channel along the band's
+          top seam with the connector recess standing up from it and dropping
+          into the band, the VESA points either side, the sunk label panel
+          and controller slot on the band, and the faint wordmark up top.
+          Wall-mount hardware deliberately absent. */}
       {backPanel && backSkinGeometry && (
         <group position-y={body.centerY}>
           <mesh geometry={backSkinGeometry} position-z={bodyBackZ + 0.002 - backPanel.depth / 2}>
@@ -475,13 +519,20 @@ function TVSetImpl({
             </mesh>
           )}
           {/* the band's vertical seams: one down each side near the ends, and
-              one continuing the recess's edge, as on the real cover */}
+              one running down from the recess's center, as on the real cover */}
           {[
-            backPanel.bay.centerX + backPanel.bay.width / 2,
+            backPanel.bay.centerX,
             ...backPanel.cover.seams.flatMap((f) => [f * body.width / 2, -f * body.width / 2]),
           ].map((x, i) => (
-            <mesh key={i} position={[x, -body.height / 2 + backPanel.cover.height / 2, coverFaceZ - 0.0004]}>
-              <boxGeometry args={[0.0022, backPanel.cover.height - 0.02, 0.0008]} />
+            <mesh
+              key={i}
+              position={[
+                x,
+                -body.height / 2 + (backPanel.cover.height - (i === 0 ? backPanel.bay.drop : 0)) / 2,
+                coverFaceZ - 0.0004,
+              ]}
+            >
+              <boxGeometry args={[0.0022, backPanel.cover.height - (i === 0 ? backPanel.bay.drop : 0) - 0.02, 0.0008]} />
               <meshPhysicalMaterial color="#08090b" metalness={0.1} roughness={0.8} />
             </mesh>
           ))}
@@ -523,25 +574,27 @@ function TVSetImpl({
               </group>
             ))
           )}
-          {/* the regulatory label plate on the cover band */}
+          {/* the label panel: a dark rectangle sunk into the cover band, as
+              the photograph shows it - not a plate on it */}
           <mesh
             rotation-y={Math.PI}
             position={[backPanel.label.centerX, -body.height / 2 + backPanel.label.centerY, coverFaceZ - 0.0006]}
           >
             <planeGeometry args={[backPanel.label.width, backPanel.label.height]} />
-            <meshPhysicalMaterial color="#4a4e54" metalness={0.05} roughness={0.9} />
+            <meshPhysicalMaterial color="#0e0f11" metalness={0.1} roughness={0.85} />
           </mesh>
-          {/* TV controller: a small square button at the band's far end,
-              on the right seen from behind */}
+          {/* TV controller: a slim vertical slot at the band's far end, on
+              the right seen from behind */}
           <mesh
+            rotation-y={Math.PI}
             position={[
               -(body.width / 2 - backPanel.button.inset),
               -body.height / 2 + backPanel.button.centerY,
-              coverFaceZ - 0.0012,
+              coverFaceZ - 0.0006,
             ]}
           >
-            <boxGeometry args={[backPanel.button.size, backPanel.button.size, 0.0024]} />
-            <meshPhysicalMaterial color="#0c0d0f" metalness={0.3} roughness={0.55} />
+            <planeGeometry args={[backPanel.button.width, backPanel.button.height]} />
+            <meshPhysicalMaterial color="#050607" metalness={0.2} roughness={0.7} />
           </mesh>
           {/* faint wordmark print on the upper back */}
           {backLogoGeometry && (
