@@ -18,7 +18,7 @@ import { asset } from '@/lib/base-path.mjs'
  *   tape crossing the middle the way tape does;
  * - the shopping bag is a florist's carrier done the way an expensive shop
  *   does one: a botanical plate, the name set heavy and tight, one quiet
- *   line, the address at the foot, and nothing else.
+ *   line, the address at the foot, one ink, and nothing else.
  *
  * All of them print straight onto the material (`materialTone`), so the
  * carousel's finish swatches change the board under the print: white board,
@@ -800,24 +800,28 @@ export function MailerEnd({ material }: { material: string }) {
 /*  The shopping bag                                                   */
 /* ------------------------------------------------------------------ */
 
-/** The florist's two inks: the board's ink, and a terracotta or a gold to go with it. */
-function shop(material: string): { ink: string; accent: string } {
+/**
+ * The florist prints in one ink. On a dark board that ink is white - not the
+ * library's cream "paper" ink - because the bag the shop actually hands over
+ * is black with white print; on a light board it is the near-black.
+ */
+function shop(material: string): { ink: string } {
   const t = materialTone(material)
-  return { ink: t.text, accent: t.text === INK ? '#b8532e' : '#e2b96a' }
+  return { ink: t.text === INK ? INK : '#ffffff' }
 }
 
 /** The florist's mark: a marigold, an engraving printed in the one ink (see `Plate`). */
 const MARIGOLD = asset('/art/marigold.webp')
 
 /**
- * The name: Inter, heavy and tightened, in regular casing, the ampersand in
- * the second ink. An expensive carrier's restraint is in what is left off
- * the bag, not in letterspaced capitals.
+ * The name: Inter, heavy and tightened, in regular casing, in the one ink.
+ * An expensive carrier's restraint is in what is left off the bag, not in
+ * letterspaced capitals or a second colour.
  */
-function Wordmark({ accent, size }: { accent: string; size: string }) {
+function Wordmark({ size }: { size: string }) {
   return (
     <div style={{ fontFamily: FONT, fontSize: size, fontWeight: 700, letterSpacing: '-0.035em', lineHeight: 1, whiteSpace: 'nowrap' }}>
-      Marigold <span style={{ color: accent }}>&amp;</span> Moss
+      Marigold &amp; Moss
     </div>
   )
 }
@@ -840,7 +844,7 @@ function Line({ children, style }: { children: ReactNode; style?: CSSProperties 
  * the geometric centre reads as riding high.
  */
 export function BagFront({ material }: { material: string }) {
-  const { ink, accent } = shop(material)
+  const { ink } = shop(material)
   const t = materialTone(material)
   return (
     <Sheet tone={t} style={{ flexDirection: 'column', alignItems: 'center', padding: '8cqw 10cqw 7cqw', color: ink, textAlign: 'center' }}>
@@ -848,9 +852,9 @@ export function BagFront({ material }: { material: string }) {
       {/* 800 x 1302 in the file */}
       <Plate src={MARIGOLD} ink={ink} style={{ width: '36cqw', height: '58.6cqw' }} />
       <div style={{ marginTop: '6cqw' }}>
-        <Wordmark accent={accent} size="7cqw" />
+        <Wordmark size="7cqw" />
       </div>
-      <div style={{ width: '6cqw', height: '0.28cqw', background: accent, marginTop: '3.6cqw', flex: 'none' }} />
+      <div style={{ width: '6cqw', height: '0.28cqw', background: ink, opacity: 0.7, marginTop: '3.6cqw', flex: 'none' }} />
       <Line style={{ marginTop: '3cqw', opacity: 0.8 }}>Fleuriste · Est. 2016</Line>
       <div style={{ flex: 1, minHeight: '6cqw' }} />
       <Line style={{ fontSize: '2cqw', opacity: 0.7 }}>34 Elm Street · Northampton, Massachusetts</Line>
@@ -862,24 +866,25 @@ export function BagFront({ material }: { material: string }) {
  * The back: the shop's seal - the plate inside a ring of small type - with
  * the name under it and the one line the shop allows itself. A seal is what
  * the expensive bags carry on the reverse when they carry anything at all.
- * The legend is short enough to leave a gap at the join whatever the
- * viewer's rasteriser does to Inter's widths.
+ * The legend is the one line of capitals on the bag, because a seal's rim
+ * is where the real ones print them; it is short enough to leave a gap at
+ * the join whatever the viewer's rasteriser does to Inter's widths.
  */
 export function BagBack({ material }: { material: string }) {
-  const { ink, accent } = shop(material)
+  const { ink } = shop(material)
   const t = materialTone(material)
   return (
     <Sheet tone={t} style={{ flexDirection: 'column', alignItems: 'center', padding: '8cqw 10cqw 7cqw', color: ink, textAlign: 'center' }}>
       <div style={{ flex: 1.3 }} />
       <RoundSeal
         size="34cqw"
-        legend="Marigold & Moss · Fleuriste · "
+        legend="MARIGOLD & MOSS · FLEURISTE · "
         color={ink}
         ring={false}
         center={<Plate src={MARIGOLD} ink={ink} style={{ width: '100%', height: '100%' }} />}
       />
       <div style={{ marginTop: '6cqw' }}>
-        <Wordmark accent={accent} size="5cqw" />
+        <Wordmark size="5cqw" />
       </div>
       <Line style={{ marginTop: '4cqw', fontSize: '2.8cqw', opacity: 0.85 }}>
         Grown slow. Cut this morning.

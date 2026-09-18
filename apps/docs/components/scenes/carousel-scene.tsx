@@ -661,10 +661,12 @@ const OBJECTS: Entry[] = [
     res: mmRes('shoppingBag'),
     fit: BAG_FIT,
     lift: 0,
+    // Charcoal first: the carousel stages each object's first swatch, and the
+    // florist's plate and cream type read best on the dark board.
     colorways: stock(
+      ['charcoal', 'Charcoal', '#33373d'],
       ['kraft', 'Kraft', '#c19a6b'],
       ['white', 'Gloss white', '#f2efe9'],
-      ['charcoal', 'Charcoal', '#33373d'],
       ['olive', 'Olive', '#7d8a5c']
     ),
     material: true,

@@ -23,7 +23,7 @@ import { asset } from '@/lib/base-path.mjs'
  * the apparatus - a pull quote, the flap copy, the author with her photograph,
  * the imprint's colophon, and the barcode block a Korean book prints: the
  * EAN-13 of the ISBN with the five-digit 부가기호 beside it and the price set
- * as `값 18,000원`, all in the white box a barcode is scanned from. Get those
+ * as `정가 18,000원`, all in the white box a barcode is scanned from. Get those
  * two faces right and the front is allowed to be quiet.
  *
  * The photograph does the work the pattern used to. It is a cut-out on a
@@ -97,7 +97,7 @@ const ISBN_DIGITS = '978899496301'
 const ISBN_TEXT = 'ISBN 978-89-94963-01-3'
 /** The 부가기호: general readership, a hardback, Korean literature. */
 const ADDON = '03810'
-const PRICE = '값 18,000원'
+const PRICE = '정가 18,000원'
 
 /** The jacket's small type: regular casing, tightened. */
 function Micro({ children, style }: { children: ReactNode; style?: CSSProperties }) {
@@ -329,7 +329,7 @@ function AuthorPhoto({ size }: { size: string }) {
 
 /**
  * The barcode block, as a Korean book prints it: the ISBN in figures and the
- * price on one line, then the EAN-13 with the 부가기호 add-on to its right.
+ * price (정가, the list price) on one line, then the EAN-13 with the 부가기호 add-on to its right.
  * A barcode is only a barcode on white, so the box is white whatever the
  * jacket is, and the symbol keeps to its nominal size - about 37 mm across
  * on a 156 mm cover, with the add-on beside it - because a barcode set big
