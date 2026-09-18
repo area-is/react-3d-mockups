@@ -10,6 +10,10 @@ import { BOARD, BoardBack, BoardFront, CREAM, CardBack, CardFront, CartonFace, C
  * shop that repaints its front reprints its cards.
  */
 
+/** The glazing tint, lit and unlit - the panes' material and the door's paint. */
+const GLASS_OPEN = '#5a6d75'
+const GLASS_CLOSED = '#3a4448'
+
 export function StorefrontScene({ open, paint }: { open: boolean; paint: string }) {
   return (
     <StorefrontMockup
@@ -17,7 +21,7 @@ export function StorefrontScene({ open, paint }: { open: boolean; paint: string 
       color={paint}
       // Darker glass once the lights are off: the panes are a reflection tint,
       // so a shop that has closed reads as closed from across the street.
-      windowColor={open ? '#5a6d75' : '#3a4448'}
+      windowColor={open ? GLASS_OPEN : GLASS_CLOSED}
       surfaceBackground={CREAM}
       rotation={[0, -0.28, 0]}
     >
@@ -30,7 +34,12 @@ export function StorefrontScene({ open, paint }: { open: boolean; paint: string 
       <StorefrontMockup.FrontRight>
         <WindowPoster title="Bread daily" sub={'sourdough at 7:30\nbuns at 8, 11 and 3'} seed="ninefold-right" paint={paint} />
       </StorefrontMockup.FrontRight>
-      <StorefrontMockup.Door surfaceBackground="transparent">
+      {/* The door is painted in the glass tint rather than left transparent.
+          A surface is DOM under the canvas, so transparent pixels fall
+          through to whatever is behind them - here the rear window's poster,
+          which showed through the door from the front. Opaque glass, in the
+          same tint as the panes, and the shop has a back wall again. */}
+      <StorefrontMockup.Door surfaceBackground={open ? GLASS_OPEN : GLASS_CLOSED}>
         <Door open={open} paint={paint} />
       </StorefrontMockup.Door>
       <StorefrontMockup.LeftSign surfaceBackground={paint}>

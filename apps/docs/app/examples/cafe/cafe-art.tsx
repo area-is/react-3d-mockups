@@ -57,10 +57,21 @@ export function WindowPoster({ title, sub, seed, paint }: { title: string; sub: 
   )
 }
 
-/** The glazed door (260 x 726): the hanging sign, and the hours under it. */
+/**
+ * The glazed door (260 x 726): the hanging sign, and the hours under it.
+ *
+ * The slot paints the glass tint underneath; this face only adds the sheen -
+ * a highlight down the top and a shadow into the foot - so the pane reads as
+ * glass without being transparent. Transparent would show the rear window's
+ * poster straight through the shop.
+ */
 export function Door({ open, paint }: { open: boolean; paint: string }) {
   return (
-    <Face background="transparent" color={CREAM} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '14cqw 10cqw' }}>
+    <Face
+      background="linear-gradient(168deg, rgba(255,255,255,0.22) 0%, rgba(255,255,255,0.06) 32%, rgba(255,255,255,0) 55%, rgba(0,0,0,0.22) 100%)"
+      color={CREAM}
+      style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '14cqw 10cqw' }}
+    >
       <div
         style={{
           width: '78cqw',

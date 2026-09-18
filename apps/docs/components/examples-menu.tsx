@@ -45,11 +45,9 @@ export function ExamplesMenu() {
               role="menuitem"
               onClick={() => setOpen(false)}
             >
-              <span className="nav-menu-item-title">{example.title}</span>
-              <span className="nav-menu-item-desc">{example.description}</span>
+              {example.title}
             </Link>
           ))}
-          <span className="nav-menu-note">More examples soon</span>
         </span>
       ) : null}
     </span>
