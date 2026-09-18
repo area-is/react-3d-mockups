@@ -1,0 +1,436 @@
+/* ------------------------------------------------------------------ */
+/*  /examples/campaign - an isolated case-study example page.          */
+/*                                                                     */
+/*  A long, scrolling page with seven WebGL scenes on it. The layout   */
+/*  gives every scene a box with a definite height (`.cp-stage`,       */
+/*  `.cp-bulletin-stage`) so LazyScene can mount and unmount them      */
+/*  without the page moving under the reader.                          */
+/* ------------------------------------------------------------------ */
+
+.cp {
+  --cp-acid: #e8ff47;
+  --cp-night: #0b0a12;
+  --cp-panel: #12111a;
+  --cp-line: #23222e;
+  position: relative;
+  isolation: isolate;
+  min-height: 100svh;
+  background: var(--cp-night);
+  color: var(--text);
+}
+
+.cp a {
+  color: inherit;
+}
+
+/* ---- top bar --------------------------------------------------------- */
+
+.cp-top {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 26px 32px 0;
+}
+
+.cp-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  white-space: nowrap;
+}
+
+.cp-brand-mark {
+  width: 14px;
+  height: 14px;
+  background: #e1341e;
+}
+
+.cp-crumb {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.cp-crumb span {
+  margin: 0 6px;
+  opacity: 0.5;
+}
+
+.cp-badge {
+  margin-left: auto;
+  font-size: 12.5px;
+  font-weight: 500;
+  white-space: nowrap;
+  color: var(--muted);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 6px 13px;
+  background: rgba(13, 15, 21, 0.55);
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+
+.cp-badge a {
+  font-weight: 600;
+  transition: color 0.15s ease;
+}
+
+.cp-badge a:hover {
+  color: var(--text);
+}
+
+.cp-part a,
+.cp-credits a {
+  color: var(--text);
+  border-bottom: 1px solid var(--cp-line);
+}
+
+/* ---- hero copy ----------------------------------------------------------- */
+
+.cp-hero {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: clamp(48px, 9vh, 96px) 32px 40px;
+}
+
+.cp-eyebrow {
+  margin: 0 0 18px;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--cp-acid);
+}
+
+.cp-hero h1 {
+  max-width: 820px;
+  margin: 0 0 22px;
+  font-size: clamp(40px, 5.4vw, 76px);
+  font-weight: 800;
+  letter-spacing: -0.045em;
+  line-height: 0.98;
+}
+
+.cp-lede {
+  max-width: 620px;
+  margin: 0;
+  font-size: 18px;
+  line-height: 1.55;
+  color: var(--muted);
+}
+
+/* ---- the billboard ------------------------------------------------------- */
+
+.cp-bulletin {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 0 32px;
+}
+
+/* Wide and grounded: the bulletin stands on a pole, so the box is a
+   landscape one and the sky behind it is the page. */
+.cp-bulletin-stage {
+  position: relative;
+  height: min(72vh, 720px);
+  overflow: clip;
+  border-radius: 22px;
+  background:
+    radial-gradient(70% 60% at 50% 40%, rgba(232, 255, 71, 0.07) 0%, transparent 70%),
+    var(--cp-panel);
+}
+
+.cp-caption {
+  margin: 12px 0 0;
+  font-size: 13px;
+  color: var(--text-low);
+}
+
+.cp-loading {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  color: var(--muted);
+}
+
+/* ---- the system ---------------------------------------------------------- */
+
+.cp-system {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: clamp(56px, 9vh, 104px) 32px 24px;
+}
+
+.cp-system-copy {
+  max-width: 620px;
+  margin-bottom: 36px;
+}
+
+.cp-system h2,
+.cp-city h2 {
+  margin: 0 0 12px;
+  font-size: clamp(26px, 3vw, 36px);
+  font-weight: 800;
+  letter-spacing: -0.035em;
+}
+
+.cp-system-copy p,
+.cp-city-head p {
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.55;
+  color: var(--muted);
+}
+
+.cp-system-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+.cp-part h3 {
+  margin: 18px 0 6px;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.cp-part p {
+  margin: 0;
+  font-size: 14.5px;
+  line-height: 1.5;
+  color: var(--muted);
+}
+
+.cp-part em {
+  font-style: normal;
+  color: var(--text);
+}
+
+/* The three specimens share one box, so the row reads as one row. */
+.cp-swatch,
+.cp-inks,
+.cp-wordmark {
+  height: 260px;
+  border-radius: 16px;
+  overflow: hidden;
+  background: var(--cp-panel);
+}
+
+.cp-inks {
+  display: flex;
+}
+
+.cp-ink {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 4px;
+  padding: 12px 10px;
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: #0b0a12;
+  mix-blend-mode: normal;
+}
+
+/* Night is the one swatch too dark for dark type. */
+.cp-ink:first-child {
+  color: #f4f1ff;
+  box-shadow: inset 0 0 0 1px var(--cp-line);
+}
+
+/* The site styles `code` as a green docs chip; on a swatch it is a hex in
+   the swatch's own ink, unboxed. */
+.cp .cp-ink code {
+  padding: 0;
+  font-size: 10.5px;
+  font-weight: 500;
+  color: inherit;
+  background: none;
+  border-radius: 0;
+  opacity: 0.75;
+}
+
+.cp-wordmark {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 20px 22px;
+}
+
+.cp-wordmark-name {
+  font-size: clamp(40px, 4.6vw, 62px);
+  font-weight: 800;
+  letter-spacing: -0.05em;
+  line-height: 0.86;
+  text-transform: uppercase;
+  color: #f4f1ff;
+}
+
+.cp-wordmark-dates {
+  margin-top: 12px;
+  font-size: 17px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: var(--cp-acid);
+}
+
+.cp-wordmark-place {
+  margin-top: 4px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+/* ---- across the city ------------------------------------------------------ */
+
+.cp-city {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: clamp(48px, 8vh, 88px) 32px 64px;
+}
+
+.cp-city-head {
+  max-width: 620px;
+  margin-bottom: 28px;
+}
+
+.cp-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.cp-piece {
+  border-radius: 18px;
+  background: var(--cp-panel);
+  overflow: clip;
+}
+
+/* A definite height, so LazyScene has a box to hold while unmounted. */
+.cp-stage {
+  position: relative;
+  height: 520px;
+}
+
+.cp-piece-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 16px 20px 20px;
+  border-top: 1px solid var(--cp-line);
+}
+
+.cp-piece-meta strong {
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.cp-piece-meta span {
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--muted);
+}
+
+/* ---- footer ------------------------------------------------------------ */
+
+.cp-foot {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 24px;
+  flex-wrap: wrap;
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 24px 32px 40px;
+  border-top: 1px solid var(--cp-line);
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.cp-credits {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 24px;
+}
+
+.cp-credits strong {
+  margin-right: 6px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.cp-foot a {
+  font-weight: 600;
+  color: var(--text);
+}
+
+/* ---- narrower ------------------------------------------------------------ */
+
+@media (max-width: 1000px) {
+  .cp-system-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .cp-swatch,
+  .cp-inks,
+  .cp-wordmark {
+    height: 220px;
+  }
+
+  .cp-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .cp-stage {
+    height: 480px;
+  }
+}
+
+@media (max-width: 760px) {
+  .cp-top {
+    padding: 18px 20px 0;
+  }
+
+  /* The badge and the breadcrumb both compete with the wordmark for one
+     line; the footer says what the badge says. */
+  .cp-badge,
+  .cp-crumb {
+    display: none;
+  }
+
+  .cp-hero,
+  .cp-bulletin,
+  .cp-system,
+  .cp-city,
+  .cp-foot {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+
+  .cp-hero h1 {
+    font-size: clamp(34px, 10vw, 48px);
+  }
+
+  .cp-lede {
+    font-size: 16.5px;
+  }
+
+  .cp-bulletin-stage {
+    height: 56vh;
+    border-radius: 16px;
+  }
+
+  .cp-stage {
+    height: 420px;
+  }
+}

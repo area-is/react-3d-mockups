@@ -293,53 +293,48 @@ code {
   transform: rotate(180deg);
 }
 
+/* The list is one row per example, and it keeps growing. It is capped at the
+   viewport (its top sits about 53px down: the header's 58px less the button's
+   inset, plus the 40px drop) and scrolls inside that cap, so on a short
+   window the last examples are a wheel away instead of below the fold. */
 .nav-menu-pop {
   position: absolute;
   top: 40px;
   right: -11px;
-  width: 225px;
-  background: #101319;
+  width: 190px;
+  max-height: calc(100vh - 70px);
+  max-height: calc(100dvh - 70px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-strong) transparent;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  background: var(--bg);
   border: 1px solid var(--border-strong);
   border-radius: 11px;
   box-shadow: 0 24px 50px -18px rgba(0, 0, 0, 0.8);
-  padding: 7px;
+  padding: 6px;
   z-index: 20;
 }
 
-.nav-menu-item {
+/* Plain rows on the page's own background: white type, and a faint lift on
+   hover - the same treatment as the header's icon buttons. */
+.site-nav .nav-menu-item {
   display: block;
-  padding: 9px 11px;
+  flex: none;
+  padding: 7px 11px;
   border-radius: 7px;
-  background: rgba(80, 224, 66, 0.07);
+  font-size: 14px;
+  font-weight: 500;
+  color: #fff;
   transition: background 0.15s ease;
 }
 
-.nav-menu-item:hover {
-  background: rgba(80, 224, 66, 0.14);
-}
-
-.nav-menu-item-title {
-  display: block;
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--text);
-}
-
-.nav-menu-item-desc {
-  display: block;
-  font-size: 14px;
-  color: var(--muted);
-  font-weight: 400;
-  line-height: 1.45;
-}
-
-.nav-menu-note {
-  display: block;
-  margin: 5px 11px 5px;
-  padding: 7px 0 4px;
-  border-top: 1px solid var(--border);
-  font-size: 14px;
-  color: var(--text-low);
+.site-nav .nav-menu-item:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.06);
 }
 
 .site-footer {

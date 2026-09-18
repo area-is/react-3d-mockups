@@ -9,14 +9,19 @@
 export interface SiteExample {
   href: string
   title: string
-  /** One line on what it shows - the dropdown has room for it, the sheet doesn't. */
-  description: string
 }
 
 export const SITE_EXAMPLES: SiteExample[] = [
-  {
-    href: '/examples/hero-phone',
-    title: 'Hero Phone',
-    description: 'Product hero with a giant, draggable phone',
-  },
+  { href: '/examples/print-shop', title: 'Print Shop' },
+  { href: '/examples/campaign', title: 'Campaign' },
+  { href: '/examples/ledger', title: 'Ledger' },
+  { href: '/examples/cafe', title: 'Café' },
+  { href: '/examples/fleet', title: 'Fleet' },
+  { href: '/examples/stream', title: 'Stream' },
+  { href: '/examples/packaging', title: 'Packaging' },
+  { href: '/examples/stationery', title: 'Stationery' },
+  { href: '/examples/matchday', title: 'Match day' },
+  { href: '/examples/atlas', title: 'Atlas' },
+  { href: '/examples/arcade', title: 'Arcade' },
+  { href: '/examples/ambient', title: 'Ambient' },
 ]

@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { ChevronDown } from 'lucide-react'
 import { SITE_EXAMPLES } from './site-examples'
 
-/** "Examples" header dropdown: one entry today, room for more. */
+/** "Examples" header dropdown: the standalone example pages, one row each. */
 export function ExamplesMenu() {
   const [open, setOpen] = useState(false)
   const ref = useRef<HTMLSpanElement>(null)
@@ -45,11 +45,9 @@ export function ExamplesMenu() {
               role="menuitem"
               onClick={() => setOpen(false)}
             >
-              <span className="nav-menu-item-title">{example.title}</span>
-              <span className="nav-menu-item-desc">{example.description}</span>
+              {example.title}
             </Link>
           ))}
-          <span className="nav-menu-note">More examples soon</span>
         </span>
       ) : null}
     </span>

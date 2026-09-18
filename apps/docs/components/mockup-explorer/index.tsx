@@ -177,9 +177,9 @@ const initialState = (
       // One prop, two pieces of UI state: the switch and the speed slider.
       state.autoRotate = value !== false && value !== 0
       if (typeof value === 'number') state.autoRotateSpeed = value
-    } else if (name === 'openAngle') {
+    } else if (name === 'openAngle' && spec.openable) {
       state.openAngle = typeof value === 'number' ? value : value === false ? 0 : 180
-    } else if (name in state) {
+    } else if (name in state && handWritten(spec, name)) {
       // A hand-written control owns it; the rest are inferred rows in `extra`.
       ;(state as unknown as Record<string, unknown>)[name] = value
     } else {
@@ -187,6 +187,27 @@ const initialState = (
     }
   }
   return state
+}
+
+/**
+ * Whether the panel's hand-written control for this prop is switched on for
+ * this component. The state has a `variant` field for every component, but
+ * only a family with `variants` in its spec reads it - a TV's `variant` is an
+ * inferred row driven from its prop table, and lives in `extra` like any
+ * other. Seeding the field the panel ignores left the page's `variant:
+ * 'pedestal'` in a slot nothing rendered, so the preview opened on legs.
+ */
+const handWritten = (spec: ExplorerSpec, name: string) => {
+  switch (name) {
+    case 'variant':
+      return !!spec.variants
+    case 'orientation':
+      return !!spec.orientation
+    case 'coverage':
+      return !!spec.coverage
+    default:
+      return true
+  }
 }
 
 /**

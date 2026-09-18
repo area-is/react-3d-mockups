@@ -1,0 +1,440 @@
+/* ------------------------------------------------------------------ */
+/*  /examples/stream - an isolated streaming-service example.          */
+/*                                                                     */
+/*  Cinema dark with the service's prism gradient, on the site's own   */
+/*  tokens. The picker row under the TV is the one control on the     */
+/*  page; every screen follows it.                                     */
+/* ------------------------------------------------------------------ */
+
+.st {
+  --st-prism: linear-gradient(135deg, #8b7cf8 0%, #22d3ee 100%);
+  --st-panel: #10121b;
+  --st-line: #1f2333;
+  position: relative;
+  isolation: isolate;
+  min-height: 100svh;
+  background:
+    radial-gradient(60% 40% at 50% 30%, rgba(139, 124, 248, 0.12) 0%, transparent 70%),
+    #08090f;
+  color: var(--text);
+}
+
+.st a {
+  color: inherit;
+}
+
+.st button {
+  font-family: inherit;
+  letter-spacing: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+.st h1,
+.st h2 {
+  font-weight: 800;
+  letter-spacing: -0.045em;
+  line-height: 0.98;
+}
+
+/* ---- top bar --------------------------------------------------------- */
+
+.st-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 26px 32px 0;
+}
+
+.st-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 19px;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+}
+
+.st-brand-mark {
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+  background: var(--st-prism);
+}
+
+.st-nav {
+  display: flex;
+  gap: 26px;
+  font-size: 14.5px;
+  font-weight: 500;
+  color: var(--muted);
+}
+
+.st-top-right {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.st-badge {
+  font-size: 12.5px;
+  font-weight: 500;
+  white-space: nowrap;
+  color: var(--muted);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 6px 13px;
+  background: rgba(13, 15, 21, 0.55);
+}
+
+.st-badge a {
+  font-weight: 600;
+  transition: color 0.15s ease;
+}
+
+.st-badge a:hover {
+  color: var(--text);
+}
+
+.st-cta {
+  font-size: 14px;
+  font-weight: 700;
+  color: #08090f;
+  background: #fff;
+  border-radius: 999px;
+  padding: 9px 16px;
+  white-space: nowrap;
+}
+
+/* ---- hero copy ----------------------------------------------------------- */
+
+.st-hero {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: clamp(44px, 8vh, 80px) 32px 12px;
+  text-align: center;
+}
+
+.st-eyebrow {
+  margin: 0 0 16px;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  background: var(--st-prism);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  display: inline-block;
+}
+
+.st-hero h1 {
+  margin: 0 auto 18px;
+  max-width: 760px;
+  font-size: clamp(40px, 5.6vw, 76px);
+}
+
+.st-lede {
+  max-width: 580px;
+  margin: 0 auto;
+  font-size: 18px;
+  line-height: 1.55;
+  color: var(--muted);
+}
+
+/* ---- the TV and the picker ------------------------------------------------ */
+
+.st-tv {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 8px 32px 0;
+}
+
+/* A definite, wide box: a 65" set on its pedestal wants the width. */
+.st-tv-stage {
+  position: relative;
+  height: min(74vh, 720px);
+  overflow: clip;
+  border-radius: 24px;
+}
+
+.st-picker {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: -6px;
+  padding: 18px 20px 18px;
+  border: 1px solid var(--st-line);
+  border-radius: 18px;
+  background: rgba(16, 18, 27, 0.85);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+}
+
+.st-picker-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.st-picker-label {
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.st-picker-now {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.st-picker-now strong {
+  color: var(--text);
+  font-weight: 700;
+}
+
+.st-picker-row {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 10px;
+}
+
+.st-pick {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  padding: 4px 4px 6px;
+  background: transparent;
+  border: 1.5px solid transparent;
+  border-radius: 12px;
+  text-align: left;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.st-pick:hover {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.st-pick[aria-pressed='true'] {
+  border-color: #fff;
+}
+
+.st-pick-title {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding: 0 3px;
+}
+
+.st-picker-note {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--muted);
+}
+
+.st-picker-note a {
+  font-weight: 600;
+  color: var(--text);
+  border-bottom: 1px solid var(--st-line);
+}
+
+/* ---- watch anywhere ------------------------------------------------------- */
+
+.st-anywhere {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: clamp(56px, 9vh, 104px) 32px 0;
+}
+
+.st-anywhere-head {
+  max-width: 620px;
+  margin-bottom: 24px;
+}
+
+.st-anywhere-head h2 {
+  margin: 0 0 10px;
+  font-size: clamp(26px, 3vw, 36px);
+}
+
+.st-anywhere-head p {
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.55;
+  color: var(--muted);
+}
+
+.st-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+}
+
+.st-card {
+  border-radius: 18px;
+  background: var(--st-panel);
+  border: 1px solid var(--st-line);
+  overflow: clip;
+}
+
+/* A definite height, so LazyScene has a box to hold while unmounted. */
+.st-card-stage {
+  position: relative;
+  height: 460px;
+}
+
+.st-card-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 16px 20px 20px;
+  border-top: 1px solid var(--st-line);
+}
+
+.st-card-copy strong {
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.st-card-copy span {
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--muted);
+}
+
+/* ---- plans ---------------------------------------------------------------- */
+
+.st-plans {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: clamp(48px, 8vh, 88px) 32px 64px;
+}
+
+.st-plan {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 24px 26px;
+  border-radius: 18px;
+  background: var(--st-panel);
+  border: 1px solid var(--st-line);
+}
+
+.st-plan[data-featured='true'] {
+  border-color: transparent;
+  background:
+    linear-gradient(var(--st-panel), var(--st-panel)) padding-box,
+    var(--st-prism) border-box;
+}
+
+.st-plan-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--muted);
+}
+
+.st-plan-price {
+  font-size: 34px;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  line-height: 1;
+}
+
+.st-plan-price small {
+  margin-left: 4px;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0;
+  color: var(--muted);
+}
+
+.st-plan-note {
+  font-size: 13.5px;
+  color: var(--muted);
+}
+
+/* ---- footer ------------------------------------------------------------ */
+
+.st-foot {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 22px 32px 36px;
+  border-top: 1px solid var(--st-line);
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.st-foot a {
+  font-weight: 600;
+  color: var(--text);
+}
+
+/* ---- narrower ------------------------------------------------------------ */
+
+@media (max-width: 1000px) {
+  .st-picker-row {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  .st-grid,
+  .st-plans {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 760px) {
+  .st-top {
+    padding: 18px 20px 0;
+  }
+
+  .st-badge,
+  .st-nav {
+    display: none;
+  }
+
+  .st-hero,
+  .st-tv,
+  .st-anywhere,
+  .st-plans,
+  .st-foot {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+
+  .st-hero {
+    text-align: left;
+  }
+
+  .st-hero h1 {
+    margin-left: 0;
+    font-size: clamp(34px, 10vw, 48px);
+  }
+
+  .st-lede {
+    margin-left: 0;
+    font-size: 16.5px;
+  }
+
+  .st-tv-stage {
+    height: 50vh;
+    border-radius: 16px;
+  }
+
+  .st-card-stage {
+    height: 420px;
+  }
+}

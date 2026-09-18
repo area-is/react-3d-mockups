@@ -1,0 +1,422 @@
+/* ------------------------------------------------------------------ */
+/*  /examples/matchday - an isolated football-club example.            */
+/*                                                                     */
+/*  The club's green and gold on a near-black ground; a live strip     */
+/*  under the wordmark carries the same clock the TV and the watch     */
+/*  show. Tokens override the site's on `.md` only.                    */
+/* ------------------------------------------------------------------ */
+
+.md {
+  --md-green: #14532d;
+  --md-bright: #22c55e;
+  --md-gold: #f2c14e;
+  --md-panel: #0f1512;
+  --md-line: #1e2a22;
+  position: relative;
+  isolation: isolate;
+  min-height: 100svh;
+  background:
+    radial-gradient(60% 40% at 50% 28%, rgba(34, 197, 94, 0.1) 0%, transparent 70%),
+    #090c0a;
+  color: var(--text);
+}
+
+.md a {
+  color: inherit;
+}
+
+.md h1,
+.md h2 {
+  font-weight: 800;
+  letter-spacing: -0.045em;
+  line-height: 0.96;
+  text-transform: uppercase;
+}
+
+/* ---- top bar --------------------------------------------------------- */
+
+.md-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 22px 32px 0;
+}
+
+.md-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.md-nav {
+  display: flex;
+  gap: 26px;
+  font-size: 14.5px;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.md-top-right {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.md-badge {
+  font-size: 12.5px;
+  font-weight: 500;
+  white-space: nowrap;
+  color: var(--muted);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 6px 13px;
+  background: rgba(13, 15, 21, 0.55);
+}
+
+.md-badge a {
+  font-weight: 600;
+  transition: color 0.15s ease;
+}
+
+.md-badge a:hover {
+  color: var(--text);
+}
+
+.md-cta {
+  font-size: 14px;
+  font-weight: 800;
+  color: #0b1a10;
+  background: var(--md-gold);
+  border-radius: 6px;
+  padding: 9px 16px;
+  white-space: nowrap;
+}
+
+/* ---- hero copy ----------------------------------------------------------- */
+
+.md-hero {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: clamp(40px, 7vh, 72px) 32px 28px;
+}
+
+.md-live {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 20px;
+  padding: 7px 14px 7px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--md-line);
+  background: var(--md-panel);
+  font-size: 13px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.md-live-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #e11d48;
+  box-shadow: 0 0 0 0 rgba(225, 29, 72, 0.6);
+  animation: md-pulse 1.6s ease-out infinite;
+}
+
+@keyframes md-pulse {
+  to {
+    box-shadow: 0 0 0 8px rgba(225, 29, 72, 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .md-live-dot {
+    animation: none;
+  }
+}
+
+.md-hero h1 {
+  max-width: 820px;
+  margin: 0 0 18px;
+  font-size: clamp(42px, 6.6vw, 92px);
+}
+
+.md-hero h1 br + * {
+  color: var(--md-gold);
+}
+
+.md-lede {
+  max-width: 620px;
+  margin: 0;
+  font-size: 18px;
+  line-height: 1.55;
+  color: var(--muted);
+}
+
+/* ---- the coach ------------------------------------------------------------ */
+
+.md-coach {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 0 32px;
+}
+
+.md-coach-stage {
+  position: relative;
+  height: min(66vh, 640px);
+  overflow: clip;
+  border-radius: 6px;
+  background: linear-gradient(to bottom, #121a15 0%, #0b100d 100%);
+}
+
+.md-caption {
+  margin: 12px 0 0;
+  font-size: 13px;
+  color: var(--text-low);
+}
+
+/* ---- the match ------------------------------------------------------------ */
+
+.md-match {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: clamp(56px, 9vh, 96px) 32px 0;
+}
+
+.md-match-head,
+.md-pass-copy {
+  max-width: 620px;
+}
+
+.md-match-head h2,
+.md-pass-copy h2 {
+  margin: 0 0 12px;
+  font-size: clamp(28px, 3.4vw, 42px);
+}
+
+.md-match-head p,
+.md-pass-copy > p {
+  margin: 0 0 22px;
+  font-size: 16px;
+  line-height: 1.55;
+  color: var(--muted);
+}
+
+.md-match-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 18px;
+}
+
+.md-card {
+  border-radius: 6px;
+  background: var(--md-panel);
+  border: 1px solid var(--md-line);
+  overflow: clip;
+}
+
+/* A definite height, so LazyScene has a box to hold while unmounted. */
+.md-card-stage {
+  position: relative;
+  height: 520px;
+}
+
+.md-card-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 16px 20px 20px;
+  border-top: 1px solid var(--md-line);
+}
+
+.md-card-copy strong {
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.md-card-copy span {
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--muted);
+}
+
+.md-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.md-stat {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 18px;
+  border-radius: 6px;
+  background: var(--md-panel);
+  border: 1px solid var(--md-line);
+  font-size: 18px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.md-stat span:last-child {
+  text-align: right;
+  color: var(--muted);
+}
+
+.md-stat strong {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-low);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* ---- the pass ------------------------------------------------------------- */
+
+.md-pass {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(300px, 460px);
+  gap: 44px;
+  align-items: center;
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: clamp(56px, 9vh, 96px) 32px 64px;
+}
+
+.md-pass-stage {
+  position: relative;
+  height: 560px;
+  border-radius: 6px;
+  overflow: clip;
+  background: var(--md-panel);
+  border: 1px solid var(--md-line);
+}
+
+.md-eyebrow {
+  margin: 0 0 12px;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--md-gold);
+}
+
+.md-fixtures {
+  display: flex;
+  flex-direction: column;
+  border-top: 1px solid var(--md-line);
+}
+
+.md-fixture {
+  display: grid;
+  grid-template-columns: 90px 1fr auto;
+  gap: 14px;
+  align-items: baseline;
+  padding: 11px 0;
+  border-bottom: 1px solid var(--md-line);
+  font-size: 13.5px;
+  color: var(--muted);
+}
+
+.md-fixture strong {
+  font-weight: 700;
+  color: var(--text);
+}
+
+.md-fixture[data-live='true'] span:first-child {
+  color: var(--md-bright);
+  font-weight: 700;
+}
+
+/* ---- footer ------------------------------------------------------------ */
+
+.md-foot {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 22px 32px 36px;
+  border-top: 1px solid var(--md-line);
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.md-foot a {
+  font-weight: 700;
+  color: var(--text);
+}
+
+/* ---- narrower ------------------------------------------------------------ */
+
+@media (max-width: 1000px) {
+  .md-match-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .md-stats {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .md-pass {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+}
+
+@media (max-width: 760px) {
+  .md-top {
+    padding: 18px 20px 0;
+  }
+
+  .md-badge,
+  .md-nav {
+    display: none;
+  }
+
+  .md-hero,
+  .md-coach,
+  .md-match,
+  .md-pass,
+  .md-foot {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+
+  .md-hero h1 {
+    font-size: clamp(36px, 11vw, 52px);
+  }
+
+  .md-lede {
+    font-size: 16.5px;
+  }
+
+  .md-coach-stage {
+    height: 46vh;
+  }
+
+  .md-card-stage {
+    height: 420px;
+  }
+
+  .md-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .md-pass-stage {
+    height: 480px;
+  }
+}

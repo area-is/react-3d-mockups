@@ -23,6 +23,10 @@
  *   with no chin, and a slab of even thickness because the electronics live in
  *   an external One Connect box). It ships with the Slim Fit Wall Mount and
  *   hangs flush, so it stands on nothing: the panel meets the surface directly.
+ *   Its back is the matte-black grid-textured skin of Samsung's own rear
+ *   photography, whatever the bezel finish: a lower cover band with a seam
+ *   the One Connect cable runs along, the connector recess standing up from
+ *   that seam, and the VESA points either side of it.
  *
  * Normalized to ~258 mm per world unit (the 65" panel is 5.6 units wide). The
  * origin is the panel center; the media-stand plane is `standHeight` below it.
@@ -72,6 +76,19 @@ const fromTable = (table: readonly (readonly [number, number])[], d: number) => 
 /** Samsung's published AERO CENTER footprint (width, depth in mm) by diagonal. */
 const AERO_STAND_WIDTH = [[55, 263.9], [65, 314.3], [75, 354.8], [85, 375.4]] as const
 const AERO_STAND_DEPTH = [[55, 247.4], [65, 279.4], [75, 331.5], [85, 366.5]] as const
+
+/**
+ * The picture-frame set's VESA pattern by diagonal (mm), a step table rather
+ * than an interpolation: mount patterns are standard sizes, and a set carries
+ * the pattern of its size class. Samsung lists 200 x 200 through 50", 400 x 300
+ * for the 55" and 65", 400 x 400 at 75" and 600 x 400 from 85" up.
+ */
+const FRAME_VESA = [[43, 200, 200], [55, 400, 300], [75, 400, 400], [85, 600, 400]] as const
+const vesaPattern = (d: number) => {
+  let pattern: (typeof FRAME_VESA)[number] = FRAME_VESA[0]
+  for (const row of FRAME_VESA) if (d >= row[0]) pattern = row
+  return { width: pattern[1], height: pattern[2] }
+}
 
 /** The variant every binding defaults to. */
 export const TV_DEFAULT_VARIANT: TVVariant = 'legs'
@@ -170,30 +187,58 @@ export function tvSpec(inches: number = 65, variant: TVVariant = TV_DEFAULT_VARI
      */
     portBay: v.ports ? { width: 0.62, height: 1.08, inset: 0.03 } : null,
     /**
-     * The picture-frame set's flat back (its electronics live in the connect
-     * box, so this is all it has): an inset rear plate whose rim seam is the
-     * visible gap around the edge, a recessed One Connect bay low on the
-     * back - Samsung documents the 65"'s bay ~122 mm up from the bottom with
-     * its right edge ~168 mm right of center - with the slim connector
-     * inside, a horizontal cable-routing groove running left and right of
-     * the bay, and the TV controller nub near the lower right corner. Wall
-     * mount hardware is deliberately not modeled. Null on cabinets that
-     * carry a real input bay instead.
+     * The picture-frame set's back (its electronics live in the connect box,
+     * so this is all it has), laid out from Samsung's rear photograph of the
+     * 65" LS03D: one matte-black skin over the whole back, textured with a
+     * fine dashed grid, with a lower cover band standing slightly proud of
+     * it. The band's top edge is the seam the One Connect cable runs along,
+     * in a shallow channel; the connector recess is a tall slot standing up
+     * from that seam and dropping a little below it, the band notched round
+     * it, right of center viewed from the front, with the slim socket near
+     * its top; the VESA points sit either side of it, the upper pair a
+     * hand's breadth above the seam; a dark recessed label panel and the
+     * controller slot are on the band. Wall mount hardware is deliberately
+     * not modeled. Null on cabinets that carry a real input bay instead.
      */
     backPanel: v.ports
       ? null
       : {
-          /** Rear plate inset from the body edges, and how proud it sits. */
-          inset: 0.04,
-          depth: 0.016,
-          /** Recessed connector bay; `centerX` from body center, `bottomY` up from the bottom edge. */
-          bay: { width: mm(160), height: mm(64), centerX: mm(88), bottomY: mm(122) },
-          /** Cable groove sharing the bay's bottom edge, running both ways. */
-          groove: { width: Math.min(bodyW * 0.72, mm(1150)), height: mm(26) },
-          /** The One Connect socket in the bay. */
+          /** The skin's reveal inside the bezel's return, and how proud it sits. */
+          inset: 0.006,
+          depth: 0.012,
+          /** The grid texture's cell, mm across and mm down. */
+          grid: { pitchX: 2.5, pitchY: 2 },
+          /**
+           * The lower cover band: its height up from the bottom edge, how far
+           * it stands proud of the skin, and where its vertical seams fall as
+           * fractions of the half-width; a further seam runs down from the
+           * recess's center.
+           */
+          cover: { height: bodyH * 0.33, lift: 0.0035, seams: [0.86] },
+          /**
+           * Connector recess: `height` up from the cover seam, `drop` below it
+           * into the band, `centerX` from body center.
+           */
+          bay: { width: mm(120), height: mm(235), drop: mm(25), centerX: mm(88) },
+          /** Cable channel along the cover seam, running both ways from the recess. */
+          groove: { width: Math.min(bodyW - mm(260), mm(1220)), height: mm(12) },
+          /** The One Connect socket, sunk in the recess near its top. */
           port: { width: mm(62), height: mm(13) },
-          /** TV controller nub, inset from the lower right rear corner. */
-          button: { r: mm(11), inset: mm(85) },
+          /**
+           * VESA pattern for this size class. The photograph puts the upper
+           * pair ~0.146 of the height above the cover seam, so the pattern is
+           * centered from there rather than on the panel.
+           */
+          vesa: {
+            width: mm(vesaPattern(d).width),
+            height: mm(vesaPattern(d).height),
+            centerY: bodyH * 0.33 + bodyH * 0.146 - mm(vesaPattern(d).height) / 2,
+            r: mm(4.5),
+          },
+          /** Recessed label panel on the cover band; `centerX` from body center, `centerY` up from the bottom. */
+          label: { width: mm(180), height: mm(70), centerX: -Math.min(bodyW * 0.29, mm(420)), centerY: mm(50) },
+          /** TV controller: a slim vertical slot at the cover band's far end. */
+          button: { width: mm(7), height: mm(22), inset: mm(40), centerY: mm(185) },
         },
     /** How the set stands: splayed feet, a center pedestal, or nothing. */
     stand,

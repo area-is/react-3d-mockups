@@ -1,0 +1,410 @@
+/* ------------------------------------------------------------------ */
+/*  /examples/stationery - an isolated text-driven print example.      */
+/*                                                                     */
+/*  Warm paper, a serif, and the palette's accent read from            */
+/*  `--am-accent` so the page follows the suite. The tokens override   */
+/*  the site's on `.am` only.                                          */
+/* ------------------------------------------------------------------ */
+
+.am {
+  --am-accent: #b8a56a;
+  --am-ink: #2f4a3a;
+  --am-paper: #faf7f1;
+  --am-panel: #f1ece2;
+  --am-text: #2b2823;
+  --am-muted: #746d62;
+  --am-line: #e0d8c8;
+  --am-line-strong: #c4b9a3;
+  position: relative;
+  isolation: isolate;
+  min-height: 100svh;
+  background: var(--am-paper);
+  color: var(--am-text);
+}
+
+.am a {
+  color: inherit;
+}
+
+.am button,
+.am input {
+  font-family: inherit;
+  letter-spacing: inherit;
+  color: inherit;
+}
+
+.am button {
+  cursor: pointer;
+}
+
+.am h1,
+.am h2,
+.am-brand {
+  font-family: var(--font-fraunces), Fraunces, 'Iowan Old Style', 'Palatino Linotype', serif;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+}
+
+/* ---- top bar --------------------------------------------------------- */
+
+.am-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 24px 32px 0;
+}
+
+.am-brand {
+  font-size: 24px;
+  color: var(--am-ink);
+  transition: color 0.4s ease;
+}
+
+.am-nav {
+  display: flex;
+  gap: 26px;
+  font-size: 14.5px;
+  font-weight: 500;
+  color: var(--am-muted);
+}
+
+.am-top-right {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.am-badge {
+  font-size: 12.5px;
+  font-weight: 500;
+  white-space: nowrap;
+  color: var(--am-muted);
+  border: 1px solid var(--am-line);
+  border-radius: 999px;
+  padding: 6px 13px;
+  background: rgba(255, 255, 255, 0.5);
+}
+
+.am-badge a {
+  font-weight: 600;
+  transition: color 0.15s ease;
+}
+
+.am-badge a:hover {
+  color: var(--am-text);
+}
+
+.am-cta {
+  font-size: 14px;
+  font-weight: 700;
+  color: #fff;
+  background: var(--am-ink);
+  border-radius: 999px;
+  padding: 9px 16px;
+  white-space: nowrap;
+  transition: background 0.4s ease;
+}
+
+/* ---- hero copy ----------------------------------------------------------- */
+
+.am-hero {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: clamp(44px, 8vh, 84px) 32px 32px;
+}
+
+.am-eyebrow {
+  margin: 0 0 14px;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--am-accent);
+  transition: color 0.4s ease;
+}
+
+.am-hero h1 {
+  max-width: 760px;
+  margin: 0 0 18px;
+  font-size: clamp(40px, 5.4vw, 72px);
+  line-height: 1.02;
+}
+
+.am-lede {
+  max-width: 600px;
+  margin: 0;
+  font-size: 18px;
+  line-height: 1.55;
+  color: var(--am-muted);
+}
+
+/* ---- the builder ---------------------------------------------------------- */
+
+.am-builder {
+  display: grid;
+  grid-template-columns: minmax(300px, 380px) minmax(0, 1fr);
+  gap: 40px;
+  align-items: start;
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 0 32px 64px;
+}
+
+.am-form {
+  position: sticky;
+  top: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 22px;
+  border: 1px solid var(--am-line);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.5);
+}
+
+.am-form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.am-text {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+  font-size: 12.5px;
+  font-weight: 700;
+}
+
+/* `width: 100%` and `min-width: 0`, or the two inputs in a row keep their
+   intrinsic width and run out of the form. */
+.am-text input {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  padding: 10px 12px;
+  font-size: 15px;
+  font-weight: 500;
+  background: #fff;
+  border: 1.5px solid var(--am-line);
+  border-radius: 10px;
+  outline: none;
+  transition: border-color 0.15s ease;
+}
+
+.am-text input:focus {
+  border-color: var(--am-ink);
+}
+
+.am-field {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  min-width: 0;
+}
+
+.am-field legend {
+  padding: 0;
+  margin: 0 0 8px;
+  font-size: 12.5px;
+  font-weight: 700;
+}
+
+.am-palettes {
+  display: flex;
+  gap: 8px;
+}
+
+.am-palette {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 10px 7px 7px;
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+  background: rgba(255, 255, 255, 0.6);
+  border: 1.5px solid var(--am-line);
+  border-radius: 10px;
+  transition: border-color 0.15s ease;
+}
+
+.am-palette[aria-pressed='true'] {
+  border-color: var(--am-ink);
+  background: #fff;
+}
+
+.am-palette-chip {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  width: 30px;
+  height: 22px;
+  padding: 3px;
+  box-sizing: border-box;
+  border-radius: 5px;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+}
+
+.am-palette-chip span {
+  flex: 1;
+  height: 9px;
+  border-radius: 2px;
+}
+
+.am-seg {
+  display: flex;
+  gap: 6px;
+}
+
+.am-seg button {
+  flex: 1;
+  padding: 9px 8px;
+  font-size: 15px;
+  background: rgba(255, 255, 255, 0.6);
+  border: 1.5px solid var(--am-line);
+  border-radius: 10px;
+  transition: border-color 0.15s ease;
+}
+
+.am-seg button[data-face='serif'] {
+  font-family: var(--font-fraunces), Fraunces, serif;
+  font-weight: 500;
+}
+
+.am-seg button[data-face='sans'] {
+  font-weight: 700;
+  letter-spacing: -0.03em;
+}
+
+.am-seg button[aria-pressed='true'] {
+  border-color: var(--am-ink);
+  background: #fff;
+}
+
+.am-form-note {
+  margin: 4px 0 0;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--am-muted);
+}
+
+.am-form-note a {
+  font-weight: 600;
+  color: var(--am-text);
+  border-bottom: 1px solid var(--am-line);
+}
+
+.am-pieces {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+
+.am-piece {
+  border-radius: 18px;
+  border: 1px solid var(--am-line);
+  background: rgba(255, 255, 255, 0.4);
+  overflow: clip;
+}
+
+/* A definite height, so LazyScene has a box to hold while unmounted. */
+.am-piece-stage {
+  position: relative;
+  height: 400px;
+  background: var(--am-panel);
+}
+
+.am-piece-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 14px 18px 18px;
+}
+
+.am-piece-meta strong {
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.am-piece-meta span {
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--am-muted);
+}
+
+/* ---- footer ------------------------------------------------------------ */
+
+.am-foot {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 22px 32px 36px;
+  border-top: 1px solid var(--am-line);
+  font-size: 13px;
+  color: var(--am-muted);
+}
+
+.am-foot a {
+  font-weight: 600;
+  color: var(--am-text);
+}
+
+/* ---- narrower ------------------------------------------------------------ */
+
+@media (max-width: 1000px) {
+  .am-builder {
+    grid-template-columns: 1fr;
+  }
+
+  .am-form {
+    position: relative;
+    top: auto;
+  }
+}
+
+@media (max-width: 760px) {
+  .am-top {
+    padding: 18px 20px 0;
+  }
+
+  .am-badge,
+  .am-nav {
+    display: none;
+  }
+
+  .am-hero,
+  .am-builder,
+  .am-foot {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+
+  .am-hero h1 {
+    font-size: clamp(34px, 10vw, 48px);
+  }
+
+  .am-lede {
+    font-size: 16.5px;
+  }
+
+  .am-pieces {
+    grid-template-columns: 1fr;
+  }
+
+  .am-piece-stage {
+    height: 380px;
+  }
+
+  .am-palettes {
+    flex-direction: column;
+  }
+}
