@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react'
 import { SceneBoundary } from './scene-boundary'
 
 /**
@@ -50,15 +50,37 @@ function enforceCap() {
  *
  * The wrapper fills its parent, so it must sit inside a container with a
  * fixed height (`.mockup-viewport`) for layout to hold while unmounted.
+ *
+ * `poster` is what shows until the scene has something to show - before it
+ * mounts, and after, until it says it is ready. Children written as a
+ * function are handed that `ready` callback to pass as the canvas's
+ * `onCreated`, which r3f calls once the scene graph is built, just before the
+ * first frame; plain children count as ready the moment they mount.
  */
-export function LazyScene({ children }: { children: React.ReactNode }) {
+export function LazyScene({
+  children,
+  poster,
+}: {
+  children: ReactNode | ((ready: () => void) => ReactNode)
+  poster?: ReactNode
+}) {
   const ref = useRef<HTMLDivElement>(null)
   const [mounted, setMounted] = useState(false)
+  const [ready, setReady] = useState(false)
+  const markReady = useCallback(() => setReady(true), [])
+  const deferred = typeof children === 'function'
 
   useEffect(() => {
     const el = ref.current
     if (!el) return
-    const slot: Slot = { visible: false, seen: 0, release: () => setMounted(false) }
+    const slot: Slot = {
+      visible: false,
+      seen: 0,
+      release: () => {
+        setMounted(false)
+        setReady(false)
+      },
+    }
     const observer = new IntersectionObserver(
       ([entry]) => {
         slot.visible = entry?.isIntersecting ?? false
@@ -80,9 +102,17 @@ export function LazyScene({ children }: { children: React.ReactNode }) {
     }
   }, [])
 
+  const shown = mounted && (ready || !deferred)
   return (
-    <div ref={ref} style={{ width: '100%', height: '100%' }}>
-      {mounted ? <SceneBoundary>{children}</SceneBoundary> : null}
+    <div ref={ref} style={{ position: 'relative', width: '100%', height: '100%' }}>
+      {poster ? (
+        <div className="scene-poster-layer" data-hidden={shown} aria-hidden>
+          {poster}
+        </div>
+      ) : null}
+      {mounted ? (
+        <SceneBoundary>{typeof children === 'function' ? children(markReady) : children}</SceneBoundary>
+      ) : null}
     </div>
   )
 }

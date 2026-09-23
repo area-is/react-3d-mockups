@@ -99,6 +99,22 @@
   gap: 8px;
 }
 
+/* A category's name across both columns, in the voice of Fumadocs' own
+   sidebar separators but a step quieter - these are under "Devices". */
+.mockup-grid-heading {
+  grid-column: 1 / -1;
+  margin: 8px 0 -2px;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-fd-muted-foreground);
+}
+
+.mockup-grid-heading:first-child {
+  margin-top: 0;
+}
+
 .mockup-tile {
   display: flex;
   flex-direction: column;
@@ -358,6 +374,10 @@
   overflow: hidden;
   margin: 1.5rem 0;
   font-size: 12px;
+  /* A share link scrolls the explorer into view; this is the clearance
+     Fumadocs gives its heading anchors (`scroll-m-28`), so it lands below the
+     sticky nav rather than under it. */
+  scroll-margin-top: 7rem;
 }
 
 .mx-header {
@@ -1095,7 +1115,9 @@
 .mx-tabs {
   display: flex;
   align-items: center;
-  padding: 0 12px;
+  /* No right padding: `.mx-actions` ends the strip and carries its own, so
+     its sticky edge is the strip's edge and nothing scrolls past it. */
+  padding: 0 0 0 12px;
   border-bottom: 1px solid var(--color-fd-border);
 }
 
@@ -1124,18 +1146,42 @@
   box-shadow: inset 0 -2px 0 var(--mx-accent);
 }
 
-.mx-copy {
+/* Share, StackBlitz and copy, at the strip's far end. Sticky, so on an object
+   with enough faces to scroll the tabs, the tabs slide under the buttons
+   rather than taking them off the end - which needs the card's own fill
+   behind them. */
+.mx-actions {
+  position: sticky;
+  right: 0;
   margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 0 12px 0 8px;
+  background: var(--color-fd-card);
+}
+
+.mx-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px;
   border: 0;
+  border-radius: 6px;
   background: none;
   color: var(--color-fd-muted-foreground);
   font-size: 12px;
-  cursor: pointer;
   font-family: inherit;
+  white-space: nowrap;
+  cursor: pointer;
 }
 
-.mx-copy:hover {
+.mx-action:hover {
   color: var(--color-fd-foreground);
+}
+
+.mx-action svg {
+  flex: none;
 }
 
 .mx-code pre {
@@ -1247,5 +1293,65 @@
 
   .mx-range {
     width: 60px;
+  }
+
+  /* Icons only, so the file tabs keep the strip. Each button carries its name
+     in aria-label, so nothing is lost to a screen reader. */
+  .mx-action-label {
+    display: none;
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/*  Scene posters (LazyScene)                                          */
+/* ------------------------------------------------------------------ */
+
+/*
+ * The model an example is about to render, greyed to a silhouette under the
+ * stage until the scene is built - see `ModelPoster`. It breathes, so it
+ * reads as on its way rather than as the picture, and it fades out rather
+ * than vanishing as the real model draws in over it.
+ */
+.scene-poster-layer {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+  transition: opacity 0.35s ease;
+}
+
+.scene-poster-layer[data-hidden='true'] {
+  opacity: 0;
+}
+
+.scene-poster-layer[data-hidden='true'] .scene-poster {
+  animation: none;
+}
+
+.scene-poster {
+  width: auto;
+  height: min(62%, 300px);
+  aspect-ratio: 1;
+  object-fit: contain;
+  filter: grayscale(1) brightness(0.72) contrast(0.8);
+  opacity: 0.3;
+  animation: scene-poster-breathe 1.8s ease-in-out infinite;
+}
+
+.dark .scene-poster {
+  filter: grayscale(1) contrast(0.7) brightness(1.6);
+  opacity: 0.18;
+}
+
+@keyframes scene-poster-breathe {
+  50% {
+    opacity: 0.12;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scene-poster {
+    animation: none;
   }
 }

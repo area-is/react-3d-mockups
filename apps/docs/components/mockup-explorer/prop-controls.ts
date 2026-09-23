@@ -242,6 +242,74 @@ export function editableProp(doc: PropDoc): EditableProp | null {
 
 export const same = (a: unknown, b: unknown) => JSON.stringify(a) === JSON.stringify(b)
 
+/* ------------------------------------------------------------------ */
+/*  Reading a value back in                                            */
+/* ------------------------------------------------------------------ */
+
+/** A colour as a color well writes it, or as a table or a page seeds one. */
+export const isHexColor = (value: unknown): value is string =>
+  typeof value === 'string' && /^#(?:[0-9a-f]{3,4}|[0-9a-f]{6}|[0-9a-f]{8})$/i.test(value)
+
+const finite = (value: unknown): value is number => typeof value === 'number' && Number.isFinite(value)
+
+export const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value))
+
+/**
+ * The ceiling on a millimetre size read from a link - ten metres, which no
+ * object here comes near. The fields take whatever is typed, but a link is
+ * someone else's typing, and a panel far past any real object is a surface
+ * the browser would be asked to allocate at the same pixel density.
+ */
+const MAX_MM = 10_000
+
+/**
+ * `value` as this prop's control could have set it, or `undefined` when no
+ * control could have - for a value that arrives from outside the panel (a
+ * shared link) rather than from one of its own widgets.
+ *
+ * Each case is the control's own contract: a switch holds a boolean, a slider
+ * clamps to its travel, a select to its options, a color well to a hex. The
+ * composites are held a little tighter than their number fields, to what an
+ * object can be: a size above zero, a camera with a field of view. Nothing
+ * free-form gets through, which matters beyond tidiness - these values are
+ * printed into the snippet as code.
+ */
+export function acceptValue(prop: EditableProp, value: unknown): unknown {
+  const { control } = prop
+  switch (control.kind) {
+    case 'switch':
+      return typeof value === 'boolean' ? value : undefined
+    case 'switchColor':
+      return typeof value === 'boolean' || isHexColor(value) ? value : undefined
+    case 'color':
+      return isHexColor(value) ? value : undefined
+    case 'number':
+      return finite(value) ? clamp(value, control.min, control.max) : undefined
+    case 'enum':
+      return typeof value === 'string' && control.options.includes(value) ? value : undefined
+    case 'vector':
+      return Array.isArray(value) && value.length === control.axes.length && value.every(finite)
+        ? value
+        : undefined
+    case 'dimensions': {
+      if (!value || typeof value !== 'object') return undefined
+      const size: Record<string, number> = {}
+      for (const { key } of control.axes) {
+        const mm = (value as Record<string, unknown>)[key]
+        if (!finite(mm) || mm <= 0) return undefined
+        size[key] = Math.min(mm, MAX_MM)
+      }
+      return size
+    }
+    case 'camera': {
+      if (!value || typeof value !== 'object') return undefined
+      const { position, fov } = value as { position?: unknown; fov?: unknown }
+      if (!Array.isArray(position) || position.length !== 3 || !position.every(finite)) return undefined
+      return finite(fov) ? { position, fov: clamp(fov, 1, 179) } : undefined
+    }
+  }
+}
+
 /** Trim float noise a slider leaves behind: `0.30000000000000004` -> `0.3`. */
 const num = (value: number) => String(Math.round(value * 1e4) / 1e4)
 

@@ -24,15 +24,20 @@ export const metadata: Metadata = {
   ...socialMetadata({ title: 'React 3D Mockups documentation', description: DOCS_DESCRIPTION }),
 }
 
-// `themeColor` lives on `viewport` in this version of Next. The docs follow
-// the system colour scheme (Fumadocs' light and dark page backgrounds, see
-// docs.css), so the browser chrome does too.
+// `themeColor` lives on `viewport` in this version of Next. The docs open
+// dark (see `DOCS_THEME`), so the browser chrome is dark to match; a reader
+// who switches to light keeps it, since the meta tag cannot follow a class.
 export const viewport: Viewport = {
-  themeColor: [
-    { media: '(prefers-color-scheme: light)', color: '#ffffff' },
-    { media: '(prefers-color-scheme: dark)', color: '#121212' },
-  ],
+  themeColor: '#121212',
 }
+
+/**
+ * The docs open in dark, like the home page they are one click from, rather
+ * than following the system: on a light system the step from the dark home
+ * page into a white docs page read as leaving the site. The toggle in the
+ * sidebar still switches, and a reader's choice is remembered as before.
+ */
+const DOCS_THEME = { defaultTheme: 'dark' }
 
 // Root layout for the documentation. It is deliberately separate from the
 // site root layout: the docs use Fumadocs UI on Tailwind, the site keeps its
@@ -52,7 +57,7 @@ export default function DocsRootLayout({ children }: { children: ReactNode }) {
           * so it resolves to a bare `/api/search` and misses our prefix
           * entirely. Pointing it explicitly is the whole fix.
           */}
-        <RootProvider search={{ options: { api: asset('/api/search') } }}>
+        <RootProvider theme={DOCS_THEME} search={{ options: { api: asset('/api/search') } }}>
           <DocsLayout
             tree={hideGridPages(source.getPageTree())}
             {...baseOptions()}
