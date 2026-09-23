@@ -1,0 +1,17 @@
+{
+  // The stand-in for the area.is apex app - see worker.js for why it exists
+  // and apps/docs/DEPLOYMENT.md ("The apex") for how to deploy and retire it.
+  // Not an npm workspace: it has no dependencies and no build step.
+  "$schema": "../../apps/docs/node_modules/wrangler/config-schema.json",
+  "name": "area-apex",
+  "main": "worker.js",
+  "compatibility_date": "2026-07-28",
+
+  // Everything on the apex that the docs Worker's more specific routes
+  // (`area.is/react-3d-mockups*`) do not claim. Needs the apex DNS record to
+  // stay PROXIED, which it already is for the docs.
+  "routes": [{ "pattern": "area.is/*", "zone_name": "area.is" }],
+
+  "workers_dev": false,
+  "preview_urls": false
+}

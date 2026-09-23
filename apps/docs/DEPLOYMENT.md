@@ -1,10 +1,101 @@
-# Serving the site at `area.is/react-3d-mockups`
+# Deploying the docs site
 
-> How the site is built and deployed at all - Workers Builds, the OpenNext
-> indirections, the bundle size - is in the root
-> [README](../../README.md#deploying-the-docs). This file is only about the URL
-> it answers on, which is the one deployment change with enough moving parts to
-> be worth writing down.
+Two halves: how the site is built and deployed at all (Workers Builds, the
+OpenNext indirections, the bundle size), and the URL it answers on - a path on
+the `area.is` apex, which is the one deployment change with enough moving parts
+to be worth writing down.
+
+## Building and deploying
+
+The docs site runs on Cloudflare Workers through the
+[OpenNext](https://opennext.js.org/cloudflare) adapter. Config lives in
+`wrangler.jsonc` and `open-next.config.ts`.
+
+```bash
+npm run preview:docs   # build + serve the real Worker locally (workerd, not next dev)
+npm run deploy:docs    # build + deploy from your machine
+```
+
+`npm run dev` is still the fastest loop for day-to-day work; `preview:docs` is what to
+run before trusting a deploy, since it executes the app in the Workers runtime rather
+than Node.
+
+### CI/CD
+
+**Deploys** are [Workers Builds](https://developers.cloudflare.com/workers/ci-cd/builds/),
+configured in the Cloudflare dashboard rather than in this repo. Cloudflare clones,
+builds and deploys on push, under an API token it generates and holds itself, so there
+are no deploy credentials in GitHub and no deploy workflow here.
+
+The workflows that *are* here do everything else: `ci.yml` typechecks, tests and builds
+every pull request, `release.yml` publishes to npm on a tag, and
+`cloudflare-build-pr-comments.yml` reports each Workers build back onto its PR.
+
+Settings live under **Workers & Pages → area-3d-mockups-docs → Settings → Build**:
+
+| Setting | Value |
+| --- | --- |
+| Root directory | `apps/docs` |
+| Build command | `npm run build` |
+| Deploy command | `npx wrangler deploy` |
+| Non-production branch deploy command | `npx wrangler versions upload` |
+| Git branch | `main` |
+
+Two things that are easy to get wrong:
+
+- **The Worker's name in the dashboard has to be `area-3d-mockups-docs`**, matching
+  `name` in `apps/docs/wrangler.jsonc`. A mismatch fails the build rather than
+  deploying to the wrong place.
+- **Root directory is `apps/docs`, not the repo root.** That is where the Wrangler
+  config lives, which is what Cloudflare keys off. It works with npm workspaces
+  because `npm ci` walks up to the root lockfile, installs every workspace, and runs
+  the `prepare` hooks that build `packages/react/dist` before the docs build reads it.
+
+Those are the stock Workers Builds commands, unedited. They land on OpenNext through
+two indirections worth knowing about:
+
+- **`npm run build` in `apps/docs` is `opennextjs-cloudflare build`, not `next build`.**
+  Wrangler needs `.open-next/worker.js`, which a plain Next build never produces. The
+  Next build survives as `build:next`, and `open-next.config.ts` sets that as OpenNext's
+  `buildCommand`. Without it the adapter would fall back to its own default of
+  `npm run build` and recurse into itself.
+- **`wrangler deploy` re-executes itself as `opennextjs-cloudflare deploy`.** It detects
+  an OpenNext project from a `next.config.*`, an `open-next.config.*` and an installed
+  `@opennextjs/cloudflare`, then hands off. That hand-off is the seam where cache
+  population would happen if `open-next.config.ts` ever gains an incremental cache.
+
+`wrangler versions upload` has no such hand-off: it uploads the built Worker directly.
+That is equivalent today, because the incremental cache is `dummy` and there is nothing
+to populate. If that changes, the non-production command has to become an explicit
+`opennextjs-cloudflare upload` rather than the default.
+
+### Worker size
+
+The bundle is about 3.9 MB gzipped, over the
+[3 MB Workers Free ceiling](https://developers.cloudflare.com/workers/platform/limits/#worker-size)
+and well under the 10 MB paid one, so deploys need a Workers Paid account.
+
+Shiki is the weight: around 400 TextMate grammars end up inlined in the Worker. They
+get there because Next externalises `shiki`, so the whole package is traced into the
+server bundle and OpenNext's esbuild pass inlines its full-bundle import map. Nothing
+ever calls it at runtime, though. Every docs route is prerendered, `/api/search` is
+Orama, and `components/code-block.tsx` is a plain `<pre><code>`, so the highlighted
+HTML is baked in at build time and the grammars are dead code.
+
+Two things that look like fixes but are not, both measured at 4035 KiB gzipped
+against a 4036 KiB baseline:
+
+- `rehypeCodeOptions.langs` in `source.config.ts`. It controls which grammars the
+  highlighter *loads*, not which ones are reachable from the module graph.
+- `outputFileTracingExcludes` in `next.config.ts`. OpenNext traces `@shikijs` in
+  regardless.
+
+What would work is shiki's [fine-grained bundle](https://shiki.style/guide/bundles):
+`fumadocs-core/mdx-plugins/rehype-code.core` accepts a `ShikiFactory`, so a highlighter
+built from `shiki/core` plus explicit `@shikijs/langs/{tsx,ts,bash}` imports never
+references the full-bundle map that pulls the other ~397 in.
+
+# Serving the site at `area.is/react-3d-mockups`
 
 The site is served at a **path on the apex** rather than on its own hostname.
 That is two changes that have to land together, and the code half is done:
@@ -173,7 +264,7 @@ off the edge under exactly the paths the routes match.
 ## Part 3 - what is left to do
 
 Steps 1 and 2 are the two ✅ sections above. The rest needs a human with
-Cloudflare access:
+Cloudflare access (and so does the apex stand-in, below):
 
 3. **Deploy** with the routes in place and the old Custom Domain **still
    there**. Both URLs now serve; the old one is the fallback.
@@ -195,6 +286,42 @@ Cloudflare access:
 
 The `*.workers.dev` URLs serve the site too and are toggled separately, if you
 eventually want exactly one address.
+
+## The apex: `area.is/`, `/robots.txt`, `/sitemap.xml`
+
+Until the apex app ships, nothing answered on the apex but this Worker's
+prefix. `https://area.is/`, `/robots.txt` and `/sitemap.xml` all went to the
+`100::` placeholder above and came back as Cloudflare **522**s - and that
+reaches the docs too. A crawler reads robots.txt only at the host root, a
+robots.txt that keeps failing with a 5xx can be read as "do not crawl this
+host" (docs included), and the `Sitemap:` line in `app/robots.ts` is only ever
+served at `/react-3d-mockups/robots.txt`, a path no crawler reads rules from.
+
+[`infra/apex`](../../infra/apex) is the stand-in: a dependency-free Worker
+routed at `area.is/*` that answers
+
+| Path | Response |
+| --- | --- |
+| `/` | `302` to `/react-3d-mockups` (temporary on purpose - the apex will be its own site) |
+| `/robots.txt` | the rules from `app/robots.ts`, prefixed, plus `Sitemap: https://area.is/react-3d-mockups/sitemap.xml` |
+| `/sitemap.xml` | a sitemap index pointing at the docs' sitemap |
+| anything else | a plain `404` page linking to the docs (not a redirect: that would be a soft 404) |
+
+The docs Worker's routes are more specific, so they keep winning for
+everything under `/react-3d-mockups`. The apex record stays exactly as it is,
+proxied; the route is what makes it answer.
+
+To deploy it (a human with Cloudflare access, once):
+
+```bash
+cd infra/apex
+npx wrangler deploy          # needs a Cloudflare login with access to the area.is zone
+curl -I https://area.is/robots.txt   # 200, text/plain
+```
+
+When the real apex app ships, delete this Worker (Workers & Pages →
+`area-apex` → Settings → Delete) and carry the robots.txt lines over to the
+new app - `app/robots.ts` stays the written record of them.
 
 ## Things that change quietly
 

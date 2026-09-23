@@ -56,3 +56,28 @@ jobs:
 
       - name: Build the docs site
         run: npm run build:docs
+
+      # The behavioural budgets from `npm run bench`: an idle mockup draws
+      # nothing, an off-screen or hidden carousel neither draws nor advances,
+      # the home page does not shift, a docs page never holds more WebGL
+      # contexts than LazyScene allows. Run against the production build just
+      # made, on SwiftShader, so no GPU is needed and the answers are the same
+      # as on a laptop. Timings are reported in the job summary, not enforced.
+      - name: Install Chromium for the benchmark
+        working-directory: apps/docs
+        run: npx playwright install --with-deps chromium
+
+      - name: Benchmark budgets
+        timeout-minutes: 25
+        working-directory: apps/docs
+        run: |
+          npx next start -p 3100 > "$RUNNER_TEMP/next-start.log" 2>&1 &
+          for i in $(seq 1 60); do
+            curl -sf -o /dev/null http://localhost:3100/react-3d-mockups/docs && break
+            sleep 2
+          done
+          PORT=3100 node scripts/bench.mjs --markdown="$RUNNER_TEMP/bench.md"
+
+      - name: Benchmark summary
+        if: always()
+        run: cat "$RUNNER_TEMP/bench.md" >> "$GITHUB_STEP_SUMMARY" 2>/dev/null || true
