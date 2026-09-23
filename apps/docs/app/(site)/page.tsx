@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { highlight } from 'fumadocs-core/highlight'
 import { HeroCarousel } from '@/components/hero-carousel'
 import { DEVICES, OBJECTS } from '@/lib/mockup-catalog.mjs'
+import { asset } from '@/lib/base-path.mjs'
 import {
   AUTHOR,
   GITHUB_URL,
@@ -51,16 +52,28 @@ const STRUCTURED_DATA = {
 }
 
 /**
- * What the library is, in four claims.
+ * What the library is, in four claims, each beside a picture of it.
  *
  * No rules between them: the space down the page is the separation, and a
  * border around a paragraph of prose only ever reads as a box to escape from.
- * Each claim is one sentence and a qualifier - set at reading size in a single
- * column, anything longer stops being a claim and becomes documentation.
+ * Each claim is one sentence and a qualifier - anything longer stops being a
+ * claim and becomes documentation.
+ *
+ * The pictures are renders of the real mockups, made by
+ * `scripts/generate-feature-shots.mjs` (`npm run features`), not live canvases:
+ * four more WebGL contexts to illustrate four sentences would cost the page
+ * more than the carousel above them does. `width` and `height` are the files'
+ * own, so the browser reserves each one's box before it loads.
  */
 const FEATURES = [
   {
     title: 'Real GPU rendering',
+    image: {
+      src: '/features/rendering.webp',
+      width: 485,
+      height: 720,
+      alt: 'The back of an iPhone 17 Pro mockup in Cosmic Orange, showing its camera plateau',
+    },
     body: (
       <>
         WebGL through three.js and react-three-fiber: physically-based materials, studio
@@ -71,6 +84,12 @@ const FEATURES = [
   },
   {
     title: 'Any content on the surface',
+    image: {
+      src: '/features/surface.webp',
+      width: 1040,
+      height: 712,
+      alt: 'A MacBook Air mockup with a studio website on its screen',
+    },
     body: (
       <>
         Pass React components, video or an <code>&lt;iframe&gt;</code> as children: it stays
@@ -81,6 +100,12 @@ const FEATURES = [
   },
   {
     title: 'Procedural objects',
+    image: {
+      src: '/features/procedural.webp',
+      width: 1040,
+      height: 303,
+      alt: 'A city bus mockup with a printed side advert and a lit destination sign',
+    },
     body: (
       <>
         Every phone, laptop, carton and billboard is built from geometry at runtime: no GLB
@@ -90,6 +115,12 @@ const FEATURES = [
   },
   {
     title: 'Composable by design',
+    image: {
+      src: '/features/composable.webp',
+      width: 1040,
+      height: 601,
+      alt: 'A MacBook Air and an iPhone composed in one scene, each with its own screen',
+    },
     body: (
       <>
         Take the one-liner <code>&lt;GalaxyMockup&gt;</code>, or compose{' '}
@@ -148,11 +179,23 @@ export default function HomePage() {
       <section className="features" aria-label="What the library does">
         {FEATURES.map((feature, i) => (
           <article className="feature" key={feature.title}>
-            <span className="feature-index" aria-hidden>
-              {String(i + 1).padStart(2, '0')}
-            </span>
-            <h2>{feature.title}</h2>
-            <p>{feature.body}</p>
+            <div className="feature-copy">
+              <span className="feature-index" aria-hidden>
+                {String(i + 1).padStart(2, '0')}
+              </span>
+              <h2>{feature.title}</h2>
+              <p>{feature.body}</p>
+            </div>
+            <figure className="feature-figure">
+              <img
+                src={asset(feature.image.src)}
+                width={feature.image.width}
+                height={feature.image.height}
+                alt={feature.image.alt}
+                loading="lazy"
+                decoding="async"
+              />
+            </figure>
           </article>
         ))}
       </section>

@@ -4,10 +4,14 @@ import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { ChevronDown } from 'lucide-react'
 import { SITE_EXAMPLE_GROUPS } from './site-examples'
+import { asset } from '@/lib/base-path.mjs'
 
 /**
- * "Examples" header dropdown: the standalone example pages, one row each,
- * under a small heading per use case (see site-examples.ts for why).
+ * "Examples" header dropdown: the standalone example pages, a column per use
+ * case (see site-examples.ts for why), each row a glimpse of the page beside
+ * its name. The glimpses are `npm run example-thumbs`, a few KB each, and the
+ * menu only renders when it is open, so a visitor who never opens it never
+ * fetches them.
  */
 export function ExamplesMenu() {
   const [open, setOpen] = useState(false)
@@ -56,6 +60,14 @@ export function ExamplesMenu() {
                   role="menuitem"
                   onClick={() => setOpen(false)}
                 >
+                  <img
+                    className="nav-menu-thumb"
+                    src={asset(`/examples/${example.slug}.webp`)}
+                    alt=""
+                    width="96"
+                    height="60"
+                    decoding="async"
+                  />
                   {example.title}
                 </Link>
               ))}

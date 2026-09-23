@@ -12,7 +12,7 @@ import {
 import Link from 'next/link'
 import { useFrame } from '@react-three/fiber'
 import { Check, CodeXml, Palette, Pause, Play } from 'lucide-react'
-import type { Group } from 'three'
+import { Box3, Matrix4, type Group } from 'three'
 import {
   MockupCanvas,
   Galaxy,
@@ -33,6 +33,10 @@ import {
   ShoppingBag,
   PosterFrame,
   AFrameSign,
+  Billboard,
+  Bus,
+  Storefront,
+  TVSet,
   GALAXY_COLORWAYS,
   IPHONE_COLORWAYS,
   FOLD_COLORWAYS,
@@ -48,29 +52,16 @@ import {
   type Colorway,
   type MockupKind,
 } from 'react-3d-mockups'
+import { DEFAULT_CAMERA_FOV, ORBIT } from 'react-3d-mockups/core'
 import {
-  DEFAULT_CAMERA_FOV,
-  DEFAULT_CAMERA_POSITION,
-  ORBIT,
-  FLIP_FRAMING,
-  FOLD_FRAMING,
-  GALAXY_FRAMING,
-  IPHONE_FRAMING,
-  LAPTOP_FRAMING,
-  STUDIO_DISPLAY_FRAMING,
-  TABLET_FRAMING,
-  WATCH_FRAMING,
-  A_FRAME_SIGN_FRAMING,
-  BOOK_FRAMING,
-  MAILER_BOX_FRAMING,
-  MILK_CARTON_FRAMING,
-  POSTER_FRAME_FRAMING,
-  PRODUCT_BOX_FRAMING,
-  SHOPPING_BAG_FRAMING,
-  VINYL_RECORD_FRAMING,
-  type MockupFraming,
-} from 'react-3d-mockups/core'
-import { ChalkHoursArt, ChalkMenuArt } from '../screens/print-art'
+  BillboardAdArt,
+  BusAdArt,
+  ChalkHoursArt,
+  ChalkMenuArt,
+  StoreMuralArt,
+  StoreSignArt,
+  TVShowArt,
+} from '../screens/print-art'
 import { CartonBack, CartonFacts, CartonFront, CartonRoof, CartonStory } from '../screens/carton-art'
 import {
   BagBack,
@@ -97,6 +88,7 @@ import {
 } from '../screens/swiss-art'
 import { JacketBack, JacketCover, JacketSpine } from '../screens/book-jacket'
 import { SleeveBack, SleeveCover, SleeveLabelA, SleeveLabelB } from '../screens/record-sleeve'
+import { CarouselHintText } from '../carousel-hint'
 import { DEVICES as CATALOG_DEVICES, OBJECTS as CATALOG_OBJECTS } from '@/lib/mockup-catalog.mjs'
 
 /**
@@ -116,19 +108,21 @@ import { DEVICES as CATALOG_DEVICES, OBJECTS as CATALOG_OBJECTS } from '@/lib/mo
  * scrolling past them read as padding) plus the print and packaging objects,
  * which are what say the library is not only about phones.
  *
- * Sizing comes from the library's own framing data. A mockup frames its object
- * by placing the camera at a per-family distance, so an object that looks right
- * at distance `d` in its own canvas looks the same here when scaled by
- * `CAMERA_Z / d` - phones, laptops, monitors and milk cartons end up optically
- * matched without a table of hand-tuned scales.
+ * Every model is sized to the same box (`STAGE_HEIGHT` by `STAGE_WIDTH`) from
+ * its own measured bounds, and centred on them - see `measure`.
  */
 
-/** Shared camera distance; every object is scaled relative to it. */
+/** Shared camera distance. */
 const CAMERA_Z = 9
 /** Rig scale to fall back on before the stylesheet has been measured. */
 const DEFAULT_FIT = 1
-/** How much of the frame the staged model fills, leaving room for the row. */
-const STAGE_FILL = 0.74
+/**
+ * The box every staged model is fitted into, in rig units: as tall as a phone
+ * has always stood here, and no wider than leaves a clear gap to the models
+ * flanking it (half of `SPACING`, less half a side model at `SIDE_SCALE`).
+ */
+const STAGE_HEIGHT = 3.6
+const STAGE_WIDTH = 4.6
 /** World-space gap between the staged model and each flanking one. */
 const SPACING = 4.8
 const STAGE_Y = 0.72
@@ -225,25 +219,19 @@ function advanceTumble(t: Tumble): void {
   t.pitch = Math.min(PITCH_LIMIT, Math.max(-PITCH_LIMIT, t.pitch + pitch))
 }
 
-/** Framing distance the library itself uses for a family. */
-const distanceOf = (framing: MockupFraming<never>): number =>
-  framing.camera?.position[2] ?? DEFAULT_CAMERA_POSITION[2]
-
 interface Entry {
   /** Catalog id: the name, the docs page and the copied code all come from it. */
   id: string
   /** Live-surface readout: logical pixels for a screen, millimetres for print. */
   res: string
-  /** Scale that matches this object to the shared camera. */
-  fit: number
-  /** Nudge for objects whose origin is not their visual centre (laptops). */
-  lift: number
   /**
    * Resting tilt toward the camera, in radians, for an object whose best face
    * is on top - a mailer box shown level is a flat rectangle, and its readout
    * describes a lid nobody can see.
    */
   tilt?: number
+  /** Resting turn on top of `BASE_RY`, for an object whose best side faces away. */
+  yaw?: number
   colorways: Colorway[]
   /**
    * Ink for the system status bar, set against the artwork behind it the way
@@ -298,10 +286,12 @@ function pxRes(kind: MockupKind, props?: object): string {
 /**
  * "156 × 234 mm" - the same surface in millimetres, which is the number a
  * print piece is actually specified in. A book cover's pixel grid is a
- * rendering detail; its trim size is the thing.
+ * rendering detail; its trim size is the thing. Past ten metres it is metres:
+ * nobody quotes a billboard at 14560 mm.
  */
 function mmRes(kind: MockupKind, props?: object): string {
   const { width, height } = mockupInfo(kind as never, props as never).primary.mm
+  if (width >= 10_000) return `${(width / 1000).toFixed(1)} × ${(height / 1000).toFixed(1)} m`
   return `${Math.round(width)} × ${Math.round(height)} mm`
 }
 
@@ -315,25 +305,6 @@ function mmRes(kind: MockupKind, props?: object): string {
  */
 const stock = (...entries: [string, string, string][]): Colorway[] =>
   entries.map(([id, name, color]) => ({ id, name, color }))
-
-const fitFor = (framing: MockupFraming<never>) => (CAMERA_Z / distanceOf(framing)) * STAGE_FILL
-
-const PHONE_FIT = fitFor(GALAXY_FRAMING as MockupFraming<never>)
-const IPHONE_FIT = fitFor(IPHONE_FRAMING as MockupFraming<never>)
-const FOLD_FIT = fitFor(FOLD_FRAMING as MockupFraming<never>)
-const FLIP_FIT = fitFor(FLIP_FRAMING as MockupFraming<never>)
-const LAPTOP_FIT = fitFor(LAPTOP_FRAMING as MockupFraming<never>)
-const TABLET_FIT = fitFor(TABLET_FRAMING as MockupFraming<never>)
-const WATCH_FIT = fitFor(WATCH_FRAMING as MockupFraming<never>)
-const DISPLAY_FIT = fitFor(STUDIO_DISPLAY_FRAMING as MockupFraming<never>)
-const BOOK_FIT = fitFor(BOOK_FRAMING as MockupFraming<never>)
-const VINYL_FIT = fitFor(VINYL_RECORD_FRAMING as MockupFraming<never>)
-const CARTON_FIT = fitFor(MILK_CARTON_FRAMING as MockupFraming<never>)
-const PRODUCT_BOX_FIT = fitFor(PRODUCT_BOX_FRAMING as MockupFraming<never>)
-const MAILER_FIT = fitFor(MAILER_BOX_FRAMING as MockupFraming<never>)
-const BAG_FIT = fitFor(SHOPPING_BAG_FRAMING as MockupFraming<never>)
-const POSTER_FIT = fitFor(POSTER_FRAME_FRAMING as MockupFraming<never>)
-const AFRAME_FIT = fitFor(A_FRAME_SIGN_FRAMING as MockupFraming<never>)
 
 /**
  * What the catalog says about the object on stage: its name, its reference
@@ -388,8 +359,6 @@ const DEVICES: Entry[] = [
     id: 'galaxy-s26',
     statusBarInk: '#141414',
     res: pxRes('galaxy', { variant: 's26' }),
-    fit: PHONE_FIT,
-    lift: 0,
     colorways: GALAXY_COLORWAYS.s26,
     content: () => <SwissRotation />,
     render: ({ color, screen, surface, surfaceStyle, statusBar, resolution }) => (
@@ -402,8 +371,6 @@ const DEVICES: Entry[] = [
     id: 'iphone-17-pro',
     statusBarInk: '#efede6',
     res: pxRes('iphone', { variant: 'pro' }),
-    fit: IPHONE_FIT,
-    lift: 0,
     colorways: IPHONE_COLORWAYS.pro,
     content: () => <SwissRaster />,
     render: ({ color, screen, surface, surfaceStyle, statusBar, resolution }) => (
@@ -416,8 +383,6 @@ const DEVICES: Entry[] = [
     id: 'galaxy-z-fold7',
     statusBarInk: '#141414',
     res: pxRes('fold', { openAngle: CAROUSEL_OPEN_ANGLE }),
-    fit: FOLD_FIT,
-    lift: 0,
     colorways: FOLD_COLORWAYS.fold7,
     content: () => <Newspaper />,
     render: ({ color, screen, surface, surfaceStyle, statusBar, resolution }) => (
@@ -430,8 +395,6 @@ const DEVICES: Entry[] = [
     id: 'galaxy-z-flip7',
     statusBarInk: '#efede6',
     res: pxRes('flip', { openAngle: CAROUSEL_OPEN_ANGLE }),
-    fit: FLIP_FIT,
-    lift: 0,
     colorways: FLIP_COLORWAYS.flip7,
     content: () => <SwissField />,
     render: ({ color, screen, surface, surfaceStyle, statusBar, resolution }) => (
@@ -443,8 +406,6 @@ const DEVICES: Entry[] = [
   {
     id: 'macbook-air-13',
     res: pxRes('laptop', { variant: 'air13' }),
-    fit: LAPTOP_FIT,
-    lift: 0.55,
     colorways: LAPTOP_COLORWAYS.air13,
     content: () => <SwissSite />,
     render: ({ color, screen, surface, surfaceStyle, resolution }) => (
@@ -457,8 +418,6 @@ const DEVICES: Entry[] = [
     id: 'ipad-pro-13',
     statusBarInk: '#efede6',
     res: pxRes('ipad', { variant: 'ipadpro13' }),
-    fit: TABLET_FIT,
-    lift: 0,
     colorways: IPAD_COLORWAYS.ipadpro13,
     content: () => <SwissEpicentre />,
     render: ({ color, screen, surface, surfaceStyle, statusBar, resolution }) => (
@@ -471,8 +430,6 @@ const DEVICES: Entry[] = [
     id: 'galaxy-tab-s11',
     statusBarInk: '#141414',
     res: pxRes('galaxyTab', { variant: 'tabs11' }),
-    fit: TABLET_FIT,
-    lift: 0,
     colorways: GALAXY_TAB_COLORWAYS.tabs11,
     content: () => <SwissChecker />,
     render: ({ color, screen, surface, surfaceStyle, statusBar, resolution }) => (
@@ -484,8 +441,6 @@ const DEVICES: Entry[] = [
   {
     id: 'apple-watch-series-11',
     res: pxRes('appleWatch'),
-    fit: WATCH_FIT,
-    lift: 0,
     colorways: APPLE_WATCH_COLORWAYS.series11,
     content: () => <SwissDialA />,
     render: ({ color, screen, surface, surfaceStyle, resolution }) => <AppleWatch color={color} surfaceBackground={surface} surfaceStyle={surfaceStyle} resolution={resolution}>{screen}</AppleWatch>,
@@ -493,8 +448,6 @@ const DEVICES: Entry[] = [
   {
     id: 'galaxy-watch-8',
     res: pxRes('galaxyWatch'),
-    fit: WATCH_FIT,
-    lift: 0,
     colorways: GALAXY_WATCH_COLORWAYS.watch8,
     content: () => <WatchFace />,
     render: ({ color, screen, surface, surfaceStyle, resolution }) => <GalaxyWatch color={color} surfaceBackground={surface} surfaceStyle={surfaceStyle} resolution={resolution}>{screen}</GalaxyWatch>,
@@ -502,8 +455,6 @@ const DEVICES: Entry[] = [
   {
     id: 'studio-display',
     res: pxRes('studioDisplay'),
-    fit: DISPLAY_FIT,
-    lift: 0.1,
     colorways: STUDIO_DISPLAY_COLORWAYS,
     content: () => <SwissRhythm />,
     render: ({ color, screen, surface, surfaceStyle, resolution }) => <StudioDisplay color={color} surfaceBackground={surface} surfaceStyle={surfaceStyle} resolution={resolution}>{screen}</StudioDisplay>,
@@ -519,8 +470,6 @@ const OBJECTS: Entry[] = [
   {
     id: 'book',
     res: mmRes('book'),
-    fit: BOOK_FIT,
-    lift: 0,
     colorways: stock(
       ['navy', 'Navy cloth', '#1f3a5f'],
       ['forest', 'Forest', '#22402f'],
@@ -551,8 +500,6 @@ const OBJECTS: Entry[] = [
   {
     id: 'vinyl-record',
     res: mmRes('vinylRecord'),
-    fit: VINYL_FIT,
-    lift: 0,
     colorways: stock(
       ['natural', 'Natural board', '#f2efe8'],
       ['black', 'Black jacket', '#1b1b1e'],
@@ -584,8 +531,6 @@ const OBJECTS: Entry[] = [
   {
     id: 'milk-carton',
     res: mmRes('milkCarton'),
-    fit: CARTON_FIT,
-    lift: 0,
     colorways: stock(
       ['white', 'Coated white', '#f4f3ef'],
       ['cream', 'Cream', '#f1e7d4'],
@@ -622,8 +567,6 @@ const OBJECTS: Entry[] = [
   {
     id: 'product-box',
     res: mmRes('productBox'),
-    fit: PRODUCT_BOX_FIT,
-    lift: 0,
     colorways: stock(
       ['white', 'Coated white', '#f4f1ea'],
       ['kraft', 'Kraft', '#c9a97b'],
@@ -660,8 +603,6 @@ const OBJECTS: Entry[] = [
   {
     id: 'mailer-box',
     res: mmRes('mailerBox'),
-    fit: MAILER_FIT,
-    lift: 0,
     tilt: 0.42,
     colorways: stock(
       ['kraft', 'Kraft', '#b5915f'],
@@ -694,8 +635,6 @@ const OBJECTS: Entry[] = [
   {
     id: 'shopping-bag',
     res: mmRes('shoppingBag'),
-    fit: BAG_FIT,
-    lift: 0,
     colorways: stock(
       ['kraft', 'Kraft', '#c19a6b'],
       ['white', 'Gloss white', '#f2efe9'],
@@ -718,8 +657,6 @@ const OBJECTS: Entry[] = [
   {
     id: 'poster-frame',
     res: mmRes('posterFrame'),
-    fit: POSTER_FIT,
-    lift: 0,
     colorways: stock(
       ['black', 'Black', '#22262e'],
       ['oak', 'Oak', '#b08a53'],
@@ -736,8 +673,6 @@ const OBJECTS: Entry[] = [
   {
     id: 'a-frame-sign',
     res: mmRes('aFrameSign'),
-    fit: AFRAME_FIT,
-    lift: 0,
     colorways: stock(
       ['walnut', 'Walnut', '#4a3826'],
       ['black', 'Black', '#2a2c30'],
@@ -763,14 +698,200 @@ const OBJECTS: Entry[] = [
   },
 ]
 
-/** Everything on show, devices first. */
-const SHOWCASE: Entry[] = [...DEVICES, ...OBJECTS]
+/**
+ * A model's size and centre at unit scale, in the rig's units - measured, once
+ * per id, from the geometry it actually renders.
+ *
+ * Sizing used to come from the library's framing data: each family's camera
+ * distance, scaled to this one. That matches a model to its own docs page,
+ * which is the wrong comparison on a stage where they stand in a row. A
+ * MacBook framed to fill its own canvas covered two thirds of the area of the
+ * iPad after it, the shopping bag's handles reached up into the swatches, and
+ * a laptop, whose origin is its hinge, needed a hand-set nudge to sit level
+ * with the rest. Measured bounds fit every model into the same box and centre
+ * it on what is drawn, and a bus or a billboard needs no hand-tuned scale to
+ * join them.
+ *
+ * `Box3.setFromObject` reads each mesh's bounding box, which three caches on
+ * the geometry, so this is a walk over a few hundred boxes the first frame a
+ * model exists and a map lookup after. It runs inside the slot's frame
+ * callback, before that frame renders, so the model is never drawn at the
+ * wrong size.
+ */
+interface Extent {
+  scale: number
+  /** Its box's centre relative to its origin, at unit scale. */
+  cx: number
+  cy: number
+}
+const EXTENTS = new Map<string, Extent>()
+const bounds = new Box3()
+const toRig = new Matrix4()
+
+function extentOf(entry: Entry, g: Group): Extent {
+  const known = EXTENTS.get(entry.id)
+  if (known) return known
+  // Measured as it will rest, tilt included: a mailer box tipped back to show
+  // its lid is taller on screen than the same box lying flat.
+  g.position.set(0, 0, 0)
+  g.rotation.set(entry.tilt ?? 0, entry.yaw ?? 0, 0)
+  g.scale.setScalar(1)
+  g.updateWorldMatrix(true, true)
+  bounds.setFromObject(g)
+  // World to rig: the rig is scaled and dropped (see `RIG_DROP`), and the box
+  // is wanted in the units the stage constants are written in.
+  if (g.parent) bounds.applyMatrix4(toRig.copy(g.parent.matrixWorld).invert())
+  const width = bounds.max.x - bounds.min.x
+  const height = bounds.max.y - bounds.min.y
+  const extent = {
+    scale: width > 0 && height > 0 ? Math.min(STAGE_WIDTH / width, STAGE_HEIGHT / height) : 1,
+    cx: (bounds.max.x + bounds.min.x) / 2,
+    cy: (bounds.max.y + bounds.min.y) / 2,
+  }
+  EXTENTS.set(entry.id, extent)
+  return extent
+}
+
+/**
+ * The ones nobody expects from a mockup library: a billboard, a living-room
+ * TV, a city bus and a shopfront. They are what a screenshot-in-a-frame tool
+ * cannot do, so they are spread through the run (see `ORDER`) rather than
+ * queued up after eighteen phones and boxes.
+ */
+const SHOWPIECES: Entry[] = [
+  {
+    id: 'billboard',
+    res: mmRes('billboard'),
+    colorways: stock(
+      ['steel', 'Steel', '#2c313a'],
+      ['white', 'White', '#dcdcd8'],
+      ['green', 'Green', '#2f4a3a']
+    ),
+    content: () => <BillboardAdArt />,
+    render: ({ color, screen, surface, surfaceStyle, resolution }) => (
+      <Billboard color={color} surfaceBackground={surface} surfaceStyle={surfaceStyle} resolution={resolution}>
+        {screen}
+      </Billboard>
+    ),
+  },
+  {
+    id: 'tv',
+    res: pxRes('tv'),
+    colorways: stock(
+      ['black', 'Black', '#15171b'],
+      ['silver', 'Silver', '#b4b8be'],
+      ['white', 'White', '#e6e6e2']
+    ),
+    content: () => <TVShowArt />,
+    render: ({ color, screen, surface, surfaceStyle, resolution }) => (
+      <TVSet color={color} surfaceBackground={surface} surfaceStyle={surfaceStyle} resolution={resolution}>
+        {screen}
+      </TVSet>
+    ),
+  },
+  {
+    id: 'bus',
+    res: mmRes('bus'),
+    colorways: stock(
+      ['white', 'Fleet white', '#eef0f2'],
+      ['silver', 'Silver', '#b9bec4'],
+      ['red', 'Red', '#b3262c'],
+      ['blue', 'Blue', '#1f4e8c']
+    ),
+    // Turned to show its street side, nose first: the curb-side panel runs
+    // behind the rear door, which cuts through whatever is printed there.
+    yaw: Math.PI + 0.6,
+    content: () => <BusAdArt />,
+    // The king-size panel, and the destination sign lit above the windscreen
+    // - a string there gets the library's own dot-matrix marquee.
+    render: ({ color, screen, surface, surfaceStyle, resolution }) => (
+      <Bus color={color} surfaceBackground={surface} surfaceStyle={surfaceStyle} resolution={resolution}>
+        {screen != null && (
+          <>
+            <Bus.StreetSide>{screen}</Bus.StreetSide>
+            <Bus.DestinationSign>42 DOWNTOWN VIA 5TH AVE</Bus.DestinationSign>
+          </>
+        )}
+      </Bus>
+    ),
+  },
+  {
+    id: 'storefront',
+    res: mmRes('storefront'),
+    colorways: stock(
+      ['green', 'Racing green', '#2e4638'],
+      ['navy', 'Navy', '#1f2b3d'],
+      ['oxblood', 'Oxblood', '#5b2230'],
+      ['cream', 'Cream', '#e3dccb']
+    ),
+    content: () => <StoreSignArt />,
+    // The fascia is the primary face; the side signs repeat it and the side
+    // walls carry a painted mural. The display bays stay glass - a shop is
+    // more convincing with windows you can see into.
+    render: ({ color, screen, surface, surfaceStyle, resolution }) => (
+      <Storefront color={color} surfaceBackground={surface} surfaceStyle={surfaceStyle} resolution={resolution}>
+        {screen}
+        {screen != null && (
+          <>
+            <Storefront.LeftSign>
+              <StoreSignArt />
+            </Storefront.LeftSign>
+            <Storefront.RightSign>
+              <StoreSignArt />
+            </Storefront.RightSign>
+            <Storefront.Left>
+              <StoreMuralArt />
+            </Storefront.Left>
+            <Storefront.Right>
+              <StoreMuralArt />
+            </Storefront.Right>
+          </>
+        )}
+      </Storefront>
+    ),
+  },
+]
+
+/**
+ * The running order: the phones first, since they are what most visitors
+ * came for, then a showpiece every few slides, so the breadth shows up inside
+ * the first minute of autoplay.
+ */
+const ORDER = [
+  'galaxy-s26',
+  'iphone-17-pro',
+  'galaxy-z-fold7',
+  'galaxy-z-flip7',
+  'billboard',
+  'macbook-air-13',
+  'ipad-pro-13',
+  'galaxy-tab-s11',
+  'tv',
+  'apple-watch-series-11',
+  'galaxy-watch-8',
+  'studio-display',
+  'bus',
+  'book',
+  'vinyl-record',
+  'milk-carton',
+  'product-box',
+  'mailer-box',
+  'storefront',
+  'shopping-bag',
+  'poster-frame',
+  'a-frame-sign',
+]
+
+const ENTRIES = new Map([...DEVICES, ...OBJECTS, ...SHOWPIECES].map((e) => [e.id, e]))
+
+/** Everything on show, in running order. */
+const SHOWCASE: Entry[] = ORDER.map((id) => ENTRIES.get(id)!)
 
 const N = SHOWCASE.length
 
 /**
  * Shortest signed distance from `x` to 0 on a ring of N - the float version,
- * so a slide that crosses the seam (17 → 0) travels one step rather than
+ * so a slide that crosses the seam (last → 0) travels one step rather than
  * winding all the way back. This is what makes the loop endless in both
  * directions.
  */
@@ -868,17 +989,18 @@ function StageSlot({
   useFrame((state) => {
     const g = group.current
     if (!g) return
+    const extent = extentOf(entry, g)
     const d = wrapDelta(index - anim.current)
     // 0 while centred, 1 once a full step out - drives everything that
     // distinguishes the device on stage from the ones flanking it.
     const t = Math.min(Math.abs(d), 1)
     const near = 1 - t
-    const scale = entry.fit * (1 - (1 - SIDE_SCALE) * t) * (hovered.current && t > 0.5 ? 1.05 : 1)
-    g.position.x = d * SPACING
-    g.position.y = STAGE_Y + entry.lift * scale + Math.sin(state.clock.elapsedTime * 1.1) * 0.05 * near
+    const scale = extent.scale * (1 - (1 - SIDE_SCALE) * t) * (hovered.current && t > 0.5 ? 1.05 : 1)
+    g.position.x = d * SPACING - extent.cx * scale
+    g.position.y = STAGE_Y - extent.cy * scale + Math.sin(state.clock.elapsedTime * 1.1) * 0.05 * near
     g.position.z = -1.4 * t
     g.scale.setScalar(scale)
-    g.rotation.y = BASE_RY + (tumble.current.yaw - BASE_RY) * near
+    g.rotation.y = (entry.yaw ?? 0) + BASE_RY + (tumble.current.yaw - BASE_RY) * near
     g.rotation.x = ((entry.tilt ?? 0) + tumble.current.pitch) * near
     g.updateMatrixWorld(true)
   }, -1)
@@ -940,13 +1062,14 @@ function RowSlot({
   useFrame(() => {
     const g = group.current
     if (!g) return
+    const extent = extentOf(entry, g)
     const d = wrapDelta(index - anim.current)
     const near = Math.max(0, 1 - Math.abs(d))
-    const scale = entry.fit * ROW_SCALE * (1 + 0.3 * near) * (hovered.current ? 1.1 : 1)
-    g.position.x = d * ROW_SPACING
-    g.position.y = ROW_Y + entry.lift * scale
+    const scale = extent.scale * ROW_SCALE * (1 + 0.3 * near) * (hovered.current ? 1.1 : 1)
+    g.position.x = d * ROW_SPACING - extent.cx * scale
+    g.position.y = ROW_Y - extent.cy * scale
     g.scale.setScalar(scale)
-    g.rotation.y = BASE_RY
+    g.rotation.y = (entry.yaw ?? 0) + BASE_RY
     g.updateMatrixWorld(true)
   }, -1)
 
@@ -1013,6 +1136,20 @@ function useOnScreen(ref: RefObject<HTMLElement | null>): boolean {
   return onScreen
 }
 
+/** Set once a visitor has dragged the carousel, so the hint is not repeated. */
+const HINT_KEY = 'react-3d-mockups:carousel-hint'
+
+/**
+ * The longest a flick can carry past where the finger stopped, in slots.
+ *
+ * A browse drag is one-for-one, then the release speed carries it on. That
+ * carry used to be free to round up to a second slot, so a short, fast swipe
+ * - the ordinary way to say "next" on a phone - skipped one. Now a flick moves
+ * one slot beyond the slot the drag started from; only a drag that itself
+ * crossed further lands further.
+ */
+const MAX_FLICK_SLOTS = 1
+
 export default function CarouselScene() {
   const [active, setActive] = useState(0)
   // Finish selection per model, defaulting to each palette's first swatch.
@@ -1030,8 +1167,23 @@ export default function CarouselScene() {
   // Set once the first frame is on screen, so autoplay's first dwell is spent
   // on slide 01 rather than on an empty stage while the scene loads.
   const [ready, setReady] = useState(false)
-  // After the first drag the gesture hint has done its job.
+  // After the first drag the gesture hint has done its job - on this visit
+  // and, remembered, on the next (see `HINT_KEY`).
   const [interacted, setInteracted] = useState(false)
+  const [hintSeen, setHintSeen] = useState(false)
+  useEffect(() => {
+    try {
+      if (localStorage.getItem(HINT_KEY)) setHintSeen(true)
+    } catch {
+      // Storage blocked: the hint shows every visit, which is where it started.
+    }
+  }, [])
+  useEffect(() => {
+    if (!interacted) return
+    try {
+      localStorage.setItem(HINT_KEY, '1')
+    } catch {}
+  }, [interacted])
   const [copied, setCopied] = useState(false)
 
   // The ring position: `target` is unbounded so successive steps keep moving
@@ -1110,6 +1262,11 @@ export default function CarouselScene() {
     perPx: number
     /** Most recent horizontal speed, in px/ms, for the flick. */
     vx: number
+    /**
+     * When the last move happened: the event's own `timeStamp`, not the time
+     * it was handled. A frame that stalls queues the moves behind it, and
+     * timing them on arrival read a quick swipe as a slow one - no flick.
+     */
     at: number
   } | null>(null)
   const moved = useRef(false)
@@ -1173,7 +1330,7 @@ export default function CarouselScene() {
       from: anim.current,
       perPx: slotsPerPixel(),
       vx: 0,
-      at: performance.now(),
+      at: e.timeStamp,
     }
     if (sectionRef.current) sectionRef.current.dataset.dragging = 'true'
     // Touch has no hover, so this is the first chance to say which gesture the
@@ -1216,9 +1373,8 @@ export default function CarouselScene() {
     // Browse drag: the ring follows the cursor one-for-one. `anim` is set with
     // `target` so the easing has nothing to catch up on mid-gesture - it takes
     // over only once the drag ends and the ring snaps to a slot.
-    const now = performance.now()
-    d.vx = (e.clientX - d.x) / Math.max(1, now - d.at)
-    d.at = now
+    d.vx = (e.clientX - d.x) / Math.max(1, e.timeStamp - d.at)
+    d.at = e.timeStamp
     d.x = e.clientX
     target.current = d.from - (e.clientX - d.x0) * d.perPx
     anim.current = target.current
@@ -1243,9 +1399,12 @@ export default function CarouselScene() {
     setInteracted(true)
     if (d.orbiting) return
     // Carry the flick a little past where the finger stopped, then settle on
-    // whichever slot that lands nearest.
+    // whichever slot that lands nearest - no further from the starting slot
+    // than the drag itself got, or one slot, whichever is more.
     const flick = Math.max(-1.2, Math.min(1.2, -d.vx * d.perPx * 220))
-    target.current = Math.round(anim.current + flick)
+    const start = Math.round(d.from)
+    const reach = Math.max(MAX_FLICK_SLOTS, Math.abs(Math.round(anim.current) - start))
+    target.current = start + Math.max(-reach, Math.min(reach, Math.round(anim.current + flick) - start))
     tumble.current = restingTumble()
     syncActive(((Math.round(target.current) % N) + N) % N)
     announce(target.current)
@@ -1259,6 +1418,9 @@ export default function CarouselScene() {
 
   const entry = SHOWCASE[active]!
   const selected = finish[entry.id] ?? entry.colorways[0]!.id
+  // A phone comes in colorways; a carton or a bag is printed on a material;
+  // a frame, a sign or a bus has a finish.
+  const swatchesLabel = DEVICES.includes(entry) ? 'Colorway' : entry.material ? 'Material' : 'Finish'
   const colorOf = (dev: Entry) => {
     const id = finish[dev.id] ?? dev.colorways[0]!.id
     return dev.colorways.find((c) => c.id === id)?.color ?? dev.colorways[0]!.color
@@ -1322,11 +1484,11 @@ export default function CarouselScene() {
           {/* The word "Colors" next to a row of coloured dots was labelling
               what the dots already say; the glyph holds the row's left edge
               without spelling it out, and the name stays for screen readers. */}
-          <span className="carousel-finish-label">
+          <span className="carousel-finish-label" title={swatchesLabel}>
             <Palette size={15} strokeWidth={1.75} aria-hidden />
-            <span className="sr-only">Colors</span>
+            <span className="sr-only">{swatchesLabel}</span>
           </span>
-          <span className="carousel-swatches" role="group" aria-label="Finish">
+          <span className="carousel-swatches" role="group" aria-label={swatchesLabel}>
             {entry.colorways.map((c) => (
               <button
                 key={c.id}
@@ -1447,26 +1609,21 @@ export default function CarouselScene() {
           </MockupCanvas>
         </div>
 
-        {/* The markers stay in FRONT: they name the gesture, and a label the
-            device could hide would be worse than no label. */}
-        <div className="carousel-layer carousel-marks" aria-hidden>
-          <span className="carousel-rotate-badge">
-            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M21 12a9 9 0 1 1-2.64-6.36" />
-              <path d="M21 3v6h-6" />
-            </svg>
-            Drag to rotate
-          </span>
-          <span className="carousel-chevron" data-side="left">
-            <svg viewBox="0 0 24 24" width="23" height="23" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+        {/* In FRONT of the stage, so the device can never cover them. On
+            touch these are the prev/next; on a desktop the arrows by the
+            readout are, and these only light over the half a click steps to
+            (see `.carousel-chevron`). */}
+        <div className="carousel-layer carousel-marks">
+          <button type="button" className="carousel-chevron" data-side="left" aria-label="Previous mockup" onClick={() => go(active - 1)}>
+            <svg viewBox="0 0 24 24" width="23" height="23" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
               <path d="M15 18l-6-6 6-6" />
             </svg>
-          </span>
-          <span className="carousel-chevron" data-side="right">
-            <svg viewBox="0 0 24 24" width="23" height="23" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+          </button>
+          <button type="button" className="carousel-chevron" data-side="right" aria-label="Next mockup" onClick={() => go(active + 1)}>
+            <svg viewBox="0 0 24 24" width="23" height="23" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
               <path d="M9 6l6 6-6 6" />
             </svg>
-          </span>
+          </button>
         </div>
       </div>
 
@@ -1480,11 +1637,11 @@ export default function CarouselScene() {
           {autoOn ? <Pause size={13} strokeWidth={2.2} aria-hidden /> : <Play size={13} strokeWidth={2.2} aria-hidden />}
           <span>{autoOn ? 'Pause' : 'Play'}</span>
         </button>
-        {/* Shown until the first drag, then faded: once a visitor has turned
-            the model they know the gesture, and it was a second copy of the
-            badge on the stage. */}
-        <p className="carousel-hint" data-used={interacted}>
-          Drag to spin · drag the sides to browse
+        {/* The one hint - there used to be a "Drag to rotate" badge on the
+            stage saying half of it again. In with the first frame, out at
+            the first drag, and not back for a visitor who has dragged. */}
+        <p className="carousel-hint" data-shown={ready && !interacted && !hintSeen}>
+          <CarouselHintText />
         </p>
         {/* Announced politely, and only for changes the visitor made: the
             strip is WebGL geometry, so without this a screen-reader user

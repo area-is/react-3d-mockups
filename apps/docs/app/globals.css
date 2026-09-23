@@ -361,38 +361,40 @@ code {
   transform: rotate(180deg);
 }
 
-/* The list is one row per example, and it keeps growing. It is capped at the
-   viewport (its top sits about 53px down: the header's 58px less the button's
-   inset, plus the 40px drop) and scrolls inside that cap, so on a short
-   window the last examples are a wheel away instead of below the fold. */
+/* A column per use case, a row per example. It is capped at the viewport
+   (its top sits about 53px down: the header's 58px less the button's inset,
+   plus the 40px drop) and scrolls inside that cap, so on a short window the
+   last examples are a wheel away instead of below the fold. */
 .nav-menu-pop {
   position: absolute;
   top: 40px;
   right: -11px;
-  width: 220px;
+  width: min(660px, calc(100vw - 32px));
   max-height: calc(100vh - 70px);
   max-height: calc(100dvh - 70px);
   overflow-y: auto;
   overscroll-behavior: contain;
   scrollbar-width: thin;
   scrollbar-color: var(--border-strong) transparent;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
   background: var(--bg);
   border: 1px solid var(--border-strong);
   border-radius: 11px;
   box-shadow: 0 24px 50px -18px rgba(0, 0, 0, 0.8);
-  padding: 6px;
+  padding: 8px;
   z-index: 20;
 }
 
 /* Plain rows on the page's own background: white type, and a faint lift on
    hover - the same treatment as the header's icon buttons. */
 .site-nav .nav-menu-item {
-  display: block;
+  display: flex;
+  align-items: center;
+  gap: 10px;
   flex: none;
-  padding: 7px 11px;
+  padding: 6px 8px;
   border-radius: 7px;
   font-size: 14px;
   font-weight: 500;
@@ -412,9 +414,20 @@ code {
 }
 
 .nav-menu-group + .nav-menu-group {
-  margin-top: 5px;
-  padding-top: 5px;
-  border-top: 1px solid var(--border);
+  padding-left: 6px;
+  border-left: 1px solid var(--border);
+}
+
+/* A glimpse of the page, at card size - enough to tell a dashboard from a
+   café from a freight fleet before reading the name. */
+.nav-menu-thumb {
+  flex: none;
+  width: 64px;
+  height: 40px;
+  border-radius: 5px;
+  object-fit: cover;
+  background: rgba(255, 255, 255, 0.04);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08), 0 0 0 1px rgba(255, 255, 255, 0.06);
 }
 
 .nav-menu-heading {
@@ -883,22 +896,42 @@ code {
   mask-image: var(--centre-fade);
 }
 
-.carousel[data-zone='device'] .carousel-centre,
-.carousel[data-zone='device'] .carousel-rotate-badge {
+.carousel[data-zone='device'] .carousel-centre {
   opacity: 1;
 }
 
-/* Markers in the front layer: the chevrons and the rotate badge. */
+/*
+ * The stage-edge chevrons: the carousel's prev/next on touch screens and
+ * phones, and on a desktop only the sign lit over the half a click would step
+ * to.
+ *
+ * There used to be two sets on a phone - these and the round arrows by the
+ * readout - doing the same thing a few centimetres apart. Now exactly one set
+ * is on screen at a time (see the media query below): the arrows where there
+ * is a pointer and the room to put them by the name, these where the thumb
+ * already is.
+ *
+ * They are buttons, so on touch they are what a screen reader or a keyboard
+ * finds. They never take the pointer, though: a tap there lands on the stage,
+ * which steps from its own zones, and a swipe that starts on one still
+ * browses. On a desktop `visibility` keeps them out of the tab order while
+ * they are dark - the arrows are the controls there.
+ */
 .carousel-chevron {
   position: absolute;
   top: 0;
   bottom: 26%;
   display: flex;
   align-items: center;
+  padding: 0;
+  border: 0;
+  background: none;
   color: var(--accent-2);
   filter: drop-shadow(0 0 10px rgba(49, 211, 34, 0.5));
+  pointer-events: none;
+  visibility: hidden;
   opacity: 0;
-  transition: opacity 0.2s ease;
+  transition: opacity 0.2s ease, visibility 0.2s;
 }
 
 .carousel-chevron[data-side='left'] {
@@ -911,33 +944,14 @@ code {
   padding-right: clamp(11px, 2.7vw, 36px);
 }
 
-/*
- * The rotate glyph, sat under the device rather than over it - the object is
- * the thing being looked at, and a badge across its face would be in the way.
- */
-.carousel-rotate-badge {
-  /* In the gap between the staged device and the strip, clear of both. */
-  position: absolute;
-  left: 50%;
-  bottom: 30%;
-  transform: translateX(-50%);
-  opacity: 0;
-  transition: opacity 0.2s ease;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 4px 11px 4px 8px;
-  border: 1px solid rgba(49, 211, 34, 0.35);
-  border-radius: 999px;
-  background: rgba(8, 9, 12, 0.55);
-  -webkit-backdrop-filter: blur(6px);
-  backdrop-filter: blur(6px);
-  font-family: var(--font-mono);
-  font-size: 14px;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--accent-2);
-  white-space: nowrap;
+.carousel-chevron:focus-visible {
+  outline: none;
+}
+
+.carousel-chevron:focus-visible svg {
+  border-radius: 50%;
+  outline: 2px solid var(--accent);
+  outline-offset: 6px;
 }
 
 /* ---- the navigable halves, lit on hover ---- */
@@ -973,42 +987,44 @@ code {
 }
 
 .carousel[data-zone='left'] .carousel-edge[data-side='left'],
+.carousel[data-zone='right'] .carousel-edge[data-side='right'] {
+  opacity: 1;
+}
+
 .carousel[data-zone='left'] .carousel-chevron[data-side='left'],
-.carousel[data-zone='right'] .carousel-edge[data-side='right'],
 .carousel[data-zone='right'] .carousel-chevron[data-side='right'] {
+  visibility: visible;
   opacity: 1;
 }
 
 /*
- * Touch has no hover, so every one of those affordances - the chevrons, the
- * edge washes, the rotate badge - would only ever appear mid-gesture, i.e.
- * after you already guessed. On a coarse pointer they are simply on, dimmed
- * enough to sit under the device rather than compete with it.
+ * Touch, or a phone: the chevrons are the prev/next, always on, and the arrows
+ * by the readout go.
+ *
+ * Either condition is enough. `hover: none` is a guess about the input device,
+ * and it guesses wrong often enough to matter - a phone or a tablet that
+ * reports `hover: hover` (a paired trackpad, a stylus, desktop-mode emulation)
+ * would otherwise get arrows squeezed in beside a readout with no room for
+ * them. Width is the thing we actually know. The placeholder's arrows follow
+ * the same rule, so the bar is the same height before and after the scene.
  */
-@media (hover: none) {
-  .carousel-chevron,
-  .carousel-rotate-badge {
-    opacity: 0.55;
+@media (hover: none), (max-width: 620px) {
+  .carousel-chevron {
+    visibility: visible;
+    opacity: 1;
+  }
+
+  /* Qualified to outrank the arrows' own rule, which comes later. */
+  .carousel-nav .carousel-arrow {
+    display: none;
   }
 }
 
 /*
- * On a phone the chevrons stop being a hint and become the signage for the
- * browse gesture, so they are simply on, at full strength.
- *
- * Keyed off width rather than `hover`, and deliberately not folded into the
- * rule above: that one is a guess about the input device, and it guesses wrong
- * often enough to matter - a phone browser or a tablet that reports
- * `hover: hover` (a paired trackpad, a stylus, desktop-mode emulation) leaves
- * them at zero on exactly the screens with the least room to discover the
- * gesture by accident. Width is the thing we actually know.
+ * The one gesture hint. It fades in with the first frame - "drag to spin"
+ * means nothing over a loading line - and out at the first drag, and a visitor
+ * who has dragged once does not see it again (see CarouselScene).
  */
-@media (max-width: 620px) {
-  .carousel-chevron {
-    opacity: 1;
-  }
-}
-
 .carousel-hint {
   font-family: var(--font-mono);
   font-size: 14px;
@@ -1023,8 +1039,23 @@ code {
 
 /* Faded rather than removed, so the row keeps its height and nothing under
    the carousel moves when it goes. */
-.carousel-hint[data-used='true'] {
+.carousel-hint[data-shown='false'] {
   opacity: 0;
+}
+
+/* Worded for the input at hand: a finger swipes, a mouse clicks or drags. */
+.carousel-hint-touch {
+  display: none;
+}
+
+@media (hover: none) {
+  .carousel-hint-pointer {
+    display: none;
+  }
+
+  .carousel-hint-touch {
+    display: inline;
+  }
 }
 
 /*
@@ -1195,7 +1226,9 @@ code {
   margin: 0;
   min-width: min(324px, 58vw);
   max-width: 100%;
-  flex: 1 1 auto;
+  /* Sized to its text, not grown to fill the row: grown, it pushed the arrows
+     out to the edges of the window, a long way from the model they step. */
+  flex: 0 1 auto;
   text-align: center;
   text-wrap: balance;
   font-variant-numeric: tabular-nums;
@@ -1212,6 +1245,9 @@ code {
 @media (max-width: 620px) {
   .carousel-readout {
     min-height: 2.9em;
+    /* A name that fits on one line sits in the middle of the two held for
+       it, not on top of an empty second one. */
+    align-content: center;
   }
 }
 
@@ -1408,6 +1444,58 @@ code {
   margin: 0;
   max-width: 62ch;
   text-wrap: pretty;
+}
+
+/*
+ * Each claim beside a render of it: copy then picture on a phone, side by
+ * side from a tablet up, alternating sides so the column of copy does not
+ * run down one edge with the pictures stacked along the other.
+ */
+.feature {
+  display: grid;
+  gap: 18px;
+  align-items: center;
+}
+
+/*
+ * The picture's box is a fixed shape whatever the render's, so the four rows
+ * line up and the page reserves the space before an image arrives. The
+ * renders are cut out, so they sit on a faint pool of the accent rather than
+ * in a frame.
+ */
+.feature-figure {
+  position: relative;
+  margin: 0;
+  aspect-ratio: 16 / 10;
+  max-height: 330px;
+  background: radial-gradient(58% 52% at 50% 62%, rgba(49, 211, 34, 0.09), transparent 72%);
+}
+
+/* Out of flow, so the box alone sets the row's height: in flow, a tall render
+   stretched its row to its own height whatever the box asked for. */
+.feature-figure img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  padding: clamp(10px, 2vw, 22px);
+  object-fit: contain;
+}
+
+@media (min-width: 760px) {
+  .feature {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
+    gap: clamp(28px, 4.5vw, 64px);
+  }
+
+  .feature-figure {
+    aspect-ratio: 4 / 3;
+  }
+
+  .feature:nth-child(even) .feature-figure {
+    order: -1;
+  }
 }
 
 /* ------------------------------------------------------------------ */

@@ -2,11 +2,13 @@
 
 import dynamic from 'next/dynamic'
 import { SceneBoundary } from './scene-boundary'
+import { CarouselHintText } from './carousel-hint'
 
 /**
  * The carousel's frame before the carousel exists: the same rows with the same
  * classes - readout bar, stage, foot - held invisible where there is nothing
- * to show yet, plus a loading line on the stage.
+ * to show yet (the gesture hint included: it arrives with the model it is
+ * about), plus a loading line on the stage.
  *
  * This is what the server renders, and what stands in while the scene's chunk
  * loads and WebGL is probed. It used to be nothing at all: the first paint put
@@ -41,7 +43,9 @@ function CarouselPlaceholder() {
         <span className="carousel-play carousel-hold" aria-hidden>
           Pause
         </span>
-        <p className="carousel-hint">Drag to spin · drag the sides to browse</p>
+        <p className="carousel-hint carousel-hold">
+          <CarouselHintText />
+        </p>
       </div>
     </section>
   )

@@ -47,6 +47,10 @@ import {
   GalaxyWatch,
   type GalaxyWatchVariant,
 } from 'react-3d-mockups'
+import { carouselArtNode } from '@/components/mockup-explorer/carousel-art'
+import { BillboardAdArt, BusAdArt, TVShowArt } from '@/components/screens/print-art'
+import { SwissSite } from '@/components/screens/device-apps'
+import { SwissRaster } from '@/components/screens/swiss-art'
 
 /**
  * Mockups posed straight from their own framing - no per-device wiring, so
@@ -174,13 +178,29 @@ function regionProbe(Mockup: object): React.ReactNode {
  *   rx, ry      device rotation in degrees         (default 0, 0)
  *   dist        camera distance in world units     (default per device)
  *   cy          camera height                      (default 0)
- *   screen      dark | light | green | clear | context | gradient
+ *   screen      dark | light | green | clear | context | art | gradient
  *                                                  (default gradient; `context` reports
  *                                                  whether React context reaches the glass)
+ *   art         artwork for `screen=art`: any piece the carousel stages
+ *               (SwissSite, CartonFront, …) or BusAdArt | BillboardAdArt | TVShowArt;
+ *               printed pieces take `color` as their stock
+ *   device      …also `composed`: a laptop and a phone in ONE canvas, the
+ *               home page's "Composable by design" picture
  *   shadows     1 | 0                              (default 0 - clean poses)
  *   controls    1 | 0                              (default 0 - drag tests)
  *   statusBar   1 | 0 | JSON StatusBarContent      (phones, foldables, tablets)
  */
+/** Pieces `screen=art` can name beyond the carousel's own (see `carouselArtNode`). */
+const PRINT_ART: Record<string, () => React.ReactNode> = {
+  BusAdArt: () => <BusAdArt />,
+  BillboardAdArt: () => <BillboardAdArt />,
+  TVShowArt: () => <TVShowArt />,
+}
+
+function artNode(name: string, finish: string | undefined): React.ReactNode {
+  return PRINT_ART[name]?.() ?? carouselArtNode(name, finish ?? '#f4f3ef')
+}
+
 function HarnessScene() {
   const params = useSearchParams()
   const device = params.get('device') ?? 'tablet'
@@ -200,6 +220,7 @@ function HarnessScene() {
     // shows the page straight through the glass.
     params.get('screen') === 'clear' ? null :
     params.get('screen') === 'context' ? <ContextProbe /> :
+    params.get('screen') === 'art' ? artNode(params.get('art') ?? '', color) :
     params.get('screen') === 'dark' ? (
       <div style={{ width: '100%', height: '100%', background: '#000' }} />
     ) : params.get('screen') === 'light' ? (
@@ -529,6 +550,22 @@ function HarnessScene() {
         ) : (
           <AppleWatch {...shared}>{screen}</AppleWatch>
         )}
+      </MockupCanvas>
+    )
+  }
+
+  // Two devices in one canvas: the bare components composed, which is the
+  // thing a `*Mockup` one-liner cannot show.
+  if (device === 'composed') {
+    const dist = Number(params.get('dist') ?? 8.4)
+    return (
+      <MockupCanvas controls={controls} camera={{ position: [0, cy, dist], fov: 40 }} shadows={shadows}>
+        <Laptop variant="air13" color="midnight" position={[-0.55, 0.05, -0.6]} rotation={[rx, ry + 0.32, 0]}>
+          <SwissSite />
+        </Laptop>
+        <IPhone variant="pro" color="deepblue" position={[2.05, -0.35, 0.9]} rotation={[rx, ry - 0.42, 0]} scale={0.62}>
+          <SwissRaster />
+        </IPhone>
       </MockupCanvas>
     )
   }
