@@ -105,6 +105,33 @@ function releaseScreenStack(host: HTMLElement | null): void {
  */
 export const SCREEN_MASK_INSET = 0.004
 
+/*
+ * A stable key per element drei portals a screen into, for the <Html> below.
+ *
+ * drei keeps ONE wrapper element for the life of an <Html>, and when its
+ * target changes it unmounts that wrapper's React root and creates a new root
+ * on the same element. Every canvas changes the target once: drei reads
+ * `events.connected` before r3f's Provider has connected the events, so a
+ * screen portals into the canvas's container first and into the event target
+ * a moment later. That was harmless while the old root finished unmounting on
+ * the spot. @react-three/fiber 9.8 mounts the scene inside <Canvas>'s own
+ * layout effect - inside React DOM's commit - where `root.unmount()` cannot
+ * flush, so the old root's teardown commits AFTER the new root has rendered
+ * the screen, and clearing "its" container wipes the live screen out from
+ * under the new root, which never puts it back: a blank screen, for good.
+ * Keying the <Html> by its target makes a new target a new <Html>, with a
+ * fresh wrapper for the new root, so the late teardown only empties the old,
+ * detached one.
+ */
+const portalTargetKeys = new WeakMap<object, number>()
+let nextPortalTargetKey = 0
+function portalTargetKey(target: object | null | undefined): number {
+  if (!target) return 0
+  let key = portalTargetKeys.get(target)
+  if (key === undefined) portalTargetKeys.set(target, (key = ++nextPortalTargetKey))
+  return key
+}
+
 // Staggered retry thresholds for the drei <Html> mount race (see below):
 // screens created back-to-back get different frame counts, so their
 // remounts land in separate commits instead of re-racing each other.
@@ -268,6 +295,10 @@ function BridgedScreen({
   const gl = useThree((state) => state.gl)
   const scene = useThree((state) => state.scene)
   const invalidate = useThree((state) => state.invalidate)
+  // drei's own portal target (`portal || events.connected || canvas parent`;
+  // no `portal` is passed here). See `portalTargetKey`.
+  const connected = useThree((state) => state.events.connected)
+  const htmlKey = portalTargetKey(connected || gl.domElement.parentNode)
   const { screenAccessibility } = React.useContext(StageContext)
   /*
    * drei's <Html> renders its children into a SEPARATE React root, and a new
@@ -485,6 +516,7 @@ function BridgedScreen({
   return (
     <group ref={anchorRef} position={position} rotation={rotation}>
       <Html
+        key={htmlKey}
         transform
         occlude="blending"
         geometry={blendGeometry ? <primitive object={blendGeometry} attach="geometry" /> : undefined}

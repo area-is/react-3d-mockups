@@ -160,6 +160,16 @@ breaking change can ship in a minor release, and is always listed under
 
 ### Fixed
 
+- **Screens render under `@react-three/fiber` 9.8.** Fiber 9.8.0 mounts the
+  scene inside `<Canvas>`'s own commit, and there drei's `<Html>`, which
+  re-roots the same wrapper element once events connect, clears its own new
+  screen with the old root's late teardown. Every screen stayed blank, and
+  9.8 is the only fiber that accepts React 19.3. Each screen's `<Html>` is now
+  keyed by its portal target, so the new root gets a fresh wrapper. Checked
+  under fiber 9.7.0 and 9.8.0, and 9.8.0 with React 19.3. In development, 9.8
+  still logs React's "synchronously unmount a root" warning once per screen,
+  from drei's cleanup; it is harmless.
+
 - **No console warnings from the CSG engine.** `three-bvh-csg` 0.0.18 passes
   `three-mesh-bvh` 0.9 a deprecated option, which printed twenty-odd
   `maxLeafSize` warnings on a page of devices. The library no longer lets that

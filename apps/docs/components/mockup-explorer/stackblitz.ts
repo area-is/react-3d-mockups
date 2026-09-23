@@ -20,19 +20,17 @@ const PACKAGE = {
   version: '0.0.0',
   type: 'module',
   scripts: { dev: 'vite', build: 'vite build', preview: 'vite preview' },
-  // Inside the library's peer ranges, held to the minors this site runs.
-  // Left at `^`, a fresh install takes React 19.3, which only fiber 9.8
-  // accepts - and under fiber 9.8.0 the mockup draws but its screen never
-  // mounts, so the project would open on a blank device. `react-3d-mockups`
-  // itself installs from the npm registry, not from this repo, so the project
-  // runs whatever was last published under `latest` - not necessarily the
-  // build these docs describe.
+  // Inside the library's peer ranges. `react-3d-mockups` itself installs
+  // from the npm registry, not from this repo, so the project runs whatever
+  // was last published under `latest` - not necessarily the build these docs
+  // describe. Screens need a release with the fiber 9.8 fix (see
+  // device-screen.tsx), since a fresh install here takes fiber 9.8.
   dependencies: {
     '@react-three/drei': '^10.7.0',
-    '@react-three/fiber': '~9.7.0',
-    react: '~19.2.0',
+    '@react-three/fiber': '^9.7.0',
+    react: '^19.2.0',
     'react-3d-mockups': 'latest',
-    'react-dom': '~19.2.0',
+    'react-dom': '^19.2.0',
     three: '~0.185.0',
   },
   // What `npm create vite` puts in its react-ts template today. The types and
