@@ -719,7 +719,7 @@ export function EdgeSocket({
  * `cutGeometry` + `stadiumCutter` first): the stainless receptacle shell
  * seated just past the machined lip, the dark cavity floor behind it and the
  * gold pin tongue in the middle - real geometry at real depths, so the port
- * shows parallax from every angle like the reference scans.
+ * shows parallax from every angle like the real one does.
  */
 export function UsbC({
   x = 0,

@@ -5,6 +5,7 @@ import { SiteNav } from '@/components/site-nav'
 import { SITE_EXAMPLES } from '@/components/site-examples'
 import { fraunces, inter, jetbrainsMono, notoSansKR } from '@/lib/fonts'
 import {
+  AUTHOR,
   CHANGELOG_URL,
   GITHUB_URL,
   LICENSE_URL,
@@ -69,7 +70,12 @@ export default function SiteLayout({ children }: { children: React.ReactNode }) 
 
           <footer className="site-footer">
             <div className="container footer-inner">
-              <span>MIT © {new Date().getFullYear()} subwaymatch</span>
+              <span>
+                MIT © {new Date().getFullYear()}{' '}
+                <a href={AUTHOR.url} target="_blank" rel="noreferrer">
+                  {AUTHOR.name}
+                </a>
+              </span>
               <nav className="footer-links" aria-label="Footer">
                 {FOOTER_LINKS.map((link) =>
                   link.external ? (

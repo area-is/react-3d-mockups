@@ -221,7 +221,7 @@ breaking change can ship in a minor release, and is always listed under
   angle renders its own pose and dragging below flat never rebuilds a screen.
 
 - **`railColor` derived rails in the wrong colour space.** Its HSL constants
-  were fitted against sRGB values measured off retail hardware, but three's
+  were fitted against sRGB values sampled from retail product photography, but three's
   HSL accessors default to the linear working space, so every custom `color`
   produced a rail far too light and too saturated: a Navy back returned
   `#66718e` instead of `#414a60`. Named retail colorways were unaffected

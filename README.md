@@ -96,4 +96,4 @@ less than they look.
 
 ## License
 
-[MIT](LICENSE) © subwaymatch
+[MIT](LICENSE) © [Ye Joo Park](https://github.com/subwaymatch)

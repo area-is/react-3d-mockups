@@ -84,7 +84,7 @@ export interface GalaxyProps extends Omit<GroupProps, 'children' | 'color'>, Sur
  * loaded - the whole device is generated from geometry at runtime, so it
  * tree-shakes and never pops in. Detail geometry (button
  * pills, camera island, port and speaker cutouts, antenna seams) follows
- * reference scans of the retail devices.
+ * published specifications and product photography.
  *
  * Must be rendered inside a react-three-fiber `<Canvas>` (or `<MockupCanvas>`).
  */
@@ -354,7 +354,7 @@ function GalaxyImpl({
         )}
 
         {/* side keys on the right rail - machined pills seated in the frame,
-            protruding ~0.5 mm like the real keys (positions from the scan) */}
+            protruding ~0.5 mm like the real keys (positions as measured) */}
         {buttons.map(({ y, length }, i) => (
           <SideKey
             key={i}

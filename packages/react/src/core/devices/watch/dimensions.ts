@@ -278,7 +278,7 @@ export const APPLE_WATCH_VARIANTS: Record<'series11', WatchSpec> = {
  * Galaxy Watch 9, 44 mm. The generation is internal (chip, battery, Wear OS
  * 7): the published case - 46.0 x 43.7 x 8.6 mm - and the 1.47" 480x480 dial
  * are the Watch 8's to the tenth of a millimetre, so the cushion geometry is
- * the Watch 8 scan's, carried over deliberately rather than remeasured.
+ * the Watch 8's, carried over deliberately rather than remeasured.
  */
 const GALAXY_WATCH_9: WatchSpec = {
   ...GALAXY_WATCH_8,

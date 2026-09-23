@@ -11,8 +11,8 @@
  *
  * Shares the Galaxy world scale (~36.66 mm per unit) so it sits at true
  * relative size beside the S-series and the Fold. Detail geometry (buttons,
- * lens rings, hinge band, ports, seams) was measured from a reference 3D scan
- * of the retail device. Pure, renderer-agnostic data.
+ * lens rings, hinge band, ports, seams) was measured from published
+ * specifications and product photography. Pure, renderer-agnostic data.
  *
  * Real Galaxy Z Flip 7: unfolded 166.7 x 75.2 x 6.5 mm (6.85" 2520x1080 main);
  * folded 85.5 x 75.2 x 13.7 mm (4.1" 948x1048 cover wrapping the cameras).
@@ -106,9 +106,9 @@ const FLIP7: FlipSpec = {
   },
   rearCamera: {
     // Each 13.4 mm module stands ~2 mm proud of the cover glass on its own -
-    // no shared plate (the pill in the reference scan was the screen-protector
-    // cutout, not raised hardware; product photos show bare glass between the
-    // flash and the lenses).
+    // no shared plate (the pill outline some images show is the
+    // screen-protector cutout, not raised hardware; product photos show bare
+    // glass between the flash and the lenses).
     raise: 0.055,
     // 50 MP main (outer) + 12 MP ultra-wide (inner).
     rings: [
@@ -118,7 +118,7 @@ const FLIP7: FlipSpec = {
     flash: { x: 0.035, y: 0.821, r: 0.058 },
   },
   coverGlass: { width: 1.973, height: 2.195, radius: 0.162 },
-  // Scan: volume 19.1 mm, power 13.7 mm on the right edge of the cover half.
+  // Measured: volume 19.1 mm, power 13.7 mm on the right edge of the cover half.
   buttons: [
     { y: 0.241, length: 0.52 },
     { y: -0.426, length: 0.374 },
@@ -141,8 +141,9 @@ const FLIP7: FlipSpec = {
  * 2520x1080 grid, folded 85.7 x 75.4 x 13.1 mm. The 4.1" 948x1048 cover
  * panel carries over unchanged, and the whole cover-screen geometry with it.
  * Detail geometry (buttons, lens rings, hinge band, ports, seams) is the
- * Flip 7 scan's, carried over pending a scan of the retail Flip 8 - the
- * published body deltas are two tenths of a millimetre where they apply.
+ * Flip 7's, carried over until the Flip 8 is measured from its own product
+ * photography - the published body deltas are two tenths of a millimetre
+ * where they apply.
  */
 const FLIP8: FlipSpec = {
   open: {

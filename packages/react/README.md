@@ -295,4 +295,4 @@ Full documentation and live demos: [area.is/react-3d-mockups](https://area.is/re
 
 ## License
 
-MIT © subwaymatch
+MIT © [Ye Joo Park](https://github.com/subwaymatch)

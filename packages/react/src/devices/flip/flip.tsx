@@ -128,7 +128,7 @@ function freeEdgeCutters(
  * the unfolded tall phone (6.85" main display) and the folded compact whose
  * front is nearly all cover screen, switched with the `openAngle` prop. Detail
  * geometry (separate protruding lens rings, hinge band with its engraved wordmark, button
- * pills, ports) follows a reference scan of the retail device. No 3D asset
+ * pills, ports) follows published specifications and product photography. No 3D asset
  * files are loaded - everything is generated from geometry at runtime.
  *
  * Must be rendered inside a react-three-fiber `<Canvas>` (or `<MockupCanvas>`).
@@ -854,7 +854,7 @@ function FlipImpl({
         {/* the lower half's edge kit lands on the TOP edge when folded */}
         <group position-z={-halfZ}>{freeEdgeKit(half.height / 2)}</group>
 
-        {/* hinge spine capping the bottom - crown reaching the scan's
+        {/* hinge spine capping the bottom - crown reaching the hardware's
             overhang below the stack */}
         {hingeBand(stackBottom - spec.hinge.overhang + stackR)}
 

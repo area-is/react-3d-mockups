@@ -4,6 +4,7 @@ import { highlight } from 'fumadocs-core/highlight'
 import { HeroCarousel } from '@/components/hero-carousel'
 import { DEVICES, OBJECTS } from '@/lib/mockup-catalog.mjs'
 import {
+  AUTHOR,
   GITHUB_URL,
   INSTALL_COMMANDS,
   NPM_URL,
@@ -45,7 +46,7 @@ const STRUCTURED_DATA = {
   programmingLanguage: 'TypeScript',
   runtimePlatform: 'React',
   license: 'https://opensource.org/licenses/MIT',
-  author: { '@type': 'Person', name: 'subwaymatch' },
+  author: { '@type': 'Person', name: AUTHOR.name, url: AUTHOR.url },
   sameAs: [NPM_URL],
 }
 

@@ -77,7 +77,7 @@ function useSlabGeometry(width: number, depth: number, radius: number, thickness
 }
 
 /* -------------------------------------------------------------------------
- * Keyboard: the 78-key US Magic Keyboard, measured off a retail-unit scan of
+ * Keyboard: the 78-key US Magic Keyboard, measured from product photography of
  * the MacBook Pro 14" - 18.8 mm x-pitch, 18.5 mm row pitch, 2.5 mm gaps,
  * six FULL-height rows (the function row matches the others since 2021),
  * half-height inverted-T arrows, caps flush with the deck.
@@ -109,7 +109,7 @@ type KeyLegend =
   /**
    * Modifier: word along the bottom with the symbol in the TOP-OUTER corner -
    * top-left on the left-hand keys, mirrored to top-right on the right-hand
-   * command/option (scan-measured, ~5.2 mm in / 4.6 mm down to symbol center).
+   * command/option (measured, ~5.2 mm in / 4.6 mm down to symbol center).
    */
   | { t: 'mod'; i?: KeyIcon; c?: string; s: string; side: 'l' | 'r' }
   /** The fn key: globe bottom-left, "fn" bottom-right. */
@@ -531,7 +531,7 @@ function Keys({ keyboard }: { keyboard: { width: number; depth: number; offsetZ:
       const py = (key.z + keyboard.depth / 2) * scale
       const hw = (key.w * scale) / 2
       const hd = (key.d * scale) / 2
-      // Corner anchors from the scan's legend geometry: words start 3.1 mm in
+      // Corner anchors measured from the printed legends: words start 3.1 mm in
       // from a left edge, end 2.7 mm from a right edge, baseline 2.85 mm up.
       const blX = px - hw + u(0.043)
       const brX = px + hw - u(0.037)
@@ -555,7 +555,7 @@ function Keys({ keyboard }: { keyboard: { width: number; depth: number; offsetZ:
           break
         case 'dual':
           // shifted symbol centered 4.5 mm from the cap top, base symbol
-          // larger (5.2 mm font) centered 11.1 mm down - scan-measured
+          // larger (5.2 mm font) centered 11.1 mm down - measured
           ctx.textAlign = 'center'
           ctx.textBaseline = 'middle'
           font(u(0.052))
@@ -590,7 +590,7 @@ function Keys({ keyboard }: { keyboard: { width: number; depth: number; offsetZ:
           break
         }
         case 'fn':
-          // globe Ø3.9 mm bottom-left, "fn" bottom-right (scan-measured)
+          // globe Ø3.9 mm bottom-left, "fn" bottom-right (measured)
           drawKeyIcon(ctx, 'globe', px - hw + u(0.07), py + hd - u(0.0666), u(0.0754))
           font(u(0.047))
           ctx.textAlign = 'right'
@@ -619,7 +619,7 @@ function Keys({ keyboard }: { keyboard: { width: number; depth: number; offsetZ:
   }, [layout, keyboard])
   React.useEffect(() => () => legendsTexture?.dispose(), [legendsTexture])
 
-  // Touch ID's sensor fills two thirds of its cap (scan-measured Ø11 mm).
+  // Touch ID's sensor fills two thirds of its cap (measured Ø11 mm).
   const sensorR = layout.touchId.w * 0.335
 
   return (
@@ -757,7 +757,7 @@ function LaptopImpl({
     }
   }, [trayGeometry, trackpadGeometry, trackpadRimGeometry, bottomPlateGeometry, glassGeometry])
 
-  // Speaker grille: the scan resolves each strip as a ~1.0 x 0.93 mm grid of
+  // Speaker grille: each strip is a ~1.0 x 0.93 mm grid of
   // ~0.63 mm drilled holes. Painted once into a transparent canvas (dark hole
   // + faint lower-edge glint for the countersink) so the aluminum deck shows
   // between the holes exactly like the machined part.
@@ -859,7 +859,7 @@ function LaptopImpl({
               <meshPhysicalMaterial color="#101216" metalness={0.3} roughness={0.5} />
             </mesh>
           )}
-          {/* caps sit nearly flush with the deck (scan: tops +0.3 mm) */}
+          {/* caps sit nearly flush with the deck (measured: tops +0.3 mm) */}
           <group position={[0, deckY - 0.013, keyboard.offsetZ]}>
             <Keys keyboard={keyboard} />
           </group>

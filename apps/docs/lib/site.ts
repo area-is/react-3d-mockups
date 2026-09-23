@@ -33,6 +33,9 @@ export const SITE_DESCRIPTION =
  * on pointing at it after the move.
  */
 export const GITHUB_URL = 'https://github.com/area-is/react-3d-mockups'
+
+/** Who the licence line credits, in the footer and the structured data. */
+export const AUTHOR = { name: 'Ye Joo Park', url: 'https://github.com/subwaymatch' } as const
 export const NPM_URL = 'https://www.npmjs.com/package/react-3d-mockups'
 export const CHANGELOG_URL = `${GITHUB_URL}/blob/main/CHANGELOG.md`
 export const LICENSE_URL = `${GITHUB_URL}/blob/main/LICENSE`
