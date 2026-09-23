@@ -1,0 +1,92 @@
+---
+title: Exporting images and video
+description: Why a canvas snapshot misses the screens, and how to capture a PNG with Playwright or a video with Remotion.
+keywords: [export, png, image, screenshot, video, remotion, playwright, puppeteer, todataurl, render, download, still]
+---
+
+## Why `toDataURL()` shows empty screens
+
+A mockup is two layers. The device - body, glass, shadow - is drawn by WebGL
+into the canvas. The screen is ordinary DOM that the browser composites with
+CSS 3D transforms *under* the canvas, seen through pixels the canvas leaves
+transparent. `canvas.toDataURL()` and `toBlob()` read only the canvas's own
+pixels - with or without `preserveDrawingBuffer` - so they return the devices
+with empty screens.
+
+To capture both layers, capture what the browser composited: a screenshot of
+the element, taken by a real browser.
+
+## A PNG with Playwright
+
+This script opens a page, waits for the mockup to render, and screenshots just
+the mockup's element at twice the CSS size. Run it against your dev server or
+a page you build for the purpose; give the mockup's wrapper something to find
+it by (here `id="hero-mockup"`).
+
+```ts title="export-mockup.mts"
+import { chromium } from 'playwright'
+
+const browser = await chromium.launch()
+const page = await browser.newPage({
+  viewport: { width: 1280, height: 900 },
+  deviceScaleFactor: 2, // a 2x image
+})
+
+await page.goto('http://localhost:3000/', { waitUntil: 'networkidle' })
+
+const mockup = page.locator('#hero-mockup')
+await mockup.scrollIntoViewIfNeeded() // an off-screen canvas does not render
+await mockup.locator('canvas').waitFor()
+
+// Let fonts and images on the screen load, then give the canvas two frames.
+await page.evaluate(async () => {
+  await document.fonts.ready
+  await new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(done)))
+})
+
+await mockup.screenshot({ path: 'mockup.png', omitBackground: true })
+await browser.close()
+```
+
+`omitBackground` drops the browser's default white, so the PNG keeps its
+transparency wherever your page itself paints nothing behind the mockup.
+On a page you capture from, leave `autoRotate` and `float` off, or the pose
+depends on when the screenshot lands - and `zoom` and `fullscreen` too, whose
+overlay buttons sit inside the element and would be in the picture.
+
+## Video with Remotion
+
+[Remotion](https://www.remotion.dev) renders a React composition in headless
+Chrome and captures the page frame by frame, so the screens are in the video
+too. Drive the motion from Remotion's frame counter rather than from the
+clock:
+
+```tsx title="turntable.tsx"
+import { useCurrentFrame, useVideoConfig } from 'remotion'
+import { GalaxyMockup } from 'react-3d-mockups'
+
+export function Turntable() {
+  const frame = useCurrentFrame()
+  const { fps } = useVideoConfig()
+  return (
+    <GalaxyMockup
+      controls={false}
+      frameloop="always"
+      pauseWhenOffscreen={false}
+      rotation={[0, (frame / fps) * 0.5, 0]}
+    >
+      <YourApp />
+    </GalaxyMockup>
+  )
+}
+```
+
+- **`rotation` from `useCurrentFrame()`**, not `autoRotate` or `float`: those
+  run on the browser's clock, which has nothing to do with the video's frames.
+  A prop change is enough to get a new frame drawn; after changing something
+  imperatively, call react-three-fiber's `invalidate()`.
+- **`frameloop="always"`** if anything else in the scene animates on its own.
+- **`pauseWhenOffscreen={false}`**, so the canvas never stops for the headless
+  renderer.
+- **WebGL in headless Chrome** needs a GPU backend: Remotion's three.js
+  documentation recommends rendering with `--gl=angle`.

@@ -4,6 +4,7 @@ import { Callout } from 'fumadocs-ui/components/callout'
 import type { MDXComponents } from 'mdx/types'
 import { BareVsMockup } from './bare-vs-mockup'
 import { DeviceDisclaimer } from './device-disclaimer'
+import { ModelGallery } from './model-gallery'
 // Through a `next/dynamic` shell: every docs page gets this map, and a static
 // import here shipped the whole 3D stack to prose-only pages.
 import { ImageDemo, MockupExplorer } from './lazy-mdx-demos'
@@ -18,6 +19,7 @@ export function getMDXComponents(components?: MDXComponents): MDXComponents {
     Callout,
     BareVsMockup,
     DeviceDisclaimer,
+    ModelGallery,
     MockupExplorer,
     ImageDemo,
     ...components,

@@ -17,8 +17,23 @@ import type { PropDoc } from '@/lib/prop-tables.generated'
  * as its type is one of these.
  */
 
-/** Props with no meaning in a live demo - they stay listed, not editable. */
-const CODE_ONLY = new Set(['surfaceStyle', 'className', 'style'])
+/**
+ * Props with no meaning in a live demo - they stay listed, not editable. The
+ * render controls and the accessible name change when a canvas draws and what
+ * assistive tech hears, not anything the demo can show: a `frameloop` of
+ * `'demand'` and one of `'always'` look identical at rest, and `'never'` would
+ * only look like a broken explorer.
+ */
+const CODE_ONLY = new Set([
+  'surfaceStyle',
+  'className',
+  'style',
+  'frameloop',
+  'pauseWhenOffscreen',
+  'gl',
+  'onCreated',
+  'label',
+])
 
 /** r3f transforms, which the docs describe in prose rather than a type. */
 const TRANSFORMS = new Set(['position', 'rotation', 'scale'])

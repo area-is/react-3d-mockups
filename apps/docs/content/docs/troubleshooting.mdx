@@ -1,0 +1,84 @@
+---
+title: Troubleshooting
+description: Answers to the questions that come up most - blank screens, lost contexts, missing providers, slow phones, SSR errors and exports.
+keywords: [troubleshooting, faq, problems, errors, blank screen, click, context lost, too many webgl contexts, hydration, provider, slow, export]
+---
+
+## Why can't I click the screen?
+
+Because screens are display-only, by design. Your content renders live - state,
+effects, video, iframes all keep running - but every pointer gesture belongs to
+the orbit controls, so a click, tap, scroll or keystroke on the screen rotates
+the model instead of reaching the content. The screen's DOM sits under the
+canvas so that hardware in front of it can cover it pixel for pixel, and that
+is also what keeps pointers away from it.
+[Why screens are display-only](/docs/screen-content#why-screens-are-display-only)
+has the full reasoning. If people need to use the app, render it on the page
+next to the mockup.
+
+## My screen is blank, or shows the page behind it
+
+Two causes, both about transparency:
+
+- **The screen's own background is transparent.** A screen shows the page
+  behind the mockup wherever your content does not paint, and
+  `surfaceBackground="transparent"` turns the whole screen into a hole. Leave
+  `surfaceBackground` on a solid color, or paint your content edge to edge.
+  See [Surface background](/docs/screen-content#surface-background).
+- **The canvas is opaque.** Screens are revealed through transparent canvas
+  pixels, so an opaque canvas hides every one of them: `gl={{ alpha: false }}`,
+  a `scene.background`, or a `<color attach="background" />` in your own scene.
+  The library logs a warning in development when it finds this. Use the
+  `background` prop (or CSS on the canvas) for a backdrop instead. See
+  [Your own canvas must stay transparent](/docs/composing#your-own-canvas-must-stay-transparent).
+
+## My context or provider is missing on the screen
+
+It should not be: context from providers above a mockup - theme, i18n,
+router, data clients - is bridged into the screen's own React root, so screen
+content reads it as if it were rendered in place. A provider inside the mockup,
+wrapped around the screen content, works as well.
+
+What does not carry over is a **portal**. A modal, tooltip or toast that
+portals into `document.body` renders on the page, not on the screen. Keep
+anything that should appear on the glass inside the screen's own tree. See
+[React context on the screen](/docs/screen-content#react-context-on-the-screen).
+
+## "Too many active WebGL contexts" or "Context Lost"
+
+Every one-liner `*Mockup` is its own canvas, and every canvas is a WebGL
+context. Browsers cap how many a page can hold - as few as about eight on
+mobile Chrome - and when the cap is passed they drop the oldest context, which
+leaves that mockup blank.
+
+- Put devices that appear together into **one** `<MockupCanvas>`. See
+  [Composing scenes](/docs/composing).
+- Mount canvases only while they are **near the viewport**, and unmount them
+  after. See [Mount canvases near the viewport](/docs/performance#mount-canvases-near-the-viewport).
+
+## It is slow on mobile
+
+- Lower the pixel-ratio ceiling: `<MockupCanvas dpr={[1, 1.5]}>`.
+- Keep `frameloop="demand"` (the default), which renders only when something
+  changes, and save `autoRotate` and `float` for one hero - they render every
+  frame while they run.
+- Use fewer canvases, as above.
+
+[GPU and performance](/docs/performance) explains what each part costs.
+
+## Hydration warnings, or "window is not defined" with SSR
+
+WebGL exists only in the browser, so a mockup must not render on the server.
+Load it client side only - in the Next.js App Router with
+`dynamic(() => import('./mockup'), { ssr: false })` from a client component -
+and give its wrapper a fixed height so the page does not shift when it mounts.
+[Next.js and SSR](/docs/nextjs) has the pattern, and
+[Other frameworks](/docs/frameworks) covers Vite, React Router, Astro and the
+Pages Router.
+
+## How do I export a PNG or a video?
+
+Not with `canvas.toDataURL()`: the screens are composited by the browser, not
+drawn into WebGL, so a canvas snapshot shows the devices with empty screens.
+Take a screenshot of the element with a headless browser, or render video with
+Remotion. See [Exporting images and video](/docs/exporting).
