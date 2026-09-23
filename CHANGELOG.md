@@ -1,11 +1,36 @@
 # Changelog
 
 Notable changes to `react-3d-mockups`. This project follows
-[semantic versioning](https://semver.org/); dates are ISO-8601.
+[semantic versioning](https://semver.org/); dates are ISO-8601. Before 1.0, a
+breaking change can ship in a minor release, and is always listed under
+*Changed (breaking)* with what to change.
 
 ## Unreleased
 
 ### Added
+
+- **Render control on every mockup.** `frameloop` (`'demand' | 'always' |
+  'never'`), `pauseWhenOffscreen`, `gl` (merged over `CANVAS_GL_DEFAULTS`) and
+  `onCreated` on `MockupCanvas`; `frameloop` is advertised on every `*Mockup`
+  and the rest route through to the canvas. See *Changed (breaking)* for the
+  new defaults.
+
+- **Accessibility.** The canvas is exposed as an image with an accessible name:
+  `label`, defaulting on each mockup to what it shows ("3D mockup of an
+  iPhone"). `screenAccessibility` decides whether screen content is in the
+  accessibility tree. With `controls` on the canvas is focusable: the arrow
+  keys turn and tilt it, `+`/`-` zoom when `zoom` is on, and Home puts the
+  camera back (`TumbleControlsHandle.reset()` does the same from code).
+
+- **React context reaches the screen.** A screen renders in its own React root,
+  which used to start with no context at all: a theme, an i18n provider, a
+  router or a query client above the mockup was invisible to the component on
+  the glass. Every context the screen can see is now bridged into that root.
+
+- **A development warning for an opaque canvas.** A `<Canvas>` with
+  `gl={{ alpha: false }}`, a `scene.background` or `<color attach="background">`
+  paints over every screen in it, silently. The first screen rendered in one
+  now says so, once, outside production builds.
 
 - **The 2026 Samsung generation: five new devices.** `FoldMockup` gains
   `variant="fold8"` - the generation's new *wide* form factor, folding open
@@ -45,6 +70,37 @@ Notable changes to `react-3d-mockups`. This project follows
 
 ### Changed (breaking)
 
+- **Mockups render on demand.** `frameloop` defaults to `'demand'`: a mockup
+  draws when something changes - a drag and the damping after it, zoom,
+  `autoRotate`, `float`, a prop change, a resize - and nothing at rest. It used
+  to draw every frame forever, at the full cost of the scene. A composed
+  `<MockupCanvas>` whose children animate themselves in `useFrame` needs
+  `frameloop="always"`, or a call to r3f's `invalidate()`.
+
+- **Off-screen and hidden canvases stop drawing.** `pauseWhenOffscreen` is on by
+  default: a canvas scrolled out of view, or in a background tab, keeps its last
+  frame and draws nothing until it is back. Turn it off for an offscreen capture.
+
+- **`powerPreference` is the browser's default.** It was hard-coded to
+  `'high-performance'`, which on a dual-GPU laptop wakes the discrete GPU for a
+  decorative element. Opt back in with `gl={{ powerPreference: 'high-performance' }}`.
+
+- **Screens are hidden from assistive technology by default.** Each screen
+  layer is `aria-hidden` and `inert`: its demo headings were landing in the
+  page's outline and its links in the tab order. Pass
+  `screenAccessibility="visible"` for a screen whose text appears nowhere else.
+
+- **Peer ranges are bounded:** React `^19`, `@react-three/fiber` `^9`,
+  `@react-three/drei` `^10`, `three` `>=0.179.0 <0.187.0`. They were open-ended,
+  so npm would have installed a future drei 11 or fiber 10 - which the screen
+  bridge's reliance on drei's `<Html>` internals is unlikely to survive - without
+  a warning. Ranges widen as new versions are tested.
+
+- **`three-bvh-csg`, `three-mesh-bvh` and `its-fine` are dependencies**, no
+  longer bundled into `dist`. An app now installs and can dedupe or update them
+  like any other package, rather than carrying a private copy of
+  `three-mesh-bvh` beside drei's.
+
 - **The package is now `react-3d-mockups`.** It was `react-3d-mockups`; nothing
   else moved, so the change is one line in your manifest and one in each import.
 
@@ -66,6 +122,28 @@ Notable changes to `react-3d-mockups`. This project follows
 
 ### Changed
 
+- **The contact shadow redraws only when something under it moves.** It used to
+  re-render the scene into its shadow map every frame (drei's `ContactShadows`
+  default) - roughly half the triangles of a mockup frame. Orbiting moves the
+  camera, not the object, so dragging, zooming and auto-rotating now leave the
+  shadow alone; `float` or a caller's own animation still updates it.
+
+- **Machined geometry is cached.** The CSG pass that cuts ports and speaker
+  holes ran again on every mount; its result is now remembered, keyed by the
+  input geometry, so a model coming back into a carousel or a docs example
+  scrolling back into view skips it.
+
+- **Damping settles.** The drag's damping used to decay forever through motion
+  far below a pixel; it now stops once less than 1e-4 rad is left, so an
+  on-demand canvas stops drawing about two seconds after a flick.
+
+- **A screen inside a hidden group is hidden.** A device under
+  `<group visible={false}>` left its DOM screen floating on its own; the screen
+  now follows the scene graph's visibility.
+
+- **One stylesheet for every screen.** Each screen injected its own copy of the
+  screen-layer CSS; it is now a single hoisted `<style>`.
+
 - **The zoom control is one pill: −, the level, +.** It replaces the stack of
   two round buttons with the percentage between them. The level is a button
   now and puts the camera back to 100%. The pill keeps the overlay's dark
@@ -81,6 +159,15 @@ Notable changes to `react-3d-mockups`. This project follows
   delta, so a pinch is continuous and a wheel notch still moves.
 
 ### Fixed
+
+- **No console warnings from the CSG engine.** `three-bvh-csg` 0.0.18 passes
+  `three-mesh-bvh` 0.9 a deprecated option, which printed twenty-odd
+  `maxLeafSize` warnings on a page of devices. The library no longer lets that
+  reach the console.
+
+- **Package metadata points at the right places**: the repository is
+  `area-is/react-3d-mockups` (it named the old `3d-mockups`), and the homepage
+  is the docs site.
 
 - **`<ProductBox>` prints its top panel.** The panel sat under the tuck flap's
   mesh, so `<ProductBox.Top>` rendered as blank board whatever was passed to

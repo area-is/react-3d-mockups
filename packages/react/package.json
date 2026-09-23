@@ -5,26 +5,35 @@
   "keywords": [
     "react",
     "threejs",
+    "three",
     "react-three-fiber",
+    "r3f",
     "drei",
     "3d",
+    "webgl",
     "mockup",
+    "device-mockup",
+    "phone-mockup",
+    "iphone-mockup",
+    "macbook-mockup",
+    "product-mockup",
+    "packaging-mockup",
+    "billboard-mockup",
+    "mockup-generator",
     "device",
     "phone",
-    "smartphone",
-    "webgl",
-    "gpu"
+    "smartphone"
   ],
   "license": "MIT",
   "author": "subwaymatch",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/area-is/3d-mockups.git",
+    "url": "git+https://github.com/area-is/react-3d-mockups.git",
     "directory": "packages/react"
   },
-  "homepage": "https://github.com/area-is/3d-mockups#readme",
+  "homepage": "https://area.is/react-3d-mockups",
   "bugs": {
-    "url": "https://github.com/area-is/3d-mockups/issues"
+    "url": "https://github.com/area-is/react-3d-mockups/issues"
   },
   "type": "module",
   "main": "./dist/index.cjs",
@@ -69,12 +78,17 @@
     "test": "vitest run",
     "test:watch": "vitest"
   },
+  "dependencies": {
+    "its-fine": "^2.0.0",
+    "three-bvh-csg": "^0.0.18",
+    "three-mesh-bvh": "^0.9.7"
+  },
   "peerDependencies": {
-    "@react-three/drei": ">=10",
-    "@react-three/fiber": ">=9",
-    "react": ">=19",
-    "react-dom": ">=19",
-    "three": ">=0.179.0"
+    "@react-three/drei": "^10.0.0",
+    "@react-three/fiber": "^9.0.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "three": ">=0.179.0 <0.187.0"
   },
   "devDependencies": {
     "@react-three/drei": "^10.7.8",
@@ -85,8 +99,6 @@
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "three": "^0.185.1",
-    "three-bvh-csg": "^0.0.18",
-    "three-mesh-bvh": "^0.9.14",
     "tsup": "^8.5.1",
     "typescript": "^6.0.3",
     "vitest": "^4.1.10"

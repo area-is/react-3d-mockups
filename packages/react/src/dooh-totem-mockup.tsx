@@ -22,6 +22,7 @@ export const DOOHTotemMockup = createMockup({
   regions: DOOH_TOTEM_REGIONS,
   metrics: DOOH_TOTEM_METRICS,
   object: DOOHTotem,
+  label: '3D mockup of a digital signage totem',
   framing: DOOH_TOTEM_FRAMING,
   slots: doohTotemSlots,
   displayName: 'DOOHTotemMockup',

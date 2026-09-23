@@ -456,6 +456,85 @@ export const CREASE_OVERLAP = 0.02
 let evaluator: Evaluator | null = null
 
 /**
+ * Machined geometry, remembered by what went into it.
+ *
+ * A CSG pass is the most expensive thing a device does on mount - a BVH over
+ * the chassis, then every triangle near a cutter clipped - and it used to run
+ * again on EVERY mount: each time the home carousel brought a model back
+ * round, each time a docs example scrolled back into view. The result is a
+ * pure function of the input geometry, so it is keyed by a hash of exactly
+ * that (positions, normals, indices of the body and every cutter), which
+ * means no call site has to describe its own inputs and none can get the key
+ * wrong.
+ *
+ * The cache holds private copies that are never drawn, so no renderer ever
+ * attaches to them; callers get a clone they own and dispose as before.
+ * Least recently used entries go first once there are `CUT_CACHE_LIMIT`.
+ */
+const cutCache = new Map<string, THREE.BufferGeometry>()
+const CUT_CACHE_LIMIT = 24
+
+/** Two independent 32-bit hashes over the geometry that decides a cut. */
+function cutKey(geometries: readonly THREE.BufferGeometry[]): string {
+  let a = 0x811c9dc5
+  let b = 0x9e3779b9
+  const mix = (word: number) => {
+    a = Math.imul(a ^ word, 0x01000193)
+    b = Math.imul(b ^ word, 0x5bd1e995)
+    b ^= b >>> 15
+  }
+  for (const geometry of geometries) {
+    for (const name of ['position', 'normal'] as const) {
+      const array = geometry.getAttribute(name)?.array as Float32Array | undefined
+      if (!array) {
+        mix(0)
+        continue
+      }
+      // The float bits, not the values: exact, and no float-to-int rounding.
+      const words = new Uint32Array(array.buffer, array.byteOffset, array.length)
+      mix(words.length)
+      for (let i = 0; i < words.length; i++) mix(words[i]!)
+    }
+    const index = geometry.index?.array
+    mix(index ? index.length : 0)
+    if (index) for (let i = 0; i < index.length; i++) mix(index[i]!)
+  }
+  return `${(a >>> 0).toString(36)}:${(b >>> 0).toString(36)}`
+}
+
+function rememberCut(key: string, geometry: THREE.BufferGeometry): void {
+  cutCache.set(key, geometry.clone())
+  while (cutCache.size > CUT_CACHE_LIMIT) {
+    const oldest = cutCache.keys().next().value as string
+    cutCache.get(oldest)?.dispose()
+    cutCache.delete(oldest)
+  }
+}
+
+/**
+ * Run a CSG evaluation without its console noise.
+ *
+ * three-bvh-csg 0.0.18 (the current release) builds each brush's BVH with the
+ * `maxLeafSize` option, which three-mesh-bvh 0.9 renamed and now warns about
+ * on every call - twenty-odd identical warnings on a page of devices, from a
+ * library that should print nothing in a default setup. Only that exact
+ * message is dropped, and only for the duration of the synchronous call. Drop
+ * this once three-bvh-csg passes `targetLeafSize`.
+ */
+function quietly<T>(run: () => T): T {
+  const warn = console.warn
+  console.warn = (...args: unknown[]) => {
+    if (typeof args[0] === 'string' && args[0].startsWith('BVH: "maxLeafSize"')) return
+    warn.apply(console, args)
+  }
+  try {
+    return run()
+  } finally {
+    console.warn = warn
+  }
+}
+
+/**
  * Concatenate disjoint solids into one geometry (position + normal only) so a
  * whole edge's cutters cost a single boolean pass. Consumes the inputs.
  */
@@ -491,6 +570,16 @@ export function cutGeometry(
   cutters: THREE.BufferGeometry[]
 ): THREE.BufferGeometry {
   if (cutters.length === 0) return base
+  const key = cutKey([base, ...cutters])
+  const cached = cutCache.get(key)
+  if (cached) {
+    // Most recently used goes to the back of the eviction order.
+    cutCache.delete(key)
+    cutCache.set(key, cached)
+    base.dispose()
+    for (const cutter of cutters) cutter.dispose()
+    return cached.clone()
+  }
   try {
     if (!evaluator) {
       evaluator = new Evaluator()
@@ -501,9 +590,10 @@ export function cutGeometry(
     const cutterBrush = new Brush(mergeSolids(cutters))
     bodyBrush.updateMatrixWorld()
     cutterBrush.updateMatrixWorld()
-    const result = evaluator.evaluate(bodyBrush, cutterBrush, SUBTRACTION).geometry
+    const result = quietly(() => evaluator!.evaluate(bodyBrush, cutterBrush, SUBTRACTION).geometry)
     cutterBrush.geometry.dispose()
     base.dispose()
+    rememberCut(key, result)
     return result
   } catch {
     return base

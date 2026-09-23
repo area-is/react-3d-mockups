@@ -22,6 +22,7 @@ export const MilkCartonMockup = createMockup({
   regions: MILK_CARTON_REGIONS,
   metrics: MILK_CARTON_METRICS,
   object: MilkCarton,
+  label: '3D mockup of a milk carton',
   framing: MILK_CARTON_FRAMING,
   slots: milkCartonSlots,
   displayName: 'MilkCartonMockup',

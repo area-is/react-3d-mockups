@@ -22,6 +22,7 @@ export const BookMockup = createMockup({
   regions: BOOK_REGIONS,
   metrics: BOOK_METRICS,
   object: Book,
+  label: '3D mockup of a hardcover book',
   framing: BOOK_FRAMING,
   slots: bookSlots,
   displayName: 'BookMockup',

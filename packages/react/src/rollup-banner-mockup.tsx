@@ -35,6 +35,7 @@ export const RollupBannerMockup = createMockup({
   regions: ROLLUP_BANNER_REGIONS,
   metrics: ROLLUP_BANNER_METRICS,
   object: StagedRollupBanner,
+  label: '3D mockup of a roll-up banner',
   framing: ROLLUP_BANNER_FRAMING,
   slots: rollupBannerSlots,
   displayName: 'RollupBannerMockup',

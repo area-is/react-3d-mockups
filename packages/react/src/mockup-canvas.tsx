@@ -1,8 +1,11 @@
 import * as React from 'react'
 import { Canvas, useFrame, useThree, type CanvasProps } from '@react-three/fiber'
-import { ContactShadows, Environment, Lightformer } from '@react-three/drei'
+import { Environment, Lightformer } from '@react-three/drei'
 import { TumbleControls, type TumbleControlsHandle } from './tumble-controls'
+import { StageShadows } from './stage-shadows'
+import { StageContext, type ScreenAccessibility, type StageSettings } from './stage-context'
 import {
+  CANVAS_GL_DEFAULTS,
   CONTACT_SHADOW,
   DEFAULT_CAMERA_FOV,
   DEFAULT_CAMERA_POSITION,
@@ -44,6 +47,63 @@ function TouchScrollFix({ zoom }: { zoom: boolean }) {
   })
   return null
 }
+
+/**
+ * Whether the canvas is worth drawing: on screen (give or take a margin) in a
+ * visible tab.
+ *
+ * A canvas scrolled out of view still ran its whole frame loop - every draw
+ * call, every frame, for pixels nobody could see - and so did one in a
+ * background tab wherever the browser kept animation frames coming. Paused, a
+ * canvas keeps showing its last frame, so resuming a little before it scrolls
+ * back in (`PAUSE_MARGIN`) is seamless.
+ */
+function useWorthDrawing(target: React.RefObject<Element | null>, enabled: boolean): boolean {
+  const [worth, setWorth] = React.useState(true)
+  React.useEffect(() => {
+    if (!enabled) {
+      setWorth(true)
+      return
+    }
+    let intersecting = true
+    let visible = document.visibilityState !== 'hidden'
+    const update = () => setWorth(intersecting && visible)
+    const element = target.current
+    const observer =
+      element && typeof IntersectionObserver !== 'undefined'
+        ? new IntersectionObserver(
+            ([entry]) => {
+              intersecting = entry?.isIntersecting ?? true
+              update()
+            },
+            { rootMargin: PAUSE_MARGIN }
+          )
+        : null
+    if (element) observer?.observe(element)
+    const onVisibility = () => {
+      visible = document.visibilityState !== 'hidden'
+      update()
+    }
+    document.addEventListener('visibilitychange', onVisibility)
+    update()
+    return () => {
+      observer?.disconnect()
+      document.removeEventListener('visibilitychange', onVisibility)
+    }
+  }, [target, enabled])
+  return worth
+}
+
+/** How far outside the viewport a canvas starts drawing again. */
+const PAUSE_MARGIN = '120px'
+
+/**
+ * A visible focus ring for the keyboard-focusable canvas. Inset, because r3f's
+ * container clips its overflow and would cut an outer outline off. Rendered as
+ * a React 19 hoistable stylesheet, so any number of mockups share one copy.
+ */
+const CANVAS_FOCUS_CSS =
+  '.react-3d-mockups-canvas:focus-visible{outline:2px solid currentColor;outline-offset:-2px}'
 
 /** Feather-style corner icon for the fullscreen toggle (16px, current color). */
 function OverlayIcon({ path }: { path: string }) {
@@ -111,6 +171,46 @@ export interface MockupCanvasProps {
   camera?: CanvasProps['camera']
   /** Device-pixel-ratio range; clamped for consistent GPU load on hi-dpi screens. */
   dpr?: CanvasProps['dpr']
+  /**
+   * When the canvas draws a frame.
+   *
+   * - `'demand'` (default): only when something changes - a drag and the
+   *   damping that follows it, zoom, `autoRotate`, `float`, a prop change, a
+   *   resize. A mockup at rest draws nothing at all.
+   * - `'always'`: every animation frame. For a composed scene that animates
+   *   itself in `useFrame` (or call r3f's `invalidate()` from it instead).
+   * - `'never'`: frozen on its last frame.
+   */
+  frameloop?: 'demand' | 'always' | 'never'
+  /**
+   * Stop drawing while the canvas is scrolled out of view or its tab is
+   * hidden, and pick up again on return. On by default; turn it off for an
+   * offscreen capture (a video render, a screenshot of a hidden element).
+   */
+  pauseWhenOffscreen?: boolean
+  /**
+   * WebGL renderer settings, merged over the defaults
+   * `{ antialias: true, alpha: true, powerPreference: 'default' }`
+   * (`CANVAS_GL_DEFAULTS`). Keep `alpha` on: the screens are seen through the
+   * pixels the canvas leaves transparent. A function or a renderer instance
+   * is handed to react-three-fiber as is.
+   */
+  gl?: CanvasProps['gl']
+  /** Called once the renderer, scene and camera exist (react-three-fiber's `onCreated`). */
+  onCreated?: CanvasProps['onCreated']
+  /**
+   * Accessible name for the canvas, which is exposed as an image. Defaults to
+   * a description of the model on the one-liner mockups, and to "3D mockup"
+   * here.
+   */
+  label?: string
+  /**
+   * Whether the live screens are in the page's accessibility tree. `'hidden'`
+   * (default) marks every screen layer `aria-hidden` and `inert`, since a
+   * screen is decorative; `'visible'` exposes a screen whose text is found
+   * nowhere else on the page.
+   */
+  screenAccessibility?: ScreenAccessibility
   className?: string
   style?: React.CSSProperties
 }
@@ -135,6 +235,12 @@ export function MockupCanvas({
   background,
   camera,
   dpr = [1, 2],
+  frameloop = 'demand',
+  pauseWhenOffscreen = true,
+  gl,
+  onCreated,
+  label = '3D mockup',
+  screenAccessibility = 'hidden',
   className,
   style,
 }: MockupCanvasProps) {
@@ -188,6 +294,27 @@ export function MockupCanvas({
     if (baseDistance.current !== null && lastDistance.current) zoomBy(baseDistance.current / lastDistance.current)
   }
 
+  const canvasRef = React.useRef<HTMLCanvasElement>(null)
+  const drawing = useWorthDrawing(canvasRef, pauseWhenOffscreen)
+
+  // An image to assistive tech, named for what it shows. r3f spreads its own
+  // props onto the container rather than the canvas, and the container also
+  // holds the screens, which must not become an image's (unreadable) children
+  // when `screenAccessibility` is 'visible' - so the canvas is named directly.
+  React.useEffect(() => {
+    const element = canvasRef.current
+    if (!element) return
+    element.setAttribute('role', 'img')
+    element.setAttribute('aria-label', label)
+  }, [label])
+
+  const glProps = React.useMemo<CanvasProps['gl']>(
+    () =>
+      typeof gl === 'function' || (gl && 'render' in gl) ? gl : { ...CANVAS_GL_DEFAULTS, ...gl },
+    [gl]
+  )
+  const stage = React.useMemo<StageSettings>(() => ({ screenAccessibility }), [screenAccessibility])
+
   // The canvas's own container is a stacking context (see isolateCanvasStack
   // in device-screen), so the blending band is sealed inside it however large
   // it gets, and these buttons only have to beat the container itself. A
@@ -196,6 +323,7 @@ export function MockupCanvas({
 
   const canvas = (
     <Canvas
+      ref={canvasRef}
       className={className}
       // pan-y keeps pages scrollable on touch: vertical swipes scroll past the
       // mockup, horizontal drags (and mouse) orbit the device. With zoom on,
@@ -203,53 +331,70 @@ export function MockupCanvas({
       style={{ touchAction: canvasTouchAction(zoom), background, ...style }}
       dpr={dpr}
       camera={camera ?? { position: DEFAULT_CAMERA_POSITION, fov: DEFAULT_CAMERA_FOV }}
-      gl={{ antialias: true, alpha: true, powerPreference: 'high-performance' }}
+      gl={glProps}
+      onCreated={onCreated}
+      frameloop={drawing ? frameloop : 'never'}
     >
-      <TouchScrollFix zoom={zoom} />
-      <ambientLight intensity={STAGE_AMBIENT_LIGHT.intensity} />
-      <directionalLight position={STAGE_KEY_LIGHT.position} intensity={STAGE_KEY_LIGHT.intensity} />
+      <StageContext.Provider value={stage}>
+        <TouchScrollFix zoom={zoom} />
+        <ambientLight intensity={STAGE_AMBIENT_LIGHT.intensity} />
+        <directionalLight position={STAGE_KEY_LIGHT.position} intensity={STAGE_KEY_LIGHT.intensity} />
 
-      {/* The core's procedural light studio, rendered once into an env map.
-          Not optional: it is what gives every material its reflections, and a
-          mockup without it reads as flat untextured plastic. No HDR files are
-          fetched, so it costs nothing at load and works offline. */}
-      <Environment resolution={STUDIO_ENV_RESOLUTION}>
-        {STUDIO_LIGHTFORMERS.map((lf, i) => (
-          <Lightformer
-            key={i}
-            form={lf.form}
-            intensity={lf.intensity}
-            position={lf.position}
-            scale={lf.scale}
-            rotation-x={lf.rotationX ?? 0}
-            rotation-y={lf.rotationY ?? 0}
+        {/* The core's procedural light studio, rendered once into an env map.
+            Not optional: it is what gives every material its reflections, and a
+            mockup without it reads as flat untextured plastic. No HDR files are
+            fetched, so it costs nothing at load and works offline. */}
+        <Environment resolution={STUDIO_ENV_RESOLUTION}>
+          {STUDIO_LIGHTFORMERS.map((lf, i) => (
+            <Lightformer
+              key={i}
+              form={lf.form}
+              intensity={lf.intensity}
+              position={lf.position}
+              scale={lf.scale}
+              rotation-x={lf.rotationX ?? 0}
+              rotation-y={lf.rotationY ?? 0}
+            />
+          ))}
+        </Environment>
+
+        {children}
+
+        {shadows && <StageShadows y={shadowY} {...CONTACT_SHADOW} />}
+
+        {controls && (
+          <TumbleControls
+            ref={controlsRef}
+            zoom={zoom}
+            autoRotate={autoRotate}
+            freeRotation={freeRotation}
+            minDistance={orbitRange.min}
+            maxDistance={orbitRange.max}
+            onDistanceChange={zoom ? handleDistanceChange : undefined}
           />
-        ))}
-      </Environment>
-
-      {children}
-
-      {shadows && <ContactShadows position={[0, shadowY, 0]} {...CONTACT_SHADOW} />}
-
-      {controls && (
-        <TumbleControls
-          ref={controlsRef}
-          zoom={zoom}
-          autoRotate={autoRotate}
-          freeRotation={freeRotation}
-          minDistance={orbitRange.min}
-          maxDistance={orbitRange.max}
-          onDistanceChange={zoom ? handleDistanceChange : undefined}
-        />
-      )}
+        )}
+      </StageContext.Provider>
     </Canvas>
   )
+
+  const focusStyle = controls ? (
+    <style href="react-3d-mockups-canvas-focus" precedence="default">
+      {CANVAS_FOCUS_CSS}
+    </style>
+  ) : null
 
   // Zoom's +/− buttons need the orbit controls to move the camera; the
   // full-screen button is independent. With neither overlay, hand back the
   // bare canvas untouched.
   const showZoomButtons = zoom && controls
-  if (!showZoomButtons && !fullscreen) return canvas
+  if (!showZoomButtons && !fullscreen) {
+    return (
+      <>
+        {focusStyle}
+        {canvas}
+      </>
+    )
+  }
 
   // Wrap so the overlay buttons anchor to the canvas box - and so the
   // Fullscreen API has an element to expand. A dark backdrop fills the letter-
@@ -272,6 +417,7 @@ export function MockupCanvas({
         background: isFullscreen ? background ?? '#0b0d12' : undefined,
       }}
     >
+      {focusStyle}
       {canvas}
       {fullscreen && (
         <div style={{ position: 'absolute', right: 10, top: 10, zIndex: overlayZ }}>

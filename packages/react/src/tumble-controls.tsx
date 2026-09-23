@@ -1,12 +1,23 @@
 import * as React from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
-import { ORBIT, TumbleOrbit, tumbleAutoRotateStep } from './core'
+import {
+  KEYBOARD_ORBIT_STEP,
+  KEYBOARD_ZOOM_FACTOR,
+  ORBIT,
+  TumbleOrbit,
+  tumbleAutoRotateStep,
+} from './core'
 import { usePrefersReducedMotion } from './use-reduced-motion'
 
 export interface TumbleControlsHandle {
   /** Multiply the camera distance (used by the overlay +/− buttons). */
   zoomBy: (factor: number) => void
+  /** Put the camera back where it started: the pose, the distance, the target. */
+  reset: () => void
 }
+
+/** Class on a keyboard-focusable canvas, for its focus ring. */
+export const FOCUSABLE_CANVAS_CLASS = 'react-3d-mockups-canvas'
 
 export interface TumbleControlsProps {
   /** Pointer-drag rotation (the tumble itself always keeps the target centered). */
@@ -58,9 +69,20 @@ export const TumbleControls = React.forwardRef<TumbleControlsHandle, TumbleContr
   ) {
     const camera = useThree((state) => state.camera)
     const gl = useThree((state) => state.gl)
+    // Every input below moves the camera or queues motion for the frame loop.
+    // On a canvas that renders on demand nothing draws unless asked, so each
+    // path asks; the frame loop keeps asking while motion is still playing out.
+    const invalidate = useThree((state) => state.invalidate)
     const reducedMotion = usePrefersReducedMotion()
 
     const orbit = React.useMemo(() => new TumbleOrbit(ORBIT.dampingFactor), [])
+
+    // Where the camera started, for `reset` (the Home key). Captured once per
+    // camera, before the first drag can move it.
+    const home = React.useMemo(
+      () => ({ position: camera.position.clone(), up: camera.up.clone() }),
+      [camera]
+    )
     React.useEffect(() => {
       if (minDistance !== undefined) orbit.minDistance = minDistance
       if (maxDistance !== undefined) orbit.maxDistance = maxDistance
@@ -71,10 +93,25 @@ export const TumbleControls = React.forwardRef<TumbleControlsHandle, TumbleContr
       )
     }, [orbit, freeRotation])
 
+    const reset = React.useCallback(() => {
+      orbit.halt()
+      orbit.target.set(0, 0, 0)
+      camera.position.copy(home.position)
+      camera.up.copy(home.up)
+      camera.lookAt(orbit.target)
+      invalidate()
+    }, [orbit, camera, home, invalidate])
+
     React.useImperativeHandle(
       ref,
-      () => ({ zoomBy: (factor: number) => orbit.zoomBy(camera, factor) }),
-      [orbit, camera]
+      () => ({
+        zoomBy: (factor: number) => {
+          orbit.zoomBy(camera, factor)
+          invalidate()
+        },
+        reset,
+      }),
+      [orbit, camera, invalidate, reset]
     )
 
     React.useEffect(() => {
@@ -111,6 +148,7 @@ export const TumbleControls = React.forwardRef<TumbleControlsHandle, TumbleContr
         const dy = event.clientY - previous.y
         pointers.set(event.pointerId, { x: event.clientX, y: event.clientY })
 
+        invalidate()
         if (panPointers.has(event.pointerId)) {
           orbit.pan(camera, dx, dy, element.clientHeight || 1)
           return
@@ -158,6 +196,7 @@ export const TumbleControls = React.forwardRef<TumbleControlsHandle, TumbleContr
         event.preventDefault()
         const delta = Math.max(-30, Math.min(30, event.deltaY))
         orbit.zoomBy(camera, Math.exp(delta * 0.01))
+        invalidate()
       }
 
       // Safari's trackpad pinch: non-standard gesture events carrying the
@@ -178,11 +217,65 @@ export const TumbleControls = React.forwardRef<TumbleControlsHandle, TumbleContr
         if (typeof scale !== 'number' || scale <= 0) return
         orbit.zoomBy(camera, gestureScale / scale)
         gestureScale = scale
+        invalidate()
       }
       const onGestureEnd = () => {
         gesturing = false
       }
 
+      /*
+       * Keyboard orbit, the one way to turn a mockup without a pointer: arrows
+       * turn and tilt by `KEYBOARD_ORBIT_STEP` (through the same damping a
+       * drag uses, so a press eases rather than jumps), + and - zoom when
+       * zoom is on, Home puts the camera back. Only keys the controls use are
+       * prevented - Tab still leaves, and page shortcuts still work.
+       */
+      const onKeyDown = (event: KeyboardEvent) => {
+        if (!enabled || event.altKey || event.ctrlKey || event.metaKey) return
+        const step = KEYBOARD_ORBIT_STEP
+        switch (event.key) {
+          // Each arrow does what a drag the same way does: the model turns
+          // (or tilts) toward the arrow.
+          case 'ArrowLeft':
+            orbit.rotate(-step, 0)
+            break
+          case 'ArrowRight':
+            orbit.rotate(step, 0)
+            break
+          case 'ArrowUp':
+            orbit.rotate(0, step)
+            break
+          case 'ArrowDown':
+            orbit.rotate(0, -step)
+            break
+          case '+':
+          case '=':
+            if (!zoom) return
+            orbit.zoomBy(camera, KEYBOARD_ZOOM_FACTOR)
+            break
+          case '-':
+          case '_':
+            if (!zoom) return
+            orbit.zoomBy(camera, 1 / KEYBOARD_ZOOM_FACTOR)
+            break
+          case 'Home':
+            reset()
+            break
+          default:
+            return
+        }
+        event.preventDefault()
+        invalidate()
+      }
+      // Focusable only while the controls are live: a canvas that cannot be
+      // turned should not take a tab stop.
+      const previousTabIndex = element.getAttribute('tabindex')
+      if (enabled) {
+        element.tabIndex = 0
+        element.classList.add(FOCUSABLE_CANVAS_CLASS)
+      }
+
+      element.addEventListener('keydown', onKeyDown)
       element.addEventListener('pointerdown', onPointerDown)
       element.addEventListener('pointermove', onPointerMove)
       element.addEventListener('pointerup', onPointerEnd)
@@ -194,6 +287,12 @@ export const TumbleControls = React.forwardRef<TumbleControlsHandle, TumbleContr
       element.addEventListener('gestureend', onGestureEnd)
       element.addEventListener('contextmenu', onContextMenu)
       return () => {
+        element.removeEventListener('keydown', onKeyDown)
+        if (enabled) {
+          if (previousTabIndex === null) element.removeAttribute('tabindex')
+          else element.setAttribute('tabindex', previousTabIndex)
+          element.classList.remove(FOCUSABLE_CANVAS_CLASS)
+        }
         element.removeEventListener('pointerdown', onPointerDown)
         element.removeEventListener('pointermove', onPointerMove)
         element.removeEventListener('pointerup', onPointerEnd)
@@ -205,7 +304,7 @@ export const TumbleControls = React.forwardRef<TumbleControlsHandle, TumbleContr
         element.removeEventListener('gestureend', onGestureEnd)
         element.removeEventListener('contextmenu', onContextMenu)
       }
-    }, [gl, enabled, zoom, orbit, camera])
+    }, [gl, enabled, zoom, orbit, camera, invalidate, reset])
 
     // Priority -1: move the camera BEFORE default-priority frame callbacks -
     // drei's <Html transform> positions the DOM screens in its own useFrame,
@@ -219,6 +318,9 @@ export const TumbleControls = React.forwardRef<TumbleControlsHandle, TumbleContr
       const speed = reducedMotion ? 0 : requested
       const step = speed ? tumbleAutoRotateStep(delta, speed) : 0
       orbit.update(camera, step)
+      // Keep frames coming while the drag's damping plays out, and for as long
+      // as auto-rotation runs. Once both stop, so does the canvas.
+      if (speed || orbit.settling) invalidate()
       if (onDistanceChange) {
         // The orbit keeps the stage center as its target, so the camera's
         // length IS the zoom distance. Report only real changes (>0.2%).

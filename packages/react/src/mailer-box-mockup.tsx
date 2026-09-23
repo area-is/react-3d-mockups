@@ -22,6 +22,7 @@ export const MailerBoxMockup = createMockup({
   regions: MAILER_BOX_REGIONS,
   metrics: MAILER_BOX_METRICS,
   object: MailerBox,
+  label: '3D mockup of a mailer box',
   framing: MAILER_BOX_FRAMING,
   slots: mailerBoxSlots,
   displayName: 'MailerBoxMockup',

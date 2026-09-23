@@ -12,6 +12,7 @@ const TVSetMockupBase = createMockup({
   regions: SCREEN_REGIONS,
   metrics: TV_METRICS,
   object: TVSet,
+  label: '3D mockup of a TV',
   framing: TV_FRAMING,
   slots: tvSetSlots,
 })

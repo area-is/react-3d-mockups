@@ -22,6 +22,7 @@ export const AFrameSignMockup = createMockup({
   regions: A_FRAME_SIGN_REGIONS,
   metrics: A_FRAME_SIGN_METRICS,
   object: AFrameSign,
+  label: '3D mockup of an A-frame sign',
   framing: A_FRAME_SIGN_FRAMING,
   slots: aFrameSignSlots,
   displayName: 'AFrameSignMockup',

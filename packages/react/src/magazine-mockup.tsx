@@ -22,6 +22,7 @@ export const MagazineMockup = createMockup({
   regions: MAGAZINE_REGIONS,
   metrics: MAGAZINE_METRICS,
   object: Magazine,
+  label: '3D mockup of a magazine',
   framing: MAGAZINE_FRAMING,
   slots: magazineSlots,
   displayName: 'MagazineMockup',

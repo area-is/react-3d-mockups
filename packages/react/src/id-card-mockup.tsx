@@ -37,6 +37,7 @@ export const IDCardMockup = createMockup({
   regions: ID_CARD_REGIONS,
   metrics: ID_CARD_METRICS,
   object: StagedIDCard,
+  label: '3D mockup of an ID card on a lanyard',
   framing: ID_CARD_FRAMING,
   slots: idCardSlots,
   displayName: 'IDCardMockup',

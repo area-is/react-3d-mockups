@@ -9,6 +9,7 @@ const AppleWatchMockupBase = createMockup({
   regions: SCREEN_REGIONS,
   metrics: APPLE_WATCH_METRICS,
   object: AppleWatch,
+  label: '3D mockup of an Apple Watch',
   framing: APPLE_WATCH_FRAMING,
   slots: watchSlots,
 })

@@ -23,6 +23,7 @@ export const BusMockup = createMockup({
   regions: BUS_REGIONS,
   metrics: BUS_METRICS,
   object: Bus,
+  label: '3D mockup of a transit bus',
   framing: BUS_FRAMING,
   slots: busSlots,
   displayName: 'BusMockup',

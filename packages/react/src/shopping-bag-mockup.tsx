@@ -22,6 +22,7 @@ export const ShoppingBagMockup = createMockup({
   regions: SHOPPING_BAG_REGIONS,
   metrics: SHOPPING_BAG_METRICS,
   object: ShoppingBag,
+  label: '3D mockup of a shopping bag',
   framing: SHOPPING_BAG_FRAMING,
   slots: shoppingBagSlots,
   displayName: 'ShoppingBagMockup',

@@ -22,6 +22,7 @@ export const SemiTrailerMockup = createMockup({
   regions: SEMI_TRAILER_REGIONS,
   metrics: SEMI_TRAILER_METRICS,
   object: SemiTrailer,
+  label: '3D mockup of a semi trailer',
   framing: SEMI_TRAILER_FRAMING,
   slots: semiTrailerSlots,
   displayName: 'SemiTrailerMockup',
