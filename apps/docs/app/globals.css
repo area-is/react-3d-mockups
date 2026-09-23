@@ -130,9 +130,16 @@ code {
   position: sticky;
   top: 0;
   z-index: 50;
-  background: rgba(8, 9, 12, 0.78);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
+  /* Near-opaque with a heavy blur. At 0.78 over a 14px blur, the lit screens
+     scrolling under it read through as legible shapes behind the wordmark on
+     a phone; this keeps a hint of the page moving and nothing more.
+     The prefixed line has to come FIRST. Next's CSS minifier treats the two
+     as one property and keeps whichever is last, and with the prefixed one
+     last it shipped only `-webkit-backdrop-filter` - which Chrome ignores, so
+     on Android the header had no blur at all. */
+  background: rgba(8, 9, 12, 0.92);
+  -webkit-backdrop-filter: blur(24px) saturate(140%);
+  backdrop-filter: blur(24px) saturate(140%);
   border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
 
@@ -205,37 +212,98 @@ code {
 /*
  * Full-width sheet under the header rather than a floating popover: it is the
  * whole navigation on a phone, so it gets the whole width and touch-sized rows.
+ *
+ * And the whole height below the header. Sized to its rows, it ended a third
+ * of the way down with the page showing underneath, which read as the menu
+ * having failed to finish opening. It scrolls inside itself when the examples
+ * are expanded on a short screen.
  */
 .nav-sheet {
   position: absolute;
   top: 100%;
   left: 0;
   right: 0;
+  height: calc(100vh - 58px);
+  height: calc(100dvh - 58px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
   display: flex;
   flex-direction: column;
-  padding: 7px clamp(14px, 3.6vw, 43px) 13px;
+  padding: 7px clamp(14px, 3.6vw, 43px) 24px;
   /* Opaque, unlike the header it hangs from: this one covers page content
      rather than sitting over the top of it, and a blur behind text the reader
      is choosing between is noise. */
   background: var(--bg);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 22px 40px -24px rgba(0, 0, 0, 0.9);
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .nav-sheet[hidden] {
   display: none;
 }
 
-.nav-sheet-link {
-  padding: 12px 2px;
-  font-size: 14px;
+/* `.site-nav` in front because `.site-nav a` - the desktop row's muted link
+   colour - would otherwise outrank a bare class and grey the sheet out. */
+.site-nav .nav-sheet-link {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 13px 2px;
+  font-size: 15px;
   font-weight: 600;
   color: var(--text);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
 
-.nav-sheet-link:last-child {
-  border-bottom: 0;
+.nav-sheet-note {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-low);
+}
+
+.nav-sheet-group > summary {
+  list-style: none;
+  cursor: pointer;
+}
+
+.nav-sheet-group > summary::-webkit-details-marker {
+  display: none;
+}
+
+.nav-sheet-caret {
+  flex: none;
+  margin-left: auto;
+  color: var(--muted);
+  transition: transform 0.15s ease;
+}
+
+.nav-sheet-group[open] .nav-sheet-caret {
+  transform: rotate(180deg);
+}
+
+/* Two columns: twelve one-word names do not need a full-width row each, and
+   halving the list keeps the whole of it on one phone screen when opened. */
+.nav-sheet-examples {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 14px;
+  padding: 4px 0 6px;
+}
+
+.nav-sheet-heading {
+  grid-column: 1 / -1;
+  padding: 12px 2px 2px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-low);
+}
+
+.site-nav .nav-sheet-sublink {
+  padding: 9px 2px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--muted);
 }
 
 .nav-icon-btn {
@@ -301,7 +369,7 @@ code {
   position: absolute;
   top: 40px;
   right: -11px;
-  width: 190px;
+  width: 220px;
   max-height: calc(100vh - 70px);
   max-height: calc(100dvh - 70px);
   overflow-y: auto;
@@ -337,6 +405,27 @@ code {
   background: rgba(255, 255, 255, 0.06);
 }
 
+.nav-menu-group {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.nav-menu-group + .nav-menu-group {
+  margin-top: 5px;
+  padding-top: 5px;
+  border-top: 1px solid var(--border);
+}
+
+.nav-menu-heading {
+  padding: 6px 11px 3px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-low);
+}
+
 .site-footer {
   border-top: 1px solid var(--border);
   margin-top: clamp(43px, 6.3vw, 72px);
@@ -345,6 +434,7 @@ code {
 .footer-inner {
   display: flex;
   justify-content: space-between;
+  align-items: baseline;
   gap: 14px;
   flex-wrap: wrap;
   padding: 18px clamp(14px, 3.6vw, 43px) 29px;
@@ -352,10 +442,17 @@ code {
   font-size: 14px;
 }
 
+.footer-links {
+  display: flex;
+  flex-wrap: wrap;
+  column-gap: 20px;
+  row-gap: 4px;
+}
+
 .footer-inner a {
-  font-family: var(--font-mono);
   font-size: 14px;
   color: var(--text-low);
+  transition: color 0.15s ease;
 }
 
 .footer-inner a:hover {
@@ -439,7 +536,9 @@ code {
   flex-direction: column;
   align-items: center;
   text-align: center;
-  padding: clamp(36px, 5.4vw, 58px) clamp(14px, 3.6vw, 43px) 0;
+  /* Trimmed at the top by about what the call-to-action row adds at the
+     bottom, so the carousel under it moved down as little as it could. */
+  padding: clamp(26px, 4vw, 44px) clamp(14px, 3.6vw, 43px) 0;
 }
 
 /*
@@ -495,6 +594,128 @@ code {
   justify-content: center;
   flex-wrap: wrap;
   margin-bottom: 16px;
+}
+
+/*
+ * The hero's ways in: two buttons and the install line, on one row where it
+ * fits (it does from about 1000px) and wrapping to two below that. Compact on
+ * purpose - the carousel under it is the hero's picture, and each row here is
+ * a row of it pushed below the fold.
+ */
+.hero-cta {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 11px 12px;
+  margin-top: clamp(20px, 2.7vw, 29px);
+}
+
+.hero-cta .btn {
+  padding: 10px 20px;
+}
+
+.hero-install {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+  max-width: 100%;
+  padding: 4px 4px 4px 14px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.035);
+}
+
+/* Plain text in the page's mono, not the green inline-code chip. */
+.hero-install code {
+  padding: 0;
+  background: none;
+  border-radius: 0;
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--text-code);
+  text-align: left;
+}
+
+/* Drawn, not typed, so it never lands on the clipboard. */
+.hero-install code::before {
+  content: '$ ';
+  color: var(--accent);
+}
+
+/* Icon only in the chip: the word would cost the command a third line on a
+   phone, and the icon turning to a green tick is confirmation enough. */
+.hero-install .copy-btn {
+  justify-content: center;
+  width: 30px;
+  padding: 0;
+}
+
+.hero-install .copy-btn-text {
+  display: none;
+}
+
+/*
+ * On a phone the line is wider than the screen. It wraps at its spaces inside
+ * a squarer box rather than scrolling sideways; the buttons get a touch less
+ * padding so the pair still share a row.
+ */
+@media (max-width: 620px) {
+  .hero-cta {
+    gap: 10px 8px;
+    margin-top: 18px;
+  }
+
+  .hero-cta .btn {
+    padding: 10px 16px;
+  }
+
+  .hero-install {
+    border-radius: 12px;
+    padding: 6px 6px 6px 12px;
+  }
+
+  .hero-install code {
+    font-size: 12.5px;
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/*  Copy buttons and code panels                                       */
+/* ------------------------------------------------------------------ */
+
+.copy-btn {
+  display: inline-flex;
+  align-items: center;
+  flex: none;
+  gap: 6px;
+  min-height: 30px;
+  padding: 5px 11px;
+  border: 0;
+  border-radius: 999px;
+  background: none;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: inherit;
+  color: var(--muted);
+  cursor: pointer;
+  transition: color 0.15s ease, background 0.15s ease;
+}
+
+.copy-btn:hover {
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.copy-btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.copy-btn[data-copied='true'] {
+  color: var(--accent);
 }
 
 /* ------------------------------------------------------------------ */
@@ -709,8 +930,8 @@ code {
   border: 1px solid rgba(49, 211, 34, 0.35);
   border-radius: 999px;
   background: rgba(8, 9, 12, 0.55);
-  backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
   font-family: var(--font-mono);
   font-size: 14px;
   letter-spacing: 0.14em;
@@ -794,8 +1015,67 @@ code {
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--text-low);
-  margin: 2px 0 0;
+  margin: 0;
   text-align: center;
+  text-wrap: balance;
+  transition: opacity 0.6s ease;
+}
+
+/* Faded rather than removed, so the row keeps its height and nothing under
+   the carousel moves when it goes. */
+.carousel-hint[data-used='true'] {
+  opacity: 0;
+}
+
+/*
+ * Autoplay's pause/play toggle. Set in the hint's voice and next to it, so it
+ * reads as part of the carousel's controls rather than as page chrome, and
+ * compact enough that the row stays one line on a phone.
+ */
+.carousel-play,
+.carousel-code {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex: none;
+  padding: 5px 11px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: none;
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: border-color 0.15s ease, color 0.15s ease;
+}
+
+.carousel-play:hover,
+.carousel-code:hover {
+  border-color: rgba(255, 255, 255, 0.36);
+  color: var(--text);
+}
+
+.carousel-play:focus-visible,
+.carousel-code:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* The copy-code pill sits at the end of the finishes row, a step apart from
+   the swatches it is not one of. */
+.carousel-code {
+  margin-left: 4px;
+}
+
+/*
+ * Space held for controls that do not exist yet: the server-rendered
+ * placeholder carries the carousel's real rows, invisible, so the page is laid
+ * out at its final height before the scene has loaded (see HeroCarousel).
+ */
+.carousel-hold {
+  visibility: hidden;
 }
 
 /*
@@ -853,12 +1133,23 @@ code {
   background: linear-gradient(180deg, var(--bg) 62%, transparent);
 }
 
-/* What is left below the stage: the gesture hint and the off-screen jumps. */
+/* What is left below the stage: autoplay's toggle, the gesture hint and the
+   off-screen jumps. One row, and a fixed height, so the page under it never
+   moves: not when the scene loads, not when the hint fades. */
 .carousel-foot {
   display: flex;
-  flex-direction: column;
   align-items: center;
+  justify-content: center;
+  gap: 14px;
+  min-height: 32px;
   padding: 7px 14px 0;
+}
+
+@media (max-width: 620px) {
+  .carousel-hint {
+    font-size: 12px;
+    letter-spacing: 0.08em;
+  }
 }
 
 .carousel-nav {
@@ -908,6 +1199,20 @@ code {
   text-align: center;
   text-wrap: balance;
   font-variant-numeric: tabular-nums;
+  /*
+   * A fixed height for the longest a readout gets: one line where it always
+   * fits, two on a phone, where "Galaxy Z Fold 7 · 820 × 910 px" wraps and
+   * "Galaxy S26" does not. Without it the bar - and the stage, the swatches
+   * and the whole page under them - shifted up and down as slides changed.
+   */
+  line-height: 1.45;
+  min-height: 1.45em;
+}
+
+@media (max-width: 620px) {
+  .carousel-readout {
+    min-height: 2.9em;
+  }
 }
 
 .carousel-readout .dim {
@@ -947,8 +1252,16 @@ code {
   display: flex;
   align-items: center;
   gap: 11px;
-  flex-wrap: wrap;
+  /*
+   * One line, always: a model with five finishes plus the code pill wrapped
+   * onto a second row on a phone, and the whole stage dropped by that row
+   * whenever such a model came round. The finish name gives way instead (see
+   * below), and the row has a fixed height so the placeholder matches it.
+   */
+  flex-wrap: nowrap;
   justify-content: center;
+  max-width: 100%;
+  height: 28px;
 }
 
 /* The palette glyph. Sized to the swatches it introduces and dimmed to the
@@ -970,7 +1283,11 @@ code {
   letter-spacing: 0;
   color: var(--muted);
   min-width: 86px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
+
 
 .carousel-swatches {
   display: flex;
@@ -990,6 +1307,43 @@ code {
 
 .carousel-swatch[data-selected='true'] {
   box-shadow: 0 0 0 2px var(--bg), 0 0 0 3.5px var(--accent);
+}
+
+@media (max-width: 620px) {
+  .carousel-finishes {
+    gap: 8px;
+  }
+
+  .carousel-swatches {
+    gap: 7px;
+  }
+
+  .carousel-swatch {
+    width: 20px;
+    height: 20px;
+  }
+
+  /* The dot shrank by 2px; the hit area around it grows by the same, so it
+     stays the 44px the touch-target rule below guarantees. */
+  .carousel-swatches .carousel-swatch::after {
+    inset: -12px;
+  }
+
+  /* The name is the part of the row that can give: it shrinks, and ellipsizes
+     rather than wrapping. */
+  .carousel-finish-name {
+    min-width: 0;
+    flex: 0 1 auto;
+  }
+
+  /* Icon only: the pill's label is also its accessible name. */
+  .carousel-code span {
+    display: none;
+  }
+
+  .carousel-code {
+    padding: 5px 8px;
+  }
 }
 
 /* Reachable by keyboard and screen readers, invisible on screen. */
@@ -1086,19 +1440,97 @@ code {
   display: flex;
   flex-direction: column;
   gap: 14px;
+  /* A grid item's minimum width is its content's by default, so one long
+     line would widen the column past the screen instead of wrapping in it. */
+  min-width: 0;
 }
 
+/*
+ * A code block with a head row: what it is on the left (the file name, or the
+ * package-manager switch) and its copy button on the right. The button sits
+ * in the head rather than floating over the code so it never covers the end
+ * of the first line, which on a phone is exactly where that line wraps.
+ */
+.code-panel {
+  background: rgba(255, 255, 255, 0.035);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 11px;
+}
+
+.code-panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 5px 6px 0 16px;
+}
+
+.code-panel-label {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--text-low);
+}
+
+.pm-switch {
+  display: flex;
+  gap: 2px;
+  margin-left: -9px;
+}
+
+.pm-switch-btn {
+  min-height: 30px;
+  padding: 4px 9px;
+  border: 0;
+  border-radius: 7px;
+  background: none;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  letter-spacing: 0;
+  color: var(--text-low);
+  cursor: pointer;
+  transition: color 0.15s ease, background 0.15s ease;
+}
+
+.pm-switch-btn:hover {
+  color: var(--text);
+}
+
+.pm-switch-btn[aria-pressed='true'] {
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.pm-switch-btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+/*
+ * Wrapped, not scrolled: the install line runs past the column even on a
+ * desktop, and on a phone the import did too - a sideways scroll inside a
+ * vertically scrolling page is the one most readers never find. A wrapped
+ * line loses its indent, which in five lines of JSX costs nothing.
+ */
 .quickstart-code pre {
   margin: 0;
-  padding: 13px 16px;
-  overflow-x: auto;
+  padding: 8px 16px 13px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
   font-family: var(--font-mono);
   font-size: 14px;
   line-height: 1.65;
   color: var(--text-code);
-  background: rgba(255, 255, 255, 0.035);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 11px;
+}
+
+@media (max-width: 620px) {
+  .quickstart-code pre {
+    padding: 6px 12px 11px;
+    font-size: 13px;
+  }
+
+  .code-panel-head {
+    padding-left: 12px;
+  }
 }
 
 /*
@@ -1196,6 +1628,13 @@ code {
 
   .nav-burger {
     display: inline-flex;
+  }
+
+  /* Opaque in all but name on a phone. The single column puts body text
+     under the header for most of the scroll, and even 8% of it showing
+     through reads as a smudge behind the wordmark. */
+  .site-header {
+    background: rgba(8, 9, 12, 0.96);
   }
 }
 
@@ -1298,9 +1737,11 @@ code {
 }
 
 /*
- * The carousel's play/pause control is gone by request. What is left of WCAG
- * 2.2.2's "moving content needs a stop": the auto-advance halts permanently at
- * the first arrow, swatch or drag, and `prefers-reduced-motion` keeps it from
- * ever starting. Neither is a control on the page, so a visitor who wants the
- * motion stopped without touching the carousel has only the system setting.
+ * WCAG 2.2.2: moving content that runs longer than five seconds needs a way to
+ * stop it. The carousel has three: the pause/play toggle under the stage
+ * (`.carousel-play`), a permanent stop at the first arrow, swatch or drag, and
+ * `prefers-reduced-motion`, which keeps autoplay from starting at all. (An
+ * earlier version dropped the toggle by request and leaned on the other two;
+ * the 2026-09 audit asked for it back, since a visitor who wants the motion
+ * gone should not have to change a system setting or touch the carousel.)
  */

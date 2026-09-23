@@ -30,7 +30,7 @@ export function MusicPlayer() {
           <span />
           <span />
         </div>
-        <h2 className="mp-title">{track.title}</h2>
+        <div className="mp-title">{track.title}</div>
         <p className="mp-artist">{track.artist}</p>
       </div>
 

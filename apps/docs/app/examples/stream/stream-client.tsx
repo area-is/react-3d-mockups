@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { ExampleBadge, TabbiedLink } from '../_shared/badge'
+import { TabbiedLink } from '../_shared/badge'
 import { lazyScene } from '../_shared/stage'
 import { Tile } from './stream-art'
 import { DEFAULT_FEATURED, PLANS, SHOWS, findShow } from './stream-data'
@@ -37,7 +37,6 @@ export function Stream() {
           <span>Plans</span>
         </nav>
         <div className="st-top-right">
-          <ExampleBadge className="st-badge" />
           <span className="st-cta">Start your free week</span>
         </div>
       </header>

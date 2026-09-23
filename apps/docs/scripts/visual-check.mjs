@@ -14,7 +14,8 @@
  *   npm run visual -- --only=bus  run a subset (substring match on case name)
  *
  * Expects the docs dev server on PORT (default 3000, which is what `npm run
- * dev` serves); pass --base to override.
+ * dev` serves); pass --base to override. CHROMIUM_EXECUTABLE points it at a
+ * Chromium other than the one Playwright downloaded.
  * WebGL runs on SwiftShader, so results are reproducible across machines
  * without a GPU - at the cost of being slow, hence the generous timeouts.
  */
@@ -183,6 +184,7 @@ const COMPARE = async ([aB64, bB64]) => {
 const browser = await chromium.launch({
   // SwiftShader: no GPU needed, and the same frames on CI as on a laptop.
   args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'],
+  ...(process.env.CHROMIUM_EXECUTABLE ? { executablePath: process.env.CHROMIUM_EXECUTABLE } : {}),
 })
 const context = await browser.newContext({ viewport: VIEWPORT, deviceScaleFactor: 1 })
 const page = await context.newPage()

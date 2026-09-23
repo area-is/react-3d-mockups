@@ -11,7 +11,7 @@ import {
 } from 'react'
 import Link from 'next/link'
 import { useFrame } from '@react-three/fiber'
-import { Palette } from 'lucide-react'
+import { Check, CodeXml, Palette, Pause, Play } from 'lucide-react'
 import type { Group } from 'three'
 import {
   MockupCanvas,
@@ -148,9 +148,16 @@ const ROW_SPACING = 1.25
  * place but hang the device high in an empty frame; 0.6 is the balance.
  */
 const RIG_DROP = 0.6
-/** Painted screen for the picker row, matching the sidebar thumbnails. */
+/**
+ * Painted screen for the picker row: dark glass with a soft reflection.
+ *
+ * It used to be the chroma green the sidebar thumbnails use to mark a live
+ * area, which on a strip of small devices read as screens that had not loaded
+ * yet. Green stays where it means something - the docs' "mockup-able areas"
+ * view.
+ */
 const ROW_SURFACE =
-  'radial-gradient(120% 90% at 30% 18%, rgba(80,224,66,0.55) 0%, rgba(49,211,34,0.22) 45%, transparent 78%), #0d1016'
+  'linear-gradient(155deg, rgba(255,255,255,0.14) 0%, rgba(255,255,255,0.03) 34%, transparent 35%), linear-gradient(180deg, #1b2130 0%, #0b0d12 100%)'
 /**
  * Virtual display width for a picker-row thumbnail, in CSS px.
  *
@@ -223,14 +230,20 @@ const distanceOf = (framing: MockupFraming<never>): number =>
   framing.camera?.position[2] ?? DEFAULT_CAMERA_POSITION[2]
 
 interface Entry {
+  /** Catalog id: the name, the docs page and the copied code all come from it. */
   id: string
-  name: string
   /** Live-surface readout: logical pixels for a screen, millimetres for print. */
   res: string
   /** Scale that matches this object to the shared camera. */
   fit: number
   /** Nudge for objects whose origin is not their visual centre (laptops). */
   lift: number
+  /**
+   * Resting tilt toward the camera, in radians, for an object whose best face
+   * is on top - a mailer box shown level is a flat rectangle, and its readout
+   * describes a lid nobody can see.
+   */
+  tilt?: number
   colorways: Colorway[]
   /**
    * Ink for the system status bar, set against the artwork behind it the way
@@ -273,10 +286,13 @@ interface Entry {
   }) => ReactNode
 }
 
-/** "360 × 780" - the primary surface of a mockup kind in logical pixels. */
+/**
+ * "360 × 780 px" - the primary surface of a mockup kind in logical pixels.
+ * The unit is spelled out because the objects beside them read in millimetres.
+ */
 function pxRes(kind: MockupKind, props?: object): string {
   const { width, height } = mockupInfo(kind as never, props as never).primary.px
-  return `${width} × ${height}`
+  return `${width} × ${height} px`
 }
 
 /**
@@ -320,24 +336,57 @@ const POSTER_FIT = fitFor(POSTER_FRAME_FRAMING as MockupFraming<never>)
 const AFRAME_FIT = fitFor(A_FRAME_SIGN_FRAMING as MockupFraming<never>)
 
 /**
- * Where the object on stage is documented.
+ * What the catalog says about the object on stage: its name, its reference
+ * page, and the component and variant that render it.
  *
- * Every entry below is keyed by a catalog id, so its reference page is a lookup
- * in the shared catalog rather than a second list of hrefs to keep in step with
- * it - the same table the docs sidebar grids and the thumbnail generator read.
- * An id with no catalog entry renders as plain text: a name that quietly stops
- * being a link beats a link into a 404.
+ * Every entry below is keyed by a catalog id, so all of that is a lookup in the
+ * shared catalog rather than a second list to keep in step with it - the same
+ * table the docs sidebar, the gallery and the thumbnail generator read. The
+ * carousel used to carry its own names, and a model was a "Framed poster"
+ * here and a "Poster frame" one click away. An id with no catalog entry
+ * renders its id as plain text: a name that quietly stops being a link beats
+ * a link into a 404.
  */
-const DOCS_HREF = new Map<string, string>(
-  [...CATALOG_DEVICES, ...CATALOG_OBJECTS].map((e: { id: string; href: string }) => [e.id, e.href])
+interface CatalogEntry {
+  id: string
+  label: string
+  href: string
+  component: string
+  variant?: string
+}
+const CATALOG = new Map<string, CatalogEntry>(
+  [...CATALOG_DEVICES, ...CATALOG_OBJECTS].map((e: CatalogEntry) => [e.id, e])
 )
+const nameOf = (entry: Entry) => CATALOG.get(entry.id)?.label ?? entry.id
+
+/** Props the carousel poses a model with that its one-liner does not default to. */
+const POSE_PROPS: Record<string, string> = {
+  'galaxy-z-fold7': ` openAngle={${CAROUSEL_OPEN_ANGLE}}`,
+  'galaxy-z-flip7': ` openAngle={${CAROUSEL_OPEN_ANGLE}}`,
+}
+
+/**
+ * The JSX for what is on stage, in the chosen finish - the one-liner a visitor
+ * would paste to get this exact mockup. Devices take the retail colorway's id;
+ * the objects' finishes are stock colours, so they take the colour itself.
+ */
+function codeFor(entry: Entry, colorway: Colorway): string | null {
+  const c = CATALOG.get(entry.id)
+  if (!c) return null
+  const color = DEVICES.includes(entry) ? colorway.id : colorway.color
+  const variant = c.variant ? ` variant="${c.variant}"` : ''
+  return `import { ${c.component} } from 'react-3d-mockups'
+
+<${c.component}${variant} color="${color}"${POSE_PROPS[entry.id] ?? ''}>
+  <YourApp />
+</${c.component}>`
+}
 
 /** One per device family - the variants are on their own docs pages. */
 const DEVICES: Entry[] = [
   {
     id: 'galaxy-s26',
     statusBarInk: '#141414',
-    name: 'Galaxy S26',
     res: pxRes('galaxy', { variant: 's26' }),
     fit: PHONE_FIT,
     lift: 0,
@@ -352,7 +401,6 @@ const DEVICES: Entry[] = [
   {
     id: 'iphone-17-pro',
     statusBarInk: '#efede6',
-    name: 'iPhone 17 Pro',
     res: pxRes('iphone', { variant: 'pro' }),
     fit: IPHONE_FIT,
     lift: 0,
@@ -367,7 +415,6 @@ const DEVICES: Entry[] = [
   {
     id: 'galaxy-z-fold7',
     statusBarInk: '#141414',
-    name: 'Galaxy Z Fold 7',
     res: pxRes('fold', { openAngle: CAROUSEL_OPEN_ANGLE }),
     fit: FOLD_FIT,
     lift: 0,
@@ -382,7 +429,6 @@ const DEVICES: Entry[] = [
   {
     id: 'galaxy-z-flip7',
     statusBarInk: '#efede6',
-    name: 'Galaxy Z Flip 7',
     res: pxRes('flip', { openAngle: CAROUSEL_OPEN_ANGLE }),
     fit: FLIP_FIT,
     lift: 0,
@@ -396,7 +442,6 @@ const DEVICES: Entry[] = [
   },
   {
     id: 'macbook-air-13',
-    name: 'MacBook Air 13\u2033',
     res: pxRes('laptop', { variant: 'air13' }),
     fit: LAPTOP_FIT,
     lift: 0.55,
@@ -411,7 +456,6 @@ const DEVICES: Entry[] = [
   {
     id: 'ipad-pro-13',
     statusBarInk: '#efede6',
-    name: 'iPad Pro 13\u2033',
     res: pxRes('ipad', { variant: 'ipadpro13' }),
     fit: TABLET_FIT,
     lift: 0,
@@ -426,7 +470,6 @@ const DEVICES: Entry[] = [
   {
     id: 'galaxy-tab-s11',
     statusBarInk: '#141414',
-    name: 'Galaxy Tab S11',
     res: pxRes('galaxyTab', { variant: 'tabs11' }),
     fit: TABLET_FIT,
     lift: 0,
@@ -440,7 +483,6 @@ const DEVICES: Entry[] = [
   },
   {
     id: 'apple-watch-series-11',
-    name: 'Apple Watch Series 11',
     res: pxRes('appleWatch'),
     fit: WATCH_FIT,
     lift: 0,
@@ -450,7 +492,6 @@ const DEVICES: Entry[] = [
   },
   {
     id: 'galaxy-watch-8',
-    name: 'Galaxy Watch 8',
     res: pxRes('galaxyWatch'),
     fit: WATCH_FIT,
     lift: 0,
@@ -460,7 +501,6 @@ const DEVICES: Entry[] = [
   },
   {
     id: 'studio-display',
-    name: 'Studio Display 27\u2033',
     res: pxRes('studioDisplay'),
     fit: DISPLAY_FIT,
     lift: 0.1,
@@ -478,7 +518,6 @@ const DEVICES: Entry[] = [
 const OBJECTS: Entry[] = [
   {
     id: 'book',
-    name: 'Hardcover book',
     res: mmRes('book'),
     fit: BOOK_FIT,
     lift: 0,
@@ -511,7 +550,6 @@ const OBJECTS: Entry[] = [
   },
   {
     id: 'vinyl-record',
-    name: 'Vinyl record',
     res: mmRes('vinylRecord'),
     fit: VINYL_FIT,
     lift: 0,
@@ -545,7 +583,6 @@ const OBJECTS: Entry[] = [
   },
   {
     id: 'milk-carton',
-    name: 'Milk carton',
     res: mmRes('milkCarton'),
     fit: CARTON_FIT,
     lift: 0,
@@ -584,7 +621,6 @@ const OBJECTS: Entry[] = [
   },
   {
     id: 'product-box',
-    name: 'Product box',
     res: mmRes('productBox'),
     fit: PRODUCT_BOX_FIT,
     lift: 0,
@@ -623,10 +659,10 @@ const OBJECTS: Entry[] = [
   },
   {
     id: 'mailer-box',
-    name: 'Mailer box',
     res: mmRes('mailerBox'),
     fit: MAILER_FIT,
     lift: 0,
+    tilt: 0.42,
     colorways: stock(
       ['kraft', 'Kraft', '#b5915f'],
       ['white', 'Bleached white', '#e8e4dd'],
@@ -657,7 +693,6 @@ const OBJECTS: Entry[] = [
   },
   {
     id: 'shopping-bag',
-    name: 'Shopping bag',
     res: mmRes('shoppingBag'),
     fit: BAG_FIT,
     lift: 0,
@@ -682,7 +717,6 @@ const OBJECTS: Entry[] = [
   },
   {
     id: 'poster-frame',
-    name: 'Framed poster',
     res: mmRes('posterFrame'),
     fit: POSTER_FIT,
     lift: 0,
@@ -701,7 +735,6 @@ const OBJECTS: Entry[] = [
   },
   {
     id: 'a-frame-sign',
-    name: 'A-frame sign',
     res: mmRes('aFrameSign'),
     fit: AFRAME_FIT,
     lift: 0,
@@ -846,7 +879,7 @@ function StageSlot({
     g.position.z = -1.4 * t
     g.scale.setScalar(scale)
     g.rotation.y = BASE_RY + (tumble.current.yaw - BASE_RY) * near
-    g.rotation.x = tumble.current.pitch * near
+    g.rotation.x = ((entry.tilt ?? 0) + tumble.current.pitch) * near
     g.updateMatrixWorld(true)
   }, -1)
 
@@ -933,11 +966,73 @@ function RowSlot({
   )
 }
 
+/** Calls `onFrame` once, from the first frame the canvas actually draws. */
+function OnFirstFrame({ onFrame }: { onFrame: () => void }) {
+  const done = useRef(false)
+  useFrame(() => {
+    if (done.current) return
+    done.current = true
+    onFrame()
+  })
+  return null
+}
+
+/**
+ * Whether `ref` is on screen in a visible tab - the condition for autoplay.
+ *
+ * The carousel used to advance on a bare interval from the moment it mounted:
+ * behind another tab, or scrolled down to the footer, it kept stepping,
+ * mounting models and compiling their shaders for nobody, and a visitor came
+ * back to find it three slides on from where they left it.
+ */
+function useOnScreen(ref: RefObject<HTMLElement | null>): boolean {
+  const [onScreen, setOnScreen] = useState(true)
+  useEffect(() => {
+    const el = ref.current
+    let intersecting = true
+    let visible = document.visibilityState !== 'hidden'
+    const update = () => setOnScreen(intersecting && visible)
+    const observer = el
+      ? new IntersectionObserver(([entry]) => {
+          intersecting = entry?.isIntersecting ?? true
+          update()
+        })
+      : null
+    if (el) observer?.observe(el)
+    const onVisibility = () => {
+      visible = document.visibilityState !== 'hidden'
+      update()
+    }
+    document.addEventListener('visibilitychange', onVisibility)
+    update()
+    return () => {
+      observer?.disconnect()
+      document.removeEventListener('visibilitychange', onVisibility)
+    }
+  }, [ref])
+  return onScreen
+}
+
 export default function CarouselScene() {
   const [active, setActive] = useState(0)
   // Finish selection per model, defaulting to each palette's first swatch.
   const [finish, setFinish] = useState<Record<string, string>>({})
-  const [auto, setAuto] = useState(true)
+  /*
+   * Autoplay: `null` until the visitor decides, which means "on, unless they
+   * asked their system for less motion". The pause button and any interaction
+   * set it explicitly.
+   */
+  const [auto, setAuto] = useState<boolean | null>(null)
+  // What the live region says. Only changes the visitor makes are announced:
+  // announcing every autoplay step read a new product name aloud every six
+  // seconds to anyone with a screen reader on the page.
+  const [announcement, setAnnouncement] = useState('')
+  // Set once the first frame is on screen, so autoplay's first dwell is spent
+  // on slide 01 rather than on an empty stage while the scene loads.
+  const [ready, setReady] = useState(false)
+  // After the first drag the gesture hint has done its job.
+  const [interacted, setInteracted] = useState(false)
+  const [copied, setCopied] = useState(false)
 
   // The ring position: `target` is unbounded so successive steps keep moving
   // in one direction across the seam; `anim` chases it.
@@ -967,13 +1062,19 @@ export default function CarouselScene() {
 
   /*
    * Auto-advance stops for good at the first sign of a visitor: `stop()` runs
-   * on every arrow, swatch and pointer-down on the stage, and a reduced-motion
-   * preference forces it off before it ever starts. There is no explicit
-   * play/pause control - so the only way to stop it without touching the
-   * carousel is the system preference (see the note in globals.css).
+   * on every arrow, swatch and pointer-down on the stage. A reduced-motion
+   * preference keeps it off from the start, and the pause button beside the
+   * hint stops or restarts it outright (WCAG 2.2.2 asks for exactly that on
+   * anything that moves on its own for more than five seconds). It also waits
+   * for the first frame, and holds while the stage is off screen or the tab is
+   * hidden - see `useOnScreen`.
    */
   const reducedMotion = usePrefersReducedMotion()
-  const playing = auto && !reducedMotion
+  const autoOn = auto ?? !reducedMotion
+  const sectionRef = useRef<HTMLElement>(null)
+  const stageRef = useRef<HTMLDivElement>(null)
+  const onScreen = useOnScreen(stageRef)
+  const playing = autoOn && ready && onScreen
 
   useEffect(() => {
     if (!playing) return
@@ -981,13 +1082,17 @@ export default function CarouselScene() {
     return () => clearInterval(t)
   }, [playing, step])
 
+  const announce = useCallback((i: number) => {
+    const to = ((i % N) + N) % N
+    setAnnouncement(`${nameOf(SHOWCASE[to]!)}, ${to + 1} of ${N}`)
+  }, [])
   const stop = () => setAuto(false)
   const go = (i: number) => {
     stop()
     goTo(i)
+    announce(i)
   }
 
-  const sectionRef = useRef<HTMLElement>(null)
   const fit = useCarouselFit(sectionRef)
 
   const drag = useRef<{
@@ -1007,7 +1112,6 @@ export default function CarouselScene() {
     vx: number
     at: number
   } | null>(null)
-  const stageRef = useRef<HTMLDivElement>(null)
   const moved = useRef(false)
 
   /**
@@ -1132,10 +1236,11 @@ export default function CarouselScene() {
       // space around them all do the same thing, every time. The strip is left
       // alone so its taps can pick out a specific thumbnail, and a click on
       // the staged device does nothing rather than resetting its pose.
-      if (d.zone === 'left') step(-1)
-      else if (d.zone === 'right') step(1)
+      if (d.zone === 'left') go(activeRef.current - 1)
+      else if (d.zone === 'right') go(activeRef.current + 1)
       return
     }
+    setInteracted(true)
     if (d.orbiting) return
     // Carry the flick a little past where the finger stopped, then settle on
     // whichever slot that lands nearest.
@@ -1143,6 +1248,7 @@ export default function CarouselScene() {
     target.current = Math.round(anim.current + flick)
     tumble.current = restingTumble()
     syncActive(((Math.round(target.current) % N) + N) % N)
+    announce(target.current)
   }
 
   /** A tap on a thumbnail only counts when the gesture did not become a drag. */
@@ -1158,7 +1264,19 @@ export default function CarouselScene() {
     return dev.colorways.find((c) => c.id === id)?.color ?? dev.colorways[0]!.color
   }
   const counter = `${String(active + 1).padStart(2, '0')} / ${N}`
-  const docsHref = DOCS_HREF.get(entry.id)
+  const docsHref = CATALOG.get(entry.id)?.href
+  const colorway = entry.colorways.find((c) => c.id === selected) ?? entry.colorways[0]!
+  const code = codeFor(entry, colorway)
+  const copyCode = () => {
+    if (!code) return
+    navigator.clipboard?.writeText(code).then(
+      () => {
+        setCopied(true)
+        setTimeout(() => setCopied(false), 1600)
+      },
+      () => {}
+    )
+  }
 
   /**
    * Which slots exist. Both windows are wider than what is on screen so a slot
@@ -1180,19 +1298,17 @@ export default function CarouselScene() {
               <path d="M15 18l-6-6 6-6" />
             </svg>
           </button>
-          {/* Announced politely: the strip is WebGL geometry, so without this
-              a screen-reader user pressing the arrows hears nothing change. */}
-          <p className="carousel-readout" aria-live="polite" aria-atomic="true">
+          <p className="carousel-readout">
             <span className="dim">{counter}</span> ·{' '}
             {/* The name is the way off the home page and into the object's own
                 reference page - the model on stage is the one thing a visitor
                 is already looking at, and until now nothing here was clickable. */}
             {docsHref ? (
               <Link className="carousel-readout-link" href={docsHref}>
-                {entry.name}
+                {nameOf(entry)}
               </Link>
             ) : (
-              entry.name
+              nameOf(entry)
             )}{' '}
             · {entry.res}
           </p>
@@ -1210,13 +1326,14 @@ export default function CarouselScene() {
             <Palette size={15} strokeWidth={1.75} aria-hidden />
             <span className="sr-only">Colors</span>
           </span>
-          <span className="carousel-swatches">
+          <span className="carousel-swatches" role="group" aria-label="Finish">
             {entry.colorways.map((c) => (
               <button
                 key={c.id}
                 type="button"
                 className="carousel-swatch"
                 aria-label={c.name}
+                aria-pressed={c.id === selected}
                 title={c.name}
                 data-selected={c.id === selected}
                 style={{ background: c.color }}
@@ -1231,9 +1348,19 @@ export default function CarouselScene() {
               />
             ))}
           </span>
-          <span className="carousel-finish-name">
-            {entry.colorways.find((c) => c.id === selected)?.name}
-          </span>
+          <span className="carousel-finish-name">{colorway.name}</span>
+          {code ? (
+            <button
+              type="button"
+              className="carousel-code"
+              onClick={copyCode}
+              title="Copy the JSX for this mockup"
+              aria-label={copied ? 'Code copied' : `Copy the code for this ${nameOf(entry)}`}
+            >
+              {copied ? <Check size={14} strokeWidth={2} aria-hidden /> : <CodeXml size={14} strokeWidth={2} aria-hidden />}
+              <span>{copied ? 'Copied' : 'Code'}</span>
+            </button>
+          ) : null}
         </div>
       </div>
 
@@ -1271,11 +1398,20 @@ export default function CarouselScene() {
             if (sectionRef.current) sectionRef.current.dataset.zone = ''
           }}
         >
+          {/*
+           * `always`: every slot moves itself from its own frame callback, so
+           * there is no prop change for an on-demand canvas to wake up for. The
+           * library still stops the loop whenever the stage is off screen or
+           * the tab is hidden.
+           */}
           <MockupCanvas
             controls={false}
             shadows={false}
+            frameloop="always"
+            label="3D mockups of devices and printed products, one on stage at a time"
             camera={{ position: [0, 0, CAMERA_Z], fov: DEFAULT_CAMERA_FOV }}
           >
+            <OnFirstFrame onFrame={() => setReady(true)} />
             <Ticker anim={anim} target={target} tumble={tumble} />
 
             {/* One group for the whole rig: the staged models, the gap between
@@ -1335,15 +1471,33 @@ export default function CarouselScene() {
       </div>
 
       <div className="carousel-foot">
-        <p className="carousel-hint">
-          Drag the model to spin it · drag either side to browse
+        <button
+          type="button"
+          className="carousel-play"
+          onClick={() => setAuto(!autoOn)}
+          aria-label={autoOn ? 'Pause autoplay' : 'Play autoplay'}
+        >
+          {autoOn ? <Pause size={13} strokeWidth={2.2} aria-hidden /> : <Play size={13} strokeWidth={2.2} aria-hidden />}
+          <span>{autoOn ? 'Pause' : 'Play'}</span>
+        </button>
+        {/* Shown until the first drag, then faded: once a visitor has turned
+            the model they know the gesture, and it was a second copy of the
+            badge on the stage. */}
+        <p className="carousel-hint" data-used={interacted}>
+          Drag to spin · drag the sides to browse
+        </p>
+        {/* Announced politely, and only for changes the visitor made: the
+            strip is WebGL geometry, so without this a screen-reader user
+            pressing the arrows hears nothing change. */}
+        <p className="sr-only" aria-live="polite" aria-atomic="true">
+          {announcement}
         </p>
         {/* The strip is geometry in the canvas, so keyboard and screen-reader
             users get the same jumps from real buttons here. */}
         <div className="sr-only">
           {SHOWCASE.map((dev, i) => (
             <button key={dev.id} type="button" onClick={() => go(i)}>
-              Show {dev.name}
+              Show {nameOf(dev)}
             </button>
           ))}
         </div>

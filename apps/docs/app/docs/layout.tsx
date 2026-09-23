@@ -1,4 +1,4 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import type { ReactNode } from 'react'
 import { RootProvider } from 'fumadocs-ui/provider/next'
 import { DocsLayout } from 'fumadocs-ui/layouts/docs'
@@ -22,6 +22,16 @@ export const metadata: Metadata = {
   },
   description: DOCS_DESCRIPTION,
   ...socialMetadata({ title: 'React 3D Mockups documentation', description: DOCS_DESCRIPTION }),
+}
+
+// `themeColor` lives on `viewport` in this version of Next. The docs follow
+// the system colour scheme (Fumadocs' light and dark page backgrounds, see
+// docs.css), so the browser chrome does too.
+export const viewport: Viewport = {
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#ffffff' },
+    { media: '(prefers-color-scheme: dark)', color: '#121212' },
+  ],
 }
 
 // Root layout for the documentation. It is deliberately separate from the

@@ -2,7 +2,6 @@
 
 import { useCallback, useState } from 'react'
 import Link from 'next/link'
-import { ExampleBadge } from '../_shared/badge'
 import { lazyScene } from '../_shared/stage'
 import { MothMark } from './arcade-art'
 import { GAME, LEVELS, OST, findLevel, type Level } from './arcade-data'
@@ -39,7 +38,6 @@ export function Arcade() {
           <span>{GAME.studio}</span>
         </nav>
         <div className="ar-top-right">
-          <ExampleBadge className="ar-badge" tabbied={false} />
           <span className="ar-cta">Wishlist · {GAME.price}</span>
         </div>
       </header>

@@ -3,10 +3,10 @@
 import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { ChevronDown } from 'lucide-react'
+import { GITHUB_URL } from '@/lib/site'
 import { ExamplesMenu } from './examples-menu'
-import { SITE_EXAMPLES } from './site-examples'
-
-const GITHUB_URL = 'https://github.com/area-is/3d-mockups'
+import { SITE_EXAMPLES, SITE_EXAMPLE_GROUPS } from './site-examples'
 
 function GitHubMark() {
   return (
@@ -24,6 +24,11 @@ function GitHubMark() {
  * disclosure button opening a full-width sheet under the header. The links used
  * to be `display: none` on narrow screens, which left phones with no way to
  * reach the docs or the examples at all; the sheet is what puts them back.
+ *
+ * The sheet leads with the three places most visitors are going - the docs,
+ * the gallery of every model, the repo - and folds the twelve examples into
+ * one disclosure. Listed flat they were a screen of brand names, and the docs
+ * link was one row among thirteen.
  */
 export function SiteNav() {
   const [open, setOpen] = useState(false)
@@ -66,6 +71,9 @@ export function SiteNav() {
         <Link href="/docs" className="nav-plain">
           Docs
         </Link>
+        <Link href="/docs/gallery" className="nav-plain">
+          Gallery
+        </Link>
         <ExamplesMenu />
       </span>
 
@@ -107,11 +115,33 @@ export function SiteNav() {
         <Link href="/docs" className="nav-sheet-link">
           Docs
         </Link>
-        {SITE_EXAMPLES.map((example) => (
-          <Link key={example.href} href={example.href} className="nav-sheet-link">
-            {example.title} example
-          </Link>
-        ))}
+        <Link href="/docs/gallery" className="nav-sheet-link">
+          Gallery
+          <span className="nav-sheet-note">all models</span>
+        </Link>
+        <a href={GITHUB_URL} target="_blank" rel="noreferrer" className="nav-sheet-link">
+          GitHub
+          <GitHubMark />
+        </a>
+        <details className="nav-sheet-group">
+          <summary className="nav-sheet-link">
+            Examples
+            <span className="nav-sheet-note">{SITE_EXAMPLES.length}</span>
+            <ChevronDown className="nav-sheet-caret" size={16} strokeWidth={2} aria-hidden />
+          </summary>
+          {SITE_EXAMPLE_GROUPS.map((group) => (
+            <div key={group.label} className="nav-sheet-examples" role="group" aria-label={group.label}>
+              <span className="nav-sheet-heading" aria-hidden>
+                {group.label}
+              </span>
+              {group.examples.map((example) => (
+                <Link key={example.href} href={example.href} className="nav-sheet-sublink">
+                  {example.title}
+                </Link>
+              ))}
+            </div>
+          ))}
+        </details>
       </div>
     </nav>
   )

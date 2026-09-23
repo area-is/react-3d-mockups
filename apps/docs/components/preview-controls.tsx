@@ -1,6 +1,7 @@
 'use client'
 
 import * as React from 'react'
+import { colorInputValue } from './mockup-explorer/controls'
 import {
   AFrameSignMockup,
   BillboardMockup,
@@ -651,7 +652,7 @@ function ControlInput({
       <input
         type="color"
         aria-label={title}
-        value={typeof shown === 'string' ? shown : '#8890a0'}
+        value={colorInputValue(typeof shown === 'string' ? shown : '#8890a0')}
         onChange={(event) => onChange(event.target.value)}
         style={{ width: 18, height: 18, padding: 0, border: 'none', background: 'transparent', cursor: 'pointer' }}
       />

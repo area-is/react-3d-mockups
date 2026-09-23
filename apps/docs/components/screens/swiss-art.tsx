@@ -297,7 +297,7 @@ export function Micro({ children, style }: { children: ReactNode; style?: CSSPro
 /** The one big thing on the sheet. Flush left, tight, never centred. */
 function Title({ children, style }: { children: ReactNode; style?: CSSProperties }) {
   return (
-    <h2
+    <div
       style={{
         margin: 0,
         fontSize: '13cqmin',
@@ -310,7 +310,7 @@ function Title({ children, style }: { children: ReactNode; style?: CSSProperties
       }}
     >
       {children}
-    </h2>
+    </div>
   )
 }
 

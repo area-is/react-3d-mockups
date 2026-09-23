@@ -17,6 +17,7 @@
     "typecheck": "npm run typecheck -w react-3d-mockups && npm run typecheck -w docs",
     "test": "npm run test -w react-3d-mockups",
     "visual": "node apps/docs/scripts/visual-check.mjs",
+    "bench": "node apps/docs/scripts/bench.mjs",
     "devices:check": "node packages/react/scripts/sync-device-table.mjs",
     "devices:sync": "node packages/react/scripts/sync-device-table.mjs --write"
   },

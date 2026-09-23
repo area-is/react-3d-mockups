@@ -2,6 +2,11 @@ import localFont from 'next/font/local'
 
 // Variable fonts shared by every root layout (site, docs, embedded). Weights
 // stay flexible for later, while the UI sticks to 100-increment stops.
+//
+// Inter is subset to the Latin the site actually sets (see
+// app/fonts/LICENSES.md for the ranges): the full family shipped Cyrillic,
+// Greek and Vietnamese too, 352 KB on every page for a site written in
+// English. Anything outside the subset falls back glyph by glyph.
 export const inter = localFont({
   src: '../app/fonts/InterVariable.woff2',
   weight: '100 900',
@@ -34,6 +39,11 @@ export const fraunces = localFont({
   weight: '100 900',
   display: 'swap',
   variable: '--font-fraunces',
+  // Only the demo artwork sets Fraunces, so it is not preloaded: a preload
+  // fetched both files on every page, prose pages included, before anything
+  // needed them. Without one the browser loads a face when text in it is
+  // first laid out - on the home page, once the carousel's artwork mounts.
+  preload: false,
 })
 
 /**
@@ -52,4 +62,7 @@ export const notoSansKR = localFont({
   display: 'swap',
   variable: '--font-noto-sans-kr',
   declarations: [{ prop: 'unicode-range', value: 'U+AC00-D7A3, U+1100-11FF, U+3130-318F' }],
+  // Not preloaded either: a preload fetches the file whatever the
+  // `unicode-range` says, which defeated the range on every page.
+  preload: false,
 })

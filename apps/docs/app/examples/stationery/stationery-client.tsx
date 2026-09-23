@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { ExampleBadge, TabbiedLink } from '../_shared/badge'
+import { TabbiedLink } from '../_shared/badge'
 import { lazyScene } from '../_shared/stage'
 import { DEFAULT_SUITE, FACES, PALETTES, names, type Suite } from './stationery-data'
 
@@ -45,7 +45,6 @@ export function Stationery() {
           <span>Journal</span>
         </nav>
         <div className="am-top-right">
-          <ExampleBadge className="am-badge" />
           <span className="am-cta">Order samples</span>
         </div>
       </header>

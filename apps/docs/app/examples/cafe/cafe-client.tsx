@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { ExampleBadge, TabbiedLink } from '../_shared/badge'
+import { TabbiedLink } from '../_shared/badge'
 import { lazyScene } from '../_shared/stage'
 import { BAKES, DRINKS, PAINTS, SHOP, price, type MenuItem, type PaintId } from './cafe-data'
 
@@ -52,7 +52,6 @@ export function Cafe() {
           <span>Find us</span>
         </nav>
         <div className="cf-top-right">
-          <ExampleBadge className="cf-badge" />
           <span className="cf-cta">Order ahead</span>
         </div>
       </header>

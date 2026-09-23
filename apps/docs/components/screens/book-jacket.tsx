@@ -198,7 +198,7 @@ export function JacketCover({ cloth }: { cloth: string }) {
       {/* the type block sits over the photograph, so it is its own layer */}
       <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', gap: '3cqw' }}>
         <Micro style={{ color: t.accent }}>A memoir</Micro>
-        <h2
+        <div
           style={{
             margin: 0,
             fontSize: '15.5cqw',
@@ -209,7 +209,7 @@ export function JacketCover({ cloth }: { cloth: string }) {
           }}
         >
           {TITLE.join('\n')}
-        </h2>
+        </div>
         <span style={{ fontSize: '5.4cqw', fontWeight: 500, letterSpacing: '-0.01em', opacity: 0.62 }}>
           {TITLE_KO}
         </span>

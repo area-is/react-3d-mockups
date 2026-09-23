@@ -1,7 +1,7 @@
 'use client'
 
-import { Suspense } from 'react'
-import { useSearchParams } from 'next/navigation'
+import { Suspense, createContext, useContext } from 'react'
+import { usePathname, useSearchParams } from 'next/navigation'
 import {
   AFrameSignMockup,
   BillboardMockup,
@@ -68,6 +68,31 @@ const parseStatusBar = (value: string | null): boolean | Record<string, unknown>
   } catch {
     return undefined
   }
+}
+
+/**
+ * `screen=context`: a screen that reads React context provided ABOVE the
+ * mockup - the page's own provider, and the Next router's. A screen renders in
+ * its own React root (drei's <Html>), which starts with no context at all, so
+ * without the library's bridge both read as missing. The visual check never
+ * exercised this; `bench`-style scripts read `[data-context-probe]`.
+ */
+const ProbeContext = createContext<string | null>(null)
+
+function ContextProbe() {
+  const value = useContext(ProbeContext)
+  const pathname = usePathname()
+  return (
+    <div
+      data-context-probe={value ?? 'missing'}
+      data-pathname={pathname ?? 'missing'}
+      style={{ width: '100%', height: '100%', display: 'grid', placeItems: 'center', background: value ? '#1f7a3a' : '#9b1c1c', color: '#fff', font: '700 28px/1.3 system-ui, sans-serif', textAlign: 'center' }}
+    >
+      context: {value ?? 'missing'}
+      <br />
+      router: {pathname ?? 'missing'}
+    </div>
+  )
 }
 
 const PLAIN = {
@@ -149,7 +174,9 @@ function regionProbe(Mockup: object): React.ReactNode {
  *   rx, ry      device rotation in degrees         (default 0, 0)
  *   dist        camera distance in world units     (default per device)
  *   cy          camera height                      (default 0)
- *   screen      dark | gradient                    (default gradient)
+ *   screen      dark | light | green | clear | context | gradient
+ *                                                  (default gradient; `context` reports
+ *                                                  whether React context reaches the glass)
  *   shadows     1 | 0                              (default 0 - clean poses)
  *   controls    1 | 0                              (default 0 - drag tests)
  *   statusBar   1 | 0 | JSON StatusBarContent      (phones, foldables, tablets)
@@ -172,6 +199,7 @@ function HarnessScene() {
     // background is FOR - with it, content that doesn't cover every pixel
     // shows the page straight through the glass.
     params.get('screen') === 'clear' ? null :
+    params.get('screen') === 'context' ? <ContextProbe /> :
     params.get('screen') === 'dark' ? (
       <div style={{ width: '100%', height: '100%', background: '#000' }} />
     ) : params.get('screen') === 'light' ? (
@@ -564,7 +592,9 @@ function HarnessStage() {
   return (
     <div id="harness-stage" style={{ width: '100vw', height: '100vh', background: bg }}>
       {bg === 'transparent' ? <style>{'html,body{background:transparent!important}'}</style> : null}
-      <HarnessScene />
+      <ProbeContext.Provider value="bridged">
+        <HarnessScene />
+      </ProbeContext.Provider>
     </div>
   )
 }

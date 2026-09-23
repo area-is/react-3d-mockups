@@ -35,9 +35,9 @@ export function BookCoverArt() {
         {/* explicit color: the docs site's global heading styles would
             otherwise override the cover's inherited cream and render the
             title near-black on the navy jacket */}
-        <h1 style={{ fontSize: 44, lineHeight: 1.15, fontWeight: 500, margin: '26px 0 0', color: '#e8dcc0' }}>
+        <div style={{ fontSize: 44, lineHeight: 1.15, fontWeight: 500, margin: '26px 0 0', color: '#e8dcc0' }}>
           The Atlas of Quiet Places
-        </h1>
+        </div>
         <svg width="86" height="86" viewBox="0 0 86 86" style={{ margin: 'auto 0' }} aria-hidden>
           <circle cx="43" cy="43" r="34" fill="none" stroke="#b89b5e" strokeWidth="1.5" />
           <path d="M43 13v60M13 43h60M22 22l42 42M64 22L22 64" stroke="#b89b5e" strokeWidth="0.8" />
@@ -132,9 +132,9 @@ export function BrochureFrontArt() {
         <path d="M0 40 L22 12 L34 26 L52 4 L70 30 L82 18 L100 40" fill="none" stroke="#e8b64c" strokeWidth="2" strokeLinejoin="round" />
         <circle cx="78" cy="8" r="5" fill="#f0ead6" />
       </svg>
-      <h2 style={{ fontSize: 34, lineHeight: 1.05, margin: '14px 0 8px', fontWeight: 700, color: '#f0ead6' }}>
+      <div style={{ fontSize: 34, lineHeight: 1.05, margin: '14px 0 8px', fontWeight: 700, color: '#f0ead6' }}>
         Trail Guide
-      </h2>
+      </div>
       <div style={{ fontSize: 12, opacity: 0.85 }}>2026 season · free map inside</div>
     </div>
   )

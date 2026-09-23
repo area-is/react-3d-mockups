@@ -11,7 +11,8 @@ import { asset } from '@/lib/base-path.mjs'
  * ⚠️ This is NOT the robots.txt that governs this site. Under `basePath` it is
  * served at `/react-3d-mockups/robots.txt`, and a crawler only ever reads
  * `https://area.is/robots.txt` - a path this Worker never sees. The rules
- * below have to be mirrored, prefixed, in whatever serves the apex:
+ * below have to be mirrored, prefixed, in whatever serves the apex (today the
+ * stand-in Worker in `infra/apex/worker.js`, see DEPLOYMENT.md):
  *
  * ```
  * Disallow: /react-3d-mockups/harness

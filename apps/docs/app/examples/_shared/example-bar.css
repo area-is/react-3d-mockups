@@ -1,0 +1,128 @@
+/*
+ * The bar across the top of every example (example-bar.tsx). In the site's
+ * own dark and type rather than the example's, so it reads as the frame
+ * around the page and not as part of the brand the page is dressed as.
+ * Not sticky: several examples pin their own stage or header, and a second
+ * sticky strip would sit on top of them.
+ */
+.ex-bar {
+  position: relative;
+  z-index: 60;
+  /* A step above the site's --bg: half the examples are dark themselves,
+     and on those the bar at the page's own black melted into the header. */
+  background: #111318;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  color: var(--muted);
+  font-family: var(--font-sans);
+  font-size: 13px;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+}
+
+.ex-bar-inner {
+  display: flex;
+  /* Never wider than the screen: on anything narrower than the one-row
+     layout below allows for, the links drop to a second row instead. */
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 12px;
+  max-width: 1240px;
+  min-height: 38px;
+  margin: 0 auto;
+  padding: 4px 32px;
+}
+
+.ex-bar a {
+  color: var(--text);
+  transition: color 0.15s ease;
+}
+
+.ex-bar a:hover {
+  color: var(--accent-2);
+}
+
+.ex-bar-home {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  flex: none;
+  font-weight: 650;
+  white-space: nowrap;
+}
+
+.ex-bar-tag {
+  flex: none;
+  padding: 2px 8px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 999px;
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.ex-bar-note {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ex-bar-links {
+  display: flex;
+  gap: 16px;
+  flex: none;
+  margin-left: auto;
+  white-space: nowrap;
+}
+
+.ex-bar-links a {
+  font-weight: 600;
+}
+
+.ex-bar-narrow {
+  display: none;
+}
+
+/* The same line at phone width: the sentence goes and the links keep one
+   word each. One row down to 360px; below that the mark goes too. */
+@media (max-width: 760px) {
+  .ex-bar-inner {
+    column-gap: 9px;
+    padding: 4px 14px;
+  }
+
+  .ex-bar-note,
+  .ex-bar-wide {
+    display: none;
+  }
+
+  .ex-bar-narrow {
+    display: inline;
+  }
+
+  .ex-bar-links {
+    gap: 13px;
+  }
+}
+
+@media (max-width: 359px) {
+  .ex-bar-home svg {
+    display: none;
+  }
+
+  .ex-bar-inner {
+    column-gap: 7px;
+    padding: 4px 10px;
+  }
+
+  .ex-bar-tag {
+    padding: 2px 6px;
+    letter-spacing: 0.02em;
+  }
+
+  .ex-bar-links {
+    gap: 10px;
+  }
+}

@@ -3,9 +3,12 @@
 import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { ChevronDown } from 'lucide-react'
-import { SITE_EXAMPLES } from './site-examples'
+import { SITE_EXAMPLE_GROUPS } from './site-examples'
 
-/** "Examples" header dropdown: the standalone example pages, one row each. */
+/**
+ * "Examples" header dropdown: the standalone example pages, one row each,
+ * under a small heading per use case (see site-examples.ts for why).
+ */
 export function ExamplesMenu() {
   const [open, setOpen] = useState(false)
   const ref = useRef<HTMLSpanElement>(null)
@@ -37,16 +40,26 @@ export function ExamplesMenu() {
       </button>
       {open ? (
         <span className="nav-menu-pop" role="menu">
-          {SITE_EXAMPLES.map((example) => (
-            <Link
-              key={example.href}
-              href={example.href}
-              className="nav-menu-item"
-              role="menuitem"
-              onClick={() => setOpen(false)}
-            >
-              {example.title}
-            </Link>
+          {SITE_EXAMPLE_GROUPS.map((group) => (
+            // The heading is for the eye; the group's label is what a screen
+            // reader announces on entering it, so the heading itself is hidden
+            // rather than read twice.
+            <span key={group.label} className="nav-menu-group" role="group" aria-label={group.label}>
+              <span className="nav-menu-heading" aria-hidden>
+                {group.label}
+              </span>
+              {group.examples.map((example) => (
+                <Link
+                  key={example.href}
+                  href={example.href}
+                  className="nav-menu-item"
+                  role="menuitem"
+                  onClick={() => setOpen(false)}
+                >
+                  {example.title}
+                </Link>
+              ))}
+            </span>
           ))}
         </span>
       ) : null}

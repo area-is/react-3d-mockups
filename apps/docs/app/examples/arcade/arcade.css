@@ -79,26 +79,6 @@
   gap: 14px;
 }
 
-.ar-badge {
-  font-size: 12.5px;
-  font-weight: 500;
-  white-space: nowrap;
-  color: rgba(242, 239, 230, 0.6);
-  border: 1px solid var(--ar-line);
-  border-radius: 999px;
-  padding: 6px 13px;
-  background: rgba(0, 0, 0, 0.25);
-}
-
-.ar-badge a {
-  font-weight: 600;
-  transition: color 0.15s ease;
-}
-
-.ar-badge a:hover {
-  color: #fff;
-}
-
 .ar-cta {
   font-size: 14px;
   font-weight: 800;
@@ -351,7 +331,6 @@
     padding: 18px 20px 0;
   }
 
-  .ar-badge,
   .ar-nav {
     display: none;
   }

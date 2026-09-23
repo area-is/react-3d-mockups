@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { usePrefersReducedMotion } from 'react-3d-mockups'
-import { ExampleBadge } from '../_shared/badge'
 import { lazyScene } from '../_shared/stage'
 import { Crest } from './matchday-art'
 import { CLUB, FIXTURES, MATCH, clock } from './matchday-data'
@@ -52,7 +51,6 @@ export function Matchday() {
           <span>Academy</span>
         </nav>
         <div className="md-top-right">
-          <ExampleBadge className="md-badge" tabbied={false} />
           <span className="md-cta">Season tickets</span>
         </div>
       </header>

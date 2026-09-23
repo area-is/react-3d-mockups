@@ -82,27 +82,6 @@
   gap: 14px;
 }
 
-.ps-badge {
-  font-size: 12.5px;
-  font-weight: 500;
-  white-space: nowrap;
-  color: var(--ps-muted);
-  border: 1px solid var(--ps-line);
-  border-radius: 999px;
-  padding: 6px 13px;
-  background: rgba(255, 255, 255, 0.5);
-  transition: color 0.15s ease, border-color 0.15s ease;
-}
-
-.ps-badge a {
-  font-weight: 600;
-  transition: color 0.15s ease;
-}
-
-.ps-badge a:hover {
-  color: var(--ps-ink);
-}
-
 .ps-foot a[href^='https://tabbied.com'] {
   font-weight: 600;
   color: var(--ps-ink);
@@ -628,9 +607,7 @@
     padding: 18px 20px 0;
   }
 
-  /* The badge and the shop nav both compete with the wordmark for one
-     line; the footer says what the badge says. */
-  .ps-badge,
+  /* The shop nav competes with the wordmark and the bag for one line. */
   .ps-nav {
     display: none;
   }

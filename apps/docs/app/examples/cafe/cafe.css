@@ -76,26 +76,6 @@
   gap: 14px;
 }
 
-.cf-badge {
-  font-size: 12.5px;
-  font-weight: 500;
-  white-space: nowrap;
-  color: var(--cf-muted);
-  border: 1px solid var(--cf-line);
-  border-radius: 999px;
-  padding: 6px 13px;
-  background: rgba(255, 255, 255, 0.45);
-}
-
-.cf-badge a {
-  font-weight: 600;
-  transition: color 0.15s ease;
-}
-
-.cf-badge a:hover {
-  color: var(--cf-ink);
-}
-
 .cf-cta {
   font-size: 14px;
   font-weight: 700;
@@ -432,7 +412,6 @@
     padding: 18px 20px 0;
   }
 
-  .cf-badge,
   .cf-nav {
     display: none;
   }

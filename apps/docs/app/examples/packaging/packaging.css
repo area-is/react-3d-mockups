@@ -82,26 +82,6 @@
   gap: 14px;
 }
 
-.pk-badge {
-  font-size: 12.5px;
-  font-weight: 500;
-  white-space: nowrap;
-  color: var(--pk-muted);
-  border: 1px solid var(--pk-line);
-  border-radius: 999px;
-  padding: 6px 13px;
-  background: rgba(255, 255, 255, 0.45);
-}
-
-.pk-badge a {
-  font-weight: 600;
-  transition: color 0.15s ease;
-}
-
-.pk-badge a:hover {
-  color: var(--pk-ink);
-}
-
 .pk-cta {
   font-size: 14px;
   font-weight: 700;
@@ -519,7 +499,6 @@
     padding: 18px 20px 0;
   }
 
-  .pk-badge,
   .pk-nav {
     display: none;
   }

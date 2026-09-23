@@ -8,7 +8,7 @@ import { SurfaceArt } from '../screens/surface-art'
 import { carouselArtName, carouselArtNode } from './carousel-art'
 import { SCREEN_SOURCES, SOURCE_PARTS } from '@/lib/demo-sources.generated'
 import { COMPONENT_PROPS, SHARED_PROPS, type PropDoc } from '@/lib/prop-tables.generated'
-import { ColorRow, NumberField, PanelGlyph, PropRow, ResetGlyph, Segmented, Switch } from './controls'
+import { ColorRow, NumberField, PanelGlyph, PropRow, ResetGlyph, Segmented, Switch, colorInputValue } from './controls'
 import { editableProp, propAttribute, same, type EditableProp } from './prop-controls'
 import { LazyScene } from '../lazy-scene'
 import { EXPLORERS, type ExplorerSpec } from './registry'
@@ -1230,7 +1230,7 @@ function MockupExplorerImpl({
                   type="color"
                   className="mx-color"
                   aria-label="custom background"
-                  value={p.background || '#101318'}
+                  value={colorInputValue(p.background || '#101318')}
                   onChange={(e) => set('background', e.target.value)}
                 />
               </span>

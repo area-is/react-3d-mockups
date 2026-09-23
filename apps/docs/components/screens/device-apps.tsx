@@ -12,6 +12,13 @@ import { asset } from '@/lib/base-path.mjs'
  * and a digital newspaper across the Fold's two pages. They are ordinary
  * React components - which is the point of a live DOM screen - and the
  * newspaper's photographs are generated (see `/art/news-*.webp`).
+ *
+ * No headings or landmarks, in these or any of the screen art: every tag here
+ * lands in the host page's DOM. Set as `<h1>`/`<article>`/`<nav>`, the laptop's
+ * headline became a second `<h1>` on the home page and the newspaper its main
+ * `<article>` - for crawlers and reader modes, which the library's
+ * `aria-hidden` on the screen does not reach. The type is all inline-styled,
+ * so plain `div`s set identically.
  */
 
 /* ------------------------------------------------------------------ */
@@ -135,7 +142,7 @@ export function SwissSite() {
         userSelect: 'none',
       }}
     >
-      <header
+      <div
         style={{
           display: 'flex',
           alignItems: 'center',
@@ -148,12 +155,12 @@ export function SwissSite() {
           <span style={{ width: 14, height: 14, background: SITE_ACCENT, display: 'inline-block' }} />
           Raster Studio
         </div>
-        <nav style={{ display: 'flex', gap: 34, fontSize: 15, fontWeight: 500 }}>
+        <div style={{ display: 'flex', gap: 34, fontSize: 15, fontWeight: 500 }}>
           <span style={{ borderBottom: `2px solid ${SITE_INK}`, paddingBottom: 2 }}>Work</span>
           <span>Studio</span>
           <span>Journal</span>
           <span>Contact</span>
-        </nav>
+        </div>
         <span
           style={{
             background: SITE_INK,
@@ -166,7 +173,7 @@ export function SwissSite() {
         >
           Start a project →
         </span>
-      </header>
+      </div>
 
       <section style={{ display: 'grid', gridTemplateColumns: '7fr 5fr', gap: 48, padding: '52px 48px 40px' }}>
         <div style={{ display: 'flex', flexDirection: 'column' }}>
@@ -174,9 +181,9 @@ export function SwissSite() {
             <span style={{ color: SITE_ACCENT }}>01</span>
             <span style={{ color: SITE_MUTED }}>Design studio · Zürich — Lisbon</span>
           </div>
-          <h1 style={{ margin: '22px 0 24px', fontSize: 76, lineHeight: 0.97, fontWeight: 700, letterSpacing: '-0.045em', color: SITE_INK }}>
+          <div style={{ margin: '22px 0 24px', fontSize: 76, lineHeight: 0.97, fontWeight: 700, letterSpacing: '-0.045em', color: SITE_INK }}>
             Systems that make good work inevitable.
-          </h1>
+          </div>
           <p style={{ margin: 0, maxWidth: 540, fontSize: 19, lineHeight: 1.45, color: '#3a3833' }}>
             We design identities, interfaces and the grids underneath them, for teams who would rather ship one
             coherent thing than a hundred clever ones.
@@ -209,7 +216,7 @@ export function SwissSite() {
 
       <section style={{ flex: 1, minHeight: 0, display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 24, padding: '0 48px' }}>
         {cards.map(([pattern, seed, title, meta, ground, accent]) => (
-          <article key={seed} style={{ display: 'flex', flexDirection: 'column', gap: 12, minHeight: 0 }}>
+          <div key={seed} style={{ display: 'flex', flexDirection: 'column', gap: 12, minHeight: 0 }}>
             <div style={{ flex: 1, minHeight: 0, borderRadius: 6, overflow: 'hidden', background: ground }}>
               <Pattern pattern={pattern} seed={`raster-${seed}`} palette={[ground, SITE_INK, accent]} grid="4x6" />
             </div>
@@ -217,7 +224,7 @@ export function SwissSite() {
               <strong style={{ fontWeight: 600 }}>{title}</strong>
               <span style={{ color: SITE_MUTED }}>{meta}</span>
             </div>
-          </article>
+          </div>
         ))}
       </section>
 
@@ -323,7 +330,7 @@ export function Newspaper() {
       <div style={{ ...rule(2), borderBottom: `1px solid ${NEWS_INK}`, marginTop: 8, padding: '10px 0 9px', textAlign: 'center' }}>
         <div style={{ fontFamily: SERIF, fontSize: 58, lineHeight: 1, letterSpacing: '-0.01em' }}>The Meridian</div>
       </div>
-      <nav
+      <div
         style={{
           display: 'flex',
           justifyContent: 'space-between',
@@ -339,14 +346,14 @@ export function Newspaper() {
             {section}
           </span>
         ))}
-      </nav>
+      </div>
 
       {/* One row, pinned to the page: the lead's body runs off the foot of the
           page the way a jump story does, rather than pushing the row taller
           than the screen and the markets strip off it. */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gridTemplateRows: 'minmax(0, 1fr)', columnGap: 46, flex: 1, minHeight: 0, paddingTop: 16 }}>
         {/* the left page: the lead */}
-        <article style={{ minWidth: 0, minHeight: 0, overflow: 'hidden' }}>
+        <div style={{ minWidth: 0, minHeight: 0, overflow: 'hidden' }}>
           <div style={{ height: 222, overflow: 'hidden' }}>
             <Photo src={asset('/art/news-lead.webp')} position="50% 45%" />
           </div>
@@ -356,9 +363,9 @@ export function Newspaper() {
           <div style={{ marginTop: 14 }}>
             <Kicker>Transit</Kicker>
           </div>
-          <h1 style={{ fontFamily: SERIF, fontWeight: 400, fontSize: 33, lineHeight: 1.08, letterSpacing: '-0.012em', margin: '6px 0 10px', color: NEWS_INK }}>
+          <div style={{ fontFamily: SERIF, fontWeight: 400, fontSize: 33, lineHeight: 1.08, letterSpacing: '-0.012em', margin: '6px 0 10px', color: NEWS_INK }}>
             City&rsquo;s first light-rail line opens to dawn crowds and a decade of promises
-          </h1>
+          </div>
           <p style={{ fontFamily: SERIF, fontSize: 14.5, lineHeight: 1.4, color: '#33312c', margin: '0 0 9px' }}>
             Twelve years after the referendum, the Green Line carried 41,000 riders on its first morning. The
             second phase breaks ground in spring.
@@ -384,27 +391,27 @@ export function Newspaper() {
               phase north to the hospital campus is due to start construction in April.
             </p>
           </div>
-        </article>
+        </div>
 
         {/* the right page: the shorts, the list, the markets */}
-        <aside style={{ minWidth: 0, minHeight: 0, display: 'flex', flexDirection: 'column' }}>
+        <div style={{ minWidth: 0, minHeight: 0, display: 'flex', flexDirection: 'column' }}>
           {SECOND.map((story) => (
-            <article
+            <div
               key={story.title}
               style={{ display: 'grid', gridTemplateColumns: '1fr 120px', gap: 14, paddingBottom: 10, marginBottom: 10, borderBottom: '1px solid #d6d1c6' }}
             >
               <div style={{ minWidth: 0 }}>
                 <Kicker>{story.kicker}</Kicker>
-                <h2 style={{ fontFamily: SERIF, fontWeight: 400, fontSize: 18, lineHeight: 1.15, letterSpacing: '-0.01em', margin: '4px 0 5px', color: NEWS_INK }}>
+                <div style={{ fontFamily: SERIF, fontWeight: 400, fontSize: 18, lineHeight: 1.15, letterSpacing: '-0.01em', margin: '4px 0 5px', color: NEWS_INK }}>
                   {story.title}
-                </h2>
+                </div>
                 <p style={{ margin: 0, fontSize: 11, lineHeight: 1.38, color: '#33312c' }}>{story.standfirst}</p>
                 <div style={{ fontSize: 10.5, color: NEWS_MUTED, marginTop: 5 }}>By {story.byline}</div>
               </div>
               <div style={{ height: 94, overflow: 'hidden' }}>
                 <Photo src={story.photo} position={story.position} />
               </div>
-            </article>
+            </div>
           ))}
           <div>
             <div style={{ ...rule(2), paddingTop: 8, fontSize: 11, fontWeight: 700, letterSpacing: '-0.01em' }}>Most read</div>
@@ -430,7 +437,7 @@ export function Newspaper() {
               Brent <strong style={{ color: NEWS_RED }}>−1.1%</strong>
             </span>
           </div>
-        </aside>
+        </div>
       </div>
     </div>
   )

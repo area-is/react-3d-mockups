@@ -7,7 +7,7 @@ import { Download, Shuffle } from 'lucide-react'
 import { TabbiedPattern, type TabbiedPatternHandle } from 'tabbied/react'
 import { LazyScene } from '@/components/lazy-scene'
 import { SceneBoundary } from '@/components/scene-boundary'
-import { ExampleBadge, TabbiedLink } from '../_shared/badge'
+import { TabbiedLink } from '../_shared/badge'
 import {
   BLEEDS,
   DEFAULT_ORDER,
@@ -96,7 +96,6 @@ export function PrintShop() {
           <span className="ps-nav-link">Studio</span>
         </nav>
         <div className="ps-top-right">
-          <ExampleBadge className="ps-badge" />
           <span className="ps-bag" aria-live="polite">
             Bag · {bag}
           </span>

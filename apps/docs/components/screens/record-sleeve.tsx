@@ -152,7 +152,7 @@ export function SleeveCover() {
           <Micro style={{ color: BOARD, opacity: 0.8 }}>{CATALOG} · Stereo</Micro>
         </div>
         <div style={{ height: '0.5cqw', background: BOARD, flex: 'none', opacity: 0.9 }} />
-        <h2
+        <div
           style={{
             margin: 0,
             marginTop: '1.5cqw',
@@ -165,7 +165,7 @@ export function SleeveCover() {
           }}
         >
           {TITLE.join('\n')}
-        </h2>
+        </div>
         <span
           style={{
             fontSize: '5cqw',

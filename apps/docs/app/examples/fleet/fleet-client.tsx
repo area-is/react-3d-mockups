@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { ExampleBadge, TabbiedLink } from '../_shared/badge'
+import { TabbiedLink } from '../_shared/badge'
 import { lazyScene } from '../_shared/stage'
 import { COMPANY, COVERAGES, LIVERIES, STATS, type CoverageId, type Livery, type LiveryId } from './fleet-data'
 
@@ -33,7 +33,6 @@ export function Fleet() {
           <span>Track</span>
         </nav>
         <div className="fl-top-right">
-          <ExampleBadge className="fl-badge" />
           <span className="fl-cta">Get a quote</span>
         </div>
       </header>
