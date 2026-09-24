@@ -149,14 +149,54 @@ async function CodeBlock({ code, lang }: { code: string; lang: string }) {
   })
 }
 
+/**
+ * Install and a first component, straight under the carousel: someone who
+ * has just watched a model spin is one copy away from their own.
+ */
+function QuickStart() {
+  return (
+    <section className="quickstart">
+      <div className="quickstart-copy">
+        <h2>Quick start</h2>
+        <p>
+          One component. Anything you pass as children shows up on the glass, live. three.js,
+          react-three-fiber and drei are peer dependencies, installed alongside it.
+        </p>
+        <Link className="accent-link" href="/docs">
+          Read the docs →
+        </Link>
+      </div>
+      <div className="quickstart-code">
+        {/* Peers listed in full: npm 7+ and pnpm 8+ would pull them in
+            anyway, Yarn classic would not. */}
+        <InstallTabs
+          options={Object.entries(INSTALL_COMMANDS).map(([id, command]) => ({
+            id,
+            command,
+            code: <CodeBlock code={command} lang="bash" />,
+          }))}
+        />
+        <div className="code-panel">
+          <div className="code-panel-head">
+            <span className="code-panel-label">App.tsx</span>
+            <CopyButton text={importSnippet} label="Copy code example" />
+          </div>
+          <CodeBlock code={importSnippet} lang="tsx" />
+        </div>
+      </div>
+    </section>
+  )
+}
+
 export default function HomePage() {
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd(STRUCTURED_DATA) }} />
 
-      {/* The title and the three ways in - start, browse, install - and
-          nothing else: the carousel directly under it is the hero's picture,
-          and every line added here pushes it further below the fold. */}
+      {/* The title and the two ways in - start, browse - and nothing else:
+          the carousel directly under it is the hero's picture, and every
+          line added here pushes it further below the fold. The install
+          command is the first thing under the carousel instead. */}
       <section className="hero">
         <p className="eyebrow">GPU-accelerated mockups for React</p>
         <h1>Your Component in 3D</h1>
@@ -167,14 +207,12 @@ export default function HomePage() {
           <Link className="btn btn-secondary" href="/docs/gallery">
             Browse all {MODEL_COUNT} models
           </Link>
-          <div className="hero-install">
-            <code>{INSTALL_COMMANDS.npm}</code>
-            <CopyButton text={INSTALL_COMMANDS.npm} label="Copy install command" />
-          </div>
         </div>
       </section>
 
       <HeroCarousel />
+
+      <QuickStart />
 
       <section className="features" aria-label="What the library does">
         {FEATURES.map((feature, i) => (
@@ -200,36 +238,6 @@ export default function HomePage() {
         ))}
       </section>
 
-      <section className="quickstart">
-        <div className="quickstart-copy">
-          <h2>Quick start</h2>
-          <p>
-            One component. Anything you pass as children shows up on the glass, live. three.js,
-            react-three-fiber and drei are peer dependencies, installed alongside it.
-          </p>
-          <Link className="accent-link" href="/docs">
-            Read the docs →
-          </Link>
-        </div>
-        <div className="quickstart-code">
-          {/* Peers listed in full: npm 7+ and pnpm 8+ would pull them in
-              anyway, Yarn classic would not. */}
-          <InstallTabs
-            options={Object.entries(INSTALL_COMMANDS).map(([id, command]) => ({
-              id,
-              command,
-              code: <CodeBlock code={command} lang="bash" />,
-            }))}
-          />
-          <div className="code-panel">
-            <div className="code-panel-head">
-              <span className="code-panel-label">App.tsx</span>
-              <CopyButton text={importSnippet} label="Copy code example" />
-            </div>
-            <CodeBlock code={importSnippet} lang="tsx" />
-          </div>
-        </div>
-      </section>
     </>
   )
 }

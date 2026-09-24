@@ -610,10 +610,10 @@ code {
 }
 
 /*
- * The hero's ways in: two buttons and the install line, on one row where it
- * fits (it does from about 1000px) and wrapping to two below that. Compact on
- * purpose - the carousel under it is the hero's picture, and each row here is
- * a row of it pushed below the fold.
+ * The hero's ways in: two buttons on one row. Compact on purpose - the
+ * carousel under it is the hero's picture, and each row here is a row of it
+ * pushed below the fold. The install command is the first thing under the
+ * carousel instead (see `.quickstart`).
  */
 .hero-cta {
   display: flex;
@@ -628,52 +628,7 @@ code {
   padding: 10px 20px;
 }
 
-.hero-install {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  min-width: 0;
-  max-width: 100%;
-  padding: 4px 4px 4px 14px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.035);
-}
-
-/* Plain text in the page's mono, not the green inline-code chip. */
-.hero-install code {
-  padding: 0;
-  background: none;
-  border-radius: 0;
-  font-size: 13px;
-  line-height: 1.45;
-  color: var(--text-code);
-  text-align: left;
-}
-
-/* Drawn, not typed, so it never lands on the clipboard. */
-.hero-install code::before {
-  content: '$ ';
-  color: var(--accent);
-}
-
-/* Icon only in the chip: the word would cost the command a third line on a
-   phone, and the icon turning to a green tick is confirmation enough. */
-.hero-install .copy-btn {
-  justify-content: center;
-  width: 30px;
-  padding: 0;
-}
-
-.hero-install .copy-btn-text {
-  display: none;
-}
-
-/*
- * On a phone the line is wider than the screen. It wraps at its spaces inside
- * a squarer box rather than scrolling sideways; the buttons get a touch less
- * padding so the pair still share a row.
- */
+/* On a phone the buttons get a touch less padding so the pair share a row. */
 @media (max-width: 620px) {
   .hero-cta {
     gap: 10px 8px;
@@ -682,15 +637,6 @@ code {
 
   .hero-cta .btn {
     padding: 10px 16px;
-  }
-
-  .hero-install {
-    border-radius: 12px;
-    padding: 6px 6px 6px 12px;
-  }
-
-  .hero-install code {
-    font-size: 12.5px;
   }
 }
 
