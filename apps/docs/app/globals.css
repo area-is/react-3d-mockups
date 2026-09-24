@@ -875,25 +875,27 @@ code {
  * Same idea as the edges and deliberately fainter: it only has to say "this
  * part is the device" without competing with the device itself. Its width is
  * the hit region, so the feedback teaches where the boundary actually is.
+ *
+ * Centred on the model rather than on the stage (`--stage-centre`, set by the
+ * scene), and an ellipse that fades out inside its own box, so it is light
+ * behind the object and never runs up under the readout bar, whose opaque
+ * background would cut it off in a straight line.
  */
 .carousel-centre {
   position: absolute;
   left: 50%;
-  top: 0;
-  bottom: 26%;
+  top: var(--stage-centre, 44%);
   width: 34%;
-  transform: translateX(-50%);
+  height: 58%;
+  transform: translate(-50%, -50%);
   opacity: 0;
   transition: opacity 0.2s ease;
   background: radial-gradient(
-    62% 56% at 50% 46%,
+    closest-side,
     rgba(49, 211, 34, 0.2),
-    rgba(49, 211, 34, 0.07) 52%,
-    transparent 78%
+    rgba(49, 211, 34, 0.07) 66%,
+    transparent
   );
-  --centre-fade: linear-gradient(180deg, transparent, #000 18%, #000 66%, transparent);
-  -webkit-mask-image: var(--centre-fade);
-  mask-image: var(--centre-fade);
 }
 
 .carousel[data-zone='device'] .carousel-centre {
@@ -919,8 +921,9 @@ code {
  */
 .carousel-chevron {
   position: absolute;
-  top: 0;
-  bottom: 26%;
+  /* Level with the model and the wash behind it, not the stage's middle. */
+  top: var(--stage-centre, 44%);
+  transform: translateY(-50%);
   display: flex;
   align-items: center;
   padding: 0;
@@ -963,27 +966,41 @@ code {
   pointer-events: none;
 }
 
+/*
+ * Half an ellipse of light spreading in from the side, centred on the models'
+ * line (`--stage-centre`) and about as tall as they are. It used to fill the
+ * stage from its top down, which ran it up under the readout bar and ended it
+ * there on the bar's straight edge; an ellipse that fades out inside its own
+ * box has no edge to show.
+ */
 .carousel-edge {
   position: absolute;
-  top: 0;
-  bottom: 26%;
-  width: 30%;
+  top: var(--stage-centre, 44%);
+  width: 28%;
+  height: 56%;
+  transform: translateY(-50%);
   opacity: 0;
   transition: opacity 0.2s ease;
-  /* Fade the wash out vertically too, or it ends on a hard horizontal line. */
-  --edge-fade: linear-gradient(180deg, transparent, #000 22%, #000 62%, transparent);
-  -webkit-mask-image: var(--edge-fade);
-  mask-image: var(--edge-fade);
 }
 
 .carousel-edge[data-side='left'] {
   left: 0;
-  background: linear-gradient(90deg, rgba(49, 211, 34, 0.26), rgba(49, 211, 34, 0.07) 46%, transparent 80%);
+  background: radial-gradient(
+    100% 50% at 0% 50%,
+    rgba(49, 211, 34, 0.26),
+    rgba(49, 211, 34, 0.07) 46%,
+    transparent 80%
+  );
 }
 
 .carousel-edge[data-side='right'] {
   right: 0;
-  background: linear-gradient(270deg, rgba(49, 211, 34, 0.26), rgba(49, 211, 34, 0.07) 46%, transparent 80%);
+  background: radial-gradient(
+    100% 50% at 100% 50%,
+    rgba(49, 211, 34, 0.26),
+    rgba(49, 211, 34, 0.07) 46%,
+    transparent 80%
+  );
 }
 
 .carousel[data-zone='left'] .carousel-edge[data-side='left'],

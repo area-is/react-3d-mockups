@@ -111,8 +111,11 @@
   color: var(--color-fd-muted-foreground);
 }
 
+/* The first has no grid gap above it, only the separator's own margin; this
+   makes up the difference, so every category starts the same 16px below
+   whatever comes before it. */
 .mockup-grid-heading:first-child {
-  margin-top: 0;
+  margin-top: 12px;
 }
 
 .mockup-tile {

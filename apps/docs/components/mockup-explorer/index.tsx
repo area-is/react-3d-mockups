@@ -812,6 +812,14 @@ function MockupExplorerImpl({
   }, [arranged])
 
   const hasColor = documents.has('color') && !ownedByItems.has('color')
+  /**
+   * What an unset `color` renders as, for its row to show: the component's
+   * documented default when that is a plain colour. A single near-black for
+   * everything had the row reading #101216 over a book that was plainly navy.
+   */
+  const colorDefault =
+    /^'(#[0-9a-f]{3,8})'$/i.exec(COMPONENT_PROPS[spec.name]?.find((doc) => doc.name === 'color')?.default ?? '')?.[1] ??
+    '#101216'
 
   const driven = new Set<string>([
     'float',
@@ -1273,7 +1281,7 @@ function MockupExplorerImpl({
               <ColorRow
                 label="color"
                 value={p.color}
-                fallback="#101216"
+                fallback={colorDefault}
                 presetName={preset?.name}
                 swatch={preset?.color}
                 onChange={(v) => set('color', v)}

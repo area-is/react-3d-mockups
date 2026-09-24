@@ -5,6 +5,7 @@ import {
   useEffect,
   useRef,
   useState,
+  type CSSProperties,
   type PointerEvent as ReactPointerEvent,
   type ReactNode,
   type RefObject,
@@ -35,8 +36,6 @@ import {
   AFrameSign,
   Billboard,
   Bus,
-  Storefront,
-  TVSet,
   GALAXY_COLORWAYS,
   IPHONE_COLORWAYS,
   FOLD_COLORWAYS,
@@ -58,9 +57,6 @@ import {
   BusAdArt,
   ChalkHoursArt,
   ChalkMenuArt,
-  StoreMuralArt,
-  StoreSignArt,
-  TVShowArt,
 } from '../screens/print-art'
 import { CartonBack, CartonFacts, CartonFront, CartonRoof, CartonStory } from '../screens/carton-art'
 import {
@@ -753,10 +749,10 @@ function extentOf(entry: Entry, g: Group): Extent {
 }
 
 /**
- * The ones nobody expects from a mockup library: a billboard, a living-room
- * TV, a city bus and a shopfront. They are what a screenshot-in-a-frame tool
- * cannot do, so they are spread through the run (see `ORDER`) rather than
- * queued up after eighteen phones and boxes.
+ * The ones nobody expects from a mockup library: a billboard and a city bus.
+ * They are what a screenshot-in-a-frame tool cannot do, so they are spread
+ * through the run (see `ORDER`) rather than queued up after eighteen phones
+ * and boxes.
  */
 const SHOWPIECES: Entry[] = [
   {
@@ -772,21 +768,6 @@ const SHOWPIECES: Entry[] = [
       <Billboard color={color} surfaceBackground={surface} surfaceStyle={surfaceStyle} resolution={resolution}>
         {screen}
       </Billboard>
-    ),
-  },
-  {
-    id: 'tv',
-    res: pxRes('tv'),
-    colorways: stock(
-      ['black', 'Black', '#15171b'],
-      ['silver', 'Silver', '#b4b8be'],
-      ['white', 'White', '#e6e6e2']
-    ),
-    content: () => <TVShowArt />,
-    render: ({ color, screen, surface, surfaceStyle, resolution }) => (
-      <TVSet color={color} surfaceBackground={surface} surfaceStyle={surfaceStyle} resolution={resolution}>
-        {screen}
-      </TVSet>
     ),
   },
   {
@@ -815,41 +796,6 @@ const SHOWPIECES: Entry[] = [
       </Bus>
     ),
   },
-  {
-    id: 'storefront',
-    res: mmRes('storefront'),
-    colorways: stock(
-      ['green', 'Racing green', '#2e4638'],
-      ['navy', 'Navy', '#1f2b3d'],
-      ['oxblood', 'Oxblood', '#5b2230'],
-      ['cream', 'Cream', '#e3dccb']
-    ),
-    content: () => <StoreSignArt />,
-    // The fascia is the primary face; the side signs repeat it and the side
-    // walls carry a painted mural. The display bays stay glass - a shop is
-    // more convincing with windows you can see into.
-    render: ({ color, screen, surface, surfaceStyle, resolution }) => (
-      <Storefront color={color} surfaceBackground={surface} surfaceStyle={surfaceStyle} resolution={resolution}>
-        {screen}
-        {screen != null && (
-          <>
-            <Storefront.LeftSign>
-              <StoreSignArt />
-            </Storefront.LeftSign>
-            <Storefront.RightSign>
-              <StoreSignArt />
-            </Storefront.RightSign>
-            <Storefront.Left>
-              <StoreMuralArt />
-            </Storefront.Left>
-            <Storefront.Right>
-              <StoreMuralArt />
-            </Storefront.Right>
-          </>
-        )}
-      </Storefront>
-    ),
-  },
 ]
 
 /**
@@ -866,7 +812,6 @@ const ORDER = [
   'macbook-air-13',
   'ipad-pro-13',
   'galaxy-tab-s11',
-  'tv',
   'apple-watch-series-11',
   'galaxy-watch-8',
   'studio-display',
@@ -876,7 +821,6 @@ const ORDER = [
   'milk-carton',
   'product-box',
   'mailer-box',
-  'storefront',
   'shopping-bag',
   'poster-frame',
   'a-frame-sign',
@@ -930,6 +874,21 @@ function useCarouselFit(ref: RefObject<HTMLElement | null>): number {
   }, [ref])
 
   return fit
+}
+
+/**
+ * How far down the stage the staged model's centre lands, as a fraction of
+ * the stage's height: what the hover washes and the chevrons centre on.
+ *
+ * Not the middle. The camera looks straight at world y = 0, but the model
+ * stands `STAGE_Y` up a rig that is scaled by `fit` and then dropped by
+ * `RIG_DROP` of what the scale took away - so it sits a little high, by an
+ * amount that changes with each breakpoint's fit.
+ */
+function stageCentre(fit: number): number {
+  const visible = 2 * CAMERA_Z * Math.tan((DEFAULT_CAMERA_FOV * Math.PI) / 360)
+  const y = fit * STAGE_Y + ROW_Y * RIG_DROP * (1 - fit)
+  return 0.5 - y / visible
 }
 
 /**
@@ -1532,7 +1491,10 @@ export default function CarouselScene() {
        * containing block that starts where the stage does - not one that starts
        * above the bar.
        */}
-      <div className="carousel-viewport">
+      <div
+        className="carousel-viewport"
+        style={{ '--stage-centre': `${(stageCentre(fit) * 100).toFixed(2)}%` } as CSSProperties}
+      >
         <div className="carousel-glow" aria-hidden />
 
         {/*

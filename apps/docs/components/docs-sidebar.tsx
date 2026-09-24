@@ -80,7 +80,10 @@ function GridSection({ label, entries }: { label: string; entries: CatalogEntry[
       <div className="mockup-grid">
         {byCategory(entries).map(([category, group]) => (
           <Fragment key={category}>
-            <span className="mockup-grid-heading">{category}</span>
+            {/* Indented like the separator above it, so the two labels line up. */}
+            <span className="mockup-grid-heading" style={style}>
+              {category}
+            </span>
             {group.map((e) => (
               <Link key={e.id} href={e.href} className="mockup-tile" data-active={pathname === e.href}>
                 <span className="mockup-tile-thumb">
