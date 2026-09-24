@@ -27,7 +27,7 @@ import {
   MailerFront,
   MailerLid,
 } from '../screens/package-art'
-import { ChalkHoursArt, ChalkMenuArt } from '../screens/print-art'
+import { BillboardAdArt, ChalkHoursArt, ChalkMenuArt } from '../screens/print-art'
 
 /**
  * What the home page's carousel puts on each object - so that an object's own
@@ -108,6 +108,7 @@ export const CAROUSEL_ART: Readonly<Record<string, CarouselFaces>> = {
   mailerBox: { top: 'MailerLid', front: 'MailerFront', right: 'MailerEnd', left: 'MailerEnd' },
   shoppingBag: { front: 'BagFront', back: 'BagBack' },
   posterFrame: { poster: 'SwissBill' },
+  billboard: { face: 'BillboardAdArt' },
   aFrameSign: { front: 'ChalkMenuArt', back: 'ChalkHoursArt' },
 }
 
@@ -129,6 +130,7 @@ const ART: Readonly<Record<string, (finish: string) => ReactNode>> = {
   SwissDialA: () => <SwissDialA />,
   SwissRhythm: () => <SwissRhythm />,
   SwissBill: () => <SwissBill />,
+  BillboardAdArt: () => <BillboardAdArt />,
   Newspaper: () => <Newspaper />,
   SwissSite: () => <SwissSite />,
   WatchFace: () => <WatchFace />,

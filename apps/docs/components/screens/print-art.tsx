@@ -2,6 +2,7 @@
 
 import { SERIF } from './label-art'
 import { FONT } from './swiss-art'
+import { asset } from '@/lib/base-path.mjs'
 
 /**
  * Full-bleed artwork for the object mockups (book, magazine, brochure, card,
@@ -316,41 +317,79 @@ export function PosterArt() {
   )
 }
 
-/** 14x48 bulletin creative - one message, big type. */
+/**
+ * 14x48 bulletin creative (1200 x 350 at the default resolution): Halden, a
+ * fictional headphone maker, selling quiet.
+ *
+ * Built the way a bulletin is: one line a driver can read in the three
+ * seconds they have, set huge on a single saturated ground, the product as
+ * large as the board allows, and the brand in the corner. The headphones are
+ * a generated cut-out on a transparent ground (`/art/halden-headphones.webp`),
+ * so they sit on the cobalt rather than in a box, inside the one graphic:
+ * rings of sound spreading out from them and fading, which is the promise.
+ * Measured in container units against the face, so the layout holds at any
+ * `resolution`.
+ */
 export function BillboardAdArt() {
-  return (
+  const ring = (r: number, alpha: number) => (
     <div
+      key={r}
+      aria-hidden
       style={{
-        width: '100%',
-        height: '100%',
-        boxSizing: 'border-box',
-        padding: '0 48px',
-        background: '#0e1b2e',
-        color: '#f4f7fb',
-        display: 'flex',
-        alignItems: 'center',
-        gap: 40,
+        position: 'absolute',
+        left: `${HALDEN_CENTRE - r}cqw`,
+        top: `calc(50cqh - ${r}cqw)`,
+        width: `${r * 2}cqw`,
+        aspectRatio: 1,
+        borderRadius: '50%',
+        border: `0.28cqw solid rgba(255, 255, 255, ${alpha})`,
       }}
-    >
-      <div style={{ fontSize: 56, fontWeight: 800, letterSpacing: -1.5, lineHeight: 1.02, flex: 1 }}>
-        Ship mockups, <span style={{ color: '#5ad0a6' }}>not screenshots.</span>
-      </div>
-      <div
-        style={{
-          background: '#5ad0a6',
-          color: '#0e1b2e',
-          fontSize: 24,
-          fontWeight: 700,
-          padding: '16px 28px',
-          borderRadius: 999,
-          whiteSpace: 'nowrap',
-        }}
-      >
-        react-3d-mockups
+    />
+  )
+  return (
+    <div style={{ width: '100%', height: '100%', containerType: 'size', background: HALDEN.ground, overflow: 'hidden' }}>
+      <div style={{ position: 'relative', width: '100%', height: '100%', color: HALDEN.ink, fontFamily: FONT, userSelect: 'none' }}>
+        {[ring(12, 0.2), ring(18, 0.14), ring(25, 0.09), ring(33, 0.05)]}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={asset('/art/halden-headphones.webp')}
+          alt=""
+          draggable={false}
+          style={{
+            position: 'absolute',
+            height: '94cqh',
+            top: '3cqh',
+            left: `${HALDEN_CENTRE}cqw`,
+            transform: 'translateX(-50%) rotate(-6deg)',
+            aspectRatio: '484 / 560',
+            pointerEvents: 'none',
+          }}
+        />
+        <div style={{ position: 'absolute', left: '4.5cqw', top: 0, bottom: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+          <div style={{ fontSize: '7cqw', fontWeight: 800, letterSpacing: '-0.055em', lineHeight: 0.92 }}>
+            Hear the room
+            <br />
+            <span style={{ color: HALDEN.accent }}>go quiet.</span>
+          </div>
+        </div>
+        {/* the brand in the corner, clear of the product */}
+        <div style={{ position: 'absolute', right: '4cqw', bottom: '12cqh', display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '1cqw', textAlign: 'right' }}>
+          <span style={{ fontSize: '3.1cqw', fontWeight: 800, letterSpacing: '0.18em', lineHeight: 1, marginRight: '-0.18em' }}>HALDEN</span>
+          <span style={{ fontSize: '1.2cqw', fontWeight: 600, lineHeight: 1.3, color: HALDEN.accent, whiteSpace: 'nowrap' }}>
+            Q2 wireless
+            <br />
+            Adaptive noise cancelling
+          </span>
+        </div>
       </div>
     </div>
   )
 }
+
+/** The bulletin's inks: one cobalt, a white, and a pale blue for the second voice. */
+const HALDEN = { ground: '#1f3fd1', ink: '#f5f7ff', accent: '#a9bbff' }
+/** Where the headphones and their rings are centred, in cqw of the face. */
+const HALDEN_CENTRE = 65
 
 /** ID badge front. */
 export function BadgeFrontArt() {
