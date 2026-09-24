@@ -30,9 +30,10 @@ import { asset } from '@/lib/base-path.mjs'
  * vitamins as bare percentages two to a line - which is the label most
  * people picture, and the one a dairy this size still prints.
  *
- * Every panel prints straight onto the board (`materialTone`), so the
- * carousel's finish swatches change the carton the print sits on, the way a
- * brand's white and kraft variants do. The greens are solid inks and stay
+ * Every panel prints straight onto the board (`materialTone`), so a
+ * different `material` changes the carton the print sits on, the way a
+ * brand's white and kraft variants do - though the home carousel only offers
+ * the coated white. The greens are solid inks and stay
  * put; the type flips to white ink on a dark board and the pale grey follows
  * the board it is mixed with.
  *

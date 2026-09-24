@@ -52,12 +52,8 @@ import {
   type MockupKind,
 } from 'react-3d-mockups'
 import { DEFAULT_CAMERA_FOV, ORBIT } from 'react-3d-mockups/core'
-import {
-  BillboardAdArt,
-  BusAdArt,
-  ChalkHoursArt,
-  ChalkMenuArt,
-} from '../screens/print-art'
+import { BillboardAdArt, ChalkHoursArt, ChalkMenuArt } from '../screens/print-art'
+import { SUNPEEL_FLAVOURS, SunpeelRear, SunpeelSide } from '../screens/bus-wrap'
 import { CartonBack, CartonFacts, CartonFront, CartonRoof, CartonStory } from '../screens/carton-art'
 import {
   BagBack,
@@ -246,6 +242,8 @@ interface Entry {
    * without it a transparent sheet would sit on a white panel, not on kraft.
    */
   material?: boolean
+  /** What the swatches are called when they are neither colorways, materials nor finishes. */
+  swatchLabel?: string
   /**
    * The bare object. `screen` is live DOM for the staged models; the picker
    * row passes `surface` instead - a gradient costs no DOM to lay out, though
@@ -330,6 +328,7 @@ const nameOf = (entry: Entry) => CATALOG.get(entry.id)?.label ?? entry.id
 const POSE_PROPS: Record<string, string> = {
   'galaxy-z-fold7': ` openAngle={${CAROUSEL_OPEN_ANGLE}}`,
   'galaxy-z-flip7': ` openAngle={${CAROUSEL_OPEN_ANGLE}}`,
+  bus: ` coverage="perforated"`,
 }
 
 /**
@@ -496,11 +495,9 @@ const OBJECTS: Entry[] = [
   {
     id: 'vinyl-record',
     res: mmRes('vinylRecord'),
-    colorways: stock(
-      ['natural', 'Natural board', '#f2efe8'],
-      ['black', 'Black jacket', '#1b1b1e'],
-      ['sunset', 'Sunset', '#d8663f']
-    ),
+    // One board: `color` is the jacket stock, which only shows on the sleeve's
+    // edges once both faces are printed, so other boards changed nothing.
+    colorways: stock(['natural', 'Natural board', '#f2efe8']),
     content: () => <SleeveCover />,
     // The jacket's reverse and both centre labels, because a record is a
     // four-sided print job and the disc peeks out past the sleeve edge - that
@@ -527,12 +524,7 @@ const OBJECTS: Entry[] = [
   {
     id: 'milk-carton',
     res: mmRes('milkCarton'),
-    colorways: stock(
-      ['white', 'Coated white', '#f4f3ef'],
-      ['cream', 'Cream', '#f1e7d4'],
-      ['kraft', 'Kraft', '#cbab7f'],
-      ['slate', 'Slate', '#d3dae0']
-    ),
+    colorways: stock(['white', 'Coated white', '#f4f3ef']),
     material: true,
     content: (color) => <CartonFront material={color} />,
     // Every face is printed, because that is what a carton is: the front is
@@ -772,24 +764,34 @@ const SHOWPIECES: Entry[] = [
   },
   {
     id: 'bus',
-    res: mmRes('bus'),
-    colorways: stock(
-      ['white', 'Fleet white', '#eef0f2'],
-      ['silver', 'Silver', '#b9bec4'],
-      ['red', 'Red', '#b3262c'],
-      ['blue', 'Blue', '#1f4e8c']
-    ),
-    // Turned to show its street side, nose first: the curb-side panel runs
-    // behind the rear door, which cuts through whatever is printed there.
-    yaw: Math.PI + 0.6,
-    content: () => <BusAdArt />,
-    // The king-size panel, and the destination sign lit above the windscreen
-    // - a string there gets the library's own dot-matrix marquee.
+    res: mmRes('bus', { coverage: 'perforated' }),
+    // A full wrap is bought as a colour, so the swatches are the campaign's
+    // flavours: each repaints the bus and swaps the fruit on every face (see
+    // bus-wrap.tsx).
+    swatchLabel: 'Flavour',
+    colorways: SUNPEEL_FLAVOURS.map((f) => ({ id: f.id, name: f.name, color: f.ground })),
+    // The curb side, three-quarters on from the nose, so the windscreen and
+    // the lit destination sign are in the picture. The wrap is laid out
+    // around the doors (see bus-wrap.tsx), so they no longer cut the art the
+    // way they cut the old king-size panel, which is why this used to show
+    // the street side flat on.
+    yaw: -0.35,
+    content: (color) => <SunpeelSide ground={color} />,
+    // Wrapped all round as perforated film, the way a transit wrap runs over
+    // the passenger glass - the doors and the driver's window stay clear -
+    // and the destination sign lit above the windscreen, where a string gets
+    // the library's own dot-matrix marquee.
     render: ({ color, screen, surface, surfaceStyle, resolution }) => (
-      <Bus color={color} surfaceBackground={surface} surfaceStyle={surfaceStyle} resolution={resolution}>
+      <Bus coverage="perforated" color={color} surfaceBackground={surface} surfaceStyle={surfaceStyle} resolution={resolution}>
         {screen != null && (
           <>
             <Bus.StreetSide>{screen}</Bus.StreetSide>
+            <Bus.CurbSide>
+              <SunpeelSide ground={color} doors />
+            </Bus.CurbSide>
+            <Bus.Rear>
+              <SunpeelRear ground={color} />
+            </Bus.Rear>
             <Bus.DestinationSign>42 DOWNTOWN VIA 5TH AVE</Bus.DestinationSign>
           </>
         )}
@@ -1379,7 +1381,7 @@ export default function CarouselScene() {
   const selected = finish[entry.id] ?? entry.colorways[0]!.id
   // A phone comes in colorways; a carton or a bag is printed on a material;
   // a frame, a sign or a bus has a finish.
-  const swatchesLabel = DEVICES.includes(entry) ? 'Colorway' : entry.material ? 'Material' : 'Finish'
+  const swatchesLabel = entry.swatchLabel ?? (DEVICES.includes(entry) ? 'Colorway' : entry.material ? 'Material' : 'Finish')
   const colorOf = (dev: Entry) => {
     const id = finish[dev.id] ?? dev.colorways[0]!.id
     return dev.colorways.find((c) => c.id === id)?.color ?? dev.colorways[0]!.color
