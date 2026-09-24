@@ -62,6 +62,27 @@ export function CoverPreview() {
 Every object's page has multiple live, draggable examples with the code
 next to them - see the Components section in the sidebar.
 
+## Printing onto the stock
+
+On the objects whose `color` is the material itself - card, board, paper, a
+record jacket, a vehicle's paint under its vinyl - a live surface still
+defaults to a white `surfaceBackground`, so artwork with a transparent ground
+prints onto white. To print it onto the stock instead, give the surface the
+same colour:
+
+```tsx
+<MilkCartonMockup color="#cbab7f" surfaceBackground="#cbab7f">
+  <LabelArt /> {/* no background of its own: the kraft shows through */}
+</MilkCartonMockup>
+```
+
+That is what the samples on these pages do. Their artwork has no ground of
+its own, so changing `color` in an example changes what it is printed on,
+and its type flips between dark and light ink to stay legible. The
+exceptions are the objects where `color` is hardware around a separate
+sheet - a frame's moulding, a billboard's steel, a roll-up's cassette - and
+a book's dust jacket, which is its own printed paper.
+
 ## Multiple live surfaces
 
 Several objects host more than one surface. Bare children fill the object's

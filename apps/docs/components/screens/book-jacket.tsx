@@ -2,7 +2,7 @@
 
 import type { CSSProperties, ReactNode } from 'react'
 import { epicentre } from 'tabbied/patterns'
-import { FONT, INK, Pattern, Sheet, type Tone } from './swiss-art'
+import { FONT, INK, Pattern, Sheet, luminance, type Tone } from './swiss-art'
 import { Ean13, Ean5 } from './label-art'
 import { asset } from '@/lib/base-path.mjs'
 
@@ -52,20 +52,6 @@ import { asset } from '@/lib/base-path.mjs'
 
 /** Uncoated cream stock - what a literary hardback's jacket is printed on. */
 const PAPER = '#efe9dd'
-
-/** sRGB relative luminance, 0-1. Duplicated from `swiss-art` only because that one is not exported. */
-function luminance(hex: string): number {
-  const h = hex.replace('#', '')
-  const n =
-    h.length === 3
-      ? [...h].map((c) => Number.parseInt(c + c, 16))
-      : [0, 2, 4].map((i) => Number.parseInt(h.slice(i, i + 2), 16))
-  const [r, g, b] = n.map((v) => {
-    const c = v / 255
-    return c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4
-  }) as [number, number, number]
-  return 0.2126 * r + 0.7152 * g + 0.0722 * b
-}
 
 /**
  * The jacket, given the binding cloth underneath it.

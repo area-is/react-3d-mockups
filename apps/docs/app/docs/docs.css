@@ -1096,6 +1096,11 @@
   color: #eafff0;
 }
 
+/* Printed straight onto the object's stock: the stock is the ground. */
+.mx-surface-art[data-material] {
+  background: none;
+}
+
 .mx-surface-art-label {
   font-size: 13px;
   letter-spacing: 0.18em;

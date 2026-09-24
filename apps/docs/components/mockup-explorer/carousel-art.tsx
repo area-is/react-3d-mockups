@@ -114,9 +114,11 @@ export const CAROUSEL_ART: Readonly<Record<string, CarouselFaces>> = {
 /**
  * Name → element, given the finish currently selected.
  *
- * The pieces that print onto the material take it (`material`, or `cloth` for
- * the book's jacket, which is a sheet wrapped around one); the pieces that are
- * their own sheet ignore it. That split is the same one the carousel makes.
+ * The pieces that print onto the material take it (`material` - the record's
+ * two jacket faces among them - or `cloth` for the book's jacket, which is a
+ * sheet wrapped around one); the pieces that are their own sheet ignore it -
+ * a poster, a screen, a record's paper labels. That split is the same one
+ * the carousel makes.
  */
 const ART: Readonly<Record<string, (finish: string) => ReactNode>> = {
   SwissRotation: () => <SwissRotation />,
@@ -135,8 +137,8 @@ const ART: Readonly<Record<string, (finish: string) => ReactNode>> = {
   JacketSpine: (finish) => <JacketSpine cloth={finish} />,
   JacketBack: (finish) => <JacketBack cloth={finish} />,
 
-  SleeveCover: () => <SleeveCover />,
-  SleeveBack: () => <SleeveBack />,
+  SleeveCover: (finish) => <SleeveCover material={finish} />,
+  SleeveBack: (finish) => <SleeveBack material={finish} />,
   SleeveLabelA: () => <SleeveLabelA />,
   SleeveLabelB: () => <SleeveLabelB />,
 

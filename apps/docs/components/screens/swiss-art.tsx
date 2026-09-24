@@ -103,7 +103,8 @@ export const TONES = {
 export type ToneName = keyof typeof TONES
 
 /** sRGB relative luminance, 0 (black) to 1 (white). */
-function luminance(hex: string): number {
+/** sRGB relative luminance of a hex colour, 0-1. */
+export function luminance(hex: string): number {
   const h = hex.replace('#', '')
   const n =
     h.length === 3

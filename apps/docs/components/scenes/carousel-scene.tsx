@@ -495,10 +495,12 @@ const OBJECTS: Entry[] = [
   {
     id: 'vinyl-record',
     res: mmRes('vinylRecord'),
-    // One board: `color` is the jacket stock, which only shows on the sleeve's
-    // edges once both faces are printed, so other boards changed nothing.
-    colorways: stock(['natural', 'Natural board', '#f2efe8']),
-    content: () => <SleeveCover />,
+    // The jacket stock is the cover's field: both faces print straight onto
+    // it (record-sleeve.tsx), so this is the colour the sleeve was designed
+    // on, and `material` paints it behind them.
+    colorways: stock(['orange', 'Orange', '#d8552a']),
+    material: true,
+    content: (color) => <SleeveCover material={color} />,
     // The jacket's reverse and both centre labels, because a record is a
     // four-sided print job and the disc peeks out past the sleeve edge - that
     // label is on stage whether or not anything is printed on it.
@@ -508,7 +510,7 @@ const OBJECTS: Entry[] = [
         {screen != null && (
           <>
             <VinylRecord.Back>
-              <SleeveBack />
+              <SleeveBack material={color} />
             </VinylRecord.Back>
             <VinylRecord.Label>
               <SleeveLabelA />
