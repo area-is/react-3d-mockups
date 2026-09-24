@@ -45,7 +45,7 @@ Beyond the [shared screen props](/docs/screen-content):
 | --- | --- | --- | --- |
 | `vinylColor` | `string` | `'#0b0b0d'` | Disc color. Classic black; try pressing colors. |
 | `color` | `string` | `'#f2efe8'` | Jacket stock (edges and unprinted faces). |
-| `surfaceBackground` | `string` | `'#ffffff'` | CSS background behind cover, back and label. |
+| `surfaceBackground` | `string` | `color` | CSS background behind cover, back and label - the stock itself unless you set it, so whatever the content leaves clear prints on `color`. |
 | `resolution` | `number` | `520` | Virtual cover width in CSS px; the label shares its dpi. |
 
 ## Regions

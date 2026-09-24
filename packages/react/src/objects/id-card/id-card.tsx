@@ -51,7 +51,8 @@ function IDCardImpl({
   children,
   color = '#f4f5f7',
   lanyardColor = '#b3223a',
-  surfaceBackground = '#ffffff',
+  // Printed straight onto the stock: whatever the content leaves clear is `color`.
+  surfaceBackground = color,
   resolution = ID_CARD.resolution,
   surfaceStyle,
   ...groupProps

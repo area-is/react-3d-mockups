@@ -45,7 +45,7 @@ Beyond the [shared screen props](/docs/screen-content):
 | --- | --- | --- | --- |
 | `openAngle` | `number` | `65` | Angle between the panels (display sweet spot is 60–75). |
 | `color` | `string` | `'#f6f3ec'` | Card stock: edges and unprinted faces. |
-| `surfaceBackground` | `string` | `'#ffffff'` | CSS background behind each printed face. |
+| `surfaceBackground` | `string` | `color` | CSS background behind each printed face - the stock itself unless you set it, so whatever the content leaves clear prints on `color`. |
 | `resolution` | `number` | `380` | Virtual panel width in CSS px; height follows the A7 panel. |
 
 ## Regions

@@ -53,7 +53,7 @@ Beyond the [shared screen props](/docs/screen-content):
 | `color` | `string` | `'#f4f3ef'` | Board color. Poly-coated white by default; try a brand dip or kraft. |
 | `capColor` | `string` | `'#d7dbdf'` | Screw cap color. |
 | `cap` | `boolean` | `true` | Render the screw cap. Off gives the older pull-open spout carton. |
-| `surfaceBackground` | `string` | `'#ffffff'` | CSS background behind each printed panel. |
+| `surfaceBackground` | `string` | `color` | CSS background behind each printed panel - the stock itself unless you set it, so whatever the content leaves clear prints on `color`. |
 | `resolution` | `number` | `420` | Virtual front panel width in CSS px; other panels share its dpi. |
 
 ## Regions

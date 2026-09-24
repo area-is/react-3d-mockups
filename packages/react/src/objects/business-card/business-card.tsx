@@ -41,7 +41,8 @@ function BusinessCardImpl({
   children,
   color = '#f7f6f2',
   edgeColor,
-  surfaceBackground = '#ffffff',
+  // Printed straight onto the stock: whatever the content leaves clear is `color`.
+  surfaceBackground = color,
   resolution = BUSINESS_CARD.resolution,
   surfaceStyle,
   ...groupProps

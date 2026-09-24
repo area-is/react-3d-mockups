@@ -46,7 +46,7 @@ Beyond the [shared screen props](/docs/screen-content):
 | --- | --- | --- | --- |
 | `size` | `{ width, height, depth }` | `190×265×55` | Real size in **millimeters**. The longest edge normalizes to the stage, so any size fills the camera at true proportions. |
 | `color` | `string` | `'#f4f1ea'` | Carton stock: unprinted panels and fold edges. |
-| `surfaceBackground` | `string` | `'#ffffff'` | CSS background behind each printed panel. |
+| `surfaceBackground` | `string` | `color` | CSS background behind each printed panel - the stock itself unless you set it, so whatever the content leaves clear prints on `color`. |
 | `resolution` | `number` | `480` | Virtual front-panel width in CSS px; other panels share its dpi. |
 
 ## Regions

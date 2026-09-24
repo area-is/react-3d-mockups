@@ -137,7 +137,8 @@ function SemiTrailerImpl({
   children,
   color = '#eef0f2',
   skirtColor,
-  surfaceBackground = '#ffffff',
+  // Printed straight onto the stock: whatever the content leaves clear is `color`.
+  surfaceBackground = color,
   resolution = SEMI_TRAILER.resolution,
   surfaceStyle,
   ...groupProps

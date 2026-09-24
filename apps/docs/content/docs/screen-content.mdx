@@ -176,8 +176,11 @@ See [Accessibility](/docs/accessibility) for the rest.
 
 ## Surface background
 
-`surfaceBackground` paints *underneath* your content - black on lit screens,
-white on print surfaces. It only shows where your content does **not** paint:
+`surfaceBackground` paints *underneath* your content - black on lit screens;
+on a print object whose `color` is its stock (a card, a carton, a bag, a record
+jacket, a vehicle's paint), that `color`, so your content prints onto the
+material; white on the other print surfaces. It only shows where your content
+does **not** paint:
 a logo on a transparent PNG, a layout shorter than the surface, rounded corners
 on a card, the moment before an `<iframe>` finishes loading.
 

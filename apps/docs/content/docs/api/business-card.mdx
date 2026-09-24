@@ -43,7 +43,7 @@ Beyond the [shared screen props](/docs/screen-content):
 | --- | --- | --- | --- |
 | `color` | `string` | `'#f7f6f2'` | Stock color: the faces' base and unprinted back. |
 | `edgeColor` | `string` | stock color | Painted-edge color - the bright seam that says "32 pt". |
-| `surfaceBackground` | `string` | `'#ffffff'` | CSS background behind each face's content. |
+| `surfaceBackground` | `string` | `color` | CSS background behind each face's content - the stock itself unless you set it, so whatever the content leaves clear prints on `color`. |
 | `resolution` | `number` | `520` | Virtual face width in CSS px (~150 dpi); height follows the card aspect. |
 
 ## Regions

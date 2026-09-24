@@ -51,7 +51,8 @@ function MailerBoxImpl({
   size,
   color = '#b5915f',
   tapeColor = 'rgba(168, 127, 79, 0.82)',
-  surfaceBackground = '#ffffff',
+  // Printed straight onto the stock: whatever the content leaves clear is `color`.
+  surfaceBackground = color,
   resolution = MAILER_BOX.resolution,
   surfaceStyle,
   ...groupProps

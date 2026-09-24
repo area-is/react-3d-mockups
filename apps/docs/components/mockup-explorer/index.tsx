@@ -625,9 +625,7 @@ function buildArrangedSource(
   p: PropState,
   stageHeight: number,
   screen: string,
-  extras: EditableProp[],
-  /** The surface is the stock colour rather than one the reader picked - see `stockSurface`. */
-  stockSurface = false
+  extras: EditableProp[]
 ): Line[] {
   const shared = objectAttributes(spec, p, extras, NOT_AN_ARRANGED_OBJECT_PROP)
   const camera = extras.find((prop) => prop.name === 'camera')
@@ -646,10 +644,6 @@ function buildArrangedSource(
     const name = itemSpec?.bareName ?? spec.bareName ?? spec.name
     imports.add(name)
     const own = Object.entries(item.props ?? {}).map(([prop, value]) => literalAttribute(prop, value))
-    // An instance on its own stock prints on that stock, as it does on stage.
-    const itemColor = item.props?.color
-    if (stockSurface && !item.component && typeof itemColor === 'string' && itemColor.startsWith('#'))
-      own.push(literalAttribute('surfaceBackground', itemColor))
     // What the page writes on this instance wins over what the panel sets for
     // all of them - the same way the spread on the stage resolves it.
     const props = lastWins([...(item.component ? [] : shared), ...own])
@@ -965,18 +959,14 @@ function MockupExplorerImpl({
     colorways[0]?.color ??
     colorDefault
   /*
-   * What is really behind the artwork. On an object whose `color` is the
-   * stock it is printed on (`spec.stock`), that stock: the sample artwork
-   * has no ground of its own there, so the card, board or paint shows
-   * through and `color` changes what is printed on. The library's default
-   * surface is white whatever the stock, so without this a kraft carton
-   * printed onto white, and a dark one printed white ink onto white. A
-   * surface the reader picks still wins.
+   * What is behind the artwork when the reader has not picked a surface. On
+   * an object whose `color` is the stock it is printed on (`spec.stock`) the
+   * library paints that stock there, and the sample artwork has no ground of
+   * its own, so `color` changes what it is printed on. The flat view is the
+   * one place that has to paint it by hand - it is plain DOM, not the model.
    */
-  const stockSurface = Boolean(spec.stock) && !p.surfaceBackground
-  const surfaceBackground = p.surfaceBackground || (spec.stock ? finish : '')
-  /** The props as mounted, which is what the snippet has to reproduce. */
-  const mounted: PropState = stockSurface ? { ...p, surfaceBackground } : p
+  const surfaceDoc = [...(COMPONENT_PROPS[spec.name] ?? []), ...SHARED_PROPS].find((doc) => doc.name === 'surfaceBackground')
+  const surfaceDefault = spec.stock ? finish : (/^'(#[0-9a-f]{3,8})'$/i.exec(surfaceDoc?.default ?? '')?.[1] ?? '#000000')
 
   /**
    * What is staged on one region.
@@ -1039,7 +1029,7 @@ function MockupExplorerImpl({
     ...(spec.orientation ? { orientation: p.orientation } : {}),
     ...(spec.openable ? { openAngle: p.openAngle } : {}),
     ...(spec.coverage ? { coverage: p.coverage } : {}),
-    ...(surfaceBackground ? { surfaceBackground } : {}),
+    ...(p.surfaceBackground ? { surfaceBackground: p.surfaceBackground } : {}),
     ...(p.resolution ? { resolution: p.resolution } : {}),
     ...p.extra,
   }
@@ -1082,8 +1072,8 @@ function MockupExplorerImpl({
   // Built whichever tab is open: StackBlitz always gets `demo.tsx`, a surface
   // file on its own being nothing that runs.
   const demo = arranged
-    ? buildArrangedSource(spec, arranged, mounted, stageHeight, screenName ?? '', editable, stockSurface)
-    : buildSource(spec, mounted, stageHeight, screenName, editable)
+    ? buildArrangedSource(spec, arranged, p, stageHeight, screenName ?? '', editable)
+    : buildSource(spec, p, stageHeight, screenName, editable)
   /*
    * One tab per surface next to demo.tsx, and the same `view` drives both -
    * so picking a panel's source shows that panel on the stage, and picking a
@@ -1154,17 +1144,13 @@ function MockupExplorerImpl({
                   {arranged.items.map((item, i) => {
                     const itemSpec = item.component ? EXPLORERS[item.component]! : spec
                     const Bare = itemSpec.bare
-                    // An instance that brings its own stock prints on it.
+                    // An instance that brings its own stock prints on it, so its
+                    // artwork has to set its ink for that stock.
                     const own = item.props?.color
                     const itemStock =
-                      stockSurface && !item.component && typeof own === 'string' && own.startsWith('#') ? own : undefined
+                      spec.stock && !item.component && typeof own === 'string' && own.startsWith('#') ? own : undefined
                     return (
-                      <Bare
-                        key={i}
-                        {...(item.component ? {} : objectProps)}
-                        {...(itemStock ? { surfaceBackground: itemStock } : {})}
-                        {...item.props}
-                      >
+                      <Bare key={i} {...(item.component ? {} : objectProps)} {...item.props}>
                         {content(
                           itemSpec.Component.regions?.[0]?.name ?? 'children',
                           item.surface,
@@ -1212,7 +1198,7 @@ function MockupExplorerImpl({
                   style={{
                     width: flatSize.px.width,
                     height: flatSize.px.height,
-                    background: surfaceBackground || undefined,
+                    background: p.surfaceBackground || (spec.stock ? finish : undefined),
                     // Content still lays out at true CSS pixel size - that is the
                     // whole point of the view - and only the picture is scaled.
                     transform: `scale(${flatSize.scale})`,
@@ -1374,7 +1360,7 @@ function MockupExplorerImpl({
             <ColorRow
               label="surfaceBackground"
               value={p.surfaceBackground}
-              fallback={spec.stock ? finish : '#000000'}
+              fallback={surfaceDefault}
               onChange={(v) => set('surfaceBackground', v)}
             />
             <div className="mx-row">

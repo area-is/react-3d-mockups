@@ -44,7 +44,7 @@ Beyond the [shared screen props](/docs/screen-content):
 | --- | --- | --- | --- |
 | `size` | `{ width, height, depth }` | required | Box size in millimeters. |
 | `color` | `string` | `'#e8e5df'` | Stock color for unprinted faces. |
-| `surfaceBackground` | `string` | `'#ffffff'` | CSS background behind each printed face. |
+| `surfaceBackground` | `string` | `color` | CSS background behind each printed face - the stock itself unless you set it, so whatever the content leaves clear prints on `color`. |
 | `resolution` | `number` | `560` | Virtual front face width in CSS px; all faces share its dpi. |
 
 `customBoxScale(size)` is exported if you need the world-units-per-mm

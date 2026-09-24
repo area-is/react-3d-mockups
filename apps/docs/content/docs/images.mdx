@@ -77,13 +77,14 @@ mockupInfo('laptop', { variant: 'air15' }).primary.aspect // 1.545 - shoot 3:2
 ## A transparent image on the material
 
 A logo is not a full-bleed picture: it sits on the board. Export it with a
-transparent background, size it as an element inside the surface, and set
-`surfaceBackground` to the object's own `color`, so everything the picture
-leaves clear is the bag. The same file prints on kraft, on gloss white or on a
-charcoal bag without being re-exported.
+transparent background and size it as an element inside the surface.
+A bag's surfaces print onto the bag - `surfaceBackground` defaults to its
+`color` - so everything the picture leaves clear is the bag, and the same file
+prints on kraft, on gloss white or on a charcoal bag without being
+re-exported.
 
 ```tsx
-<ShoppingBagMockup color="#c19a6b" surfaceBackground="#c19a6b" float>
+<ShoppingBagMockup color="#c19a6b" float>
   <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '18% 14%' }}>
     <img src="/art/fox.webp" alt="" style={{ width: '100%' }} />
   </div>
@@ -94,8 +95,8 @@ charcoal bag without being re-exported.
 
 Do not reach for `surfaceBackground="transparent"` to get the board through -
 the surface sits under the canvas, so transparent pixels fall through to the
-page and read as a hole in the object. Paint the board's colour and let the
-image be the transparent thing. [Surface background](/docs/screen-content#surface-background)
+page and read as a hole in the object. The board's colour is already there;
+let the image be the transparent thing. [Surface background](/docs/screen-content#surface-background)
 has the longer version.
 
 ## How big should the image be?

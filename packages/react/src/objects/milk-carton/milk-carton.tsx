@@ -75,7 +75,8 @@ function MilkCartonImpl({
   color = '#f4f3ef',
   capColor = '#d7dbdf',
   cap = true,
-  surfaceBackground = '#ffffff',
+  // Printed straight onto the stock: whatever the content leaves clear is `color`.
+  surfaceBackground = color,
   resolution = MILK_CARTON.resolution,
   surfaceStyle,
   ...groupProps

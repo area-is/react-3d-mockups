@@ -90,6 +90,18 @@ breaking change can ship in a minor release, and is always listed under
   page's outline and its links in the tab order. Pass
   `screenAccessibility="visible"` for a screen whose text appears nowhere else.
 
+- **Print objects print onto their own stock.** On the objects whose `color` is
+  the material their surfaces are printed on - `Brochure`, `BusinessCard`,
+  `IDCard`, `GreetingCard`, `ProductBox`, `MailerBox`, `MilkCarton`,
+  `ShoppingBag`, `VinylRecord`, `CustomPanel`, `CustomBox`, `Bus`, `Van` and
+  `SemiTrailer` - `surfaceBackground` now defaults to `color` instead of white.
+  Whatever your content leaves clear is the card, the board, the bag or the
+  paint, so a transparent logo prints onto kraft without a second prop.
+  Full-bleed opaque artwork looks exactly as before. To keep a white ground
+  under transparent content, pass `surfaceBackground="#ffffff"`. Objects whose
+  `color` is hardware around a separate sheet (frames, signs, the billboard) and
+  the book's cover still default to white.
+
 - **Peer ranges are bounded:** React `^19`, `@react-three/fiber` `^9`,
   `@react-three/drei` `^10`, `three` `>=0.179.0 <0.187.0`. They were open-ended,
   so npm would have installed a future drei 11 or fiber 10 - which the screen

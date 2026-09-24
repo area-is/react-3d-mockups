@@ -40,7 +40,8 @@ function GreetingCardImpl({
   children,
   openAngle = GREETING_CARD.openAngle,
   color = '#f6f3ec',
-  surfaceBackground = '#ffffff',
+  // Printed straight onto the stock: whatever the content leaves clear is `color`.
+  surfaceBackground = color,
   resolution = GREETING_CARD.resolution,
   surfaceStyle,
   ...groupProps

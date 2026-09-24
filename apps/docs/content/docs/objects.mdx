@@ -65,23 +65,26 @@ next to them - see the Components section in the sidebar.
 ## Printing onto the stock
 
 On the objects whose `color` is the material itself - card, board, paper, a
-record jacket, a vehicle's paint under its vinyl - a live surface still
-defaults to a white `surfaceBackground`, so artwork with a transparent ground
-prints onto white. To print it onto the stock instead, give the surface the
-same colour:
+record jacket, a vehicle's paint under its vinyl - a live surface prints onto
+that material: `surfaceBackground` defaults to `color`. Artwork with a
+transparent ground shows the stock wherever it leaves clear, and one file
+prints on kraft, on white or on a brand dip without being re-exported.
 
 ```tsx
-<MilkCartonMockup color="#cbab7f" surfaceBackground="#cbab7f">
+<MilkCartonMockup color="#cbab7f">
   <LabelArt /> {/* no background of its own: the kraft shows through */}
 </MilkCartonMockup>
 ```
 
-That is what the samples on these pages do. Their artwork has no ground of
-its own, so changing `color` in an example changes what it is printed on,
-and its type flips between dark and light ink to stay legible. The
-exceptions are the objects where `color` is hardware around a separate
-sheet - a frame's moulding, a billboard's steel, a roll-up's cassette - and
-a book's dust jacket, which is its own printed paper.
+Set `surfaceBackground` to print onto something else - a white label on a
+kraft carton, say.
+
+The samples on these pages are built that way: their artwork has no ground
+of its own, so changing `color` in an example changes what it is printed on,
+and its type flips between dark and light ink to stay legible. Where `color`
+is hardware around a separate sheet - a frame's moulding, a billboard's steel,
+a roll-up's cassette - and on a book, whose cover art is its own printed
+jacket, the surface still defaults to white.
 
 ## Multiple live surfaces
 

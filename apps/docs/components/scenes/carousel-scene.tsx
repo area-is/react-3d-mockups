@@ -237,9 +237,11 @@ interface Entry {
    */
   content: (color: string) => ReactNode
   /**
-   * Paint the object's finish behind the live surface instead of the library's
-   * default white. Set on the faces whose artwork prints onto the material -
-   * without it a transparent sheet would sit on a white panel, not on kraft.
+   * The finish is the material the artwork prints onto - a board, a bag, a
+   * record jacket - rather than a colourway or the hardware around a sheet,
+   * so the swatches are labelled "Material". The library already paints that
+   * stock behind the printed faces (`surfaceBackground` defaults to `color`
+   * on those objects), so a transparent sheet sits on kraft, not on white.
    */
   material?: boolean
   /** What the swatches are called when they are neither colorways, materials nor finishes. */
@@ -980,8 +982,6 @@ function StageSlot({
     >
       {entry.render({
         color,
-        // The finish doubles as the panel behind a printed face (see `material`).
-        surface: entry.material ? color : undefined,
         statusBar: entry.statusBarInk ? { color: entry.statusBarInk } : false,
         /*
          * Every staged slot carries its surface for as long as it exists -
