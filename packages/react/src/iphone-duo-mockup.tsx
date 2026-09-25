@@ -37,4 +37,5 @@ export const IPhoneDuoMockup = createMockup({
   framing: IPHONE_DUO_FRAMING,
   slots: foldSlots,
   displayName: 'IPhoneDuoMockup',
+  label: '3D mockup of an iPhone Duo',
 })
