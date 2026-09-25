@@ -48,7 +48,7 @@ Beyond the [shared screen props](/docs/screen-content):
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
 | `color` | `string` | `'#eef0f2'` | Body paint. Wrap fleets are usually white. |
-| `surfaceBackground` | `string` | `'#ffffff'` | CSS background behind your wrap content. |
+| `surfaceBackground` | `string` | `color` | CSS background behind your wrap content - the body paint itself unless you set it, so whatever the wrap leaves clear shows `color`. |
 | `coverage` | `'panel' \| 'full' \| 'perforated'` | `'panel'` | `'full'` covers the entire side elevations AND the whole rear face - corner post to corner post - carving out the wheel arches and the gasketed door glass, while the proud hardware (rails, mirrors, handles, markers) draws on top of the livery via per-pixel depth compositing, like hardware remounted over the vinyl; the cab-door shut lines and the box's sheet seams are carved as slits the film tucks into. On the rear, every taillight lamp, the third brake light and the shut gap around the roll-up door are carved to a slim install margin. Both coverages keep the roll-up door's slat joints visible through the wrap. `'perforated'` is the same full wrap running OVER the cab door glass as perforated window film. |
 | `resolution` | `number` | `900` panel · `1360` full | Virtual side-wrap width in CSS px; the rear panel shares its dpi. |
 

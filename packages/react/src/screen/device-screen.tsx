@@ -3,6 +3,7 @@ import type * as THREE from 'three'
 import { Group, ShapeGeometry } from 'three'
 import { Html } from '@react-three/drei'
 import { useFrame, useThree } from '@react-three/fiber'
+import { FiberProvider, useContextBridge } from 'its-fine'
 import {
   SCREEN_LAYER_CLASS,
   SCREEN_LAYER_CSS,
@@ -15,6 +16,7 @@ import {
   type ScreenRadius,
 } from '../core'
 import { SurfaceProvider } from './use-surface'
+import { StageContext } from '../stage-context'
 
 export type { ScreenRadius }
 
@@ -103,6 +105,33 @@ function releaseScreenStack(host: HTMLElement | null): void {
  */
 export const SCREEN_MASK_INSET = 0.004
 
+/*
+ * A stable key per element drei portals a screen into, for the <Html> below.
+ *
+ * drei keeps ONE wrapper element for the life of an <Html>, and when its
+ * target changes it unmounts that wrapper's React root and creates a new root
+ * on the same element. Every canvas changes the target once: drei reads
+ * `events.connected` before r3f's Provider has connected the events, so a
+ * screen portals into the canvas's container first and into the event target
+ * a moment later. That was harmless while the old root finished unmounting on
+ * the spot. @react-three/fiber 9.8 mounts the scene inside <Canvas>'s own
+ * layout effect - inside React DOM's commit - where `root.unmount()` cannot
+ * flush, so the old root's teardown commits AFTER the new root has rendered
+ * the screen, and clearing "its" container wipes the live screen out from
+ * under the new root, which never puts it back: a blank screen, for good.
+ * Keying the <Html> by its target makes a new target a new <Html>, with a
+ * fresh wrapper for the new root, so the late teardown only empties the old,
+ * detached one.
+ */
+const portalTargetKeys = new WeakMap<object, number>()
+let nextPortalTargetKey = 0
+function portalTargetKey(target: object | null | undefined): number {
+  if (!target) return 0
+  let key = portalTargetKeys.get(target)
+  if (key === undefined) portalTargetKeys.set(target, (key = ++nextPortalTargetKey))
+  return key
+}
+
 // Staggered retry thresholds for the drei <Html> mount race (see below):
 // screens created back-to-back get different frame counts, so their
 // remounts land in separate commits instead of re-racing each other.
@@ -110,6 +139,58 @@ let retryPhase = 0
 function nextRetryThreshold(): number {
   retryPhase = (retryPhase + 1) % 5
   return 6 + retryPhase * 3
+}
+
+/**
+ * The screen-layer stylesheet, rendered as a React 19 hoistable `<style>`:
+ * `href` + `precedence` make React lift it into the document head once and
+ * dedupe every other copy, instead of each screen injecting its own element
+ * (a carousel of eighteen screens carried eighteen identical stylesheets).
+ */
+const SCREEN_LAYER_STYLE_HREF = 'react-3d-mockups-screen-layer'
+
+// Typed locally: this is browser code and does not take node's types.
+declare const process: { env: { NODE_ENV?: string } }
+
+/**
+ * Written as the literal `process.env.NODE_ENV` so every bundler can inline it
+ * and drop the warning below from production builds; the try covers an
+ * unbundled page, where `process` does not exist and nothing is dev.
+ */
+const DEV = (() => {
+  try {
+    return process.env.NODE_ENV !== 'production'
+  } catch {
+    return false
+  }
+})()
+let warnedOpaque = false
+
+/**
+ * Development warning for the one canvas setup that silently hides every
+ * screen. Screens are DOM stacked UNDER the canvas and seen through the pixels
+ * it leaves transparent; a canvas that paints its own background paints over
+ * all of them, and nothing errors - the devices just render with black glass.
+ * `MockupCanvas` is transparent unless told otherwise, so this is almost
+ * always a `<Canvas>` the caller owns (see "Composing scenes").
+ */
+function warnIfOpaque(gl: THREE.WebGLRenderer, scene: THREE.Scene): void {
+  if (!DEV || warnedOpaque) return
+  const reason =
+    gl.getContextAttributes()?.alpha === false
+      ? '`gl.alpha` is false'
+      : scene.background
+        ? '`scene.background` is set (e.g. by <color attach="background">)'
+        : gl.getClearAlpha() >= 1
+          ? 'the clear alpha is 1'
+          : null
+  if (!reason) return
+  warnedOpaque = true
+  console.warn(
+    `react-3d-mockups: a live screen is inside an opaque canvas (${reason}), so the canvas paints over it. ` +
+      'Screens are DOM under the canvas, seen through the pixels it leaves transparent: keep the canvas ' +
+      'transparent (`gl={{ alpha: true }}`, no scene background) and give the page or the canvas element a CSS background instead.'
+  )
 }
 
 export interface DeviceScreenProps {
@@ -178,7 +259,25 @@ export interface DeviceScreenProps {
  * live in `src/core` (see `SCREEN_LAYER_CSS` and
  * `createBackfaceCuller` there); this component is the thin React wiring.
  */
-export function DeviceScreen({
+export function DeviceScreen(props: DeviceScreenProps) {
+  /*
+   * Its own FiberProvider, for the context bridge below. The bridge finds this
+   * component's fiber by searching down from the nearest provider, and r3f
+   * renders one at the root of every canvas - but that is r3f's copy of
+   * its-fine, and an app that ends up with two copies (a nested install, a
+   * bundler splitting them) has two unrelated provider contexts: the screen
+   * then threw "useFiber must be called within a <FiberProvider />". Providing
+   * it here makes the bridge independent of r3f's copy, and turns the search
+   * from the whole scene into this one screen's subtree.
+   */
+  return (
+    <FiberProvider>
+      <BridgedScreen {...props} />
+    </FiberProvider>
+  )
+}
+
+function BridgedScreen({
   region,
   width,
   height,
@@ -194,6 +293,22 @@ export function DeviceScreen({
   children,
 }: DeviceScreenProps) {
   const gl = useThree((state) => state.gl)
+  const scene = useThree((state) => state.scene)
+  const invalidate = useThree((state) => state.invalidate)
+  // drei's own portal target (`portal || events.connected || canvas parent`;
+  // no `portal` is passed here). See `portalTargetKey`.
+  const connected = useThree((state) => state.events.connected)
+  const htmlKey = portalTargetKey(connected || gl.domElement.parentNode)
+  const { screenAccessibility } = React.useContext(StageContext)
+  /*
+   * drei's <Html> renders its children into a SEPARATE React root, and a new
+   * root starts with no context at all - so a theme, an i18n provider, a
+   * router or a query client above the mockup was invisible to the component
+   * on the glass, which then threw or rendered unstyled. The bridge re-provides
+   * every context this screen can see (the page's, which r3f already bridges
+   * into the canvas, plus any provider inside the canvas) to the screen's root.
+   */
+  const ContextBridge = useContextBridge()
   // Canvas size in CSS px. Not read for itself - it is what changes when the
   // drawing buffer or the display density does, so it is the dependency that
   // re-derives the raster scale below.
@@ -263,6 +378,8 @@ export function DeviceScreen({
     gl.domElement.style.pointerEvents = 'auto'
   }, [gl])
 
+  React.useEffect(() => warnIfOpaque(gl, scene), [gl, scene])
+
   // drei's blending setup is a per-<Html> layout effect that mutates GLOBAL
   // canvas style, and r3f can reconnect and re-stamp it. Re-assert the
   // config from the frame loop so it always holds, whatever the mount order.
@@ -271,7 +388,24 @@ export function DeviceScreen({
   // Backface culling for the DOM plane - hide it whenever its normal points
   // away from the camera (CSS backface-visibility can't see drei's chain).
   const anchorRef = React.useRef<Group>(null!)
-  const contentRef = React.useRef<HTMLDivElement>(null!)
+  const contentRef = React.useRef<HTMLDivElement | null>(null)
+  /*
+   * The content element, and the frame it needs to land in.
+   *
+   * drei positions a screen from its own frame callback, but its root commits
+   * the screen's DOM asynchronously - AFTER the frame that mounted it. A canvas
+   * rendering every frame never noticed; one rendering on demand has no next
+   * frame coming, and the screen sat unplaced (full-canvas size, untransformed)
+   * until something happened to move. So the arrival of the content - on
+   * mount, on a re-portal, on a mount-race retry - requests that frame itself.
+   */
+  const setContent = React.useCallback(
+    (element: HTMLDivElement | null) => {
+      contentRef.current = element
+      if (element) invalidate()
+    },
+    [invalidate]
+  )
   // Retry epoch + bookkeeping for the drei <Html> mount race (see the
   // frame loop): bumping the epoch re-commits the <Html> subtree, which
   // re-runs drei's dependency-less render effect on its existing root.
@@ -309,6 +443,10 @@ export function DeviceScreen({
         retry.retries += 1
         setHtmlEpoch((epoch) => epoch + 1)
       }
+      // Counting frames only works if frames keep coming: on a canvas that
+      // renders on demand, ask for the next one until the content lands or the
+      // retries run out.
+      if (retry.retries < 8) invalidate()
     } else {
       retryState.current.frames = 0
     }
@@ -328,10 +466,17 @@ export function DeviceScreen({
    * `screenStyle` - clip paths that punch a spindle hole or a lanyard slot are
    * authored in these pixels, so this box keeps its declared size whatever the
    * screen is painted at.
+   *
+   * It is also where the screen leaves the accessibility tree (see
+   * `ScreenAccessibility`): `inert` as well as `aria-hidden`, because a link or
+   * a button on a decorative screen would otherwise still take a tab stop the
+   * visitor can neither see the focus of nor activate.
    */
   const surface = (
     <div
-      ref={rasterScale === 1 ? contentRef : undefined}
+      ref={rasterScale === 1 ? setContent : undefined}
+      aria-hidden={screenAccessibility === 'visible' ? undefined : true}
+      inert={screenAccessibility === 'visible' ? undefined : true}
       style={{
         ...screenSurfaceStyle({ width, height, radius, resolution, background }),
         // The inset the system UI costs the content, for CSS to pick up. Set
@@ -371,6 +516,7 @@ export function DeviceScreen({
   return (
     <group ref={anchorRef} position={position} rotation={rotation}>
       <Html
+        key={htmlKey}
         transform
         occlude="blending"
         geometry={blendGeometry ? <primitive object={blendGeometry} attach="geometry" /> : undefined}
@@ -385,32 +531,36 @@ export function DeviceScreen({
         // legitimately wants to paint over the mockup.
         pointerEvents="none"
       >
-        <style>{SCREEN_LAYER_CSS}</style>
-        {rasterScale === 1 ? (
-          surface
-        ) : (
-          /*
-           * The painted box. The surface still LAYS OUT at full size and only
-           * draws smaller, so this is sized to the drawn result and clips to
-           * it - and it is this element, not the surface, that the compositor
-           * promotes, which is what holds the rasterized layer to these bounds
-           * instead of the surface's own.
-           */
-          <div
-            ref={contentRef}
-            style={{
-              position: 'relative',
-              width: resolution * rasterScale,
-              height: cssHeight * rasterScale,
-              overflow: 'hidden',
-              pointerEvents: 'none',
-              backfaceVisibility: 'hidden',
-              WebkitBackfaceVisibility: 'hidden',
-            }}
-          >
-            {surface}
-          </div>
-        )}
+        <style href={SCREEN_LAYER_STYLE_HREF} precedence="default">
+          {SCREEN_LAYER_CSS}
+        </style>
+        <ContextBridge>
+          {rasterScale === 1 ? (
+            surface
+          ) : (
+            /*
+             * The painted box. The surface still LAYS OUT at full size and only
+             * draws smaller, so this is sized to the drawn result and clips to
+             * it - and it is this element, not the surface, that the compositor
+             * promotes, which is what holds the rasterized layer to these bounds
+             * instead of the surface's own.
+             */
+            <div
+              ref={setContent}
+              style={{
+                position: 'relative',
+                width: resolution * rasterScale,
+                height: cssHeight * rasterScale,
+                overflow: 'hidden',
+                pointerEvents: 'none',
+                backfaceVisibility: 'hidden',
+                WebkitBackfaceVisibility: 'hidden',
+              }}
+            >
+              {surface}
+            </div>
+          )}
+        </ContextBridge>
       </Html>
     </group>
   )

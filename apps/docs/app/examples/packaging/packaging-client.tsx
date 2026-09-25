@@ -3,7 +3,7 @@
 import { useState, type ReactNode } from 'react'
 import Link from 'next/link'
 import { SceneBoundary } from '@/components/scene-boundary'
-import { ExampleBadge, TabbiedLink } from '../_shared/badge'
+import { TabbiedLink } from '../_shared/badge'
 import { lazyScene } from '../_shared/stage'
 import dynamic from 'next/dynamic'
 import {
@@ -74,7 +74,6 @@ export function Packaging() {
           <span>Samples</span>
         </nav>
         <div className="pk-top-right">
-          <ExampleBadge className="pk-badge" />
           <span className="pk-cta">Talk to a packer</span>
         </div>
       </header>

@@ -1,6 +1,7 @@
 ---
 title: Objects and print surfaces
 description: Books, packaging, posters, out-of-home formats, vehicles, and custom-size panels and boxes - every non-device mockup in the library.
+keywords: [objects, print, print surfaces, packaging, out of home, ooh, vehicles, wraps, slots, custom size]
 ---
 
 Beyond phones and laptops, the library models everyday objects whose printable
@@ -60,6 +61,30 @@ export function CoverPreview() {
 
 Every object's page has multiple live, draggable examples with the code
 next to them - see the Components section in the sidebar.
+
+## Printing onto the stock
+
+On the objects whose `color` is the material itself - card, board, paper, a
+record jacket, a vehicle's paint under its vinyl - a live surface prints onto
+that material: `surfaceBackground` defaults to `color`. Artwork with a
+transparent ground shows the stock wherever it leaves clear, and one file
+prints on kraft, on white or on a brand dip without being re-exported.
+
+```tsx
+<MilkCartonMockup color="#cbab7f">
+  <LabelArt /> {/* no background of its own: the kraft shows through */}
+</MilkCartonMockup>
+```
+
+Set `surfaceBackground` to print onto something else - a white label on a
+kraft carton, say.
+
+The samples on these pages are built that way: their artwork has no ground
+of its own, so changing `color` in an example changes what it is printed on,
+and its type flips between dark and light ink to stay legible. Where `color`
+is hardware around a separate sheet - a frame's moulding, a billboard's steel,
+a roll-up's cassette - and on a book, whose cover art is its own printed
+jacket, the surface still defaults to white.
 
 ## Multiple live surfaces
 

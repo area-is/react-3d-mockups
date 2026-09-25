@@ -30,7 +30,7 @@ import { collectSlots, createSlots, resolveSurface, type SurfaceProps } from '..
 
 type GroupProps = ThreeElements['group']
 
-// Machined USB-C opening, measured off the reference A16 scan: ~9.9 × 3.2 mm
+// Machined USB-C opening, measured from the A16's product photography: ~9.9 × 3.2 mm
 // stadium at the tablet world scale (64 mm/unit). Same receptacle across the
 // lineup - the connector is the standard part, only its edge differs.
 const USB_WIDTH = 0.155

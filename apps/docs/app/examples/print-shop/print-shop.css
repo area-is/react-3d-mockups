@@ -82,27 +82,6 @@
   gap: 14px;
 }
 
-.ps-badge {
-  font-size: 12.5px;
-  font-weight: 500;
-  white-space: nowrap;
-  color: var(--ps-muted);
-  border: 1px solid var(--ps-line);
-  border-radius: 999px;
-  padding: 6px 13px;
-  background: rgba(255, 255, 255, 0.5);
-  transition: color 0.15s ease, border-color 0.15s ease;
-}
-
-.ps-badge a {
-  font-weight: 600;
-  transition: color 0.15s ease;
-}
-
-.ps-badge a:hover {
-  color: var(--ps-ink);
-}
-
 .ps-foot a[href^='https://tabbied.com'] {
   font-weight: 600;
   color: var(--ps-ink);
@@ -153,15 +132,28 @@
   inset: -8% -12%;
 }
 
+/* A pill, not bare grey type: the frame can be zoomed or turned right over
+   this corner of the stage, and grey on a print is unreadable. The pill
+   carries its own wall-coloured ground, so the line reads over anything. */
 .ps-stage-hint {
   position: absolute;
-  left: 0;
-  right: 0;
+  left: 50%;
   bottom: 16px;
+  transform: translateX(-50%);
+  width: max-content;
+  max-width: calc(100% - 32px);
   margin: 0;
+  padding: 6px 13px;
+  border-radius: 999px;
+  background: rgba(250, 248, 243, 0.88);
+  box-shadow: 0 0 0 1px rgba(26, 25, 23, 0.07), 0 4px 14px -6px rgba(26, 25, 23, 0.25);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
   text-align: center;
   font-size: 12.5px;
-  color: var(--ps-muted);
+  font-weight: 500;
+  line-height: 1.35;
+  color: #4a4741;
   pointer-events: none;
 }
 
@@ -628,9 +620,7 @@
     padding: 18px 20px 0;
   }
 
-  /* The badge and the shop nav both compete with the wordmark for one
-     line; the footer says what the badge says. */
-  .ps-badge,
+  /* The shop nav competes with the wordmark and the bag for one line. */
   .ps-nav {
     display: none;
   }

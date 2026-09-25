@@ -1,0 +1,119 @@
+---
+title: Other frameworks
+description: Vite, React Router, Astro and the Next.js Pages Router - the same rule everywhere, mount the mockup in the browser only.
+keywords: [frameworks, vite, react router, remix, astro, pages router, client only, clientonly, ssr, spa, lazy, suspense]
+---
+
+One rule covers every framework: WebGL exists only in the browser, so a mockup
+has to mount on the client. Where a framework renders on the server, skip the
+mockup there and mount it after hydration. Wherever it lives, give its wrapper
+a fixed height - the mockup fills its parent, and a reserved box keeps the page
+from shifting when the canvas appears.
+
+The examples below all load this component:
+
+```tsx title="mockup.tsx"
+import { GalaxyMockup } from 'react-3d-mockups'
+
+export default function Mockup() {
+  return (
+    <GalaxyMockup float>
+      <YourApp />
+    </GalaxyMockup>
+  )
+}
+```
+
+For the Next.js App Router, see [Next.js and SSR](/docs/nextjs).
+
+## Vite + React
+
+A Vite single-page app renders only in the browser, so import the mockup
+directly. Loading it lazily keeps three.js out of your first chunk:
+
+```tsx title="hero.tsx"
+import { lazy, Suspense } from 'react'
+
+const Mockup = lazy(() => import('./mockup'))
+
+export function Hero() {
+  return (
+    <div style={{ height: 560 }}>
+      <Suspense fallback={null}>
+        <Mockup />
+      </Suspense>
+    </div>
+  )
+}
+```
+
+## React Router (framework mode) and Remix
+
+Framework mode renders routes on the server, and `lazy` alone does not stop
+that. Gate the mockup on hydration: `useSyncExternalStore` reads `false` on
+the server and while hydrating, then `true`, so the server HTML and the first
+client render agree and the mockup mounts right after.
+
+```tsx title="app/components/hero.tsx"
+import { lazy, Suspense, useSyncExternalStore } from 'react'
+
+const Mockup = lazy(() => import('./mockup'))
+
+const subscribe = () => () => {}
+const useHydrated = () =>
+  useSyncExternalStore(subscribe, () => true, () => false)
+
+export function Hero() {
+  const hydrated = useHydrated()
+  return (
+    <div style={{ height: 560 }}>
+      {hydrated && (
+        <Suspense fallback={null}>
+          <Mockup />
+        </Suspense>
+      )}
+    </div>
+  )
+}
+```
+
+`<ClientOnly>` from `remix-utils` is the same gate as a component. With
+`ssr: false` in `react-router.config.ts` (SPA mode) nothing renders on the
+server, and the Vite pattern above is enough.
+
+## Astro
+
+Render the component as a React island with `client:only="react"`, which skips
+server rendering for it entirely (the `@astrojs/react` integration has to be
+installed):
+
+```astro title="src/pages/index.astro"
+---
+import Mockup from '../components/mockup.tsx'
+---
+
+<div style="height: 560px">
+  <Mockup client:only="react" />
+</div>
+```
+
+`client:load` or `client:visible` would render it on the server first, which
+is exactly what has to be avoided.
+
+## Next.js Pages Router
+
+In the Pages Router, `next/dynamic` with `ssr: false` works directly in a page:
+
+```tsx title="pages/index.tsx"
+import dynamic from 'next/dynamic'
+
+const Mockup = dynamic(() => import('../components/mockup'), { ssr: false })
+
+export default function Home() {
+  return (
+    <div style={{ height: 560 }}>
+      <Mockup />
+    </div>
+  )
+}
+```

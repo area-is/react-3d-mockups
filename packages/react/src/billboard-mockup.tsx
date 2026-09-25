@@ -36,6 +36,7 @@ export const BillboardMockup = createMockup({
   regions: BILLBOARD_REGIONS,
   metrics: BILLBOARD_METRICS,
   object: StagedBillboard,
+  label: '3D mockup of a billboard',
   framing: BILLBOARD_FRAMING,
   slots: billboardSlots,
   displayName: 'BillboardMockup',

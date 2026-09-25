@@ -11,7 +11,8 @@ export interface BrochureProps extends Omit<GroupProps, 'children' | 'color'>, S
    * Panel content: one slot per panel - `<Brochure.FrontLeft>`,
    * `.FrontCenter`, `.FrontRight` and the matching `.Back*` for the reverse
    * faces. Bare children are shorthand for `FrontLeft`. Panels left out show
-   * bare `color` stock; front panels default to `surfaceBackground`.
+   * bare `color` stock; front panels show `surfaceBackground`, which is
+   * that same stock unless you set it.
    */
   children?: React.ReactNode
   /**
@@ -47,7 +48,8 @@ function BrochureImpl({
   size,
   foldAngle = BROCHURE.foldAngle,
   color = '#f5f4f0',
-  surfaceBackground = '#ffffff',
+  // Printed straight onto the stock: whatever the content leaves clear is `color`.
+  surfaceBackground = color,
   resolution = BROCHURE.resolution,
   surfaceStyle,
   ...groupProps

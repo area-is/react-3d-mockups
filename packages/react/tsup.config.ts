@@ -24,7 +24,23 @@ const shared = {
    * empty `dist/` once, up front, instead.
    */
   clean: false,
-  external: ['react', 'react-dom', 'three', '@react-three/fiber', '@react-three/drei'],
+  /*
+   * Peers, plus the runtime dependencies. tsup would externalize the
+   * dependencies on its own; they are listed so that moving one back to
+   * devDependencies cannot silently start bundling it again. The CSG pair used
+   * to be bundled: every app then carried a private copy of three-mesh-bvh
+   * alongside the one drei installs, and could neither dedupe nor update it.
+   */
+  external: [
+    'react',
+    'react-dom',
+    'three',
+    '@react-three/fiber',
+    '@react-three/drei',
+    'its-fine',
+    'three-bvh-csg',
+    'three-mesh-bvh',
+  ],
 } satisfies Options
 
 export default defineConfig([

@@ -79,12 +79,15 @@ drei bridge; same for `devices`/`objects`, whose specs and scene components
 mirror each other):
 
 - The **canvas/stage component** wiring core config into the renderer
-  (`mockup-canvas.tsx` over r3f `<Canvas>`, drei `Environment`/`ContactShadows`,
-  and `TumbleControls` over the core `TumbleOrbit`).
+  (`mockup-canvas.tsx` over r3f `<Canvas>`, drei `Environment`, the
+  motion-tracked contact shadow in `stage-shadows.tsx`, and `TumbleControls`
+  over the core `TumbleOrbit`).
 - The **HTML screen bridge**: portaling framework content onto the display glass
   (`screen/device-screen.tsx` over drei `<Html transform occlude="blending">`),
-  calling the core's backface culler and confining drei's z-index band to the
-  mockup's own stacking context.
+  calling the core's backface culler, confining drei's z-index band to the
+  mockup's own stacking context, bridging React context into the screen's
+  separate root (its-fine), and keeping the screen out of the accessibility
+  tree unless asked (`stage-context.tsx`).
 - The **device/object scene components** - declarative meshes built from core specs
   (`devices/*/*.tsx`, `objects/*/*.tsx`), plus per-device DOM overlays (punch hole,
   notch) computed from the same specs.
@@ -130,6 +133,29 @@ is built on:
 The float animation is `floatPose` sampled once per frame - run it *before* the orbit
 controls and HTML bridge update (r3f frame priority -2) so the DOM screen never
 trails the WebGL body.
+
+## Rendering on demand
+
+A mockup canvas defaults to `frameloop="demand"`: it draws only when something
+asks for a frame, and draws nothing at rest (and nothing at all while it is off
+screen - `pauseWhenOffscreen`). r3f requests a frame by itself for a prop change
+or a resize. Everything else that moves has to ask, and each does:
+
+- `TumbleControls` - on every pointer, wheel, gesture and key event, and from
+  its frame loop for as long as the orbit is `settling` or `autoRotate` runs;
+- `FloatGroup` - every frame while it floats;
+- `DeviceScreen` - when its content element arrives (drei's `<Html>` commits it
+  after the frame that mounted it, so without a request the screen would sit
+  unplaced), and every frame while it waits out drei's mount race;
+- `StageShadows` - never asks; it re-renders the shadow map on frames that
+  happen anyway, and only when a mesh's world matrix or geometry has changed.
+
+The rule for new code: **anything that changes the picture from outside a prop
+change calls `invalidate()`**, and a frame callback that animates keeps calling
+it while it animates. A test that only screenshots once after load will not
+catch a missing call - the first frames happen anyway - so check that a
+mockup still animates after it has sat idle, and `npm run bench`'s `idle`
+scenario checks the other direction.
 
 ## How the core is built
 

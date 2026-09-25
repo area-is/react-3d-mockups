@@ -23,6 +23,7 @@ export const BrochureMockup = createMockup({
   regions: BROCHURE_REGIONS,
   metrics: BROCHURE_METRICS,
   object: Brochure,
+  label: '3D mockup of a folded brochure',
   framing: BROCHURE_FRAMING,
   slots: brochureSlots,
   displayName: 'BrochureMockup',

@@ -21,6 +21,7 @@ export const PosterFrameMockup = createMockup({
   regions: POSTER_FRAME_REGIONS,
   metrics: POSTER_FRAME_METRICS,
   object: PosterFrame,
+  label: '3D mockup of a framed poster',
   framing: POSTER_FRAME_FRAMING,
   slots: posterFrameSlots,
   displayName: 'PosterFrameMockup',

@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { useFrame } from '@react-three/fiber'
+import { useFrame, useThree } from '@react-three/fiber'
 import type { Group } from 'three'
 import { floatPose, randomFloatPhase, FLOAT_REST_POSE } from './core'
 import { usePrefersReducedMotion } from './use-reduced-motion'
@@ -27,6 +27,11 @@ export function FloatGroup({
   // switching the preference on mid-session has to settle the object, not
   // strand it wherever the last animated frame left it.
   const reduced = usePrefersReducedMotion()
+  // The float is motion nothing else asks a frame for, so on a canvas that
+  // renders on demand it requests the next one itself - and stops requesting
+  // once reduced motion holds it at rest, after one frame to settle there.
+  const invalidate = useThree((state) => state.invalidate)
+  React.useEffect(() => invalidate(), [reduced, invalidate])
   useFrame(({ clock }) => {
     const pose = reduced ? FLOAT_REST_POSE : floatPose(clock.elapsedTime, intensity, phase)
     const group = ref.current
@@ -34,6 +39,7 @@ export function FloatGroup({
     group.rotation.y = pose.rotationY
     group.rotation.z = pose.rotationZ
     group.position.y = pose.positionY
+    if (!reduced) invalidate()
   }, -2)
   return <group ref={ref}>{children}</group>
 }

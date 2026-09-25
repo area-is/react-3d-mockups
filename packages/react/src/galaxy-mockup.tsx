@@ -28,6 +28,7 @@ export const GalaxyMockup = createMockup({
   regions: SCREEN_REGIONS,
   metrics: GALAXY_METRICS,
   object: Galaxy,
+  label: '3D mockup of a Galaxy S phone',
   framing: GALAXY_FRAMING,
   slots: galaxySlots,
   displayName: 'GalaxyMockup',

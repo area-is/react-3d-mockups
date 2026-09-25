@@ -27,6 +27,18 @@ import { propSummary, type EditableProp } from './prop-controls'
  * mockup never sees an angle outside the hinge's travel. Blur (or Enter) drops
  * the draft, which is what snaps a typed "200" back to the clamped 180.
  */
+/**
+ * The value an `<input type="color">` will take. It accepts only `#rrggbb`:
+ * the short form a default is often written in (`#000`) logs a console warning
+ * on every render and shows black, and so does a named colour. Short hex is
+ * expanded; anything else falls back.
+ */
+export function colorInputValue(color: string, fallback = '#000000'): string {
+  const short = /^#([0-9a-f])([0-9a-f])([0-9a-f])$/i.exec(color)
+  if (short) return `#${short[1]}${short[1]}${short[2]}${short[2]}${short[3]}${short[3]}`
+  return /^#[0-9a-f]{6}$/i.test(color) ? color : fallback
+}
+
 export function NumberField({
   label,
   value,
@@ -227,7 +239,7 @@ export function ColorRow({
           type="color"
           aria-label={label}
           className="mx-color"
-          value={hex}
+          value={colorInputValue(hex)}
           onChange={(e) => onChange(e.target.value)}
         />
         {value ? <Reset label={label} onClick={() => onChange('')} /> : null}
@@ -328,7 +340,7 @@ export function PropRow({ prop, value, set, onChange, onReset }: PropRowProps) {
               type="color"
               aria-label={`${name} color`}
               className="mx-color"
-              value={hex}
+              value={colorInputValue(hex)}
               onChange={(e) => onChange(e.target.value)}
             />
           ) : null}
@@ -362,7 +374,7 @@ export function PropRow({ prop, value, set, onChange, onReset }: PropRowProps) {
             type="color"
             aria-label={name}
             className="mx-color"
-            value={hex}
+            value={colorInputValue(hex)}
             onChange={(e) => onChange(e.target.value)}
           />
           {reset}

@@ -7,7 +7,7 @@ import { Download, Shuffle } from 'lucide-react'
 import { TabbiedPattern, type TabbiedPatternHandle } from 'tabbied/react'
 import { LazyScene } from '@/components/lazy-scene'
 import { SceneBoundary } from '@/components/scene-boundary'
-import { ExampleBadge, TabbiedLink } from '../_shared/badge'
+import { TabbiedLink } from '../_shared/badge'
 import {
   BLEEDS,
   DEFAULT_ORDER,
@@ -96,7 +96,6 @@ export function PrintShop() {
           <span className="ps-nav-link">Studio</span>
         </nav>
         <div className="ps-top-right">
-          <ExampleBadge className="ps-badge" />
           <span className="ps-bag" aria-live="polite">
             Bag · {bag}
           </span>
@@ -113,7 +112,7 @@ export function PrintShop() {
               <Scene order={order} artRef={artRef} />
             </SceneBoundary>
           </div>
-          <p className="ps-stage-hint">Drag to turn the frame · pinch to look closer</p>
+          <p className="ps-stage-hint">Shown with a hardback for scale · drag to turn, pinch to zoom</p>
         </div>
 
         <div className="ps-config">

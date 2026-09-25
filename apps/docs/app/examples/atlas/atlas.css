@@ -54,7 +54,6 @@
 .at-brand {
   font-size: 30px;
   font-weight: 600;
-  text-transform: uppercase;
   letter-spacing: -0.03em;
 }
 
@@ -70,26 +69,6 @@
   display: flex;
   align-items: center;
   gap: 14px;
-}
-
-.at-badge {
-  font-size: 12.5px;
-  font-weight: 500;
-  white-space: nowrap;
-  color: var(--at-muted);
-  border: 1px solid var(--at-line);
-  border-radius: 999px;
-  padding: 6px 13px;
-  background: rgba(255, 255, 255, 0.45);
-}
-
-.at-badge a {
-  font-weight: 600;
-  transition: color 0.15s ease;
-}
-
-.at-badge a:hover {
-  color: var(--at-ink);
 }
 
 .at-cta {
@@ -115,10 +94,9 @@
 
 .at-eyebrow {
   margin: 0 0 14px;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
+  letter-spacing: -0.005em;
   color: var(--at-red);
 }
 
@@ -151,10 +129,9 @@
 }
 
 .at-control-label {
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
+  letter-spacing: -0.005em;
   color: var(--at-muted);
 }
 
@@ -368,7 +345,6 @@
     padding: 18px 20px 0;
   }
 
-  .at-badge,
   .at-nav {
     display: none;
   }

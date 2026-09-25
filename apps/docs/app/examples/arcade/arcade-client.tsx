@@ -2,7 +2,6 @@
 
 import { useCallback, useState } from 'react'
 import Link from 'next/link'
-import { ExampleBadge } from '../_shared/badge'
 import { lazyScene } from '../_shared/stage'
 import { MothMark } from './arcade-art'
 import { GAME, LEVELS, OST, findLevel, type Level } from './arcade-data'
@@ -39,7 +38,6 @@ export function Arcade() {
           <span>{GAME.studio}</span>
         </nav>
         <div className="ar-top-right">
-          <ExampleBadge className="ar-badge" tabbied={false} />
           <span className="ar-cta">Wishlist · {GAME.price}</span>
         </div>
       </header>
@@ -124,7 +122,7 @@ export function Arcade() {
       </section>
 
       <footer className="ar-foot">
-        <span>Moth is a fictional game by a fictional studio. The one on the TV is a hundred lines of canvas, and it is actually running.</span>
+        <span>Moth is a fictional game by a fictional studio. The one on the TV is a canvas, a handful of generated silhouettes and a moth, and it is actually running.</span>
         <Link href="/docs/screen-content">What a screen can show →</Link>
       </footer>
     </main>

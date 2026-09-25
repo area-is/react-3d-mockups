@@ -3,10 +3,21 @@
 import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { ChevronDown } from 'lucide-react'
-import { SITE_EXAMPLES } from './site-examples'
+import { SITE_EXAMPLE_GROUPS } from './site-examples'
+import { asset } from '@/lib/base-path.mjs'
 
-/** "Examples" header dropdown: the standalone example pages, one row each. */
-export function ExamplesMenu() {
+/**
+ * "Examples" header dropdown: the standalone example pages, a column per use
+ * case (see site-examples.ts for why), each row a glimpse of the page beside
+ * its name. The glimpses are `npm run example-thumbs`, a few KB each, and the
+ * menu only renders when it is open, so a visitor who never opens it never
+ * fetches them.
+ *
+ * The site header and the bar across the top of every example both carry
+ * it. On an example, `current` names the page the visitor is on, which the
+ * menu marks rather than offering as somewhere to go.
+ */
+export function ExamplesMenu({ current }: { current?: string } = {}) {
   const [open, setOpen] = useState(false)
   const ref = useRef<HTMLSpanElement>(null)
 
@@ -37,16 +48,35 @@ export function ExamplesMenu() {
       </button>
       {open ? (
         <span className="nav-menu-pop" role="menu">
-          {SITE_EXAMPLES.map((example) => (
-            <Link
-              key={example.href}
-              href={example.href}
-              className="nav-menu-item"
-              role="menuitem"
-              onClick={() => setOpen(false)}
-            >
-              {example.title}
-            </Link>
+          {SITE_EXAMPLE_GROUPS.map((group) => (
+            // The heading is for the eye; the group's label is what a screen
+            // reader announces on entering it, so the heading itself is hidden
+            // rather than read twice.
+            <span key={group.label} className="nav-menu-group" role="group" aria-label={group.label}>
+              <span className="nav-menu-heading" aria-hidden>
+                {group.label}
+              </span>
+              {group.examples.map((example) => (
+                <Link
+                  key={example.href}
+                  href={example.href}
+                  className="nav-menu-item"
+                  role="menuitem"
+                  aria-current={example.slug === current ? 'page' : undefined}
+                  onClick={() => setOpen(false)}
+                >
+                  <img
+                    className="nav-menu-thumb"
+                    src={asset(`/examples/${example.slug}.webp`)}
+                    alt=""
+                    width="96"
+                    height="60"
+                    decoding="async"
+                  />
+                  {example.title}
+                </Link>
+              ))}
+            </span>
           ))}
         </span>
       ) : null}

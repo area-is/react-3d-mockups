@@ -1,14 +1,15 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { ExampleBadge, TabbiedLink } from '../_shared/badge'
+import { TabbiedLink } from '../_shared/badge'
+import { exampleMetadata } from '../_shared/metadata'
 import { MarkSwatch, Stage, type SceneName } from './campaign-client'
 import { FESTIVAL, INKS } from './campaign-identity'
 
-export const metadata: Metadata = {
+export const metadata: Metadata = exampleMetadata('campaign', {
   title: 'Aperture Festival - campaign example | React 3D Mockups',
   description:
     'An isolated example page: a studio case study rolling one generative identity across a billboard, a bus shelter, a digital totem, a phone, a tote, a crew pass and a roll-up, built with react-3d-mockups and tabbied.',
-}
+})
 
 /**
  * Every object the identity is shown on, in the order the page walks the
@@ -65,7 +66,6 @@ export default function CampaignExamplePage() {
         <span className="cp-crumb">
           Work <span aria-hidden>/</span> Aperture Festival 2026
         </span>
-        <ExampleBadge className="cp-badge" />
       </header>
 
       <section className="cp-hero">
@@ -128,7 +128,7 @@ export default function CampaignExamplePage() {
               <span className="cp-wordmark-place">{FESTIVAL.place}</span>
             </div>
             <h3>The wordmark</h3>
-            <p>Inter at its heaviest, tight, upper case. It holds at eight feet on the bulletin and at eight millimetres on the pass.</p>
+            <p>Inter at its heaviest, set tight. It holds at eight feet on the bulletin and at eight millimetres on the pass.</p>
           </article>
         </div>
       </section>

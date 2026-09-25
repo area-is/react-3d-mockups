@@ -1,15 +1,24 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import Link from 'next/link'
 import { Logo } from '@/components/logo'
 import { SiteNav } from '@/components/site-nav'
-import { fraunces, inter, jetbrainsMono, notoSansKR } from '@/lib/fonts'
-import { SITE_URL, socialMetadata } from '@/lib/site'
+import { SITE_EXAMPLES } from '@/components/site-examples'
+import { fraunces, inter, jetbrainsMono } from '@/lib/fonts'
+import { notoSerifKR } from '@/lib/fonts-ko'
+import {
+  AUTHOR,
+  CHANGELOG_URL,
+  GITHUB_URL,
+  LICENSE_URL,
+  NPM_URL,
+  SITE_DESCRIPTION,
+  SITE_TITLE,
+  SITE_URL,
+  THEME_COLOR,
+  socialMetadata,
+} from '@/lib/site'
 import '../globals.css'
 import '../screens.css'
-
-const SITE_TITLE = 'React 3D Mockups: 3D device mockups for React'
-const SITE_DESCRIPTION =
-  'GPU-accelerated 3D device mockups for React, built on three.js. Drop any content onto the screen of a 3D device and it renders live - real DOM, not a texture.'
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -18,12 +27,34 @@ export const metadata: Metadata = {
   ...socialMetadata({ title: SITE_TITLE, description: SITE_DESCRIPTION }),
 }
 
+// `themeColor` lives on `viewport`, not `metadata`, in this version of Next.
+// The site is dark in every colour scheme, so it is one colour, not a pair.
+export const viewport: Viewport = {
+  themeColor: THEME_COLOR,
+}
+
+/**
+ * The footer's links: the site's own places first, then where the project
+ * lives off-site. Examples points at the first one rather than at a list,
+ * because there is no index page - every example carries a bar linking on to
+ * the next, which is the index.
+ */
+const FOOTER_LINKS: { label: string; href: string; external?: boolean }[] = [
+  { label: 'Docs', href: '/docs' },
+  { label: 'Gallery', href: '/docs/gallery' },
+  { label: 'Examples', href: SITE_EXAMPLES[0].href },
+  { label: 'GitHub', href: GITHUB_URL, external: true },
+  { label: 'npm', href: NPM_URL, external: true },
+  { label: 'Changelog', href: CHANGELOG_URL, external: true },
+  { label: 'License', href: LICENSE_URL, external: true },
+]
+
 // Root layout for the marketing site (the home page and its 404). The docs and
 // embedded routes have their own root layouts, so the site styles never mix
 // with the Fumadocs/Tailwind styles and vice versa.
 export default function SiteLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${inter.variable} ${jetbrainsMono.variable} ${fraunces.variable} ${notoSansKR.variable}`}>
+    <html lang="en" className={`${inter.variable} ${jetbrainsMono.variable} ${fraunces.variable} ${notoSerifKR.variable}`}>
       <body>
         <div className="site">
           <header className="site-header">
@@ -40,10 +71,25 @@ export default function SiteLayout({ children }: { children: React.ReactNode }) 
 
           <footer className="site-footer">
             <div className="container footer-inner">
-              <span>MIT © {new Date().getFullYear()} subwaymatch</span>
-              <a href="https://github.com/area-is/3d-mockups" target="_blank" rel="noreferrer">
-                github.com/area-is/3d-mockups
-              </a>
+              <span>
+                MIT © {new Date().getFullYear()}{' '}
+                <a href={AUTHOR.url} target="_blank" rel="noreferrer">
+                  {AUTHOR.name}
+                </a>
+              </span>
+              <nav className="footer-links" aria-label="Footer">
+                {FOOTER_LINKS.map((link) =>
+                  link.external ? (
+                    <a key={link.label} href={link.href} target="_blank" rel="noreferrer">
+                      {link.label}
+                    </a>
+                  ) : (
+                    <Link key={link.label} href={link.href}>
+                      {link.label}
+                    </Link>
+                  )
+                )}
+              </nav>
             </div>
           </footer>
         </div>

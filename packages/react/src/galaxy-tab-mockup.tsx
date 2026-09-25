@@ -9,6 +9,7 @@ const GalaxyTabMockupBase = createMockup({
   regions: SCREEN_REGIONS,
   metrics: GALAXY_TAB_METRICS,
   object: GalaxyTab,
+  label: '3D mockup of a Galaxy Tab tablet',
   framing: GALAXY_TAB_FRAMING,
   slots: tabletSlots,
 })

@@ -1,4 +1,4 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import type { ReactNode } from 'react'
 import { RootProvider } from 'fumadocs-ui/provider/next'
 import { DocsLayout } from 'fumadocs-ui/layouts/docs'
@@ -6,7 +6,8 @@ import { source } from '@/lib/source'
 import { baseOptions } from '@/lib/layout.shared'
 import { DocsSidebarSeparator } from '@/components/docs-sidebar'
 import { hideGridPages } from '@/lib/sidebar-tree'
-import { fraunces, inter, jetbrainsMono, notoSansKR } from '@/lib/fonts'
+import { fraunces, inter, jetbrainsMono } from '@/lib/fonts'
+import { notoSerifKR } from '@/lib/fonts-ko'
 import { asset } from '@/lib/base-path.mjs'
 import { SITE_URL, socialMetadata } from '@/lib/site'
 import './docs.css'
@@ -24,6 +25,21 @@ export const metadata: Metadata = {
   ...socialMetadata({ title: 'React 3D Mockups documentation', description: DOCS_DESCRIPTION }),
 }
 
+// `themeColor` lives on `viewport` in this version of Next. The docs open
+// dark (see `DOCS_THEME`), so the browser chrome is dark to match; a reader
+// who switches to light keeps it, since the meta tag cannot follow a class.
+export const viewport: Viewport = {
+  themeColor: '#121212',
+}
+
+/**
+ * The docs open in dark, like the home page they are one click from, rather
+ * than following the system: on a light system the step from the dark home
+ * page into a white docs page read as leaving the site. The toggle in the
+ * sidebar still switches, and a reader's choice is remembered as before.
+ */
+const DOCS_THEME = { defaultTheme: 'dark' }
+
 // Root layout for the documentation. It is deliberately separate from the
 // site root layout: the docs use Fumadocs UI on Tailwind, the site keeps its
 // own stylesheet, and neither can leak resets into the other.
@@ -31,7 +47,7 @@ export default function DocsRootLayout({ children }: { children: ReactNode }) {
   return (
     <html
       lang="en"
-      className={`${inter.variable} ${jetbrainsMono.variable} ${fraunces.variable} ${notoSansKR.variable}`}
+      className={`${inter.variable} ${jetbrainsMono.variable} ${fraunces.variable} ${notoSerifKR.variable}`}
       suppressHydrationWarning
     >
       <body className="flex flex-col min-h-screen">
@@ -42,7 +58,7 @@ export default function DocsRootLayout({ children }: { children: ReactNode }) {
           * so it resolves to a bare `/api/search` and misses our prefix
           * entirely. Pointing it explicitly is the whole fix.
           */}
-        <RootProvider search={{ options: { api: asset('/api/search') } }}>
+        <RootProvider theme={DOCS_THEME} search={{ options: { api: asset('/api/search') } }}>
           <DocsLayout
             tree={hideGridPages(source.getPageTree())}
             {...baseOptions()}

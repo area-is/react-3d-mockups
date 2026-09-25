@@ -37,7 +37,11 @@ const REGION = Symbol.for('react-3d-mockups.region')
 export interface SurfaceProps {
   /**
    * CSS background painted behind the region's content, under whatever you
-   * render. Defaults to black on lit screens, white on print surfaces.
+   * render. Defaults to black on lit screens. On an object whose `color` is
+   * the stock its surfaces are printed on - a card, a carton, a bag, a record
+   * jacket, a vehicle's paint - it defaults to that `color`, so a transparent
+   * logo prints onto the material; on other print surfaces (a book's cover, a
+   * poster, a billboard) it defaults to white.
    *
    * It only shows where your content does NOT paint: a logo on a transparent
    * PNG, a layout shorter than the surface, a rounded card over the corners,

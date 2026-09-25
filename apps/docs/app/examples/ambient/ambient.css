@@ -83,26 +83,6 @@
   gap: 14px;
 }
 
-.ab-badge {
-  font-size: 12.5px;
-  font-weight: 500;
-  white-space: nowrap;
-  color: var(--ab-muted);
-  border: 1px solid var(--ab-line);
-  border-radius: 999px;
-  padding: 6px 13px;
-  background: rgba(255, 255, 255, 0.45);
-}
-
-.ab-badge a {
-  font-weight: 600;
-  transition: color 0.15s ease;
-}
-
-.ab-badge a:hover {
-  color: var(--ab-text);
-}
-
 .ab-cta {
   font-size: 14px;
   font-weight: 700;
@@ -464,7 +444,6 @@
     padding: 18px 20px 0;
   }
 
-  .ab-badge,
   .ab-nav {
     display: none;
   }

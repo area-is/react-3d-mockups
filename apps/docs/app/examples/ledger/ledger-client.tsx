@@ -5,7 +5,6 @@ import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import { RotateCcw } from 'lucide-react'
 import { SceneBoundary } from '@/components/scene-boundary'
-import { ExampleBadge } from '../_shared/badge'
 import { lazyScene } from '../_shared/stage'
 import { CATEGORIES, DAILY_BUDGET, QUICK_ADDS, SEED_TRANSACTIONS, addTransaction, eur, summarize, type Tx } from './ledger-data'
 import type { LedgerState } from './ledger-screens'
@@ -44,7 +43,6 @@ export function Ledger() {
           <span>Changelog</span>
         </nav>
         <div className="lg-top-right">
-          <ExampleBadge className="lg-badge" />
           <span className="lg-cta">Get the app</span>
         </div>
       </header>

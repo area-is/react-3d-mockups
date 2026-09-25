@@ -1,5 +1,12 @@
 # react-3d-mockups
 
+<p align="center">
+  <img src="https://raw.githubusercontent.com/area-is/react-3d-mockups/main/assets/hero.png" alt="A 3D iPhone mockup with a live music-player UI on its screen, flanked by two more devices" width="720" />
+</p>
+
+**Live React components on procedural 3D devices - no GLB files.**
+[Docs, live demos and a gallery of all 51 models →](https://area.is/react-3d-mockups/docs/gallery)
+
 GPU-accelerated **3D device mockups for React**. Put any content on the screen of a 3D
 device - real DOM, projected onto WebGL glass, so it stays live: text is vector crisp at
 any angle, videos play, iframes load, React state and effects keep running. Mockups are
@@ -13,16 +20,18 @@ decorative: you rotate and zoom them, and the hardware masks the screen pixel fo
   iPad (A16), Galaxy Tab S11 / S11 Ultra, an Apple Watch Series 11 and the Galaxy
   Watch 8, Watch 9 and Watch Ultra 2 on
   full wristbands, and a Studio Display-style 27" monitor, all procedurally generated
-  at runtime. No GLB files, no
-  hosting, no pop-in - importing one mockup costs 7.4–48.8 KB gzipped (the whole
-  library: 103.8 KB), peers excluded. The phone, foldable, and
-  laptop families carry a small CSG engine that machines their ports and speaker/mic
-  holes into the chassis as real cavities; it tree-shakes away for every other mockup.
+  at runtime. No GLB files and nothing to host - importing one mockup costs about
+  11–55 KB gzipped (the whole library: 124 KB), peers excluded. The phones, foldables,
+  tablets, watches and laptops use a small CSG engine (`three-bvh-csg`, a regular
+  dependency) to machine their ports and speaker/mic holes into the chassis as real
+  cavities; every other mockup leaves it out.
 - **True-to-device screens** - each virtual display matches the real device's logical
   resolution in portrait *and* landscape (table below), so your layouts and breakpoints
   behave exactly like on the hardware.
-- **Real GPU rendering** - three.js + react-three-fiber, physically-based materials, studio
-  lighting, soft shadows, clamped DPR.
+- **Real GPU rendering, only when needed** - three.js + react-three-fiber,
+  physically-based materials, studio lighting, soft shadows, clamped DPR. A mockup draws
+  a frame only when something moves (a drag, `autoRotate`, `float`, a prop change), and
+  not at all while it is scrolled off screen or its tab is hidden.
 - **Any content on screen** - pass React components, an `<iframe>` or a `<video>` as
   children. State, effects and media playback keep running, and every surface is masked
   per-pixel by the hardware in front of it.
@@ -37,8 +46,8 @@ decorative: you rotate and zoom them, and the hardware masks the screen pixel fo
 npm install react-3d-mockups three @react-three/fiber @react-three/drei
 ```
 
-React 19+ (react-three-fiber 9 and drei 10 both require it). `three` 0.179+,
-`@react-three/fiber` and `@react-three/drei` are
+React 19 (react-three-fiber 9 and drei 10 both require it), `three` 0.179 to 0.186,
+`@react-three/fiber` 9 and `@react-three/drei` 10. Those are
 **peer** dependencies rather than bundled ones, because each has to exist exactly once in
 an app - two copies of `three` mean two different `THREE.Mesh` classes, so `instanceof`
 checks and r3f's element catalogue stop matching.
@@ -66,8 +75,10 @@ export function Hero() {
 }
 ```
 
-Drag anywhere - body, background, or the screen itself - to orbit. In Next.js, load it
-client-side only (`dynamic(() => import('./mockup'), { ssr: false })`).
+Drag anywhere - body, background, or the screen itself - to orbit; with the canvas
+focused, the arrow keys turn it and Home resets it. In Next.js, load it client-side only
+(`dynamic(() => import('./mockup'), { ssr: false })`) and give the wrapper a fixed height
+so the page does not shift when the canvas mounts.
 
 ## Regions & slots
 
@@ -109,9 +120,9 @@ names come from each object's spec in the core.
 
 Every device appearance prop, plus `float` (idle floating animation) and the staging
 props from `<MockupCanvas>`: `controls`, `autoRotate`, `zoom`,
-`fullscreen`, `shadows`, `background`, `camera`, `className`, `style`. The three canvas
-props marked *canvas only* below tune the renderer rather than the picture and stay on
-`<MockupCanvas>`. Transforms are first-class: `position`, `rotation` and `scale` flow
+`fullscreen`, `shadows`, `background`, `camera`, `frameloop`, `label`,
+`screenAccessibility`, `className`, `style`. The canvas props marked *canvas only*
+below tune the renderer rather than the picture and stay on `<MockupCanvas>`. Transforms are first-class: `position`, `rotation` and `scale` flow
 straight through to the device group (`<IPhoneMockup rotation={[0, 0.25, 0]}>`).
 
 ### `<MockupCanvas>` - the stage
@@ -127,6 +138,12 @@ straight through to the device group (`<IPhoneMockup rotation={[0, 0.25, 0]}>`).
 | `background` | `string` | - | CSS background of the canvas |
 | `camera` | r3f camera | `[0, 0.5, 7.4]`, fov 40 | Camera override |
 | `dpr` | `number \| [min, max]` | `[1, 2]` | Device-pixel-ratio clamp. Canvas only |
+| `frameloop` | `'demand' \| 'always' \| 'never'` | `'demand'` | When to draw. `'demand'` draws only when something changes; use `'always'` for your own `useFrame` animation in a composed scene |
+| `pauseWhenOffscreen` | `boolean` | `true` | Stop drawing while the canvas is off screen or its tab is hidden. Canvas only |
+| `gl` | r3f `gl` | `{ antialias: true, alpha: true, powerPreference: 'default' }` | Renderer settings, merged over the defaults. Keep `alpha` on - screens show through transparent pixels. Canvas only |
+| `onCreated` | `(state) => void` | - | r3f's `onCreated`, e.g. to read `gl.info`. Canvas only |
+| `label` | `string` | per model | Accessible name; the canvas is exposed as `role="img"` ("3D mockup of an iPhone") |
+| `screenAccessibility` | `'hidden' \| 'visible'` | `'hidden'` | Screens are decorative, so by default they are `aria-hidden` and `inert`; `'visible'` exposes their content |
 
 ### `<Galaxy>` - the device
 
@@ -180,6 +197,18 @@ look right, so that trade is not offered.
 
 If you need a genuinely usable embedded app, render it in the page next to the
 mockup rather than on it.
+
+The screen renders in its own React root, and React context from above the mockup -
+a theme, i18n, your router, a query client - is bridged into it, so screen content
+reads the same providers the rest of your page does. It is kept out of the
+accessibility tree and the tab order by default (`screenAccessibility`).
+
+## Exporting images and video
+
+The screen is DOM composited by the browser, not pixels in the WebGL canvas, so
+`canvas.toDataURL()` gives you devices with empty screens. Screenshot the element in a
+real browser instead (Playwright's `locator.screenshot()` captures both layers), or use
+Remotion for video. Recipes: [Exporting images and video](https://area.is/react-3d-mockups/docs/exporting).
 
 ## Virtual screen resolutions
 
@@ -257,13 +286,13 @@ the layer that renders it through react-three-fiber.
 The main entry re-exports a curated slice of the core (variants, colorways, size
 types); the full core surface is available from `react-3d-mockups/core`, which carries
 no `'use client'` directive so a server component can import a spec for layout math.
-See [ARCHITECTURE.md](https://github.com/area-is/3d-mockups/blob/main/ARCHITECTURE.md)
+See [ARCHITECTURE.md](https://github.com/area-is/react-3d-mockups/blob/main/ARCHITECTURE.md)
 for the layering rule.
 
 ## Docs & demos
 
-Full documentation and live demos: [github.com/area-is/3d-mockups](https://github.com/area-is/3d-mockups)
+Full documentation and live demos: [area.is/react-3d-mockups](https://area.is/react-3d-mockups). Source: [github.com/area-is/react-3d-mockups](https://github.com/area-is/react-3d-mockups)
 
 ## License
 
-MIT © subwaymatch
+MIT © [Ye Joo Park](https://github.com/subwaymatch)

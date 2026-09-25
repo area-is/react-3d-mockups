@@ -1,6 +1,7 @@
 ---
 title: Roadmap
-description: Where the library is heading next.
+description: Where the library is heading next, what has changed, and how versions are numbered.
+keywords: [roadmap, changelog, releases, release notes, versions, versioning, semver, breaking changes, upgrade]
 ---
 
 - More devices: more monitors, more wearables, and desktop towers.
@@ -11,3 +12,15 @@ description: Where the library is heading next.
 TVs, foldables and packaging (product box, mailer box, shopping bag, custom
 boxes) were on this list and have since shipped. See
 [Devices](/docs/devices) and [Objects](/docs/objects).
+
+## Changelog and versions
+
+Every release is listed in the
+[changelog on GitHub](https://github.com/area-is/react-3d-mockups/blob/main/CHANGELOG.md).
+
+The library follows semantic versioning, and it is still on `0.x`. Until 1.0,
+a breaking change may land in a minor version (`0.1` to `0.2`), not only in a
+major one, and every breaking change is called out in the changelog. npm's
+default caret range already respects that: on `0.x`, `^0.1.0` accepts
+`0.1.x` releases but not `0.2.0`, so moving to the next minor version is a
+change you make on purpose - read the changelog when you do.

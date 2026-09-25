@@ -1,11 +1,12 @@
 import type { Metadata } from 'next'
+import { exampleMetadata } from '../_shared/metadata'
 import { PrintShop } from './print-shop-client'
 
-export const metadata: Metadata = {
+export const metadata: Metadata = exampleMetadata('print-shop', {
   title: 'Grid Editions - print shop example | React 3D Mockups',
   description:
     'An isolated example page: a generative-print shop whose controls re-render the poster inside a 3D frame in real time, built with react-3d-mockups and tabbied.',
-}
+})
 
 /**
  * A complete, isolated product-configurator example: a fictional print shop

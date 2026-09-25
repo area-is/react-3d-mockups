@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { TabbiedPattern } from 'tabbied/react'
-import { ExampleBadge, TabbiedLink } from '../_shared/badge'
+import { TabbiedLink } from '../_shared/badge'
 import { lazyScene } from '../_shared/stage'
 import { CHANNELS, DEFAULT_SETTINGS, FINISHES, MATTES, PLANS, findChannel, type Settings } from './ambient-data'
 
@@ -37,7 +37,6 @@ export function Ambient() {
           <span>Plans</span>
         </nav>
         <div className="ab-top-right">
-          <ExampleBadge className="ab-badge" />
           <span className="ab-cta">Try it free for a month</span>
         </div>
       </header>

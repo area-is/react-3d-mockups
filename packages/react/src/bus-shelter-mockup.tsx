@@ -22,6 +22,7 @@ export const BusShelterMockup = createMockup({
   regions: BUS_SHELTER_REGIONS,
   metrics: BUS_SHELTER_METRICS,
   object: BusShelter,
+  label: '3D mockup of a bus shelter',
   framing: BUS_SHELTER_FRAMING,
   slots: busShelterSlots,
   displayName: 'BusShelterMockup',

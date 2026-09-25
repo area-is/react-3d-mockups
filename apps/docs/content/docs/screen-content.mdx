@@ -1,6 +1,7 @@
 ---
 title: Screen content
 description: Put components, whole pages, or video on the glass, and control how the screen behaves.
+keywords: [screen, content, iframe, video, react context, provider, display only, status bar, surfaceBackground, resolution, viewport]
 ---
 
 Anything the browser can render can live on a device screen. The screen is a
@@ -132,10 +133,54 @@ out entirely. Mockups exist to look right, so that trade is not offered.
 If you need a genuinely usable embedded app, render it in the page next to the
 mockup rather than on it.
 
+## React context on the screen
+
+A screen renders into a React root of its own - its DOM has to live outside the
+canvas - but context from providers above the mockup still reaches it: the
+library bridges it across. A theme, an i18n provider, a router or a data client
+around your page works on the glass without being repeated inside it.
+
+```tsx
+<QueryClientProvider client={queryClient}>
+  <ThemeProvider theme="dark">
+    <GalaxyMockup>
+      <Dashboard /> {/* reads both providers */}
+    </GalaxyMockup>
+  </ThemeProvider>
+</QueryClientProvider>
+```
+
+A provider inside the mockup, wrapped around the screen content, works too.
+The one thing to watch is portals: a modal, tooltip or toast that portals into
+`document.body` renders on the page, not on the screen. Keep anything that
+should appear on the glass inside the screen's own tree.
+
+## Screens and assistive technology
+
+Screen content is decorative by default, the same way a product photo is: every
+screen layer is marked `aria-hidden` and `inert`, so screen readers skip it and
+the Tab key never lands in it. That keeps a demo's headings and buttons out of
+your page's outline. The canvas itself has `role="img"` and an accessible name
+(`label`) that describes the model.
+
+When the screen carries meaningful text that appears nowhere else on the page,
+expose it:
+
+```tsx
+<IPadMockup screenAccessibility="visible">
+  <PricingTable />
+</IPadMockup>
+```
+
+See [Accessibility](/docs/accessibility) for the rest.
+
 ## Surface background
 
-`surfaceBackground` paints *underneath* your content - black on lit screens,
-white on print surfaces. It only shows where your content does **not** paint:
+`surfaceBackground` paints *underneath* your content - black on lit screens;
+on a print object whose `color` is its stock (a card, a carton, a bag, a record
+jacket, a vehicle's paint), that `color`, so your content prints onto the
+material; white on the other print surfaces. It only shows where your content
+does **not** paint:
 a logo on a transparent PNG, a layout shorter than the surface, rounded corners
 on a card, the moment before an `<iframe>` finishes loading.
 

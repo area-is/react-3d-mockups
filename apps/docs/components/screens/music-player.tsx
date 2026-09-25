@@ -3,7 +3,7 @@
 import { useState } from 'react'
 
 const TRACKS = [
-  { title: 'Neon Skyline', artist: 'Area Waves', hue: 258 },
+  { title: 'Neon Skyline', artist: 'Harbour Lights', hue: 258 },
   { title: 'Low Orbit', artist: 'Satellite Club', hue: 198 },
   { title: 'Afterglow', artist: 'Milky Way Express', hue: 322 },
 ]
@@ -30,7 +30,7 @@ export function MusicPlayer() {
           <span />
           <span />
         </div>
-        <h2 className="mp-title">{track.title}</h2>
+        <div className="mp-title">{track.title}</div>
         <p className="mp-artist">{track.artist}</p>
       </div>
 

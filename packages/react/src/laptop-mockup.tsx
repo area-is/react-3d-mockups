@@ -28,6 +28,7 @@ export const LaptopMockup = createMockup({
   regions: SCREEN_REGIONS,
   metrics: LAPTOP_METRICS,
   object: Laptop,
+  label: '3D mockup of a MacBook',
   framing: LAPTOP_FRAMING,
   slots: laptopSlots,
   displayName: 'LaptopMockup',

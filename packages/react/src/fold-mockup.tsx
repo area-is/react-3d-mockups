@@ -33,6 +33,7 @@ export const FoldMockup = createMockup({
   regions: SCREEN_REGIONS,
   metrics: FOLD_METRICS,
   object: Fold,
+  label: '3D mockup of a Galaxy Z Fold phone',
   framing: FOLD_FRAMING,
   slots: foldSlots,
   displayName: 'FoldMockup',

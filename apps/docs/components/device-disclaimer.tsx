@@ -1,14 +1,20 @@
+import Link from 'next/link'
+
 /**
  * The notice every device page carries.
  *
- * The device mockups are procedural models built from published dimensions and
- * product photography - close enough to sell a design, never a CAD file - and
- * they render marks their manufacturers own. Saying both, on the page where
+ * The device mockups are procedural models built from published specifications
+ * and product photography - close enough to sell a design, never a CAD file -
+ * and they render marks their manufacturers own. Saying both, on the page where
  * someone decides to ship a render, is cheaper than saying it once in a
- * LICENSE nobody opens.
+ * LICENSE nobody opens. The same wording is the provenance statement every
+ * device page makes, so the two cannot drift apart; the longer version is
+ * content/docs/trademarks.mdx.
  *
  * Objects (a book, a bus, a billboard) carry no third-party marks and are not
- * anyone's product, so they do not get this.
+ * anyone's product, so they do not get this - except the TV, whose designs
+ * follow real Samsung and LG sets and whose picture-frame back carries a
+ * Samsung print.
  */
 export function DeviceDisclaimer({ brands }: { brands?: string }) {
   return (
@@ -26,7 +32,9 @@ export function DeviceDisclaimer({ brands }: { brands?: string }) {
         of their respective owners and are referenced here for identification
         only. You are responsible for how you use a render - check the relevant
         trademark and design-rights guidelines before publishing, and take extra
-        care with anything that could imply an endorsement.
+        care with anything that could imply an endorsement. See{' '}
+        {/* next/link, not <a>: it is what adds the site's basePath. */}
+        <Link href="/docs/trademarks">Trademarks and usage</Link>.
       </p>
     </aside>
   )

@@ -1,5 +1,6 @@
 import type { BaseLayoutProps } from 'fumadocs-ui/layouts/shared'
 import { Logo } from '@/components/logo'
+import { GITHUB_URL } from '@/lib/site'
 
 /** Shared options for the Fumadocs layouts under /docs. */
 export function baseOptions(): BaseLayoutProps {
@@ -12,7 +13,7 @@ export function baseOptions(): BaseLayoutProps {
         </>
       ),
     },
-    githubUrl: 'https://github.com/area-is/3d-mockups',
+    githubUrl: GITHUB_URL,
     links: [{ text: 'Home', url: '/' }],
   }
 }

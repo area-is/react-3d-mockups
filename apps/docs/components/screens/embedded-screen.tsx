@@ -17,7 +17,7 @@ export function EmbeddedScreen() {
   return (
     <div className="screen embed">
       <div className="embed-orb" aria-hidden />
-      <p className="embed-brand">AREA&nbsp;OS</p>
+      <p className="embed-brand">Orbit&nbsp;OS</p>
       <p className="embed-clock">{time || '··:··:··'}</p>
       <button type="button" className="embed-button" onClick={() => setBoops((b) => b + 1)}>
         Boop{boops > 0 ? ` ×${boops}` : ''}

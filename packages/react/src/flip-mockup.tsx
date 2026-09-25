@@ -33,6 +33,7 @@ export const FlipMockup = createMockup({
   regions: SCREEN_REGIONS,
   metrics: FLIP_METRICS,
   object: Flip,
+  label: '3D mockup of a Galaxy Z Flip phone',
   framing: FLIP_FRAMING,
   slots: flipSlots,
   displayName: 'FlipMockup',

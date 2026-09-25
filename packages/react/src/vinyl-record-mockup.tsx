@@ -21,6 +21,7 @@ export const VinylRecordMockup = createMockup({
   regions: VINYL_RECORD_REGIONS,
   metrics: VINYL_RECORD_METRICS,
   object: VinylRecord,
+  label: '3D mockup of a vinyl record',
   framing: VINYL_RECORD_FRAMING,
   slots: vinylRecordSlots,
   displayName: 'VinylRecordMockup',

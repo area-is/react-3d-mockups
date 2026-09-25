@@ -130,9 +130,16 @@ code {
   position: sticky;
   top: 0;
   z-index: 50;
-  background: rgba(8, 9, 12, 0.78);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
+  /* Near-opaque with a heavy blur. At 0.78 over a 14px blur, the lit screens
+     scrolling under it read through as legible shapes behind the wordmark on
+     a phone; this keeps a hint of the page moving and nothing more.
+     The prefixed line has to come FIRST. Next's CSS minifier treats the two
+     as one property and keeps whichever is last, and with the prefixed one
+     last it shipped only `-webkit-backdrop-filter` - which Chrome ignores, so
+     on Android the header had no blur at all. */
+  background: rgba(8, 9, 12, 0.92);
+  -webkit-backdrop-filter: blur(24px) saturate(140%);
+  backdrop-filter: blur(24px) saturate(140%);
   border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
 
@@ -205,37 +212,97 @@ code {
 /*
  * Full-width sheet under the header rather than a floating popover: it is the
  * whole navigation on a phone, so it gets the whole width and touch-sized rows.
+ *
+ * And the whole height below the header. Sized to its rows, it ended a third
+ * of the way down with the page showing underneath, which read as the menu
+ * having failed to finish opening. It scrolls inside itself when the examples
+ * are expanded on a short screen.
  */
 .nav-sheet {
   position: absolute;
   top: 100%;
   left: 0;
   right: 0;
+  height: calc(100vh - 58px);
+  height: calc(100dvh - 58px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
   display: flex;
   flex-direction: column;
-  padding: 7px clamp(14px, 3.6vw, 43px) 13px;
+  padding: 7px clamp(14px, 3.6vw, 43px) 24px;
   /* Opaque, unlike the header it hangs from: this one covers page content
      rather than sitting over the top of it, and a blur behind text the reader
      is choosing between is noise. */
   background: var(--bg);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 22px 40px -24px rgba(0, 0, 0, 0.9);
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .nav-sheet[hidden] {
   display: none;
 }
 
-.nav-sheet-link {
-  padding: 12px 2px;
-  font-size: 14px;
+/* `.site-nav` in front because `.site-nav a` - the desktop row's muted link
+   colour - would otherwise outrank a bare class and grey the sheet out. */
+.site-nav .nav-sheet-link {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 13px 2px;
+  font-size: 15px;
   font-weight: 600;
   color: var(--text);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
 
-.nav-sheet-link:last-child {
-  border-bottom: 0;
+.nav-sheet-note {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-low);
+}
+
+.nav-sheet-group > summary {
+  list-style: none;
+  cursor: pointer;
+}
+
+.nav-sheet-group > summary::-webkit-details-marker {
+  display: none;
+}
+
+.nav-sheet-caret {
+  flex: none;
+  margin-left: auto;
+  color: var(--muted);
+  transition: transform 0.15s ease;
+}
+
+.nav-sheet-group[open] .nav-sheet-caret {
+  transform: rotate(180deg);
+}
+
+/* Two columns: twelve one-word names do not need a full-width row each, and
+   halving the list keeps the whole of it on one phone screen when opened. */
+.nav-sheet-examples {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 14px;
+  padding: 4px 0 6px;
+}
+
+.nav-sheet-heading {
+  grid-column: 1 / -1;
+  padding: 12px 2px 2px;
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: -0.005em;
+  color: var(--text-low);
+}
+
+.site-nav .nav-sheet-sublink {
+  padding: 9px 2px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--muted);
 }
 
 .nav-icon-btn {
@@ -293,38 +360,40 @@ code {
   transform: rotate(180deg);
 }
 
-/* The list is one row per example, and it keeps growing. It is capped at the
-   viewport (its top sits about 53px down: the header's 58px less the button's
-   inset, plus the 40px drop) and scrolls inside that cap, so on a short
-   window the last examples are a wheel away instead of below the fold. */
+/* A column per use case, a row per example. It is capped at the viewport
+   (its top sits about 53px down: the header's 58px less the button's inset,
+   plus the 40px drop) and scrolls inside that cap, so on a short window the
+   last examples are a wheel away instead of below the fold. */
 .nav-menu-pop {
   position: absolute;
   top: 40px;
   right: -11px;
-  width: 190px;
+  width: min(660px, calc(100vw - 32px));
   max-height: calc(100vh - 70px);
   max-height: calc(100dvh - 70px);
   overflow-y: auto;
   overscroll-behavior: contain;
   scrollbar-width: thin;
   scrollbar-color: var(--border-strong) transparent;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
   background: var(--bg);
   border: 1px solid var(--border-strong);
   border-radius: 11px;
   box-shadow: 0 24px 50px -18px rgba(0, 0, 0, 0.8);
-  padding: 6px;
+  padding: 8px;
   z-index: 20;
 }
 
 /* Plain rows on the page's own background: white type, and a faint lift on
    hover - the same treatment as the header's icon buttons. */
 .site-nav .nav-menu-item {
-  display: block;
+  display: flex;
+  align-items: center;
+  gap: 10px;
   flex: none;
-  padding: 7px 11px;
+  padding: 6px 8px;
   border-radius: 7px;
   font-size: 14px;
   font-weight: 500;
@@ -337,6 +406,37 @@ code {
   background: rgba(255, 255, 255, 0.06);
 }
 
+.nav-menu-group {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.nav-menu-group + .nav-menu-group {
+  padding-left: 6px;
+  border-left: 1px solid var(--border);
+}
+
+/* A glimpse of the page, at card size - enough to tell a dashboard from a
+   café from a freight fleet before reading the name. */
+.nav-menu-thumb {
+  flex: none;
+  width: 64px;
+  height: 40px;
+  border-radius: 5px;
+  object-fit: cover;
+  background: rgba(255, 255, 255, 0.04);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08), 0 0 0 1px rgba(255, 255, 255, 0.06);
+}
+
+.nav-menu-heading {
+  padding: 6px 11px 3px;
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: -0.005em;
+  color: var(--text-low);
+}
+
 .site-footer {
   border-top: 1px solid var(--border);
   margin-top: clamp(43px, 6.3vw, 72px);
@@ -345,6 +445,7 @@ code {
 .footer-inner {
   display: flex;
   justify-content: space-between;
+  align-items: baseline;
   gap: 14px;
   flex-wrap: wrap;
   padding: 18px clamp(14px, 3.6vw, 43px) 29px;
@@ -352,10 +453,17 @@ code {
   font-size: 14px;
 }
 
+.footer-links {
+  display: flex;
+  flex-wrap: wrap;
+  column-gap: 20px;
+  row-gap: 4px;
+}
+
 .footer-inner a {
-  font-family: var(--font-mono);
   font-size: 14px;
   color: var(--text-low);
+  transition: color 0.15s ease;
 }
 
 .footer-inner a:hover {
@@ -388,6 +496,41 @@ code {
 .btn-primary {
   background: var(--grad);
   color: var(--accent-ink);
+  transition: transform 0.12s ease, filter 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* A lift rather than a colour change: the fill is already the loudest thing
+   on the page, so hover brightens it a step and lets a soft glow of the same
+   green gather under it. */
+.btn-primary:hover {
+  filter: brightness(1.07) saturate(1.05);
+  box-shadow: 0 8px 26px -10px rgba(49, 211, 34, 0.7);
+}
+
+.btn-primary:focus-visible,
+.btn-secondary:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+.btn-icon {
+  flex: none;
+}
+
+/* The trailing arrow leans toward where the button goes. */
+.btn-icon-trail {
+  margin-right: -3px;
+  transition: transform 0.2s ease;
+}
+
+.btn:hover .btn-icon-trail {
+  transform: translateX(2px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btn:hover .btn-icon-trail {
+    transform: none;
+  }
 }
 
 .btn-secondary {
@@ -398,6 +541,16 @@ code {
 
 .btn-secondary:hover {
   border-color: rgba(255, 255, 255, 0.34);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.btn-secondary .btn-icon {
+  color: var(--muted);
+  transition: color 0.15s ease;
+}
+
+.btn-secondary:hover .btn-icon {
+  color: var(--text);
 }
 
 .text-link {
@@ -439,7 +592,9 @@ code {
   flex-direction: column;
   align-items: center;
   text-align: center;
-  padding: clamp(36px, 5.4vw, 58px) clamp(14px, 3.6vw, 43px) 0;
+  /* Trimmed at the top by about what the call-to-action row adds at the
+     bottom, so the carousel under it moved down as little as it could. */
+  padding: clamp(26px, 4vw, 44px) clamp(14px, 3.6vw, 43px) 0;
 }
 
 /*
@@ -495,6 +650,74 @@ code {
   justify-content: center;
   flex-wrap: wrap;
   margin-bottom: 16px;
+}
+
+/*
+ * The hero's ways in: two buttons on one row. Compact on purpose - the
+ * carousel under it is the hero's picture, and each row here is a row of it
+ * pushed below the fold. The install command is the first thing under the
+ * carousel instead (see `.quickstart`).
+ */
+.hero-cta {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 11px 12px;
+  margin-top: clamp(20px, 2.7vw, 29px);
+}
+
+.hero-cta .btn {
+  padding: 10px 20px;
+}
+
+/* On a phone the buttons get a touch less padding so the pair share a row. */
+@media (max-width: 620px) {
+  .hero-cta {
+    gap: 10px 8px;
+    margin-top: 18px;
+  }
+
+  .hero-cta .btn {
+    padding: 10px 16px;
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/*  Copy buttons and code panels                                       */
+/* ------------------------------------------------------------------ */
+
+.copy-btn {
+  display: inline-flex;
+  align-items: center;
+  flex: none;
+  gap: 6px;
+  min-height: 30px;
+  padding: 5px 11px;
+  border: 0;
+  border-radius: 999px;
+  background: none;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: inherit;
+  color: var(--muted);
+  cursor: pointer;
+  transition: color 0.15s ease, background 0.15s ease;
+}
+
+.copy-btn:hover {
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.copy-btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.copy-btn[data-copied='true'] {
+  color: var(--accent);
 }
 
 /* ------------------------------------------------------------------ */
@@ -588,7 +811,7 @@ code {
   /* Sits under the strip, which is placed in world units - so the offset is a
      fraction of the stage rather than a fixed pixel drop that would slide off
      a shorter one. */
-  top: calc(var(--carousel-stage-h) * 0.7);
+  top: calc(var(--carousel-stage-h) * 0.785);
   transform: translateX(-50%);
   width: min(684px, 150%);
   height: 234px;
@@ -641,43 +864,66 @@ code {
  * Same idea as the edges and deliberately fainter: it only has to say "this
  * part is the device" without competing with the device itself. Its width is
  * the hit region, so the feedback teaches where the boundary actually is.
+ *
+ * Centred on the model rather than on the stage (`--stage-centre`, set by the
+ * scene), and an ellipse that fades out inside its own box, so it is light
+ * behind the object and never runs up under the readout bar, whose opaque
+ * background would cut it off in a straight line.
  */
 .carousel-centre {
   position: absolute;
   left: 50%;
-  top: 0;
-  bottom: 26%;
+  top: var(--stage-centre, 44%);
   width: 34%;
-  transform: translateX(-50%);
+  height: 58%;
+  transform: translate(-50%, -50%);
   opacity: 0;
   transition: opacity 0.2s ease;
   background: radial-gradient(
-    62% 56% at 50% 46%,
+    closest-side,
     rgba(49, 211, 34, 0.2),
-    rgba(49, 211, 34, 0.07) 52%,
-    transparent 78%
+    rgba(49, 211, 34, 0.07) 66%,
+    transparent
   );
-  --centre-fade: linear-gradient(180deg, transparent, #000 18%, #000 66%, transparent);
-  -webkit-mask-image: var(--centre-fade);
-  mask-image: var(--centre-fade);
 }
 
-.carousel[data-zone='device'] .carousel-centre,
-.carousel[data-zone='device'] .carousel-rotate-badge {
+.carousel[data-zone='device'] .carousel-centre {
   opacity: 1;
 }
 
-/* Markers in the front layer: the chevrons and the rotate badge. */
+/*
+ * The stage-edge chevrons: the carousel's prev/next on touch screens and
+ * phones, and on a desktop only the sign lit over the half a click would step
+ * to.
+ *
+ * There used to be two sets on a phone - these and the round arrows by the
+ * readout - doing the same thing a few centimetres apart. Now exactly one set
+ * is on screen at a time (see the media query below): the arrows where there
+ * is a pointer and the room to put them by the name, these where the thumb
+ * already is.
+ *
+ * They are buttons, so on touch they are what a screen reader or a keyboard
+ * finds. They never take the pointer, though: a tap there lands on the stage,
+ * which steps from its own zones, and a swipe that starts on one still
+ * browses. On a desktop `visibility` keeps them out of the tab order while
+ * they are dark - the arrows are the controls there.
+ */
 .carousel-chevron {
   position: absolute;
-  top: 0;
-  bottom: 26%;
+  /* Level with the model and the wash behind it, not the stage's middle. */
+  top: var(--stage-centre, 44%);
+  transform: translateY(-50%);
   display: flex;
   align-items: center;
+  padding: 0;
+  border: 0;
+  background: none;
   color: var(--accent-2);
   filter: drop-shadow(0 0 10px rgba(49, 211, 34, 0.5));
+  pointer-events: none;
+  visibility: hidden;
   opacity: 0;
-  transition: opacity 0.2s ease;
+  transition: opacity 0.2s ease, visibility 0.2s;
 }
 
 .carousel-chevron[data-side='left'] {
@@ -690,33 +936,14 @@ code {
   padding-right: clamp(11px, 2.7vw, 36px);
 }
 
-/*
- * The rotate glyph, sat under the device rather than over it - the object is
- * the thing being looked at, and a badge across its face would be in the way.
- */
-.carousel-rotate-badge {
-  /* In the gap between the staged device and the strip, clear of both. */
-  position: absolute;
-  left: 50%;
-  bottom: 30%;
-  transform: translateX(-50%);
-  opacity: 0;
-  transition: opacity 0.2s ease;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 4px 11px 4px 8px;
-  border: 1px solid rgba(49, 211, 34, 0.35);
-  border-radius: 999px;
-  background: rgba(8, 9, 12, 0.55);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
-  font-family: var(--font-mono);
-  font-size: 14px;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--accent-2);
-  white-space: nowrap;
+.carousel-chevron:focus-visible {
+  outline: none;
+}
+
+.carousel-chevron:focus-visible svg {
+  border-radius: 50%;
+  outline: 2px solid var(--accent);
+  outline-offset: 6px;
 }
 
 /* ---- the navigable halves, lit on hover ---- */
@@ -728,74 +955,190 @@ code {
   pointer-events: none;
 }
 
+/*
+ * Half an ellipse of light spreading in from the side, centred on the models'
+ * line (`--stage-centre`) and about as tall as they are. It used to fill the
+ * stage from its top down, which ran it up under the readout bar and ended it
+ * there on the bar's straight edge; an ellipse that fades out inside its own
+ * box has no edge to show.
+ */
 .carousel-edge {
   position: absolute;
-  top: 0;
-  bottom: 26%;
-  width: 30%;
+  top: var(--stage-centre, 44%);
+  width: 28%;
+  height: 56%;
+  transform: translateY(-50%);
   opacity: 0;
   transition: opacity 0.2s ease;
-  /* Fade the wash out vertically too, or it ends on a hard horizontal line. */
-  --edge-fade: linear-gradient(180deg, transparent, #000 22%, #000 62%, transparent);
-  -webkit-mask-image: var(--edge-fade);
-  mask-image: var(--edge-fade);
 }
 
 .carousel-edge[data-side='left'] {
   left: 0;
-  background: linear-gradient(90deg, rgba(49, 211, 34, 0.26), rgba(49, 211, 34, 0.07) 46%, transparent 80%);
+  background: radial-gradient(
+    100% 50% at 0% 50%,
+    rgba(49, 211, 34, 0.26),
+    rgba(49, 211, 34, 0.07) 46%,
+    transparent 80%
+  );
 }
 
 .carousel-edge[data-side='right'] {
   right: 0;
-  background: linear-gradient(270deg, rgba(49, 211, 34, 0.26), rgba(49, 211, 34, 0.07) 46%, transparent 80%);
+  background: radial-gradient(
+    100% 50% at 100% 50%,
+    rgba(49, 211, 34, 0.26),
+    rgba(49, 211, 34, 0.07) 46%,
+    transparent 80%
+  );
 }
 
 .carousel[data-zone='left'] .carousel-edge[data-side='left'],
+.carousel[data-zone='right'] .carousel-edge[data-side='right'] {
+  opacity: 1;
+}
+
 .carousel[data-zone='left'] .carousel-chevron[data-side='left'],
-.carousel[data-zone='right'] .carousel-edge[data-side='right'],
 .carousel[data-zone='right'] .carousel-chevron[data-side='right'] {
+  visibility: visible;
   opacity: 1;
 }
 
 /*
- * Touch has no hover, so every one of those affordances - the chevrons, the
- * edge washes, the rotate badge - would only ever appear mid-gesture, i.e.
- * after you already guessed. On a coarse pointer they are simply on, dimmed
- * enough to sit under the device rather than compete with it.
+ * Touch, or a phone: the chevrons are the prev/next, always on, and the arrows
+ * by the readout go.
+ *
+ * Either condition is enough. `hover: none` is a guess about the input device,
+ * and it guesses wrong often enough to matter - a phone or a tablet that
+ * reports `hover: hover` (a paired trackpad, a stylus, desktop-mode emulation)
+ * would otherwise get arrows squeezed in beside a readout with no room for
+ * them. Width is the thing we actually know. The placeholder's arrows follow
+ * the same rule, so the bar is the same height before and after the scene.
  */
-@media (hover: none) {
-  .carousel-chevron,
-  .carousel-rotate-badge {
-    opacity: 0.55;
+@media (hover: none), (max-width: 620px) {
+  .carousel-chevron {
+    visibility: visible;
+    opacity: 1;
+  }
+
+  /* Qualified to outrank the arrows' own rule, which comes later. */
+  .carousel-nav .carousel-arrow {
+    display: none;
   }
 }
 
 /*
- * On a phone the chevrons stop being a hint and become the signage for the
- * browse gesture, so they are simply on, at full strength.
- *
- * Keyed off width rather than `hover`, and deliberately not folded into the
- * rule above: that one is a guess about the input device, and it guesses wrong
- * often enough to matter - a phone browser or a tablet that reports
- * `hover: hover` (a paired trackpad, a stylus, desktop-mode emulation) leaves
- * them at zero on exactly the screens with the least room to discover the
- * gesture by accident. Width is the thing we actually know.
+ * The one gesture hint. It fades in with the first frame - "drag to spin"
+ * means nothing over a loading line - and out at the first drag, and a visitor
+ * who has dragged once does not see it again (see CarouselScene).
  */
-@media (max-width: 620px) {
-  .carousel-chevron {
-    opacity: 1;
+.carousel-hint {
+  font-size: 13px;
+  letter-spacing: -0.005em;
+  color: var(--text-low);
+  margin: 0;
+  text-align: center;
+  text-wrap: balance;
+  transition: opacity 0.6s ease;
+}
+
+/* Faded rather than removed, so the row keeps its height and nothing under
+   the carousel moves when it goes. */
+.carousel-hint[data-shown='false'] {
+  opacity: 0;
+}
+
+/* Worded for the input at hand: a finger swipes, a mouse clicks or drags. */
+.carousel-hint-touch {
+  display: none;
+}
+
+@media (hover: none) {
+  .carousel-hint-pointer {
+    display: none;
+  }
+
+  .carousel-hint-touch {
+    display: inline;
   }
 }
 
-.carousel-hint {
-  font-family: var(--font-mono);
-  font-size: 14px;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--text-low);
-  margin: 2px 0 0;
-  text-align: center;
+/*
+ * The stage's toolbar: autoplay's toggle and the copy-code button in one
+ * capsule, centred under the stage they act on. Set in Inter and in sentence
+ * case like the readout above the stage - the bordered mono capitals these
+ * used to wear were a second voice on the page. The capsule is a faint fill
+ * rather than an outline, and each button lights its own half on hover.
+ */
+.carousel-tools {
+  display: inline-flex;
+  align-items: center;
+  flex: none;
+  padding: 3px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.045);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.07);
+}
+
+.carousel-tool {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  height: 32px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 999px;
+  background: none;
+  color: var(--muted);
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 550;
+  letter-spacing: -0.005em;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.carousel-tool:hover {
+  background: rgba(255, 255, 255, 0.07);
+  color: var(--text);
+}
+
+/* Two tools share the capsule, so each one's hover fill follows the capsule
+   on its outer side and meets the divider square: Play rounds on the left,
+   Copy code on the right. A tool alone keeps the whole pill. */
+.carousel-tool:first-child:not(:last-child) {
+  border-radius: 999px 0 0 999px;
+}
+
+.carousel-tool:last-child:not(:first-child) {
+  border-radius: 0 999px 999px 0;
+}
+
+.carousel-tool:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+/* "Copied" answers in the accent for the moment it shows. */
+.carousel-tool[data-done='true'] {
+  color: var(--accent-2);
+}
+
+.carousel-tools-rule {
+  width: 1px;
+  height: 16px;
+  margin: 0 2px;
+  background: rgba(255, 255, 255, 0.1);
+  flex: none;
+}
+
+/*
+ * Space held for controls that do not exist yet: the server-rendered
+ * placeholder carries the carousel's real rows, invisible, so the page is laid
+ * out at its final height before the scene has loaded (see HeroCarousel).
+ */
+.carousel-hold {
+  visibility: hidden;
 }
 
 /*
@@ -853,12 +1196,23 @@ code {
   background: linear-gradient(180deg, var(--bg) 62%, transparent);
 }
 
-/* What is left below the stage: the gesture hint and the off-screen jumps. */
+/* What is left below the stage: the toolbar, the gesture hint under it and
+   the off-screen jumps. A fixed height, so the page under it never moves: not
+   when the scene loads, not when the hint fades. */
 .carousel-foot {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 7px 14px 0;
+  justify-content: flex-start;
+  gap: 10px;
+  min-height: 68px;
+  padding: 8px 14px 0;
+}
+
+@media (max-width: 620px) {
+  .carousel-hint {
+    font-size: 12.5px;
+  }
 }
 
 .carousel-nav {
@@ -876,16 +1230,23 @@ code {
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  border: 1px solid rgba(255, 255, 255, 0.16);
+  border: 0;
   background: none;
-  color: var(--text);
+  color: var(--muted);
   cursor: pointer;
   flex: none;
-  transition: border-color 0.15s ease;
+  transition: background 0.15s ease, color 0.15s ease;
 }
 
+/* No ring at rest - the chevron is the button - and a soft disc on hover. */
 .carousel-arrow:hover {
-  border-color: rgba(255, 255, 255, 0.36);
+  background: rgba(255, 255, 255, 0.07);
+  color: var(--text);
+}
+
+.carousel-arrow:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
 }
 
 /*
@@ -904,10 +1265,29 @@ code {
   margin: 0;
   min-width: min(324px, 58vw);
   max-width: 100%;
-  flex: 1 1 auto;
+  /* Sized to its text, not grown to fill the row: grown, it pushed the arrows
+     out to the edges of the window, a long way from the model they step. */
+  flex: 0 1 auto;
   text-align: center;
   text-wrap: balance;
   font-variant-numeric: tabular-nums;
+  /*
+   * A fixed height for the longest a readout gets: one line where it always
+   * fits, two on a phone, where "Galaxy Z Fold 7 · 820 × 910 px" wraps and
+   * "Galaxy S26" does not. Without it the bar - and the stage, the swatches
+   * and the whole page under them - shifted up and down as slides changed.
+   */
+  line-height: 1.45;
+  min-height: 1.45em;
+}
+
+@media (max-width: 620px) {
+  .carousel-readout {
+    min-height: 2.9em;
+    /* A name that fits on one line sits in the middle of the two held for
+       it, not on top of an empty second one. */
+    align-content: center;
+  }
 }
 
 .carousel-readout .dim {
@@ -947,8 +1327,16 @@ code {
   display: flex;
   align-items: center;
   gap: 11px;
-  flex-wrap: wrap;
+  /*
+   * One line, always: a model with five finishes plus the code pill wrapped
+   * onto a second row on a phone, and the whole stage dropped by that row
+   * whenever such a model came round. The finish name gives way instead (see
+   * below), and the row has a fixed height so the placeholder matches it.
+   */
+  flex-wrap: nowrap;
   justify-content: center;
+  max-width: 100%;
+  height: 28px;
 }
 
 /* The palette glyph. Sized to the swatches it introduces and dimmed to the
@@ -970,7 +1358,11 @@ code {
   letter-spacing: 0;
   color: var(--muted);
   min-width: 86px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
+
 
 .carousel-swatches {
   display: flex;
@@ -990,6 +1382,34 @@ code {
 
 .carousel-swatch[data-selected='true'] {
   box-shadow: 0 0 0 2px var(--bg), 0 0 0 3.5px var(--accent);
+}
+
+@media (max-width: 620px) {
+  .carousel-finishes {
+    gap: 8px;
+  }
+
+  .carousel-swatches {
+    gap: 7px;
+  }
+
+  .carousel-swatch {
+    width: 20px;
+    height: 20px;
+  }
+
+  /* The dot shrank by 2px; the hit area around it grows by the same, so it
+     stays the 44px the touch-target rule below guarantees. */
+  .carousel-swatches .carousel-swatch::after {
+    inset: -12px;
+  }
+
+  /* The name is the part of the row that can give: it shrinks, and ellipsizes
+     rather than wrapping. */
+  .carousel-finish-name {
+    min-width: 0;
+    flex: 0 1 auto;
+  }
 }
 
 /* Reachable by keyboard and screen readers, invisible on screen. */
@@ -1056,6 +1476,58 @@ code {
   text-wrap: pretty;
 }
 
+/*
+ * Each claim beside a render of it: copy then picture on a phone, side by
+ * side from a tablet up, alternating sides so the column of copy does not
+ * run down one edge with the pictures stacked along the other.
+ */
+.feature {
+  display: grid;
+  gap: 18px;
+  align-items: center;
+}
+
+/*
+ * The picture's box is a fixed shape whatever the render's, so the four rows
+ * line up and the page reserves the space before an image arrives. The
+ * renders are cut out, so they sit on a faint pool of the accent rather than
+ * in a frame.
+ */
+.feature-figure {
+  position: relative;
+  margin: 0;
+  aspect-ratio: 16 / 10;
+  max-height: 330px;
+  background: radial-gradient(58% 52% at 50% 62%, rgba(49, 211, 34, 0.09), transparent 72%);
+}
+
+/* Out of flow, so the box alone sets the row's height: in flow, a tall render
+   stretched its row to its own height whatever the box asked for. */
+.feature-figure img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  padding: clamp(10px, 2vw, 22px);
+  object-fit: contain;
+}
+
+@media (min-width: 760px) {
+  .feature {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
+    gap: clamp(28px, 4.5vw, 64px);
+  }
+
+  .feature-figure {
+    aspect-ratio: 4 / 3;
+  }
+
+  .feature:nth-child(even) .feature-figure {
+    order: -1;
+  }
+}
+
 /* ------------------------------------------------------------------ */
 /*  Quick start                                                        */
 /* ------------------------------------------------------------------ */
@@ -1086,19 +1558,97 @@ code {
   display: flex;
   flex-direction: column;
   gap: 14px;
+  /* A grid item's minimum width is its content's by default, so one long
+     line would widen the column past the screen instead of wrapping in it. */
+  min-width: 0;
 }
 
+/*
+ * A code block with a head row: what it is on the left (the file name, or the
+ * package-manager switch) and its copy button on the right. The button sits
+ * in the head rather than floating over the code so it never covers the end
+ * of the first line, which on a phone is exactly where that line wraps.
+ */
+.code-panel {
+  background: rgba(255, 255, 255, 0.035);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 11px;
+}
+
+.code-panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 5px 6px 0 16px;
+}
+
+.code-panel-label {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--text-low);
+}
+
+.pm-switch {
+  display: flex;
+  gap: 2px;
+  margin-left: -9px;
+}
+
+.pm-switch-btn {
+  min-height: 30px;
+  padding: 4px 9px;
+  border: 0;
+  border-radius: 7px;
+  background: none;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  letter-spacing: 0;
+  color: var(--text-low);
+  cursor: pointer;
+  transition: color 0.15s ease, background 0.15s ease;
+}
+
+.pm-switch-btn:hover {
+  color: var(--text);
+}
+
+.pm-switch-btn[aria-pressed='true'] {
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.pm-switch-btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+/*
+ * Wrapped, not scrolled: the install line runs past the column even on a
+ * desktop, and on a phone the import did too - a sideways scroll inside a
+ * vertically scrolling page is the one most readers never find. A wrapped
+ * line loses its indent, which in five lines of JSX costs nothing.
+ */
 .quickstart-code pre {
   margin: 0;
-  padding: 13px 16px;
-  overflow-x: auto;
+  padding: 8px 16px 13px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
   font-family: var(--font-mono);
   font-size: 14px;
   line-height: 1.65;
   color: var(--text-code);
-  background: rgba(255, 255, 255, 0.035);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 11px;
+}
+
+@media (max-width: 620px) {
+  .quickstart-code pre {
+    padding: 6px 12px 11px;
+    font-size: 13px;
+  }
+
+  .code-panel-head {
+    padding-left: 12px;
+  }
 }
 
 /*
@@ -1196,6 +1746,13 @@ code {
 
   .nav-burger {
     display: inline-flex;
+  }
+
+  /* Opaque in all but name on a phone. The single column puts body text
+     under the header for most of the scroll, and even 8% of it showing
+     through reads as a smudge behind the wordmark. */
+  .site-header {
+    background: rgba(8, 9, 12, 0.96);
   }
 }
 
@@ -1298,9 +1855,11 @@ code {
 }
 
 /*
- * The carousel's play/pause control is gone by request. What is left of WCAG
- * 2.2.2's "moving content needs a stop": the auto-advance halts permanently at
- * the first arrow, swatch or drag, and `prefers-reduced-motion` keeps it from
- * ever starting. Neither is a control on the page, so a visitor who wants the
- * motion stopped without touching the carousel has only the system setting.
+ * WCAG 2.2.2: moving content that runs longer than five seconds needs a way to
+ * stop it. The carousel has three: the pause/play toggle under the stage
+ * (`.carousel-tool` in `.carousel-tools`), a permanent stop at the first arrow, swatch or drag, and
+ * `prefers-reduced-motion`, which keeps autoplay from starting at all. (An
+ * earlier version dropped the toggle by request and leaned on the other two;
+ * the 2026-09 audit asked for it back, since a visitor who wants the motion
+ * gone should not have to change a system setting or touch the carousel.)
  */

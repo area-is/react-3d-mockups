@@ -3,6 +3,13 @@ import * as THREE from 'three'
 const WORLD_UP = new THREE.Vector3(0, 1, 0)
 
 /**
+ * Queued rotation (radians) below which the damping tail is dropped: about
+ * 0.006° of travel still to go, a small fraction of a pixel at any size a
+ * mockup is drawn.
+ */
+const SETTLE_EPSILON = 1e-4
+
+/**
  * Orbital tumble around a fixed center - the camera motion behind every
  * mockup's drag-to-rotate.
  *
@@ -79,11 +86,33 @@ export class TumbleOrbit {
     camera.position.copy(this.target).add(this.offset)
   }
 
+  /** Drop any rotation still queued, so the camera stops where it is. */
+  halt(): void {
+    this.pendingYaw = 0
+    this.pendingPitch = 0
+  }
+
+  /**
+   * Whether queued rotation is still playing out. A caller that renders on
+   * demand keeps requesting frames while this is true and stops once it is
+   * not - which is why the damping tail is cut off below instead of being
+   * left to decay forever.
+   */
+  get settling(): boolean {
+    return this.pendingYaw !== 0 || this.pendingPitch !== 0 || this.reconcile
+  }
+
   /**
    * Advance one frame. `autoRotateStep` is an extra turntable angle (radians)
    * for auto-rotation. Returns whether the camera moved.
    */
   update(camera: THREE.Camera, autoRotateStep = 0): boolean {
+    // Exponential damping never reaches zero on its own: after a flick the
+    // queue decays for seconds through motion far below a pixel. Rendering on
+    // demand, that tail is a stream of frames nobody can see, so once what is
+    // left would move the camera by less than SETTLE_EPSILON it is dropped.
+    if (Math.abs(this.pendingYaw) < SETTLE_EPSILON) this.pendingYaw = 0
+    if (Math.abs(this.pendingPitch) < SETTLE_EPSILON) this.pendingPitch = 0
     const yaw = this.pendingYaw * this.dampingFactor + autoRotateStep
     let pitch = this.pendingPitch * this.dampingFactor
     this.pendingYaw *= 1 - this.dampingFactor

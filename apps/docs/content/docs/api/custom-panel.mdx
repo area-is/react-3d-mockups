@@ -46,7 +46,7 @@ Beyond the [shared screen props](/docs/screen-content):
 | `size` | `{ width, height, thickness? }` | required | Panel size in millimeters. `thickness` defaults to 5. |
 | `color` | `string` | `'#f2f1ed'` | Stock color: edges, and the back when unprinted. |
 | `cornerRadius` | `number` | `2` | Corner rounding in millimeters. |
-| `surfaceBackground` | `string` | `'#ffffff'` | CSS background behind each printed face. |
+| `surfaceBackground` | `string` | `color` | CSS background behind each printed face - the stock itself unless you set it, so whatever the content leaves clear prints on `color`. |
 | `resolution` | `number` | `560` | Virtual front face width in CSS px. |
 
 ## Regions

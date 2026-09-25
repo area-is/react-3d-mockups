@@ -28,6 +28,7 @@ export const StudioDisplayMockup = createMockup({
   regions: SCREEN_REGIONS,
   metrics: STUDIO_DISPLAY_METRICS,
   object: StudioDisplay,
+  label: '3D mockup of a Studio Display monitor',
   framing: STUDIO_DISPLAY_FRAMING,
   slots: studioDisplaySlots,
   displayName: 'StudioDisplayMockup',

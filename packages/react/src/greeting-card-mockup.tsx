@@ -22,6 +22,7 @@ export const GreetingCardMockup = createMockup({
   regions: GREETING_CARD_REGIONS,
   metrics: GREETING_CARD_METRICS,
   object: GreetingCard,
+  label: '3D mockup of a greeting card',
   framing: GREETING_CARD_FRAMING,
   slots: greetingCardSlots,
   displayName: 'GreetingCardMockup',

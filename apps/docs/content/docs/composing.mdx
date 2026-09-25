@@ -1,6 +1,7 @@
 ---
 title: Composing scenes
 description: Use the ready-made stage with your own arrangement, or drop devices into an existing canvas.
+keywords: [scene, canvas, multiple devices, several devices, react three fiber, r3f, compose, custom canvas]
 ---
 
 Each `*Mockup` component is a convenience wrapper around two composable parts:
@@ -30,7 +31,7 @@ export function Stage() {
 // Option B: drop the device into a Canvas you already have
 export function CustomScene() {
   return (
-    <Canvas camera={{ position: [0, 0.5, 7.4], fov: 40 }}>
+    <Canvas gl={{ alpha: true }} camera={{ position: [0, 0.5, 7.4], fov: 40 }}>
       <ambientLight intensity={0.7} />
       <directionalLight position={[4, 8, 6]} intensity={1.4} />
       <Galaxy>
@@ -43,11 +44,40 @@ export function CustomScene() {
 
 Devices accept all react-three-fiber group props (`position`, `rotation`,
 `scale`), so you can pose several of them in one scene, animate them, or mix
-them with your own meshes.
+them with your own meshes. Several devices in one canvas also cost less than
+several one-liners, each of which is a canvas of its own - see
+[GPU and performance](/docs/performance#use-fewer-canvases).
+
+## Your own canvas must stay transparent
+
+Option B works with any react-three-fiber `<Canvas>`, on one condition: the
+canvas has to stay transparent. That means an alpha context (`alpha: true`,
+which is react-three-fiber's default - do not turn it off) and no background
+drawn inside the scene: no `scene.background`, no
+`<color attach="background" />`.
+
+The reason is how screens are drawn. A screen's DOM sits *under* the canvas,
+and the device clears the canvas to transparent over the glass so the DOM shows
+through. An opaque canvas paints over that hole, and every screen disappears -
+the device renders, with nothing on it. In development the library logs a
+warning, once, when it finds a screen inside an opaque canvas.
+
+To put a color or an image behind the scene, style the canvas element or its
+container with CSS instead (`<Canvas style={{ background: '#0b0d12' }}>`) - or
+use `MockupCanvas`, whose `background` prop does exactly that.
+
+## Animating inside a composed stage
+
+`MockupCanvas` renders on demand: it draws a frame when something changes, not
+sixty times a second. A `useFrame` animation of your own inside it therefore
+needs either `frameloop="always"` on the canvas or a call to
+react-three-fiber's `invalidate()` whenever the animation moves something.
+See [Render only when something changes](/docs/performance#render-only-when-something-changes).
 
 ## Transparent background
 
 The WebGL canvas is transparent by default (alpha context, no scene
 background), so whatever your page renders behind the mockup shows through.
 Set the `background` prop on `MockupCanvas` (any CSS color, gradient, or image
-value) when you want the canvas to paint its own backdrop.
+value) when you want the canvas to paint its own backdrop - it is CSS on the
+canvas element, so the screens still show through.

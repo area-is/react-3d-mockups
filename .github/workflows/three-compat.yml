@@ -1,0 +1,92 @@
+name: three.js compatibility
+
+# The package's `three` peer range is bounded to the versions it has been
+# tested with (see CONTRIBUTING.md, "Peer dependency ranges"). This checks both
+# ends of it - the oldest version the range allows and whatever npm calls
+# `latest` today - and, once a week, flags a new three release that falls
+# outside the range, which is the cue to test it and widen the bound.
+#
+# The package is installed on its own, outside the workspace, so the pinned
+# `three` is the only copy in the tree: inside the monorepo the docs app's own
+# `three` would be the one hoisted.
+
+on:
+  pull_request:
+    paths:
+      - 'packages/react/**'
+      - '.github/workflows/three-compat.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'packages/react/**'
+  schedule:
+    - cron: '0 7 * * 1'
+  workflow_dispatch:
+
+concurrency:
+  group: three-compat-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  three:
+    name: three ${{ matrix.three }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # The floor of the peer range, and the newest release.
+        three: ['0.179.1', 'latest']
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+
+      - name: Copy the package out of the workspace
+        run: |
+          mkdir -p "$RUNNER_TEMP/compat/packages"
+          cp -r packages/react "$RUNNER_TEMP/compat/packages/"
+          cp tsconfig.base.json "$RUNNER_TEMP/compat/"
+
+      # Only the runtime is pinned: the typings stay at the version the repo
+      # develops against (@types/three reshapes signatures between minors, which
+      # says nothing about whether the code runs). `--legacy-peer-deps` works
+      # around an npm arborist crash on this dev tree's peer sets; the
+      # package's own install from a consumer app is unaffected.
+      - name: Install against three ${{ matrix.three }}
+        working-directory: ${{ runner.temp }}/compat/packages/react
+        run: |
+          npm pkg set devDependencies.three=${{ matrix.three }}
+          npm install --legacy-peer-deps --no-audit --no-fund
+          # Read, not required: three's `exports` map does not expose package.json.
+          node -p "'three ' + JSON.parse(require('fs').readFileSync('node_modules/three/package.json', 'utf8')).version"
+
+      - name: Typecheck
+        working-directory: ${{ runner.temp }}/compat/packages/react
+        run: npx tsc --noEmit -p .
+
+      - name: Unit tests
+        working-directory: ${{ runner.temp }}/compat/packages/react
+        run: npx vitest run
+
+      # `npm install` ran the `prepare` build already; this makes a build
+      # failure show up as its own step rather than as an install error.
+      - name: Build
+        working-directory: ${{ runner.temp }}/compat/packages/react
+        run: npx tsup
+
+      - name: Is the newest three inside the peer range?
+        if: matrix.three == 'latest'
+        working-directory: ${{ runner.temp }}/compat/packages/react
+        run: |
+          RANGE=$(node -p "require('./package.json').peerDependencies.three")
+          LATEST=$(node -p "JSON.parse(require('fs').readFileSync('node_modules/three/package.json', 'utf8')).version")
+          if npx --yes semver@7 -r "$RANGE" "$LATEST" > /dev/null; then
+            echo "three $LATEST is inside $RANGE"
+          else
+            echo "::warning title=three peer range::three $LATEST passed the checks above but is outside the peer range $RANGE. Widen it in packages/react/package.json (see CONTRIBUTING.md)."
+          fi
