@@ -112,7 +112,7 @@ export function PrintShop() {
               <Scene order={order} artRef={artRef} />
             </SceneBoundary>
           </div>
-          <p className="ps-stage-hint">Drag to turn the frame · pinch to look closer</p>
+          <p className="ps-stage-hint">Shown with a hardback for scale · drag to turn, pinch to zoom</p>
         </div>
 
         <div className="ps-config">

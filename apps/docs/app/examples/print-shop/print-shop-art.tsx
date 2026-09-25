@@ -4,7 +4,8 @@ import type { CSSProperties, ReactNode, Ref } from 'react'
 import { TabbiedPattern, type TabbiedPatternHandle } from 'tabbied/react'
 import { damier, dipole, epicentre, flux, gyre, halftone, maelstrom, radius } from 'tabbied/patterns'
 import type { PatternDefinition } from 'tabbied'
-import { FONT, TONES, type Tone } from '@/components/screens/swiss-art'
+import { FONT, TONES, luminance, type Tone } from '@/components/screens/swiss-art'
+import { mix } from '@/components/screens/sample-kit'
 
 /**
  * Grid Editions: the shop's catalogue, and the artwork it prints.
@@ -154,26 +155,70 @@ export function newSeed(): string {
 /** The print stock: cotton rag, a warm off-white. */
 export const PAPER = '#f5f2eb'
 export const INK = '#1a1917'
+/** The tote's natural kraft - the bag's colour, and the stock its print sits on. */
+export const KRAFT = '#c9a77a'
+
+function contrast(a: string, b: string): number {
+  const [hi, lo] = [luminance(a), luminance(b)].sort((x, y) => y - x) as [number, number]
+  return (hi + 0.05) / (lo + 0.05)
+}
+
+/** Below this an ink disappears into the stock it is pulled on. */
+const LEGIBLE = 1.8
 
 /**
- * The picture block of an order: the pattern on its ground, at the design's
- * grid, from the order's seed. Shared by every surface the shop prints on,
- * so the tote and the card carry the same edition as the sheet in the frame.
+ * An ink set as pulled straight onto a stock, with no ground of its own.
+ *
+ * The sheet in the frame is printed full colour, ground and all. The tote and
+ * the card are screen printed onto what they are made of, the way merch is:
+ * the kraft or the card is the background, and only the marks go down. A
+ * set's light inks (Midnight's white and cyan, Ember's cream) would vanish
+ * there, so each one that falls under `LEGIBLE` takes another of the set's
+ * own colours instead - its ground, its text ink, or its accent knocked
+ * halfway into the ground - whichever stand out most on the stock first.
+ * The print keeps the set's own colours, only the ones that read there.
+ */
+export function stockPalette(tone: Tone, stock: string): string[] {
+  const deep = [tone.ground, tone.text, mix(tone.accent, tone.ground, 0.5)]
+    .filter((c) => contrast(c, stock) >= LEGIBLE)
+    .sort((a, b) => contrast(b, stock) - contrast(a, stock))
+  let next = 0
+  const marks = tone.palette.slice(1).map((c) => (contrast(c, stock) >= LEGIBLE ? c : (deep[next++ % Math.max(deep.length, 1)] ?? INK)))
+  return ['transparent', ...marks]
+}
+
+/**
+ * The picture block of an order: the pattern at the design's grid, from the
+ * order's seed. Shared by every surface the shop prints on, so the tote and
+ * the card carry the same edition as the sheet in the frame.
+ *
+ * On the sheet it is the full print, the ink set's ground and all. Given a
+ * `stock`, it is the marks alone, pulled onto that stock (`stockPalette`).
  *
  * `fit="cover"` keeps the composed grid whatever the block's shape - the
  * three sheet sizes are three aspects, and a card is a fourth - rather than
  * letting the pattern get denser as the surface gets bigger.
  */
-export function Picture({ order, ref, style }: { order: Order; ref?: Ref<TabbiedPatternHandle>; style?: CSSProperties }) {
+export function Picture({
+  order,
+  ref,
+  stock,
+  style,
+}: {
+  order: Order
+  ref?: Ref<TabbiedPatternHandle>
+  stock?: string
+  style?: CSSProperties
+}) {
   const design = find(DESIGNS, order.design)
   const ink = find(INKS, order.ink)
   return (
-    <div style={{ position: 'relative', background: ink.tone.ground, overflow: 'hidden', ...style }}>
+    <div style={{ position: 'relative', background: stock ? 'transparent' : ink.tone.ground, overflow: 'hidden', ...style }}>
       <TabbiedPattern
         ref={ref}
         pattern={design.pattern}
         seed={order.seed}
-        palette={ink.tone.palette}
+        palette={stock ? stockPalette(ink.tone, stock) : ink.tone.palette}
         options={{ grid: design.grid }}
         fit="cover"
         style={{ width: '100%', height: '100%' }}
@@ -261,14 +306,14 @@ export function PosterArt({ order, ref }: { order: Order; ref?: Ref<TabbiedPatte
 }
 
 /**
- * The tote. The bag's own stock is the margin - the mockup paints the bag's
- * colour as the surface background - so the picture is a block printed on
- * kraft, not a sheet glued to it, and the wordmark sits under it in ink.
+ * The tote. The bag's own stock is the ground - the mockup paints the bag's
+ * colour as the surface background - so the marks are printed on kraft, not
+ * on a sheet glued to it, and the wordmark sits under them in ink.
  */
 export function ToteArt({ order }: { order: Order }) {
   return (
     <Sheet background="transparent" style={{ padding: '13cqw 12cqw 15cqw', gap: '3.5cqw' }}>
-      <Picture order={order} style={{ flex: 1, minHeight: 0 }} />
+      <Picture order={order} stock={KRAFT} style={{ flex: 1, minHeight: 0 }} />
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', fontSize: '3.2cqw', fontWeight: 700, letterSpacing: '-0.025em', lineHeight: 1 }}>
         <span>Grid Editions</span>
         <span style={{ opacity: 0.55, fontWeight: 600, fontSize: '2.4cqw' }}>No. {order.seed}</span>
@@ -277,11 +322,11 @@ export function ToteArt({ order }: { order: Order }) {
   )
 }
 
-/** The card's front: the same picture, a deeper margin, the plate line set small. */
+/** The card's front: the same marks straight on the card, a deeper margin, the plate line set small. */
 export function CardArt({ order }: { order: Order }) {
   return (
     <Sheet background={PAPER} style={{ padding: '9cqw 9cqw 8cqw', gap: '4cqw' }}>
-      <Picture order={order} style={{ flex: 1, minHeight: 0 }} />
+      <Picture order={order} stock={PAPER} style={{ flex: 1, minHeight: 0 }} />
       <Plate order={order} size="2.6cqw" />
     </Sheet>
   )
