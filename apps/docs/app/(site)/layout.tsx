@@ -4,7 +4,7 @@ import { Logo } from '@/components/logo'
 import { SiteNav } from '@/components/site-nav'
 import { SITE_EXAMPLES } from '@/components/site-examples'
 import { fraunces, inter, jetbrainsMono } from '@/lib/fonts'
-import { notoSansKR } from '@/lib/fonts-ko'
+import { notoSerifKR } from '@/lib/fonts-ko'
 import {
   AUTHOR,
   CHANGELOG_URL,
@@ -54,7 +54,7 @@ const FOOTER_LINKS: { label: string; href: string; external?: boolean }[] = [
 // with the Fumadocs/Tailwind styles and vice versa.
 export default function SiteLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${inter.variable} ${jetbrainsMono.variable} ${fraunces.variable} ${notoSansKR.variable}`}>
+    <html lang="en" className={`${inter.variable} ${jetbrainsMono.variable} ${fraunces.variable} ${notoSerifKR.variable}`}>
       <body>
         <div className="site">
           <header className="site-header">

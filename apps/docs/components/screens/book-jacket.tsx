@@ -73,12 +73,20 @@ function jacketTone(cloth: string): Tone {
 
 const TITLE = ['Spring', 'Comes', 'Late']
 /**
- * Inter for the Latin, with Noto Sans KR behind it for the Hangul Inter does
- * not have (see `lib/fonts-ko.ts`). The jacket is the only artwork that sets
- * Korean, so it is the only one that names the Korean face; the shared `FONT`
- * is Inter alone.
+ * Inter for the Latin, with Noto Serif KR behind it for the Hangul Inter does
+ * not have (see `lib/fonts-ko.ts`): a grotesque for the English and a
+ * Myeongjo for the Korean, the pairing a Korean literary jacket reaches for.
+ * The jacket is the only artwork that sets Korean, so it is the only one
+ * that names the Korean face; the shared `FONT` is Inter alone.
+ *
+ * Inter is tracked in on every line here, tighter the larger it is set, the
+ * way a display grotesque is meant to be; the Hangul is only nudged in, since
+ * its syllables are already set on an even square.
+ *
+ * The Korean file holds only the syllables this file contains. Add Hangul
+ * and cut the font again (`app/fonts/LICENSES.md`).
  */
-const FONT_KO = 'var(--font-inter), var(--font-noto-sans-kr), Inter, system-ui, -apple-system, "Segoe UI", sans-serif'
+const FONT_KO = 'var(--font-inter), var(--font-noto-serif-kr), Inter, system-ui, -apple-system, "Segoe UI", sans-serif'
 
 const TITLE_KO = '봄은 늦게 온다'
 const AUTHOR = 'Kim Soon-ja'
@@ -100,7 +108,7 @@ function Micro({ children, style }: { children: ReactNode; style?: CSSProperties
       style={{
         fontSize: '3.2cqw',
         fontWeight: 600,
-        letterSpacing: '-0.01em',
+        letterSpacing: '-0.02em',
         lineHeight: 1,
         ...style,
       }}
@@ -111,7 +119,7 @@ function Micro({ children, style }: { children: ReactNode; style?: CSSProperties
 }
 
 /**
- * The imprint's name, in Hangul - Noto Sans KR, through the font stack.
+ * The imprint's name, in Hangul - Noto Serif KR, through the font stack.
  * Set tight like the Latin: Hangul syllables are square and evenly spaced
  * already, and tracking them out reads as letters, not a word.
  */
@@ -204,7 +212,7 @@ export function JacketCover({ cloth }: { cloth: string }) {
         >
           {TITLE.join('\n')}
         </div>
-        <span style={{ fontSize: '5.4cqw', fontWeight: 500, letterSpacing: '-0.01em', opacity: 0.62 }}>
+        <span style={{ fontSize: '5.4cqw', fontWeight: 500, letterSpacing: '-0.02em', opacity: 0.62 }}>
           {TITLE_KO}
         </span>
       </div>
@@ -234,7 +242,7 @@ export function JacketCover({ cloth }: { cloth: string }) {
           style={{
             fontSize: '6.6cqw',
             fontWeight: 700,
-            letterSpacing: '-0.03em',
+            letterSpacing: '-0.035em',
             lineHeight: 1.02,
             // Stops short of where the portrait's left edge lands, so the two
             // never meet at the foot whatever the name's length.
@@ -274,11 +282,11 @@ export function JacketSpine({ cloth }: { cloth: string }) {
           lineHeight: 1,
         }}
       >
-        <span style={{ fontSize: '20cqw', fontWeight: 600, letterSpacing: '-0.01em' }}>{AUTHOR}</span>
-        <span style={{ fontSize: '25cqw', fontWeight: 700, letterSpacing: '-0.02em' }}>
+        <span style={{ fontSize: '20cqw', fontWeight: 600, letterSpacing: '-0.025em' }}>{AUTHOR}</span>
+        <span style={{ fontSize: '25cqw', fontWeight: 700, letterSpacing: '-0.035em' }}>
           {TITLE.join(' ')}
         </span>
-        <span style={{ fontSize: '15cqw', fontWeight: 600, letterSpacing: '0.02em', color: t.accent }}>{IMPRINT}</span>
+        <span style={{ fontSize: '15cqw', fontWeight: 600, letterSpacing: '-0.01em', color: t.accent }}>{IMPRINT}</span>
       </div>
     </Sheet>
   )
@@ -288,7 +296,7 @@ const blurb = (size = '2.95cqw'): CSSProperties => ({
   margin: 0,
   fontSize: size,
   lineHeight: 1.46,
-  letterSpacing: '-0.005em',
+  letterSpacing: '-0.015em',
 })
 
 /**
@@ -343,14 +351,14 @@ function IsbnBlock() {
         gap: '0.8cqw',
       }}
     >
-      <span style={{ fontSize: '1.9cqw', fontWeight: 600, letterSpacing: '0.01em', whiteSpace: 'nowrap', lineHeight: 1 }}>
+      <span style={{ fontSize: '1.9cqw', fontWeight: 600, letterSpacing: '-0.01em', whiteSpace: 'nowrap', lineHeight: 1 }}>
         {ISBN_TEXT}
       </span>
       <div style={{ display: 'flex', alignItems: 'flex-end', gap: '0.4cqw' }}>
         <Ean13 digits={ISBN_DIGITS} color={INK} style={{ width: '22.5cqw', height: 'auto' }} />
         <Ean5 digits={ADDON} color={INK} style={{ width: '10.5cqw', height: 'auto' }} />
       </div>
-      <span style={{ fontSize: '1.9cqw', fontWeight: 700, letterSpacing: 0, whiteSpace: 'nowrap', lineHeight: 1, textAlign: 'right' }}>
+      <span style={{ fontSize: '1.9cqw', fontWeight: 700, letterSpacing: '-0.01em', whiteSpace: 'nowrap', lineHeight: 1, textAlign: 'right' }}>
         {PRICE}
       </span>
     </div>
@@ -389,7 +397,7 @@ export function JacketBack({ cloth }: { cloth: string }) {
             margin: 0,
             fontSize: '5.4cqw',
             fontWeight: 600,
-            letterSpacing: '-0.03em',
+            letterSpacing: '-0.035em',
             lineHeight: 1.16,
             maxWidth: '78cqw',
             flex: 'none',
@@ -414,7 +422,7 @@ export function JacketBack({ cloth }: { cloth: string }) {
 
         {/* one line of praise, set the way a jacket sets it: the quote, then the name */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.3cqw', borderLeft: `0.5cqw solid ${t.accent}`, paddingLeft: '3cqw', flex: 'none' }}>
-          <p style={{ ...blurb('3cqw'), fontWeight: 600, letterSpacing: '-0.015em', lineHeight: 1.38 }}>
+          <p style={{ ...blurb('3cqw'), fontWeight: 600, letterSpacing: '-0.025em', lineHeight: 1.38 }}>
             “A century in one woman&apos;s hands, told without a wasted word.”
           </p>
           <Micro style={{ fontSize: '2.2cqw', opacity: 0.6 }}>Yoon Mi-rae · author of The Salt Years</Micro>
@@ -424,7 +432,7 @@ export function JacketBack({ cloth }: { cloth: string }) {
         <div style={{ display: 'flex', gap: '3.2cqw', alignItems: 'flex-start', paddingTop: '0.6cqw', flex: 'none' }}>
           <AuthorPhoto size="13.5cqw" />
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1.3cqw', minWidth: 0 }}>
-            <span style={{ fontSize: '3.2cqw', fontWeight: 700, letterSpacing: '-0.015em', lineHeight: 1.1 }}>
+            <span style={{ fontSize: '3.2cqw', fontWeight: 700, letterSpacing: '-0.025em', lineHeight: 1.1 }}>
               {AUTHOR} <span style={{ fontWeight: 500, opacity: 0.6 }}>{AUTHOR_KO}</span>
             </span>
             <p style={{ ...blurb('2.65cqw'), opacity: 0.72, lineHeight: 1.4 }}>
