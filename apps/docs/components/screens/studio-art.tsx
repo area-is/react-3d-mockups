@@ -89,23 +89,28 @@ export function MoreauCardBack({ material }: { material: string }) {
 /**
  * The studio's door sign. What a practice screws beside its door is the
  * letterhead at 300 mm: the mark, the name, what they do and which bell.
+ *
+ * A custom panel is whatever size its `size` says - a portrait plaque, a
+ * 3:1 fascia - so every size here is the smaller of a share of the width and
+ * a share of the height, and the column holds at any proportion.
  */
 export function MoreauSign({ material }: { material: string }) {
   const quiet = quietInk(material, 0.35)
   const mark = markOn(material)
+  const u = (w: number) => `min(${w}cqw, ${(w * 1.5).toFixed(2)}cqh)`
   return (
-    <Face ink={stockInk(material)} style={{ padding: '8cqw 8.5cqw 7.5cqw' }}>
-      <ArchesMark size="17cqw" color={mark} />
+    <Face ink={stockInk(material)} style={{ padding: u(8) }}>
+      <ArchesMark size={u(17)} color={mark} />
       <div style={{ marginTop: 'auto' }}>
-        <Name size="10.4cqw" />
-        <Small size="3.8cqw" style={{ color: quiet, marginTop: '2.4cqw' }}>
+        <Name size={u(10.4)} />
+        <Small size={u(3.8)} style={{ color: quiet, marginTop: u(2.4) }}>
           Architecture &amp; interiors
         </Small>
       </div>
-      <div style={{ height: '0.45cqw', background: mark, margin: '5cqw 0 3.6cqw', flex: 'none' }} />
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-        <Small size="3.2cqw">Studio 4 · First floor</Small>
-        <Small size="3.2cqw" style={{ color: quiet }}>
+      <div style={{ height: u(0.45), background: mark, margin: `${u(5)} 0 ${u(3.6)}`, flex: 'none' }} />
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: u(4) }}>
+        <Small size={u(3.2)}>Studio 4 · First floor</Small>
+        <Small size={u(3.2)} style={{ color: quiet }}>
           Please ring and come up
         </Small>
       </div>
@@ -119,18 +124,17 @@ export function MoreauSign({ material }: { material: string }) {
  */
 export function MoreauSignBack({ material }: { material: string }) {
   const quiet = quietInk(material, 0.35)
+  const u = (w: number) => `min(${w}cqw, ${(w * 1.5).toFixed(2)}cqh)`
   return (
-    <Face ink={stockInk(material)} style={{ alignItems: 'center', justifyContent: 'center', textAlign: 'center', gap: '2.6cqw' }}>
-      <ArchesMark size="9cqw" color={quiet} />
-      <Small size="3cqw" style={{ color: quiet }}>
+    <Face ink={stockInk(material)} style={{ alignItems: 'center', justifyContent: 'center', textAlign: 'center', gap: u(2.6), padding: `0 ${u(6)}` }}>
+      <ArchesMark size={u(9)} color={quiet} />
+      <Small size={u(3)} style={{ color: quiet }}>
         Atelier Moreau · door sign, 1 of 1
         <br />
-        300 × 200 mm, lacquered birch ply
-        <br />
-        Made by Keel &amp; Plane, Bristol · 09 / 2026
+        Lacquered birch ply · made by Keel &amp; Plane, Bristol
       </Small>
-      <Small size="2.6cqw" style={{ color: quiet, marginTop: '2cqw', fontWeight: 700 }}>
-        ↑ This way up · fix to wall with the two brass screws supplied
+      <Small size={u(2.6)} style={{ color: quiet, marginTop: u(2), fontWeight: 700 }}>
+        ↑ This way up · fix with the two brass screws supplied
       </Small>
     </Face>
   )
