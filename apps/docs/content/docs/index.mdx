@@ -1,6 +1,7 @@
 ---
 title: Introduction
 description: GPU-accelerated 3D device mockups for React, with real live DOM on every screen.
+keywords: [introduction, overview, install, installation, npm, peer dependencies, react 19, what is]
 ---
 
 `react-3d-mockups` renders procedurally generated 3D devices with WebGL and maps
@@ -10,25 +11,11 @@ no 3D asset files to host and nothing to download at runtime.
 
 ## Highlights
 
-- **Thirty-three devices**: the Galaxy S26 line (S26, S26 Ultra), two
-  foldable generations (Z Fold 7 and Z Flip 7, the wide Z Fold 8, the
-  Z Fold 8 Ultra and Z Flip 8) and Apple's foldable iPhone Duo, the full
-  iPhone 17 family (17, 17 Air, 17 Pro, 17 Pro Max) and the iPhone 18 Pro
-  and Pro Max, MacBook Air 13" and 15" and MacBook Pro 14" and 16" (M5) and
-  the MacBook Neo 13", iPad Pro 13" and 11" (M5), iPad Air 13" and 11" (M4),
-  iPad (A16), Galaxy Tab S11 and S11 Ultra, the Apple Watch Series 11,
-  Series 12 and titanium Ultra 4 and the Galaxy Watch 8, Watch 9 and titanium
-  Watch Ultra 2 wearing full wristbands, and a Studio Display style 27"
-  monitor.
-- **Twenty-four objects**: hardcover book, magazine, tri-fold brochure,
-  business card, ID badge on a lanyard, greeting card, gallery poster frame,
-  retail product box, corrugated mailer box, gable-top milk carton,
-  kraft shopping bag,
-  **custom-size panels and boxes** (any millimeter dimensions),
-  vinyl record, roll-up banner, A-frame sidewalk sign, bus shelter,
-  double-sided DOOH totem, 14'×48' billboard, a high-street storefront, a
-  city transit bus, a wrap-ready cargo van, a 53 ft semi trailer, and a
-  65" TV - the printable surface of each is a live DOM area.
+- **Thirty-three devices and twenty-four objects**: phones, foldables,
+  tablets, laptops, watches and a monitor, plus print, packaging, out-of-home
+  formats, vehicles, a TV and custom-size panels and boxes. The screen or
+  printable surface of each is a live DOM area. Browse them all in the
+  [gallery](/docs/gallery).
 - **True-to-device screens**: each virtual display defaults to the real device's
   logical resolution in portrait and landscape, so your layouts and breakpoints
   behave exactly like on the hardware.
@@ -41,6 +28,25 @@ no 3D asset files to host and nothing to download at runtime.
   content. See [Screen content](/docs/screen-content).
 - **Composable**: use the one-liner mockup components, or drop the bare devices
   into your own react-three-fiber scene.
+
+## What it is not
+
+- **Not an interactive device.** Screens are display-only: your content
+  renders live, but clicks, taps, scrolling and typing go to the orbit
+  controls and never reach it. Put a usable app next to the mockup, not on
+  it. [Why screens are display-only](/docs/screen-content#why-screens-are-display-only)
+  explains the trade.
+- **Not an official product model.** The devices are original procedural
+  approximations built from published specifications and product
+  photography - close enough for design work, not dimensionally exact, and
+  not affiliated with their manufacturers. See
+  [Trademarks and usage](/docs/trademarks).
+- **Not a server-side renderer.** WebGL exists only in the browser, so
+  mockups mount on the client. See [Next.js and SSR](/docs/nextjs) and
+  [Other frameworks](/docs/frameworks).
+- **Not an image exporter.** A canvas snapshot misses the screens, because the
+  browser composites them. [Exporting images and video](/docs/exporting) shows
+  what works.
 
 ## Installation
 
@@ -74,6 +80,9 @@ Berry) does not auto-install peers, so there the full command is required.
   </Card>
   <Card title="Screen content" href="/docs/screen-content">
     Put components, iframes, and video on the glass.
+  </Card>
+  <Card title="Gallery" href="/docs/gallery">
+    Every model in the library, filterable by kind.
   </Card>
   <Card title="Devices and resolutions" href="/docs/devices">
     Every device, body size, and logical resolution.

@@ -2,7 +2,6 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { ExampleBadge } from '../_shared/badge'
 import { lazyScene } from '../_shared/stage'
 import { Picture } from './atlas-art'
 import { BOOK, CONTENTS, MAG, PHOTOS, findPhoto } from './atlas-data'
@@ -34,7 +33,6 @@ export function Atlas() {
           <span>Subscribe</span>
         </nav>
         <div className="at-top-right">
-          <ExampleBadge className="at-badge" tabbied={false} />
           <span className="at-cta">Subscribe · €48 a year</span>
         </div>
       </header>

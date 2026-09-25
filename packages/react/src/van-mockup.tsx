@@ -23,6 +23,7 @@ export const VanMockup = createMockup({
   regions: VAN_REGIONS,
   metrics: VAN_METRICS,
   object: Van,
+  label: '3D mockup of a cargo van',
   framing: VAN_FRAMING,
   slots: vanSlots,
   displayName: 'VanMockup',

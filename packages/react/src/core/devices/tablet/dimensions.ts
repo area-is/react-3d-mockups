@@ -120,7 +120,7 @@ export interface TabletSpec {
         /**
          * Holes dropped from the outer end of the positive-x run on the TOP
          * edge only - the A16's top button truncates that run (12 → 9 on the
-         * reference scan) while the other three runs keep the full count.
+         * retail unit) while the other three runs keep the full count.
          */
         topTrim?: number
       }

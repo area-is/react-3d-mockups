@@ -5,6 +5,7 @@ import { tulle } from 'tabbied/patterns'
 import { Pattern } from '@/components/screens/swiss-art'
 import { SERIF } from '@/components/screens/label-art'
 import { FONT } from '@/components/screens/swiss-art'
+import { asset } from '@/lib/base-path.mjs'
 import { Face } from '../_shared/face'
 import { PALETTES, TABLES, TIMELINE, monogram, names, type Suite } from './stationery-data'
 
@@ -13,9 +14,11 @@ import { PALETTES, TABLES, TIMELINE, monogram, names, type Suite } from './stati
  *
  * The typography is the whole design: a display face for the names (a
  * serif with an optical-size axis, or the sans, as the couple chooses), the
- * sans for everything small, and a great deal of paper. The one ornament is
+ * sans for everything small, and a great deal of paper. The ornaments are
  * `tulle` from Tabbied, a sparse field of dots in the accent, faint enough
- * to read as a texture in the stock rather than a print on it.
+ * to read as a texture in the stock rather than a print on it, and one
+ * watercolour olive sprig over the names on the invitation and the sign - a
+ * generated cut-out on a transparent ground (`/art/stationery-olive.webp`).
  */
 
 function tone(suite: Suite) {
@@ -38,9 +41,23 @@ function Tulle({ suite, seed, opacity = 0.22 }: { suite: Suite; seed: string; op
   )
 }
 
+/** The olive sprig (606 x 640), set as a crest over the names. `width` is in cqw. */
+function Sprig({ width, style }: { width: number; style?: CSSProperties }) {
+  return (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      src={asset('/art/stationery-olive.webp')}
+      alt=""
+      draggable={false}
+      decoding="async"
+      style={{ display: 'block', position: 'relative', width: `${width}cqw`, height: 'auto', aspectRatio: 606 / 640, transform: 'rotate(-38deg)', ...style }}
+    />
+  )
+}
+
 function Small({ children, style, suite }: { children: ReactNode; style?: CSSProperties; suite: Suite }) {
   return (
-    <span style={{ fontFamily: FONT, fontSize: '3.4cqw', fontWeight: 600, letterSpacing: '0.04em', textTransform: 'uppercase', lineHeight: 1.4, color: tone(suite).accent, ...style }}>
+    <span style={{ fontFamily: FONT, fontSize: '3.6cqw', fontWeight: 600, letterSpacing: '-0.005em', lineHeight: 1.4, color: tone(suite).accent, ...style }}>
       {children}
     </span>
   )
@@ -57,6 +74,7 @@ export function InviteFront({ suite }: { suite: Suite }) {
     <Face background={t.paper} color={t.ink} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', padding: '10cqw 8cqw' }}>
       <Tulle suite={suite} seed="ampersand-front" />
       <Small suite={suite}>{monogram(suite)}</Small>
+      <Sprig width={30} style={{ marginTop: '2cqw' }} />
       <div style={{ marginTop: 'auto', marginBottom: 'auto', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2cqw' }}>
         <span style={{ ...display(suite), fontSize: '15cqw' }}>{n.first}</span>
         <span style={{ ...display(suite), fontSize: '9cqw', color: t.accent, fontStyle: suite.face === 'serif' ? 'italic' : 'normal' }}>&amp;</span>
@@ -175,6 +193,7 @@ export function WelcomeSign({ suite }: { suite: Suite }) {
     <Face background={t.paper} color={t.ink} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', padding: '12cqw 9cqw', gap: '4cqw' }}>
       <Tulle suite={suite} seed="ampersand-sign" />
       <Small suite={suite}>Welcome to the wedding of</Small>
+      <Sprig width={28} />
       <div style={{ marginTop: 'auto', marginBottom: 'auto', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1.5cqw', position: 'relative' }}>
         <span style={{ ...display(suite), fontSize: '17cqw' }}>{n.first}</span>
         <span style={{ ...display(suite), fontSize: '9cqw', color: t.accent, fontStyle: suite.face === 'serif' ? 'italic' : 'normal' }}>&amp;</span>

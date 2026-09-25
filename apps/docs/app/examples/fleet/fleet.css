@@ -54,7 +54,6 @@
   font-size: 22px;
   font-weight: 800;
   letter-spacing: -0.05em;
-  text-transform: uppercase;
 }
 
 .fl-nav {
@@ -69,26 +68,6 @@
   display: flex;
   align-items: center;
   gap: 14px;
-}
-
-.fl-badge {
-  font-size: 12.5px;
-  font-weight: 500;
-  white-space: nowrap;
-  color: var(--fl-muted);
-  border: 1px solid var(--fl-line);
-  border-radius: 999px;
-  padding: 6px 13px;
-  background: rgba(255, 255, 255, 0.5);
-}
-
-.fl-badge a {
-  font-weight: 600;
-  transition: color 0.15s ease;
-}
-
-.fl-badge a:hover {
-  color: var(--fl-ink);
 }
 
 .fl-cta {
@@ -122,7 +101,6 @@
   max-width: 820px;
   margin: 0 0 18px;
   font-size: clamp(44px, 6.4vw, 88px);
-  text-transform: uppercase;
 }
 
 .fl-lede {
@@ -411,7 +389,6 @@
     padding: 18px 20px 0;
   }
 
-  .fl-badge,
   .fl-nav {
     display: none;
   }

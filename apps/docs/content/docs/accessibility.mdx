@@ -1,0 +1,84 @@
+---
+title: Accessibility
+description: How a mockup presents itself to assistive technology, how to drive it from the keyboard, and what reduced motion changes.
+keywords: [accessibility, a11y, screen reader, aria, label, alt text, keyboard, focus, reduced motion, prefers-reduced-motion, inert, wcag]
+---
+
+To assistive technology a mockup is a picture, and it is described like one.
+
+## The canvas is an image with a name
+
+The canvas has `role="img"` and an accessible name. By default a mockup names
+itself after its model - "3D mockup of a Galaxy S phone" - and a bare
+`MockupCanvas` says "3D mockup". That is correct but rarely useful; say what
+the picture shows, the way you would write an image's `alt` text:
+
+```tsx
+<GalaxyMockup label="Our budgeting app's monthly overview on a Galaxy phone">
+  <MonthlyOverview />
+</GalaxyMockup>
+```
+
+## Screen content is hidden by default
+
+Whatever is on the screen is decorative, like the pixels in a product photo:
+by default (`screenAccessibility="hidden"`) every screen layer is marked
+`aria-hidden="true"` and `inert`. Screen readers skip it, the Tab key never
+lands in it, and a demo's headings and links do not end up in your page's
+outline. Describe what matters in `label` or in the page text around the
+mockup.
+
+When the screen carries meaningful text that appears nowhere else on the page,
+expose it with `screenAccessibility="visible"`:
+
+```tsx
+<IPadMockup label="The pricing page on an iPad" screenAccessibility="visible">
+  <PricingTable />
+</IPadMockup>
+```
+
+Keep links and buttons off a screen you expose: they would be announced, but a
+pointer can never reach them - [screens are display-only](/docs/screen-content#why-screens-are-display-only).
+
+## Keyboard
+
+With `controls` on (the default), the canvas is focusable, and the keys do
+what a drag does:
+
+| Key | Action |
+| --- | --- |
+| `←` `→` | Turn the model |
+| `↑` `↓` | Tilt the model |
+| `+` `-` | Zoom in and out (when `zoom` is on) |
+| `Home` | Reset the view |
+
+Make sure your page's styles leave a visible focus indicator on it. The zoom
+and full-screen overlay buttons are real `<button>` elements with accessible
+names ("Zoom out", "Zoom in", "View full screen").
+
+A mockup that is pure decoration - nothing to turn, nothing to read - can drop
+out of the tab order with `controls={false}`.
+
+## Reduced motion
+
+`autoRotate` and `float` stop for visitors whose system asks for
+`prefers-reduced-motion: reduce`, and the dot-matrix `LEDText` marquees hold on
+their first frame. Gestures still work - a drag, a pinch or a key press is the
+visitor's own request. Nothing is required of you; see
+[Reduced motion](/docs/api/mockup-canvas#reduced-motion) for the hook the
+library uses, if your page has motion of its own to gate.
+
+## Touch
+
+A mockup never traps page scrolling on a touch screen: vertical swipes over it
+scroll the page, horizontal drags turn the model. Turning `zoom` on hands
+two-finger gestures to the canvas. See
+[Touch behavior](/docs/screen-content#touch-behavior).
+
+## On this site
+
+The home page carousel advances on its own, and a Pause button under it stops
+and restarts that. Any arrow, swatch or drag stops it too, it waits while it is
+off screen or the tab is hidden, and under reduced motion it does not
+auto-advance at all unless you press Play. Only the changes you make are
+announced to screen readers, not every automatic step.

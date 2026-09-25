@@ -1,11 +1,27 @@
 ---
 title: Next.js and SSR
-description: Load mockups client side, since WebGL only exists in the browser.
+description: Load mockups client side in the App Router, since WebGL only exists in the browser.
+keywords: [nextjs, next, next.js, ssr, app router, server components, server side rendering, dynamic import, use client, hydration]
 ---
 
 The components ship with a `'use client'` banner, but WebGL itself only exists
-in the browser. In the App Router, load your mockup with `ssr: false` from
-inside a client component:
+in the browser. In the App Router, load your mockup with `ssr: false` - and
+because `next/dynamic` only accepts `ssr: false` in a client component, do it
+from inside one:
+
+```tsx title="mockup.tsx"
+'use client'
+
+import { GalaxyMockup } from 'react-3d-mockups'
+
+export default function Mockup() {
+  return (
+    <GalaxyMockup float>
+      <YourApp />
+    </GalaxyMockup>
+  )
+}
+```
 
 ```tsx title="hero-client.tsx"
 'use client'
@@ -16,9 +32,19 @@ import dynamic from 'next/dynamic'
 const Mockup = dynamic(() => import('./mockup'), { ssr: false })
 
 export function Hero() {
-  return <Mockup />
+  // A fixed height reserves the space, so the page does not shift when the
+  // canvas mounts - and gives the mockup, which fills its parent, a size.
+  return (
+    <div style={{ height: 560 }}>
+      <Mockup />
+    </div>
+  )
 }
 ```
 
-Reserve the layout space (a fixed height on the wrapper) so the page does not
-shift when the canvas mounts.
+Render `<Hero />` from any page or layout, server components included. Pass a
+`loading` component to `dynamic` if you want something on screen while the
+3D chunk downloads.
+
+Using the Pages Router, Vite, React Router or Astro? See
+[Other frameworks](/docs/frameworks).

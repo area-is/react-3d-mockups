@@ -1,6 +1,7 @@
 ---
 title: Images as artwork
 description: Put a picture on the surface - a wallpaper, a poster, a product shot, a logo on kraft - and size it right.
+keywords: [image, images, img, picture, photo, artwork, wallpaper, logo, webp, object-fit]
 ---
 
 The quickest artwork is a picture. A screen or a printed panel is a real DOM
@@ -8,9 +9,9 @@ layer, so an `<img>` that fills it is all it takes: no texture, no UV map, no
 re-export when the picture changes. This page is the handful of things worth
 knowing when the artwork is a bitmap rather than a component.
 
-Every example below uses an image generated with OpenAI's GPT Image 2.5 at its
-`low` quality setting - see [Where these pictures came from](#where-these-pictures-came-from)
-for the call - and each one is the actual file the snippet names.
+Every example below uses a generated image - see
+[Preparing generated images](#preparing-generated-images) - and each one is the
+actual file the snippet names.
 
 ## Fill the surface
 
@@ -76,13 +77,14 @@ mockupInfo('laptop', { variant: 'air15' }).primary.aspect // 1.545 - shoot 3:2
 ## A transparent image on the material
 
 A logo is not a full-bleed picture: it sits on the board. Export it with a
-transparent background, size it as an element inside the surface, and set
-`surfaceBackground` to the object's own `color`, so everything the picture
-leaves clear is the bag. The same file prints on kraft, on gloss white or on a
-charcoal bag without being re-exported.
+transparent background and size it as an element inside the surface.
+A bag's surfaces print onto the bag - `surfaceBackground` defaults to its
+`color` - so everything the picture leaves clear is the bag, and the same file
+prints on kraft, on gloss white or on a charcoal bag without being
+re-exported.
 
 ```tsx
-<ShoppingBagMockup color="#c19a6b" surfaceBackground="#c19a6b" float>
+<ShoppingBagMockup color="#c19a6b" float>
   <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '18% 14%' }}>
     <img src="/art/fox.webp" alt="" style={{ width: '100%' }} />
   </div>
@@ -93,8 +95,8 @@ charcoal bag without being re-exported.
 
 Do not reach for `surfaceBackground="transparent"` to get the board through -
 the surface sits under the canvas, so transparent pixels fall through to the
-page and read as a hole in the object. Paint the board's colour and let the
-image be the transparent thing. [Surface background](/docs/screen-content#surface-background)
+page and read as a hole in the object. The board's colour is already there;
+let the image be the transparent thing. [Surface background](/docs/screen-content#surface-background)
 has the longer version.
 
 ## How big should the image be?
@@ -123,37 +125,36 @@ For the record: the images on this page are 1024 px on their short side, which
 is a little under 2× for the poster and the phone and comfortably over 1× for
 everything, at 70-340 KB each as WebP.
 
-## Where these pictures came from
+## Preparing generated images
 
-Each image here was generated with GPT Image 2.5 at `quality: 'low'`, the
-fastest and cheapest setting, which is plenty for artwork that will only ever
-be seen at a few hundred CSS pixels across. Three things made them usable as
-mockup artwork without editing:
+The pictures on this page were made with a text-to-image model at its fastest,
+lowest-quality setting, which is plenty for artwork that will only ever be seen
+at a few hundred CSS pixels across. Which model matters less than how you ask;
+three things made them usable as mockup artwork without editing:
 
-- **Pick the generation size closest to the surface's aspect.** `1024x1536`
-  for the poster and the phone, `1536x1024` for the laptop, `1024x1024` for
-  the sleeve and the logo, so `object-fit: cover` has almost nothing to crop.
+- **Pick the generation size closest to the surface's aspect.** Portrait for
+  the poster and the phone, landscape for the laptop, square for the sleeve
+  and the logo, so `object-fit: cover` has almost nothing to crop.
 - **Ask for no text.** A mockup's surface is the place your own type goes,
   and generated lettering is the first thing that gives a picture away.
 - **Ask for a transparent background** where the picture is a mark rather
   than a scene - the fox above - so it prints on the material.
 
-```ts
-const res = await fetch('https://api.openai.com/v1/images/generations', {
-  method: 'POST',
-  headers: { Authorization: `Bearer ${process.env.OPENAI_API_KEY}`, 'Content-Type': 'application/json' },
-  body: JSON.stringify({
-    model: 'gpt-image-2.5-flare',
-    prompt: 'A mid-century travel poster of a mountain lake at dawn, flat colour shapes, no text.',
-    size: '1024x1536',
-    quality: 'low',
-    output_format: 'webp',
-    output_compression: 85,
-    // background: 'transparent', // for a logo or a mark
-  }),
-})
-const { data } = await res.json()
-await writeFile('public/art/poster.webp', Buffer.from(data[0].b64_json, 'base64'))
+Whatever produced the file, fit it to the surface once, at build time, rather
+than shipping the original. This build script crops a source image to the
+poster's aspect at twice its CSS size and writes WebP, using
+[sharp](https://sharp.pixelplumbing.com):
+
+```ts title="scripts/fit-art.mts"
+import sharp from 'sharp'
+import { mockupInfo } from 'react-3d-mockups/core'
+
+const { px } = mockupInfo('posterFrame').primary // { width: 540, height: 726 }
+
+await sharp('art-source/poster.png')
+  .resize(px.width * 2, px.height * 2, { fit: 'cover' })
+  .webp({ quality: 85 })
+  .toFile('public/art/poster.webp')
 ```
 
 The same rules hold for a photograph or an export from a design tool: match

@@ -437,7 +437,7 @@ function IPhoneImpl({
         )}
 
         {/* side keys, spec-accurate: Action + volume on the left rail, side button
-            + the flush Camera Control on the right - pills protruding a scan-true
+            + the flush Camera Control on the right - pills protruding a true-to-hardware
             ~0.3-0.45 mm (Camera Control sits flush, seated in the rail) */}
         {buttons.map(({ edge, y, length, flush }, i) => (
           <SideKey

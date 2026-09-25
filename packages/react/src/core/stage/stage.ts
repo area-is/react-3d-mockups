@@ -23,6 +23,39 @@ export const DEFAULT_SHADOW_Y = -2.05
 export const CONTACT_SHADOW = { opacity: 0.45, scale: 13, blur: 2.6, far: 4.5 } as const
 
 /**
+ * WebGL context attributes every mockup canvas starts from; a caller's own
+ * `gl` settings are merged over them.
+ *
+ * - `alpha` is load-bearing, not cosmetic: the live screens are DOM layered
+ *   UNDER the canvas and seen through pixels the canvas leaves transparent.
+ *   An opaque canvas hides every screen.
+ * - `powerPreference` is the browser's default rather than
+ *   `'high-performance'`. On a dual-GPU laptop the latter asks for the
+ *   discrete GPU, and waking it for a decorative element costs battery and
+ *   can visibly stall the page while the system switches GPUs. A page whose
+ *   mockup is the main event can still opt in.
+ */
+export const CANVAS_GL_DEFAULTS = {
+  antialias: true,
+  alpha: true,
+  powerPreference: 'default',
+} as const satisfies {
+  antialias: boolean
+  alpha: boolean
+  powerPreference: 'default' | 'high-performance' | 'low-power'
+}
+
+/**
+ * Keyboard orbit, for a focused mockup canvas: one arrow press turns (or
+ * tilts) the stage by this many radians - 15°, so a full turn is 24 presses
+ * and a quarter turn is 6.
+ */
+export const KEYBOARD_ORBIT_STEP = Math.PI / 12
+
+/** Keyboard zoom: `+` multiplies the orbit distance by this, `-` by its inverse. */
+export const KEYBOARD_ZOOM_FACTOR = 0.8
+
+/**
  * Rotation feel shared by all mockups: pan stays disabled (the axis is always
  * the stage center) and motion is damped. By default vertical rotation stays
  * within the classic polar clamp below; opting into free rotation removes the

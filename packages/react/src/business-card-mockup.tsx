@@ -22,6 +22,7 @@ export const BusinessCardMockup = createMockup({
   regions: BUSINESS_CARD_REGIONS,
   metrics: BUSINESS_CARD_METRICS,
   object: BusinessCard,
+  label: '3D mockup of a business card',
   framing: BUSINESS_CARD_FRAMING,
   slots: businessCardSlots,
   displayName: 'BusinessCardMockup',

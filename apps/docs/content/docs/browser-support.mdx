@@ -1,0 +1,40 @@
+---
+title: Browser support
+description: What a mockup needs from the browser, and how well each browser is tested.
+keywords: [browsers, browser support, compatibility, safari, ios, firefox, chrome, edge, android, webgl, webgl 2, webgl 1]
+---
+
+## Requirements
+
+- **WebGL 2.** The library renders with three.js r185, and three.js has
+  required WebGL 2 since r163 - there is no WebGL 1 fallback. Every current
+  desktop and mobile browser ships it, but it can still be missing: disabled
+  by policy, a GPU driver the browser blocklists, some virtual machines and
+  remote desktops. There the canvas cannot be created, so wrap mockups in an
+  error boundary with a static image as the fallback.
+- **CSS 3D transforms.** Each screen is real DOM positioned with a 3D
+  transform under a CSS `perspective`, stacked under the canvas and shown
+  through the pixels the device clears in the canvas's depth buffer. The
+  picture depends on the browser compositing that layer exactly under the
+  canvas. The library works around the engine differences it knows of - it
+  promotes the screen layer so it does not snap to a whole-pixel offset, and it
+  caps each screen's raster size so a high-DPI phone does not run out of
+  compositor memory - but this is the part of a mockup most likely to differ
+  between engines.
+
+## Tested browsers
+
+| Browser | Status |
+| --- | --- |
+| Chrome and Edge, desktop | Where the library is developed. The visual checks and the thumbnails on this site run in Chromium. |
+| Chrome, Android | Supported. Mind the WebGL context cap, which is lower on mobile - see [GPU and performance](/docs/performance). |
+| Safari, macOS | Supported, less tested. |
+| Safari, iOS and iPadOS | Supported, less tested. Other browsers on iOS generally use Safari's engine and behave like it. |
+| Firefox | Supported, less tested. |
+
+"Less tested" means no automated check runs in Safari or Firefox, so a
+problem there is more likely to go unnoticed. If a mockup looks wrong in one of
+them - a screen offset from its glass, a screen missing, a seam where the
+canvas should be transparent - please
+[open an issue](https://github.com/area-is/react-3d-mockups/issues) with the
+browser version and the mockup.

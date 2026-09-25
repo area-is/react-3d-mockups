@@ -14,8 +14,8 @@
  *
  * Both share one world scale (the same ~36.66 mm per unit as the Galaxy phone
  * family) so a Fold sits at true relative size beside the S-series. Detail
- * geometry (buttons, camera plateau + pill, hinge, ports) was measured from a
- * reference 3D scan of the retail device. Pure, renderer-agnostic data.
+ * geometry (buttons, camera plateau + pill, hinge, ports) was measured from
+ * published specifications and product photography. Pure, renderer-agnostic data.
  *
  * Real Galaxy Z Fold 7: unfolded 158.4 x 143.2 x 4.2 mm (8.0" 2184x1968 inner,
  * ratio ~1.11); folded 158.4 x 72.8 x 8.9 mm (6.5" 2520x1080 cover, ratio ~2.32).
@@ -39,9 +39,9 @@ import { foldOpenAngle } from '../../regions'
 
 /** The rear camera cluster in one pose's own back-face coordinates. */
 interface FoldRearCamera {
-  /** Light pedestal plate under the pill (scan: 19.8 x 52.1 mm, 2.7 mm proud). */
+  /** Light pedestal plate under the pill (measured: 19.8 x 52.1 mm, 2.7 mm proud). */
   plateau: { x: number; y: number; width: number; height: number; radius: number; raise: number }
-  /** Dark pill seating the lens column (scan: 15.2 x 48.6 mm, +2.2 mm more). */
+  /** Dark pill seating the lens column (measured: 15.2 x 48.6 mm, +2.2 mm more). */
   island: { x: number; y: number; width: number; height: number; radius: number; raise: number }
   /**
    * Lens collars, top to bottom (r 7.9 mm on a 16.7 mm pitch); `pupil` is the
@@ -146,12 +146,12 @@ export interface FoldSpec {
 const FOLD7: FoldSpec = {
   closed: {
     body: { width: 1.942, height: 4.321, depth: 0.241, radius: 0.081, bevel: 0.018 },
-    // A hairline seam between the folded halves. (The scan measured 1.3 mm
-    // of air, but with the slabs' edge bevels that renders as a deep V
+    // A hairline seam between the folded halves. (The hardware has about
+    // 1.3 mm of air, but with the slabs' edge bevels that renders as a deep V
     // groove from the side - the retail device reads closed-flush, so the
     // model keeps just enough gap to draw the seam line.)
     gap: 0.012,
-    // 65.98 x 153.03 mm cover panel, centered, sharp scan-true corners.
+    // 65.98 x 153.03 mm cover panel, centered, with the hardware's sharp corners.
     display: { width: 1.8, height: 4.174, radius: 0.06 },
     punchHole: { radius: 0.053, offsetY: 0.127 },
     resolution: 360,
@@ -189,7 +189,7 @@ const FOLD7: FoldSpec = {
       flash: { x: 1.033, y: 1.501, r: 0.058 },
     },
   },
-  // Scan: volume 18.6 mm at +28.4, power 13.0 mm at +6.5 on the right edge.
+  // Measured: volume 18.6 mm at +28.4, power 13.0 mm at +6.5 on the right edge.
   buttons: [
     { y: 0.775, length: 0.507 },
     { y: 0.177, length: 0.354 },
@@ -224,8 +224,8 @@ const FOLD7: FoldSpec = {
  * the same 8.0" diagonal now drives 2504x2256 px on the same 910x820 dp grid
  * (2504/910 = 2256/820 = 2.75), so the physical display rect and the logical
  * resolution both carry over. The camera keeps the Fold 7's triple layout
- * around a 200 MP main. Every detail measurement is the Fold 7 scan's, which
- * the identical chassis keeps valid.
+ * around a 200 MP main. Every detail measurement is the Fold 7's, which the
+ * identical chassis keeps valid.
  */
 const FOLD8ULTRA: FoldSpec = {
   closed: FOLD7.closed,
@@ -250,8 +250,8 @@ const FOLD8ULTRA: FoldSpec = {
  * 4:3 landscape - the one display in the catalog whose unrotated pose is
  * wider than tall. Body, panel and camera-count figures are the published
  * hardware; detail geometry (camera pill proportions, ring size and pitch,
- * buttons, hinge, ports) is adapted from the Fold 7 reference scan and the
- * official Fold 8 product renders, pending a scan of the retail device.
+ * buttons, hinge, ports) is adapted from the Fold 7's measurements and the
+ * official Fold 8 product renders.
  *
  * Resolutions: the cover panel runs 424 ppi, and 1248/2.6 = 480 dp puts it in
  * the density bucket nearest its true 163 dp/in; the inner panel divides by

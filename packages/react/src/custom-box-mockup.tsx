@@ -22,6 +22,7 @@ export const CustomBoxMockup = createMockup({
   regions: CUSTOM_BOX_REGIONS,
   metrics: CUSTOM_BOX_METRICS,
   object: CustomBox,
+  label: '3D mockup of a printed box',
   framing: CUSTOM_BOX_FRAMING,
   slots: customBoxSlots,
   displayName: 'CustomBoxMockup',

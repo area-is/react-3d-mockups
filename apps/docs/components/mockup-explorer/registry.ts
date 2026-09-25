@@ -101,6 +101,14 @@ export interface ExplorerSpec {
   fixed?: Record<string, unknown>
   /** Print/packaging surfaces read better with artwork than an app screen. */
   print?: boolean
+  /**
+   * `color` is the stock the artwork is printed on - board, card, paper, a
+   * vehicle's paint under its vinyl - rather than hardware around a separate
+   * sheet (a frame's moulding, a billboard's steel). The explorer mounts that
+   * colour as the surface background and hands it to the artwork, whose own
+   * ground is transparent, so changing `color` changes what is printed on.
+   */
+  stock?: boolean
 }
 
 const single = (list: Colorway[]): Record<string, Colorway[]> => ({ '': list })
@@ -269,22 +277,23 @@ const object = (
 const OBJECTS: Record<string, ExplorerSpec> = {
   BookMockup: object(BookMockup, 'BookMockup', 'book', 'Book', { bare: Book, bareName: 'Book' }),
   MagazineMockup: object(MagazineMockup, 'MagazineMockup', 'magazine', 'Magazine'),
-  BrochureMockup: object(BrochureMockup, 'BrochureMockup', 'brochure', 'Brochure'),
+  BrochureMockup: object(BrochureMockup, 'BrochureMockup', 'brochure', 'Brochure', { stock: true }),
   BusinessCardMockup: object(BusinessCardMockup, 'BusinessCardMockup', 'businessCard', 'Business card', {
+    stock: true,
     bare: BusinessCard,
     bareName: 'BusinessCard',
   }),
-  IDCardMockup: object(IDCardMockup, 'IDCardMockup', 'idCard', 'ID card'),
-  GreetingCardMockup: object(GreetingCardMockup, 'GreetingCardMockup', 'greetingCard', 'Greeting card'),
+  IDCardMockup: object(IDCardMockup, 'IDCardMockup', 'idCard', 'ID card', { stock: true }),
+  GreetingCardMockup: object(GreetingCardMockup, 'GreetingCardMockup', 'greetingCard', 'Greeting card', { stock: true }),
   PosterFrameMockup: object(PosterFrameMockup, 'PosterFrameMockup', 'posterFrame', 'Poster frame', {
     bare: PosterFrame,
     bareName: 'PosterFrame',
   }),
-  ProductBoxMockup: object(ProductBoxMockup, 'ProductBoxMockup', 'productBox', 'Product box'),
-  MailerBoxMockup: object(MailerBoxMockup, 'MailerBoxMockup', 'mailerBox', 'Mailer box'),
-  MilkCartonMockup: object(MilkCartonMockup, 'MilkCartonMockup', 'milkCarton', 'Milk carton'),
-  ShoppingBagMockup: object(ShoppingBagMockup, 'ShoppingBagMockup', 'shoppingBag', 'Shopping bag'),
-  VinylRecordMockup: object(VinylRecordMockup, 'VinylRecordMockup', 'vinylRecord', 'Vinyl record'),
+  ProductBoxMockup: object(ProductBoxMockup, 'ProductBoxMockup', 'productBox', 'Product box', { stock: true }),
+  MailerBoxMockup: object(MailerBoxMockup, 'MailerBoxMockup', 'mailerBox', 'Mailer box', { stock: true }),
+  MilkCartonMockup: object(MilkCartonMockup, 'MilkCartonMockup', 'milkCarton', 'Milk carton', { stock: true }),
+  ShoppingBagMockup: object(ShoppingBagMockup, 'ShoppingBagMockup', 'shoppingBag', 'Shopping bag', { stock: true }),
+  VinylRecordMockup: object(VinylRecordMockup, 'VinylRecordMockup', 'vinylRecord', 'Vinyl record', { stock: true }),
   RollupBannerMockup: object(RollupBannerMockup, 'RollupBannerMockup', 'rollupBanner', 'Roll-up banner', {
     bare: RollupBanner,
     bareName: 'RollupBanner',
@@ -297,14 +306,16 @@ const OBJECTS: Record<string, ExplorerSpec> = {
     bareName: 'Billboard',
   }),
   StorefrontMockup: object(StorefrontMockup, 'StorefrontMockup', 'storefront', 'Storefront'),
-  BusMockup: object(BusMockup, 'BusMockup', 'bus', 'Bus', { coverage: true }),
-  VanMockup: object(VanMockup, 'VanMockup', 'van', 'Van', { coverage: true }),
-  SemiTrailerMockup: object(SemiTrailerMockup, 'SemiTrailerMockup', 'semiTrailer', 'Semi trailer'),
+  BusMockup: object(BusMockup, 'BusMockup', 'bus', 'Bus', { stock: true, coverage: true }),
+  VanMockup: object(VanMockup, 'VanMockup', 'van', 'Van', { stock: true, coverage: true }),
+  SemiTrailerMockup: object(SemiTrailerMockup, 'SemiTrailerMockup', 'semiTrailer', 'Semi trailer', { stock: true }),
   TVSetMockup: object(TVSetMockup, 'TVSetMockup', 'tv', 'TV set', { print: false }),
   CustomPanelMockup: object(CustomPanelMockup, 'CustomPanelMockup', 'customPanel', 'Custom panel', {
+    stock: true,
     fixed: { size: { width: 300, height: 200, thickness: 5 } },
   }),
   CustomBoxMockup: object(CustomBoxMockup, 'CustomBoxMockup', 'customBox', 'Custom box', {
+    stock: true,
     fixed: { size: { width: 180, height: 120, depth: 60 } },
   }),
 }

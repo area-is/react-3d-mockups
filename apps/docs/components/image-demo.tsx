@@ -47,7 +47,7 @@ const EXAMPLES = {
     </LaptopMockup>
   ),
   bag: () => (
-    <ShoppingBagMockup color="#c19a6b" surfaceBackground="#c19a6b" float>
+    <ShoppingBagMockup color="#c19a6b" float>
       {/* A transparent PNG/WebP sits on the board: the surface background is
           the bag's own colour, so everything the picture leaves clear is kraft. */}
       <div

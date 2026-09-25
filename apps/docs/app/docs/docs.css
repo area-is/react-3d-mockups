@@ -99,6 +99,26 @@
   gap: 8px;
 }
 
+/* A category's name across both columns, in the voice of Fumadocs' own
+   sidebar separators but a step quieter - these are under "Devices". Set in
+   its own case: weight and colour mark it as a heading, not capitals. */
+.mockup-grid-heading {
+  grid-column: 1 / -1;
+  margin: 20px 0 -2px;
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: -0.005em;
+  line-height: 1.3;
+  color: var(--color-fd-muted-foreground);
+}
+
+/* The first has no tiles above it, only the separator; a category after
+   tiles sits 28px below them (the 8px grid gap plus its margin), which
+   separates it from the category it follows. */
+.mockup-grid-heading:first-child {
+  margin-top: 16px;
+}
+
 .mockup-tile {
   display: flex;
   flex-direction: column;
@@ -176,6 +196,152 @@
   font-weight: 600;
 }
 
+.device-disclaimer a {
+  color: var(--color-fd-foreground);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+/* ------------------------------------------------------------------ */
+/*  Gallery (components/model-gallery.tsx)                             */
+/*                                                                     */
+/*  The sidebar grid's tiles, grown up: same thumbnails, same quiet    */
+/*  card, with the kind under the name and filter chips above.         */
+/* ------------------------------------------------------------------ */
+
+.model-gallery {
+  margin: 1.5rem 0 2rem;
+}
+
+.model-gallery-chips {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.model-gallery-chips-label {
+  width: 100%;
+  margin-bottom: 2px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--color-fd-muted-foreground);
+}
+
+.model-gallery-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 32px;
+  padding: 4px 12px;
+  border: 1px solid var(--color-fd-border);
+  border-radius: 999px;
+  background: var(--color-fd-card);
+  color: var(--color-fd-muted-foreground);
+  font-size: 13px;
+  line-height: 1.2;
+  cursor: pointer;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.model-gallery-chip:hover {
+  background: var(--color-fd-accent);
+  color: var(--color-fd-foreground);
+}
+
+.model-gallery-chip[aria-pressed='true'] {
+  border-color: var(--color-fd-primary);
+  background: color-mix(in oklab, var(--color-fd-primary) 12%, transparent);
+  color: var(--color-fd-foreground);
+}
+
+.model-gallery-chip:focus-visible,
+.model-gallery-card:focus-visible {
+  outline: 2px solid var(--color-fd-ring);
+  outline-offset: 2px;
+}
+
+.model-gallery-chip-count {
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-fd-muted-foreground);
+}
+
+.model-gallery-status {
+  margin: 14px 0 10px;
+  font-size: 13px;
+  color: var(--color-fd-muted-foreground);
+}
+
+.model-gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.model-gallery-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 10px 10px 12px;
+  border: 1px solid var(--color-fd-border);
+  border-radius: 12px;
+  background: var(--color-fd-card);
+  color: inherit;
+  text-decoration: none;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.model-gallery-card:hover {
+  background: var(--color-fd-accent);
+  border-color: color-mix(in oklab, var(--color-fd-foreground) 18%, transparent);
+}
+
+.model-gallery-thumb {
+  display: block;
+  aspect-ratio: 1;
+  margin-bottom: 8px;
+}
+
+.model-gallery-thumb img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.model-gallery-label {
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.3;
+  color: var(--color-fd-foreground);
+}
+
+.model-gallery-kind {
+  margin-top: 2px;
+  font-size: 12px;
+  color: var(--color-fd-muted-foreground);
+}
+
+@media (max-width: 420px) {
+  .model-gallery-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .model-gallery-card {
+    padding: 8px 8px 10px;
+  }
+}
+
 /* ------------------------------------------------------------------ */
 /*  Prop explorer (components/mockup-explorer)                         */
 /* ------------------------------------------------------------------ */
@@ -212,6 +378,10 @@
   overflow: hidden;
   margin: 1.5rem 0;
   font-size: 12px;
+  /* A share link scrolls the explorer into view; this is the clearance
+     Fumadocs gives its heading anchors (`scroll-m-28`), so it lands below the
+     sticky nav rather than under it. */
+  scroll-margin-top: 7rem;
 }
 
 .mx-header {
@@ -915,16 +1085,20 @@
 .mx-surface-art {
   width: 100%;
   height: 100%;
+  box-sizing: border-box;
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  background:
-    radial-gradient(120% 120% at 22% 16%, #50e042 0%, transparent 55%),
-    radial-gradient(130% 130% at 82% 88%, #20c531 0%, transparent 58%),
-    #0d2a12;
-  color: #eafff0;
+  background: #e4e6e9;
+  color: #3b4048;
+  /* a hairline round the live area, inset so it reads as a margin */
+  outline: 1px dashed color-mix(in srgb, currentColor 45%, transparent);
+  outline-offset: -12px;
+}
+
+/* Printed straight onto the object's own stock: no ground of its own. */
+.mx-surface-art[data-material] {
+  background: none;
 }
 
 .mx-surface-art-label {
@@ -932,12 +1106,6 @@
   letter-spacing: 0.18em;
   text-transform: uppercase;
   opacity: 0.85;
-}
-
-.mx-surface-art-mark {
-  width: min(52%, 220px);
-  height: auto;
-  opacity: 0.95;
 }
 
 /* Code panel */
@@ -949,7 +1117,9 @@
 .mx-tabs {
   display: flex;
   align-items: center;
-  padding: 0 12px;
+  /* No right padding: `.mx-actions` ends the strip and carries its own, so
+     its sticky edge is the strip's edge and nothing scrolls past it. */
+  padding: 0 0 0 12px;
   border-bottom: 1px solid var(--color-fd-border);
 }
 
@@ -978,18 +1148,42 @@
   box-shadow: inset 0 -2px 0 var(--mx-accent);
 }
 
-.mx-copy {
+/* Share, StackBlitz and copy, at the strip's far end. Sticky, so on an object
+   with enough faces to scroll the tabs, the tabs slide under the buttons
+   rather than taking them off the end - which needs the card's own fill
+   behind them. */
+.mx-actions {
+  position: sticky;
+  right: 0;
   margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 0 12px 0 8px;
+  background: var(--color-fd-card);
+}
+
+.mx-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px;
   border: 0;
+  border-radius: 6px;
   background: none;
   color: var(--color-fd-muted-foreground);
   font-size: 12px;
-  cursor: pointer;
   font-family: inherit;
+  white-space: nowrap;
+  cursor: pointer;
 }
 
-.mx-copy:hover {
+.mx-action:hover {
   color: var(--color-fd-foreground);
+}
+
+.mx-action svg {
+  flex: none;
 }
 
 .mx-code pre {
@@ -1101,5 +1295,65 @@
 
   .mx-range {
     width: 60px;
+  }
+
+  /* Icons only, so the file tabs keep the strip. Each button carries its name
+     in aria-label, so nothing is lost to a screen reader. */
+  .mx-action-label {
+    display: none;
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/*  Scene posters (LazyScene)                                          */
+/* ------------------------------------------------------------------ */
+
+/*
+ * The model an example is about to render, greyed to a silhouette under the
+ * stage until the scene is built - see `ModelPoster`. It breathes, so it
+ * reads as on its way rather than as the picture, and it fades out rather
+ * than vanishing as the real model draws in over it.
+ */
+.scene-poster-layer {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+  transition: opacity 0.35s ease;
+}
+
+.scene-poster-layer[data-hidden='true'] {
+  opacity: 0;
+}
+
+.scene-poster-layer[data-hidden='true'] .scene-poster {
+  animation: none;
+}
+
+.scene-poster {
+  width: auto;
+  height: min(62%, 300px);
+  aspect-ratio: 1;
+  object-fit: contain;
+  filter: grayscale(1) brightness(0.72) contrast(0.8);
+  opacity: 0.3;
+  animation: scene-poster-breathe 1.8s ease-in-out infinite;
+}
+
+.dark .scene-poster {
+  filter: grayscale(1) contrast(0.7) brightness(1.6);
+  opacity: 0.18;
+}
+
+@keyframes scene-poster-breathe {
+  50% {
+    opacity: 0.12;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scene-poster {
+    animation: none;
   }
 }

@@ -1,11 +1,12 @@
 import type { Metadata } from 'next'
+import { exampleMetadata } from '../_shared/metadata'
 import { Stationery } from './stationery-client'
 
-export const metadata: Metadata = {
+export const metadata: Metadata = exampleMetadata('stationery', {
   title: 'Ampersand - wedding stationery example | React 3D Mockups',
   description:
     'An isolated example page: a stationery studio whose form fields typeset an invitation, a reply card, a welcome sign and a table plan as you type. Built with react-3d-mockups and tabbied.',
-}
+})
 
 /**
  * A complete, isolated example built on text input: the words typed into

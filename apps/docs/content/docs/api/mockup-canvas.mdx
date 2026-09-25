@@ -1,6 +1,7 @@
 ---
 title: MockupCanvas
 description: The ready-made stage, with a WebGL canvas, studio lighting, soft shadows, and drag-to-rotate controls.
+keywords: [stage, canvas, frameloop, pauseWhenOffscreen, gl, onCreated, label, screenAccessibility, keyboard, controls, zoom, fullscreen, dpr]
 ---
 
 `<MockupCanvas>` wraps a react-three-fiber `Canvas` with everything a product
@@ -8,8 +9,9 @@ shot needs. Compose it with any device, for example
 `<MockupCanvas><Galaxy>...</Galaxy></MockupCanvas>`.
 
 The one-liner `*Mockup` components are built on this stage and forward most of
-these props. Three of them - `freeRotation`, `shadowY` and `dpr` - are canvas
-only: they tune the rendering rather than the picture, and a mockup already
+these props, including the rendering and accessibility ones (`frameloop`,
+`pauseWhenOffscreen`, `gl`, `onCreated`, `label`, `screenAccessibility`).
+Three of them - `freeRotation`, `shadowY` and `dpr` - are canvas only: they tune the rendering rather than the picture, and a mockup already
 derives its shadow ground line from the object's own framing. Reach for
 `MockupCanvas` when you want that level of control, or when you are staging
 more than one device.
@@ -54,6 +56,12 @@ the way a second object in a scene of your own would.
 | `background` | `string` | - | CSS background of the canvas (color, gradient, or image). Transparent when unset - that is what the checkerboard behind each page's first example is showing through. |
 | `camera` | r3f camera | `[0, 0.5, 7.4]`, fov 40 | Override the default camera. |
 | `dpr` | `number \| [min, max]` | `[1, 2]` | Device pixel ratio clamp. Keeps hi-dpi GPU load predictable. |
+| `frameloop` | `'demand' \| 'always' \| 'never'` | `'demand'` | When the canvas draws. `'demand'` renders only when something changes (a drag and its damping, zoom, `autoRotate`, `float`, a prop change, a resize), so an idle mockup renders no frames. `'always'` renders every frame, for a `useFrame` animation of your own; `'never'` freezes the canvas. See [Rendering](#rendering). |
+| `pauseWhenOffscreen` | `boolean` | `true` | Stop rendering while the canvas is scrolled out of the viewport or the tab is hidden, and resume on return. |
+| `gl` | r3f `gl` props | `{ antialias: true, alpha: true, powerPreference: 'default' }` | WebGL renderer settings, merged over the defaults. Opt into the discrete GPU with `{ powerPreference: 'high-performance' }`. Keep `alpha: true`: screens show through transparent canvas pixels. |
+| `onCreated` | `(state) => void` | - | react-three-fiber's `onCreated`, called once with the canvas state (`gl`, `scene`, `camera`, ...) - for example to read `gl.info`. |
+| `label` | `string` | per model | Accessible name of the canvas, which has `role="img"`. Mockups default to a description of the model ("3D mockup of a Galaxy S phone"); `MockupCanvas` on its own to "3D mockup". See [Accessibility](#accessibility). |
+| `screenAccessibility` | `'hidden' \| 'visible'` | `'hidden'` | Whether screen content is exposed to assistive technology. `'hidden'` marks every screen `aria-hidden` and `inert`, so decorative screen content stays out of the accessibility tree and the tab order; `'visible'` exposes it. |
 | `className`, `style` | - | - | Forwarded to the canvas wrapper. |
 
 ## More examples
@@ -84,6 +92,81 @@ it back. It composes with `zoom`, and works on any mockup.
   <YourCoverArt />
 </BookMockup>
 ```
+
+## Rendering
+
+The canvas renders on demand (`frameloop="demand"`): it draws a frame when a
+drag or its damping moves the camera, on zoom, while `autoRotate` or `float`
+runs, when a prop changes and on resize - and not otherwise, so an idle mockup
+costs no frames. With `pauseWhenOffscreen` (on by default) it also stops
+entirely while it is scrolled out of view or the tab is hidden.
+
+Inside a composed `<MockupCanvas>`, a `useFrame` animation of your own does not
+by itself cause frames. For motion that runs continuously, render every frame:
+
+```tsx
+<MockupCanvas frameloop="always">
+  <Spinning> {/* rotates its children in useFrame */}
+    <Galaxy>
+      <YourApp />
+    </Galaxy>
+  </Spinning>
+</MockupCanvas>
+```
+
+For a change you make imperatively - mutating an object from an event
+handler, a texture that finished loading - keep the default and ask for a
+frame with react-three-fiber's `invalidate()`:
+
+```tsx
+const invalidate = useThree((state) => state.invalidate)
+
+function highlight() {
+  material.current.emissiveIntensity = 1
+  invalidate()
+}
+```
+
+Props and state that flow through React need neither: react-three-fiber
+requests a frame whenever it applies a change.
+
+`gl` is merged over the defaults `{ antialias: true, alpha: true,
+powerPreference: 'default' }`. The default lets the browser choose the GPU, so
+on a dual-GPU laptop a decorative mockup does not wake the discrete one; pass
+`gl={{ powerPreference: 'high-performance' }}` when the mockup is the main
+event. Leave `alpha` on: the screens are revealed through transparent canvas
+pixels, and an opaque canvas hides them (the library warns about it in
+development). [GPU and performance](/docs/performance) covers the rest.
+
+## Keyboard controls
+
+With `controls` on, the canvas is focusable, so a keyboard user can do what a
+drag does:
+
+| Key | Action |
+| --- | --- |
+| `←` `→` | Turn the model |
+| `↑` `↓` | Tilt the model |
+| `+` `-` | Zoom in and out (when `zoom` is on) |
+| `Home` | Reset the view |
+
+## Accessibility
+
+The canvas has `role="img"` and an accessible name from `label`. A mockup
+names itself after its model ("3D mockup of a Galaxy S phone"); pass `label` to
+say what the picture shows in your page's terms:
+
+```tsx
+<GalaxyMockup label="The checkout screen of our app on a Galaxy phone">
+  <Checkout />
+</GalaxyMockup>
+```
+
+Screen content is decorative by default (`screenAccessibility="hidden"`):
+every screen layer is `aria-hidden` and `inert`, so a demo's headings and
+links do not join the page's outline or its tab order. Set
+`screenAccessibility="visible"` when the screen carries meaningful text that
+appears nowhere else on the page. See [Accessibility](/docs/accessibility).
 
 ## Reduced motion
 

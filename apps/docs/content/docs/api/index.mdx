@@ -1,6 +1,7 @@
 ---
 title: Overview
 description: How the components fit together, and the props every mockup shares.
+keywords: [api, reference, props, components, slots, regions, all-in-one, bare model]
 ---
 
 The library has two layers, and every model appears in both.
@@ -59,6 +60,11 @@ a visitor can do with it:
 
 `controls` · `autoRotate` · `zoom` · `fullscreen` ·
 `shadows` · `background` · `camera` · `className` · `style`
+
+…and the ones that decide how it renders and how assistive technology reads
+it: `frameloop` · `pauseWhenOffscreen` · `gl` · `onCreated` · `label` ·
+`screenAccessibility`. See [Rendering](/docs/api/mockup-canvas#rendering) and
+[Accessibility](/docs/accessibility).
 
 `MockupCanvas` has a few more (`freeRotation`, `shadowY`, `dpr`) that tune the
 rendering machinery rather than the picture. A mockup does not advertise those:

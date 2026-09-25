@@ -30,9 +30,10 @@ import { asset } from '@/lib/base-path.mjs'
  * vitamins as bare percentages two to a line - which is the label most
  * people picture, and the one a dairy this size still prints.
  *
- * Every panel prints straight onto the board (`materialTone`), so the
- * carousel's finish swatches change the carton the print sits on, the way a
- * brand's white and kraft variants do. The greens are solid inks and stay
+ * Every panel prints straight onto the board (`materialTone`), so a
+ * different `material` changes the carton the print sits on, the way a
+ * brand's white and kraft variants do - though the home carousel only offers
+ * the coated white. The greens are solid inks and stay
  * put; the type flips to white ink on a dark board and the pale grey follows
  * the board it is mixed with.
  *
@@ -413,6 +414,31 @@ export function CartonRoof({ material }: { material: string }) {
       <div style={{ fontFamily: FONT, fontSize: '9cqw', fontWeight: 300, letterSpacing: '-0.02em', lineHeight: 1, color: pale }}>
         3.5%
       </div>
+    </Sheet>
+  )
+}
+
+/**
+ * The back roof panel: no cap here, so it carries what the front roof has
+ * no room for - the opening instruction, the recycling line and the dairy's
+ * name, small and in the green, the way the side panels set it.
+ */
+export function CartonRoofBack({ material }: { material: string }) {
+  const { ink, quiet } = press(material)
+  return (
+    <Sheet
+      tone={materialTone(material)}
+      style={{ color: ink, flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'space-between', padding: '4cqw 5cqw 4.4cqw', gap: '4cqw' }}
+    >
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '1.6cqw' }}>
+        <Wordmark size="4.4cqw" style={{ color: GREEN }} />
+        <p style={body('3cqw', { color: quiet })}>
+          Twist the cap to open.
+          <br />
+          Keep refrigerated below 5 °C.
+        </p>
+      </div>
+      <RecycleMark color={ink} size="9cqw" label={<span style={body('2.6cqw', { color: quiet })}>Rinse, cap on,<br />recycle</span>} />
     </Sheet>
   )
 }

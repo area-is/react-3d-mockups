@@ -4,10 +4,10 @@
  *
  * Every variant shares one world scale (~72.4 mm per unit, set so the Air's
  * closed footprint is exactly 4.2 x 2.97 units), so they keep their true
- * relative sizes side by side. The Pro 14 numbers were measured from a
- * reference 3D scan of the retail machine (ports, feet, speaker grilles,
- * notch and keyboard deck all taken from the scan geometry), normalized to
- * the official 312.6 x 221.2 x 15.5 mm closed body.
+ * relative sizes side by side. The Pro 14 numbers were measured from
+ * published specifications and product photography (ports, feet, speaker
+ * grilles, notch and keyboard deck), normalized to the official
+ * 312.6 x 221.2 x 15.5 mm closed body.
  *
  * This is pure, renderer-agnostic data: the 3D model consumes it today and a
  * future 2D (CSS/SVG) renderer can consume the same numbers.
@@ -67,7 +67,7 @@ export interface LaptopSpec {
    * Lift-lid scoop: the crescent recess machined into the front edge at
    * center. `radius` is the cutting cylinder's radius, `bite` how deep it
    * penetrates the front face at deck level (the cut fades to nothing
-   * ~sqrt(bite·2·radius) below the deck, per the reference scan).
+   * ~sqrt(bite·2·radius) below the deck, as the hardware's does).
    */
   scoop: { width: number; radius: number; bite: number }
   /** Force Touch trackpad, centered between keyboard and front edge. */
@@ -80,7 +80,7 @@ export interface LaptopSpec {
   feet: { x: number; z: number; radius: number }
   /**
    * Perforated speaker strips flanking the keyboard (Pro): centers at ±x.
-   * Hole metrics from the reference scan's grille tile: ~1.0 x 0.93 mm grid
+   * Hole metrics measured from the grille: ~1.0 x 0.93 mm grid
    * of ~0.63 mm drilled holes.
    *
    * Photo-measured on Apple's own product shots: the drilling fills the whole
@@ -136,7 +136,7 @@ const MACBOOK_AIR_13: LaptopSpec = {
 
 /**
  * MacBook Pro 14" (M5) - 312.6 x 221.2 x 15.5 mm closed, 14.2" 3024x1964
- * Liquid Retina XDR display. Detail geometry from a retail-unit scan: MagSafe,
+ * Liquid Retina XDR display. Detail geometry from product photography: MagSafe,
  * 2x Thunderbolt and headphone jack on the left; HDMI, Thunderbolt and SDXC on
  * the right; perforated speaker strips flanking the keyboard; 19.1 mm feet;
  * a deeper 36.8 mm camera notch. Default scaled resolution 1512x982 (2x).
@@ -146,7 +146,7 @@ const MACBOOK_PRO_14: LaptopSpec = {
   base: { thickness: 0.149, bevel: 0.028 },
   lid: { thickness: 0.054, bevel: 0.008 },
   // Active area 302.5 x 196.4 mm, top corners rounded, sitting 7.1 mm high.
-  // Width corrected from a scan-derived 301.4 mm: the modelled rect's aspect
+  // Width corrected from a measured 301.4 mm: the modelled rect's aspect
   // must equal the panel's 3024:1964, or a 1512-wide layout renders 985 tall
   // instead of the hardware's 982. 14.2" at that aspect puts the active area
   // at 302.48 x 196.45 mm, which the height already matched.
@@ -154,7 +154,7 @@ const MACBOOK_PRO_14: LaptopSpec = {
   notch: { width: 0.508, height: 0.088, radius: 0.018 },
   // Black keyboard tray 278.7 x 114.9 mm centered 36.5 mm behind base center.
   keyboard: { width: 3.85, depth: 1.587, offsetZ: -0.504, tray: true },
-  // Scan-measured: 54.5 mm wide crescent, 2.5 mm bite fading out 3.9 mm down.
+  // Measured: 54.5 mm wide crescent, 2.5 mm bite fading out 3.9 mm down.
   scoop: { width: 0.753, radius: 0.0593, bite: 0.0345 },
   // 129.7 x 81.6 mm trackpad, centered 64.5 mm ahead of base center.
   trackpad: { width: 1.792, depth: 1.127, offsetZ: 0.89 },
@@ -281,8 +281,7 @@ const MACBOOK_PRO_16: LaptopSpec = {
  * jack on the right. Body, panel and port figures are Apple's tech specs;
  * the deck layout (keyboard seat, trackpad, feet, camera position in the
  * bezel) is adapted from the Air 13's measured deck and Apple's product
- * photography, pending a scan of the retail machine. Default scaled
- * resolution 1204x753 (2x).
+ * photography. Default scaled resolution 1204x753 (2x).
  */
 const MACBOOK_NEO_13: LaptopSpec = {
   footprint: { width: 4.109, depth: 2.851, radius: 0.16 },

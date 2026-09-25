@@ -1,7 +1,7 @@
 'use client'
 
 import { GreetingCardMockup, ShoppingBagMockup } from 'react-3d-mockups'
-import { CardArt, PAPER, ToteArt, type Order } from './print-shop-art'
+import { CardArt, KRAFT, PAPER, ToteArt, type Order } from './print-shop-art'
 
 /**
  * The same edition on the shop's other goods. Both are separate canvases,
@@ -9,9 +9,6 @@ import { CardArt, PAPER, ToteArt, type Order } from './print-shop-art'
  * browsers cap live WebGL contexts and a product page is not the place to
  * find that cap.
  */
-
-/** Natural kraft, painted as the surface background so the print sits ON the bag. */
-const KRAFT = '#c9a77a'
 
 export function ToteScene({ order }: { order: Order }) {
   return (

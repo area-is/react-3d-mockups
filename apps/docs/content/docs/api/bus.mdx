@@ -52,7 +52,7 @@ Beyond the [shared screen props](/docs/screen-content):
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
 | `color` | `string` | `'#eef0f2'` | Body paint. Transit fleets are usually white or silver. |
-| `surfaceBackground` | `string` | `'#ffffff'` | CSS background behind your ad content. |
+| `surfaceBackground` | `string` | `color` | CSS background behind your ad content - the body paint itself unless you set it, so whatever the wrap leaves clear shows `color`. |
 | `coverage` | `'panel' \| 'full' \| 'perforated'` | `'panel'` | How much of the bus the live surfaces cover. `'full'` turns the entire side elevations and the tail live, carving the passenger glass out so it stays visible; `'perforated'` runs the same wrap OVER that glass as perforated window film. Doors and the driver's window always stay clear. |
 | `resolution` | `number` | `960` panel · `1920` full | Virtual side-surface width in CSS px; the rear surface shares its dpi. |
 

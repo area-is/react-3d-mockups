@@ -22,6 +22,7 @@ export const CustomPanelMockup = createMockup({
   regions: CUSTOM_PANEL_REGIONS,
   metrics: CUSTOM_PANEL_METRICS,
   object: CustomPanel,
+  label: '3D mockup of a printed panel',
   framing: CUSTOM_PANEL_FRAMING,
   slots: customPanelSlots,
   displayName: 'CustomPanelMockup',

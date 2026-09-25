@@ -647,7 +647,8 @@ export interface VanProps extends Omit<GroupProps, 'children' | 'color'>, Surfac
 function VanImpl({
   children,
   color = '#eef0f2',
-  surfaceBackground = '#ffffff',
+  // Printed straight onto the stock: whatever the content leaves clear is `color`.
+  surfaceBackground = color,
   resolution,
   coverage = 'panel',
   surfaceStyle,

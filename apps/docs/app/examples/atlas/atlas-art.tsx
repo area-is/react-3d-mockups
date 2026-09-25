@@ -21,7 +21,7 @@ const PAPER = '#f6f3ec'
 const INK = '#171512'
 const RED = '#c8321e'
 
-const MAST: CSSProperties = { fontFamily: SERIF, fontWeight: 600, letterSpacing: '-0.03em', lineHeight: 0.85, textTransform: 'uppercase' }
+const MAST: CSSProperties = { fontFamily: SERIF, fontWeight: 600, letterSpacing: '-0.035em', lineHeight: 0.85 }
 const SMALL: CSSProperties = { fontFamily: FONT, fontWeight: 600, letterSpacing: '-0.01em', lineHeight: 1.3 }
 
 /** A photograph covering its box. */
@@ -61,7 +61,7 @@ export function MagCover({ cover }: { cover: string }) {
         </span>
       </div>
       <div style={{ position: 'relative', marginTop: 'auto', display: 'flex', flexDirection: 'column', gap: '2.2cqw' }}>
-        <span style={{ ...SMALL, fontSize: '3.2cqw', color: '#ffd27a', textTransform: 'uppercase', letterSpacing: '0.08em' }}>The {MAG.theme} issue</span>
+        <span style={{ ...SMALL, fontSize: '3.6cqw', color: '#ffd27a' }}>The {MAG.theme} issue</span>
         <span style={{ fontFamily: SERIF, fontWeight: 500, fontSize: '9cqw', lineHeight: 1.02, letterSpacing: '-0.02em' }}>{photo.story}</span>
         <div style={{ display: 'flex', gap: '4cqw', ...SMALL, fontSize: '3.1cqw', opacity: 0.9 }}>
           {others.map((o) => (
@@ -81,7 +81,7 @@ export function MagBack({ cover }: { cover: string }) {
         <Picture photo={photo} />
       </div>
       <span style={{ ...SMALL, fontSize: '3cqw', opacity: 0.6 }}>{photo.caption}</span>
-      <span style={{ ...SMALL, fontSize: '3.4cqw', textTransform: 'uppercase', letterSpacing: '0.08em', color: RED }}>In this issue</span>
+      <span style={{ ...SMALL, fontSize: '3.8cqw', color: RED }}>In this issue</span>
       <div style={{ display: 'flex', flexDirection: 'column', gap: '1.6cqw' }}>
         {CONTENTS.map(([page, title, by]) => (
           <div key={page} style={{ display: 'grid', gridTemplateColumns: '8cqw 1fr', gap: '2cqw', ...SMALL, fontSize: '3.1cqw' }}>
@@ -134,7 +134,7 @@ export function BookCover() {
 export function BookBack() {
   return (
     <Face background="#1f3a5f" color={PAPER} style={{ display: 'flex', flexDirection: 'column', padding: '8cqw', gap: '4cqw' }}>
-      <span style={{ ...SMALL, fontSize: '3.2cqw', textTransform: 'uppercase', letterSpacing: '0.08em', opacity: 0.7 }}>From the editors of {MAG.name}</span>
+      <span style={{ ...SMALL, fontSize: '3.6cqw', opacity: 0.7 }}>From the editors of {MAG.name}</span>
       <p style={{ margin: 0, fontFamily: SERIF, fontWeight: 400, fontSize: '5.2cqw', lineHeight: 1.25 }}>{BOOK.blurb}</p>
       <div style={{ marginTop: 'auto', display: 'flex', justifyContent: 'space-between', ...SMALL, fontSize: '2.8cqw', opacity: 0.7 }}>
         <span>{BOOK.pages} pages · cloth</span>

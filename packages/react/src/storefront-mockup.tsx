@@ -23,6 +23,7 @@ export const StorefrontMockup = createMockup({
   regions: STOREFRONT_REGIONS,
   metrics: STOREFRONT_METRICS,
   object: Storefront,
+  label: '3D mockup of a storefront',
   framing: STOREFRONT_FRAMING,
   slots: storefrontSlots,
   displayName: 'StorefrontMockup',

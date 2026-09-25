@@ -2,7 +2,7 @@
 
 import type { CSSProperties, ReactNode } from 'react'
 import { chase } from 'tabbied/patterns'
-import { FONT, Pattern, Sheet, type Tone } from './swiss-art'
+import { FONT, Pattern, Sheet, luminance, type Tone } from './swiss-art'
 import { SERIF } from './label-art'
 import { asset } from '@/lib/base-path.mjs'
 
@@ -21,9 +21,16 @@ import { asset } from '@/lib/base-path.mjs'
  *
  * The photograph (`/art/jazz-trio.png` → `jazz-trio.webp`) is a cut-out on a
  * transparent ground, which is the whole reason this works: the trio stands
- * ON the orange field rather than inside a rectangle of studio wall, so the
- * field is the cover's colour and not a mount. That is the same trick the
- * era's sleeves used with a litho mask.
+ * ON the field rather than inside a rectangle of studio wall, so the field is
+ * the cover's colour and not a mount. That is the same trick the era's
+ * sleeves used with a litho mask.
+ *
+ * Both faces of the jacket print straight onto its stock (`material` - the
+ * record's own `color`), with no ground of their own, so the field is
+ * whatever colour the jacket is: the hot orange this was designed on, or any
+ * other. The type picks cream or near-black by contrast with it, and the
+ * label's orange stays the accent unless the stock is close enough to
+ * swallow it. The disc labels are their own paper and keep their own inks.
  *
  * ### Deliberately no barcode
  *
@@ -73,20 +80,25 @@ const PERSONNEL = [
   ['Clifford Nance', 'drums'],
 ]
 
-/** The jacket's front: an orange field, so the tone's ground IS the ink field. */
-const coverTone: Tone = {
-  ground: FIELD,
-  text: BOARD,
-  accent: INK,
-  palette: [FIELD, INK, BOARD],
+/** WCAG contrast ratio between two hex colours. */
+function contrast(a: string, b: string): number {
+  const [hi, lo] = [luminance(a), luminance(b)].sort((x, y) => y - x) as [number, number]
+  return (hi + 0.05) / (lo + 0.05)
 }
 
-/** The jacket's reverse: board, set in the same near-black. */
-const backTone: Tone = {
-  ground: BOARD,
-  text: INK,
-  accent: FIELD,
-  palette: [BOARD, FIELD, INK],
+/**
+ * The inks for a face printed straight onto the jacket stock: the design's
+ * cream wherever it still reads - 3:1, the bar for type this size, which the
+ * orange clears - and near-black on a stock too pale for it, a bone or a
+ * lime; and the label's orange as the accent unless the stock would swallow
+ * it. The ground is transparent: the stock is the surface behind the face
+ * (`surfaceBackground`), so it is never painted over.
+ */
+function inksOn(material: string) {
+  const ink = contrast(BOARD, material) >= 3 ? BOARD : INK
+  const accent = contrast(FIELD, material) >= 2 ? FIELD : ink
+  const tone: Tone = { ground: 'transparent', text: ink, accent, palette: ['transparent', ink, accent] }
+  return { ink, accent, tone }
 }
 
 /** The sleeve's small type - the label name, the catalogue number - regular casing, tightened. */
@@ -118,9 +130,10 @@ function Micro({ children, style }: { children: ReactNode; style?: CSSProperties
  * left edge is what makes the field read as a field the band is standing in,
  * instead of a card they have been pasted onto.
  */
-export function SleeveCover() {
+export function SleeveCover({ material = FIELD }: { material?: string }) {
+  const { ink, tone } = inksOn(material)
   return (
-    <Sheet tone={coverTone} style={{ flexDirection: 'column', padding: '7cqw', position: 'relative' }}>
+    <Sheet tone={tone} style={{ flexDirection: 'column', padding: '7cqw', position: 'relative' }}>
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={asset('/art/jazz-trio.webp')}
@@ -146,13 +159,24 @@ export function SleeveCover() {
         }}
       />
 
-      <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', gap: '2.4cqw' }}>
+      {/* The bass's scroll and the players' heads reach into the type: a halo
+          of the stock itself, inherited by every line, lifts it off the
+          photograph whichever ink is in play. */}
+      <div
+        style={{
+          position: 'relative',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '2.4cqw',
+          textShadow: `0 0 0.5cqw ${material}, 0 0 1.2cqw ${material}`,
+        }}
+      >
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-          <Micro style={{ color: BOARD }}>{LABEL_NAME}</Micro>
-          <Micro style={{ color: BOARD, opacity: 0.8 }}>{CATALOG} · Stereo</Micro>
+          <Micro>{LABEL_NAME}</Micro>
+          <Micro style={{ opacity: 0.8 }}>{CATALOG} · Stereo</Micro>
         </div>
-        <div style={{ height: '0.5cqw', background: BOARD, flex: 'none', opacity: 0.9 }} />
-        <h2
+        <div style={{ height: '0.5cqw', background: ink, flex: 'none', opacity: 0.9 }} />
+        <div
           style={{
             margin: 0,
             marginTop: '1.5cqw',
@@ -160,23 +184,17 @@ export function SleeveCover() {
             fontWeight: 700,
             letterSpacing: '-0.05em',
             lineHeight: 0.9,
-            color: BOARD,
             whiteSpace: 'pre-line',
           }}
         >
           {TITLE.join('\n')}
-        </h2>
+        </div>
         <span
           style={{
             fontSize: '5cqw',
             fontWeight: 700,
             letterSpacing: '-0.02em',
             lineHeight: 1,
-            // Cream, like the title: the artist line lands on the drum kit,
-            // and near-black ink disappeared into it. Only the flat ground
-            // below the photograph would carry dark ink, and the type does
-            // not live there.
-            color: BOARD,
           }}
         >
           {ARTIST}
@@ -244,7 +262,7 @@ function StereoBox() {
       style={{
         flex: 'none',
         width: '15cqw',
-        border: `0.22cqw solid ${INK}`,
+        border: '0.22cqw solid currentColor',
         padding: '0.9cqw 1cqw 0.8cqw',
         display: 'flex',
         flexDirection: 'column',
@@ -304,10 +322,10 @@ function Snapshot({ style }: { style?: CSSProperties }) {
 }
 
 /** One side's programme: numbered, with the composer in parentheses and the time flush right. */
-function Programme({ side, tracks }: { side: string; tracks: string[][] }) {
+function Programme({ side, tracks, accent }: { side: string; tracks: string[][]; accent: string }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.95cqw', minWidth: 0 }}>
-      <span style={{ fontSize: '1.6cqw', fontWeight: 800, letterSpacing: '-0.01em', color: FIELD, lineHeight: 1 }}>
+      <span style={{ fontSize: '1.6cqw', fontWeight: 800, letterSpacing: '-0.01em', color: accent, lineHeight: 1 }}>
         {side}
       </span>
       {tracks.map(([no, name, time], i) => (
@@ -337,12 +355,14 @@ function LabelMark({ size }: { size: string }) {
   )
 }
 
-const hairline: CSSProperties = { height: '0.18cqw', background: INK, opacity: 0.55, flex: 'none' }
+/** Rules are set in the face's ink, whichever that is. */
+const hairline: CSSProperties = { height: '0.18cqw', background: 'currentColor', opacity: 0.55, flex: 'none' }
 
 /** The reverse: head, programme, notes, credits, foot - at nine point. */
-export function SleeveBack() {
+export function SleeveBack({ material = BOARD }: { material?: string }) {
+  const { accent, tone } = inksOn(material)
   return (
-    <Sheet tone={backTone} style={{ flexDirection: 'column', padding: '5cqw 5cqw 4.4cqw', gap: '2.3cqw' }}>
+    <Sheet tone={tone} style={{ flexDirection: 'column', padding: '5cqw 5cqw 4.4cqw', gap: '2.3cqw' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '4cqw' }}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.4cqw', minWidth: 0, paddingTop: '0.4cqw' }}>
           <span style={{ fontSize: '4.6cqw', fontWeight: 700, letterSpacing: '-0.035em', lineHeight: 1, whiteSpace: 'nowrap' }}>
@@ -358,7 +378,7 @@ export function SleeveBack() {
         </div>
       </div>
 
-      <div style={{ height: '0.35cqw', background: INK, flex: 'none' }} />
+      <div style={{ height: '0.35cqw', background: 'currentColor', flex: 'none' }} />
 
       <div style={{ display: 'flex', gap: '3.6cqw', alignItems: 'flex-start' }}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8cqw', flex: 'none' }}>
@@ -369,8 +389,8 @@ export function SleeveBack() {
         </div>
         <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: '1.8cqw' }}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '2cqw' }}>
-            <Programme side="Side One" tracks={SIDE_A} />
-            <Programme side="Side Two" tracks={SIDE_B} />
+            <Programme side="Side One" tracks={SIDE_A} accent={accent} />
+            <Programme side="Side Two" tracks={SIDE_B} accent={accent} />
           </div>
           <div style={{ fontSize: '1.15cqw', lineHeight: 1.4 }}>
             {PERSONNEL.map(([who, what], i) => (
@@ -427,7 +447,7 @@ export function SleeveBack() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.7cqw' }}>
             <span style={{ fontSize: '2.7cqw', fontWeight: 700, letterSpacing: '-0.03em', lineHeight: 1 }}>
               {LABEL_NAME}
-              <span style={{ color: FIELD }}> Records</span>
+              <span style={{ color: accent }}> Records</span>
             </span>
             <span style={{ fontSize: '1.05cqw', fontWeight: 600, letterSpacing: 0, lineHeight: 1, opacity: 0.75 }}>
               Obsidian Records Inc. · 41 Bleecker Street · New York 12, N.Y.

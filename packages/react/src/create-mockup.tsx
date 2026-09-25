@@ -42,6 +42,12 @@ const CANVAS_KEYS: ReadonlySet<string> = new Set([
   'background',
   'camera',
   'dpr',
+  'frameloop',
+  'pauseWhenOffscreen',
+  'gl',
+  'onCreated',
+  'label',
+  'screenAccessibility',
   'className',
   'style',
 ] satisfies (keyof CanvasOnlyProps)[])
@@ -50,10 +56,15 @@ const CANVAS_KEYS: ReadonlySet<string> = new Set([
  * The stage props a one-liner mockup advertises: the ones that change what the
  * mockup LOOKS like on the page, or what a visitor can do with it.
  *
+ * `frameloop`, `label` and `screenAccessibility` are here too: when a mockup
+ * draws, and what assistive tech is told about it, are decisions about the
+ * page rather than about the renderer.
+ *
  * The rest of `MockupCanvasProps` tunes the rendering machinery rather than the
  * picture - `freeRotation` (a niche orbit constraint), `shadowY` (framing math
- * the mockup already derives from its core spec) and `dpr` (a GPU-load clamp
- * that is already right). Leaving those off this type keeps a mockup's
+ * the mockup already derives from its core spec), `dpr` (a GPU-load clamp
+ * that is already right), and the renderer plumbing (`gl`, `onCreated`,
+ * `pauseWhenOffscreen`). Leaving those off this type keeps a mockup's
  * autocomplete to decisions worth making; compose `<MockupCanvas>` directly
  * when you want the rest.
  */
@@ -66,6 +77,9 @@ type MockupStageProps = Pick<
   | 'shadows'
   | 'background'
   | 'camera'
+  | 'frameloop'
+  | 'label'
+  | 'screenAccessibility'
   | 'className'
   | 'style'
 >
@@ -96,6 +110,11 @@ export interface CreateMockupOptions<P, S extends Record<string, Slot<SlotProps>
   metrics?: MeasurableMockup<MockupPropsMap[K]>['metrics']
   /** Stage framing from the object's core spec (camera, shadow ground line, float). */
   framing?: MockupFraming<P>
+  /**
+   * The canvas's default accessible name - what the mockup shows, e.g.
+   * "3D mockup of an iPhone". A `label` prop on the mockup wins.
+   */
+  label?: string
   /** The object's compound slots, re-attached to the mockup (`Mockup.Front`…). */
   slots?: S
   /** Component name shown in React devtools. */
@@ -129,6 +148,7 @@ export function createMockup<
   regions,
   metrics,
   framing,
+  label,
   slots,
   displayName,
 }: CreateMockupOptions<P, S, K>): React.FC<MockupProps<P>> & S & Partial<MockupStatics<K>> {
@@ -150,7 +170,7 @@ export function createMockup<
         : undefined)
 
     return (
-      <MockupCanvas {...stage} camera={camera} shadowY={shadowY}>
+      <MockupCanvas {...stage} label={stage.label ?? label} camera={camera} shadowY={shadowY}>
         {float ? <FloatGroup intensity={framing?.floatIntensity}>{scene}</FloatGroup> : scene}
       </MockupCanvas>
     )

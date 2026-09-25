@@ -20,11 +20,13 @@ npm run typecheck     # both workspaces
 npm run test          # core unit tests (no DOM, no WebGL)
 npm run devices:check # the derived half of the device table, and aspect drift
 npm run visual        # visual regression (needs `npm run dev` running)
+npm run bench         # performance budgets (needs `npm run dev` running)
 ```
 
-CI runs the first three plus a docs build on every PR. The visual check needs a
-browser and a dev server, so it stays local. Run it whenever you touch
-geometry.
+CI runs the first three plus a docs build on every PR, then the benchmark's
+budgets against that build (its numbers land in the job summary). The visual
+check needs a dev server and takes several minutes on SwiftShader, so it stays
+local. Run it whenever you touch geometry.
 
 ## Where code goes
 
@@ -58,6 +60,15 @@ They overlap less than they look:
   `npm run visual -- --update`, and **review the diffs in
   `apps/docs/.visual-diffs/` before you do**. A baseline update is a claim that
   the new picture is the correct one.
+- **`npm run bench`**: behaviour that costs battery rather than pixels. Loads
+  the home page and a docs page in Chromium with every draw call, WebGL
+  context, layout shift and long frame counted, and fails when a mockup at rest
+  draws at all, an off-screen or hidden carousel keeps drawing or advancing,
+  the home page shifts (CLS), or a docs page holds more live contexts than
+  `LazyScene` allows. Timings are reported but never enforced: under
+  SwiftShader they only compare run to run on one machine (`--gpu` for real
+  numbers, `--mobile` and `--cpu=4` for a phone-class profile). Both scripts
+  take `CHROMIUM_EXECUTABLE` to use a Chromium other than Playwright's own.
 - **`npm run devices:check`**: the numbers in `docs/devices.mdx`. Two halves:
   the Portrait/Landscape columns against what actually renders (`devices:sync`
   rewrites those), and the modelled aspect against the hand-maintained Panel
@@ -75,6 +86,20 @@ trickiest invariants in this repo are only obvious once someone has broken them.
 Describe what changed and why. If a change moves a baseline or a documented
 number, say so in the message; those are the diffs a reviewer most needs
 pointed out.
+
+## Peer dependency ranges
+
+The peers are bounded to what has been tested: React 19, react-three-fiber 9,
+drei 10, and a `three` range whose upper bound is the newest release checked.
+The screen bridge leans on drei's `<Html>` internals, so an untested major can
+break it while installing cleanly. To widen a range, install the new version,
+run the full check list above (the visual check especially), then raise the
+bound in `packages/react/package.json` and say so in the changelog.
+
+[`three-compat.yml`](.github/workflows/three-compat.yml) typechecks, tests and
+builds the package against the oldest `three` the range allows and against the
+newest release, on every change to the package and once a week - and warns when
+the newest release is outside the range, which is the cue to do the above.
 
 ## Releasing
 

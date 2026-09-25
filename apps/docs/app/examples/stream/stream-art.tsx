@@ -2,6 +2,7 @@
 
 import type { CSSProperties, ReactNode } from 'react'
 import { Pattern } from '@/components/screens/swiss-art'
+import { asset } from '@/lib/base-path.mjs'
 import { Face } from '../_shared/face'
 import { SHOWS, findShow, type Show } from './stream-data'
 
@@ -10,11 +11,13 @@ import { SHOWS, findShow, type Show } from './stream-data'
  * layout, the Flip in flex mode, the iPad's title page. Each takes the id
  * of the featured title and builds itself around that show's key art.
  *
- * The key art is generative, so it needs no files and is drawn at whatever
+ * The key art is two layers. The ground is generative, drawn at whatever
  * size the tile happens to be: `fit="cover"` on a coarse grid gives a
  * poster a countable number of marks whether it is a 1920 px TV hero or a
- * 120 px thumbnail. The hero is `live` on the TV - a home screen that
- * moves is the screen you buy a subscription from.
+ * 120 px thumbnail. In front of it stands the show's one object, a
+ * photographed cut-out, placed in container units so it keeps its place on
+ * every size of tile. The hero's ground is `live` on the TV - a home screen
+ * that moves is the screen you buy a subscription from.
  */
 
 export const INK = '#08090f'
@@ -23,12 +26,62 @@ const TEXT = '#f2f3f8'
 const MUTED = '#9aa1b6'
 export const PRISM = 'linear-gradient(135deg, #8b7cf8 0%, #22d3ee 100%)'
 
+/**
+ * Where a tile's object stands: over the label on a poster (`top`), in the
+ * middle of a bare thumbnail or the player (`middle`), or to the right of a
+ * hero whose copy runs down the left (`right`).
+ */
+export type ArtPlace = 'top' | 'middle' | 'right'
+
+const ART_PLACE: Record<ArtPlace, CSSProperties> = {
+  top: { left: '50%', top: '7cqh', height: 'min(60cqh, 76cqw)', transform: 'translateX(-50%)' },
+  middle: { left: '50%', top: '50%', height: 'min(78cqh, 76cqw)', transform: 'translate(-50%, -50%)' },
+  right: { right: '7cqw', top: '50%', height: 'min(80cqh, 40cqw)', transform: 'translateY(-50%)' },
+}
+
 /** A show's art in a box, with the title over it. */
-export function Tile({ show, size = 14, live, grid, labeled = true, style, children }: { show: Show; size?: number; live?: boolean; grid?: string; labeled?: boolean; style?: CSSProperties; children?: ReactNode }) {
+export function Tile({
+  show,
+  size = 14,
+  live,
+  grid,
+  labeled = true,
+  art = labeled ? 'top' : 'middle',
+  style,
+  children,
+}: {
+  show: Show
+  size?: number
+  live?: boolean
+  grid?: string
+  labeled?: boolean
+  art?: ArtPlace
+  style?: CSSProperties
+  children?: ReactNode
+}) {
   return (
     <div style={{ position: 'relative', borderRadius: size * 0.7, overflow: 'hidden', background: show.palette[0], ...style }}>
       <div style={{ position: 'absolute', inset: 0 }}>
         <Pattern pattern={show.pattern} seed={`prism-${show.id}`} live={live} palette={show.palette} grid={grid ?? '2x3'} />
+      </div>
+      {/* the show's object, in front of the pattern: a pool of shadow under
+          it so it stands on the ground rather than being pasted on */}
+      <div style={{ position: 'absolute', inset: 0, containerType: 'size' }}>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={asset(show.art.src)}
+          alt=""
+          draggable={false}
+          decoding="async"
+          style={{
+            position: 'absolute',
+            width: 'auto',
+            aspectRatio: show.art.aspect,
+            filter: 'drop-shadow(0 2cqh 2.6cqh rgba(0, 0, 0, 0.5))',
+            pointerEvents: 'none',
+            ...ART_PLACE[art],
+          }}
+        />
       </div>
       {labeled ? (
         <>
@@ -107,11 +160,11 @@ export function TVHome({ featured }: { featured: string }) {
       <main style={{ position: 'relative', display: 'flex', flexDirection: 'column', minWidth: 0 }}>
         {/* the hero: the featured title's art, bleeding under the rail */}
         <div style={{ position: 'absolute', left: -150, right: 0, top: 0, height: 640 }}>
-          <Tile show={show} live grid={show.grid} labeled={false} style={{ position: 'absolute', inset: 0, borderRadius: 0 }} />
+          <Tile show={show} live grid={show.grid} labeled={false} art="right" style={{ position: 'absolute', inset: 0, borderRadius: 0 }} />
           <div style={{ position: 'absolute', inset: 0, background: `linear-gradient(to right, ${INK} 0%, rgba(8,9,15,0.85) 22%, rgba(8,9,15,0.2) 60%, rgba(8,9,15,0) 100%), linear-gradient(to top, ${INK} 0%, rgba(8,9,15,0) 45%)` }} />
         </div>
         <div style={{ position: 'relative', padding: '150px 60px 0 40px', maxWidth: 760, display: 'flex', flexDirection: 'column', gap: 18 }}>
-          <span style={{ fontSize: 15, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: '#22d3ee' }}>Tonight&rsquo;s feature</span>
+          <span style={{ fontSize: 16, fontWeight: 700, letterSpacing: '-0.01em', color: '#22d3ee' }}>Tonight&rsquo;s feature</span>
           <h1 style={{ margin: 0, fontSize: 78, fontWeight: 800, letterSpacing: '-0.045em', lineHeight: 0.95, color: TEXT }}>{show.title}</h1>
           <span style={{ fontSize: 18, fontWeight: 600, color: MUTED }}>
             {show.kind} · {show.meta}
@@ -165,10 +218,10 @@ export function FoldHome({ featured }: { featured: string }) {
         </div>
       </header>
       <div style={{ margin: '0 20px', height: 330, position: 'relative', borderRadius: 20, overflow: 'hidden', flex: 'none' }}>
-        <Tile show={show} live grid={show.grid} labeled={false} style={{ position: 'absolute', inset: 0, borderRadius: 0 }} />
+        <Tile show={show} live grid={show.grid} labeled={false} art="right" style={{ position: 'absolute', inset: 0, borderRadius: 0 }} />
         <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(8,9,15,0.92) 0%, rgba(8,9,15,0.2) 55%, rgba(8,9,15,0) 100%)' }} />
         <div style={{ position: 'absolute', left: 22, right: 22, bottom: 20, display: 'flex', flexDirection: 'column', gap: 8 }}>
-          <span style={{ fontSize: 11.5, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: '#22d3ee' }}>Tonight&rsquo;s feature</span>
+          <span style={{ fontSize: 12.5, fontWeight: 700, letterSpacing: '-0.01em', color: '#22d3ee' }}>Tonight&rsquo;s feature</span>
           <span style={{ fontSize: 38, fontWeight: 800, letterSpacing: '-0.04em', lineHeight: 1 }}>{show.title}</span>
           <span style={{ fontSize: 13, fontWeight: 600, color: MUTED }}>
             {show.kind} · {show.meta}
@@ -268,13 +321,13 @@ export function IPadTitle({ featured }: { featured: string }) {
   return (
     <Face background={INK} color={TEXT} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', paddingTop: 'var(--mockup-safe-area-top, 0px)', letterSpacing: '-0.012em' }}>
       <div style={{ position: 'relative' }}>
-        <Tile show={show} grid={show.grid} labeled={false} style={{ position: 'absolute', inset: 0, borderRadius: 0 }} />
+        <Tile show={show} grid={show.grid} labeled={false} art="top" style={{ position: 'absolute', inset: 0, borderRadius: 0 }} />
         <div style={{ position: 'absolute', inset: 0, background: `linear-gradient(to right, rgba(8,9,15,0) 60%, ${INK} 100%), linear-gradient(to top, rgba(8,9,15,0.9) 0%, rgba(8,9,15,0) 50%)` }} />
         <div style={{ position: 'absolute', left: 36, top: 30 }}>
           <Wordmark size={22} />
         </div>
         <div style={{ position: 'absolute', left: 36, right: 60, bottom: 36, display: 'flex', flexDirection: 'column', gap: 10 }}>
-          <span style={{ fontSize: 13, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: '#22d3ee' }}>{show.kind}</span>
+          <span style={{ fontSize: 14, fontWeight: 700, letterSpacing: '-0.01em', color: '#22d3ee' }}>{show.kind}</span>
           <span style={{ fontSize: 56, fontWeight: 800, letterSpacing: '-0.045em', lineHeight: 0.95 }}>{show.title}</span>
           <span style={{ fontSize: 15, fontWeight: 600, color: MUTED }}>{show.meta}</span>
           <p style={{ margin: 0, fontSize: 16, lineHeight: 1.45, color: '#c9cddb' }}>{show.blurb}</p>

@@ -23,6 +23,7 @@ export const ProductBoxMockup = createMockup({
   regions: PRODUCT_BOX_REGIONS,
   metrics: PRODUCT_BOX_METRICS,
   object: ProductBox,
+  label: '3D mockup of a product box',
   framing: PRODUCT_BOX_FRAMING,
   slots: productBoxSlots,
   displayName: 'ProductBoxMockup',

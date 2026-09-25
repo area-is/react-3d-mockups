@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { ExampleBadge, TabbiedLink } from '../_shared/badge'
+import { TabbiedLink } from '../_shared/badge'
 import { lazyScene } from '../_shared/stage'
 import { BAKES, DRINKS, PAINTS, SHOP, price, type MenuItem, type PaintId } from './cafe-data'
 
@@ -52,7 +52,6 @@ export function Cafe() {
           <span>Find us</span>
         </nav>
         <div className="cf-top-right">
-          <ExampleBadge className="cf-badge" />
           <span className="cf-cta">Order ahead</span>
         </div>
       </header>
@@ -96,7 +95,7 @@ export function Cafe() {
           </div>
           <p className="cf-control-note">
             The sign in the door, the glass and the fascia follow. Drag the shop to walk round it: every elevation is
-            signed.
+            signed, and every window carries a <TabbiedLink /> ring pattern as vinyl on the glass.
           </p>
         </div>
       </section>
@@ -126,7 +125,8 @@ export function Cafe() {
             <h2>Ninefold Oat</h2>
             <p>
               Portuguese oats, a little oil and salt, and nothing that stops it frothing. In every drink here, and on
-              the counter to take home. The print is a <TabbiedLink /> pattern on plain board.
+              the counter to take home, printed on plain board: the oats on the front, the pour on one side, the facts
+              on the other.
             </p>
             <span className="cf-good-price">1 L · {price(3.9)}</span>
           </div>
@@ -138,8 +138,8 @@ export function Cafe() {
           <div className="cf-good-copy">
             <h2>Nine, then one on us</h2>
             <p>
-              A card, a stamp per coffee, and the tenth free. The back is painted the shop&rsquo;s colour, so it
-              repaints when the shop does.
+              A card, a stamp per coffee from the pad on the counter, and the tenth free. The back is painted the
+              shop&rsquo;s colour, so it repaints when the shop does.
             </p>
             <span className="cf-good-price">Ask at the counter</span>
           </div>

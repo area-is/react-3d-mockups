@@ -28,6 +28,7 @@ export const IPhoneMockup = createMockup({
   regions: SCREEN_REGIONS,
   metrics: IPHONE_METRICS,
   object: IPhone,
+  label: '3D mockup of an iPhone',
   framing: IPHONE_FRAMING,
   slots: iPhoneSlots,
   displayName: 'IPhoneMockup',

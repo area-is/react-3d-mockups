@@ -28,6 +28,7 @@ export const IPadMockup = createMockup({
   regions: SCREEN_REGIONS,
   metrics: IPAD_METRICS,
   object: IPad,
+  label: '3D mockup of an iPad',
   framing: IPAD_FRAMING,
   slots: tabletSlots,
   displayName: 'IPadMockup',

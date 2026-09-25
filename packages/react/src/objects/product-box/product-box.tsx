@@ -47,7 +47,8 @@ function ProductBoxImpl({
   children,
   size,
   color = '#f4f1ea',
-  surfaceBackground = '#ffffff',
+  // Printed straight onto the stock: whatever the content leaves clear is `color`.
+  surfaceBackground = color,
   resolution = PRODUCT_BOX.resolution,
   surfaceStyle,
   ...groupProps

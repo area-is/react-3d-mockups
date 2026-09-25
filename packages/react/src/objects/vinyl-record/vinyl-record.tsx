@@ -42,7 +42,8 @@ function VinylRecordImpl({
   children,
   vinylColor = '#0b0b0d',
   color = '#f2efe8',
-  surfaceBackground = '#ffffff',
+  // Printed straight onto the stock: whatever the content leaves clear is `color`.
+  surfaceBackground = color,
   resolution = VINYL_RECORD.resolution,
   surfaceStyle,
   ...groupProps

@@ -12,6 +12,7 @@ const GalaxyWatchMockupBase = createMockup({
   regions: SCREEN_REGIONS,
   metrics: GALAXY_WATCH_METRICS,
   object: GalaxyWatch,
+  label: '3D mockup of a Galaxy Watch',
   framing: GALAXY_WATCH_FRAMING,
   slots: watchSlots,
 })

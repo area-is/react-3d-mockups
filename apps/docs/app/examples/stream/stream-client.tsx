@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { ExampleBadge, TabbiedLink } from '../_shared/badge'
+import { TabbiedLink } from '../_shared/badge'
 import { lazyScene } from '../_shared/stage'
 import { Tile } from './stream-art'
 import { DEFAULT_FEATURED, PLANS, SHOWS, findShow } from './stream-data'
@@ -37,7 +37,6 @@ export function Stream() {
           <span>Plans</span>
         </nav>
         <div className="st-top-right">
-          <ExampleBadge className="st-badge" />
           <span className="st-cta">Start your free week</span>
         </div>
       </header>
@@ -71,8 +70,8 @@ export function Stream() {
             ))}
           </div>
           <p className="st-picker-note">
-            Every poster is a <TabbiedLink /> pattern in the title&rsquo;s own palette, so the catalogue has no image
-            files at all. The TV&rsquo;s hero is live: it recomposes every few seconds.
+            Every poster is a <TabbiedLink /> pattern in the title&rsquo;s own palette with the show&rsquo;s one object
+            standing in front of it. The TV&rsquo;s hero is live: the pattern behind it recomposes every few seconds.
           </p>
         </div>
       </section>

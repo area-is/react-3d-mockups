@@ -13,7 +13,7 @@ name: Release react-3d-mockups
 # Setup, once, after that first manual publish:
 #
 #   npm trust github react-3d-mockups \
-#     --repo area-is/3d-mockups --file release.yml --allow-publish
+#     --repo area-is/react-3d-mockups --file release.yml --allow-publish
 #
 #   (or npmjs.com → react-3d-mockups → Settings → Trusted publishing. `npm trust`
 #    needs npm 11.15.0+ and account-level 2FA; it is not workspace-aware, hence

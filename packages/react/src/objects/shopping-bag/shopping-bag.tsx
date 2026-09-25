@@ -50,7 +50,8 @@ function ShoppingBagImpl({
   size,
   color = '#c19a6b',
   handleColor = '#7d6142',
-  surfaceBackground = '#ffffff',
+  // Printed straight onto the stock: whatever the content leaves clear is `color`.
+  surfaceBackground = color,
   resolution = SHOPPING_BAG.resolution,
   surfaceStyle,
   ...groupProps

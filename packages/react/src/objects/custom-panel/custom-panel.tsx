@@ -48,7 +48,8 @@ function CustomPanelImpl({
   size,
   color = '#f2f1ed',
   cornerRadius = 2,
-  surfaceBackground = '#ffffff',
+  // Printed straight onto the stock: whatever the content leaves clear is `color`.
+  surfaceBackground = color,
   resolution = CUSTOM_PANEL.resolution,
   surfaceStyle,
   ...groupProps

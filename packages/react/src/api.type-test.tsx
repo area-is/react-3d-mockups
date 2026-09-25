@@ -85,6 +85,17 @@ type _noDpr = Expect<Not<Has<'dpr', AFrameSignMockupProps>>>
 type _canvasKeepsThem = Expect<Has<'freeRotation', MockupCanvasProps>>
 // One prop carries the turntable, so there is no separate speed to advertise.
 type _noSeparateSpeed = Expect<Not<Has<'autoRotateSpeed', AFrameSignMockupProps>>>
+// When it draws and what assistive tech hears are page decisions: advertised.
+type _frameloop = Expect<Equal<AFrameSignMockupProps['frameloop'], 'demand' | 'always' | 'never' | undefined>>
+type _label = Expect<Has<'label', AFrameSignMockupProps>>
+type _screenAccessibility = Expect<
+  Equal<AFrameSignMockupProps['screenAccessibility'], 'hidden' | 'visible' | undefined>
+>
+// Renderer plumbing stays on the canvas (it still routes there at runtime).
+type _noGl = Expect<Not<Has<'gl', AFrameSignMockupProps>>>
+type _noOnCreated = Expect<Not<Has<'onCreated', AFrameSignMockupProps>>>
+type _noPause = Expect<Not<Has<'pauseWhenOffscreen', AFrameSignMockupProps>>>
+type _canvasRenderControl = Expect<Has<'gl' | 'onCreated' | 'pauseWhenOffscreen', MockupCanvasProps>>
 // ---- studio lighting is not optional -------------------------------------------------
 type _noEnvironment = Expect<Not<Has<'environment', MockupCanvasProps>>>
 

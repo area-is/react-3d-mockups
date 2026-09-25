@@ -52,7 +52,7 @@ Beyond the [shared screen props](/docs/screen-content):
 | --- | --- | --- | --- |
 | `color` | `string` | `'#f4f5f7'` | Card stock: the edges and the inside of the punched slot. |
 | `lanyardColor` | `string` | `'#b3223a'` | Woven strap color (lanyards come in saturated solids). |
-| `surfaceBackground` | `string` | `'#ffffff'` | CSS background behind each face's content. |
+| `surfaceBackground` | `string` | `color` | CSS background behind each face's content - the stock itself unless you set it, so whatever the content leaves clear prints on `color`. |
 | `resolution` | `number` | `420` | Virtual face width in CSS px; height follows the full card. |
 
 ## Regions

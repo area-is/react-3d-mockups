@@ -12,7 +12,18 @@ import * as React from 'react'
  * renderer. The probe context is released immediately - browsers cap live
  * contexts, and this one must not count against a page full of scenes.
  */
+let webglSupport: boolean | undefined
+
 function detectWebGL(): boolean {
+  // Once per page, not once per scene: every probe is a real context created
+  // and destroyed, and a docs page mounts a boundary for each example it
+  // scrolls past.
+  if (webglSupport !== undefined) return webglSupport
+  webglSupport = probeWebGL()
+  return webglSupport
+}
+
+function probeWebGL(): boolean {
   try {
     const canvas = document.createElement('canvas')
     const gl = canvas.getContext('webgl2') ?? canvas.getContext('webgl')
@@ -61,18 +72,26 @@ class SceneErrorBoundary extends React.Component<
  * render - degrades to an explanation instead of a dead frame.
  *
  * The capability check runs in an effect rather than during render, so the
- * server and the first client render agree; `null` for that one frame keeps
- * the reserved height without flashing a fallback at visitors who do have
- * WebGL.
+ * server and the first client render agree. Until it has run, `placeholder`
+ * stands in - which is also what the server renders, so a placeholder the
+ * size of the scene is what keeps the page from jumping when the scene
+ * arrives. With none, the boundary renders nothing for that one frame and the
+ * caller's own reserved height has to hold the space.
  */
-export function SceneBoundary({ children }: { children: React.ReactNode }) {
+export function SceneBoundary({
+  children,
+  placeholder = null,
+}: {
+  children: React.ReactNode
+  placeholder?: React.ReactNode
+}) {
   const [supported, setSupported] = React.useState<boolean | null>(null)
 
   React.useEffect(() => {
     setSupported(detectWebGL())
   }, [])
 
-  if (supported === null) return null
+  if (supported === null) return placeholder
   if (!supported) return <Fallback />
   return <SceneErrorBoundary>{children}</SceneErrorBoundary>
 }

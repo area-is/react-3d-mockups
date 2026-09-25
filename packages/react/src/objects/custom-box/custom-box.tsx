@@ -39,7 +39,8 @@ function CustomBoxImpl({
   children,
   size,
   color = '#e8e5df',
-  surfaceBackground = '#ffffff',
+  // Printed straight onto the stock: whatever the content leaves clear is `color`.
+  surfaceBackground = color,
   resolution = CUSTOM_BOX.resolution,
   surfaceStyle,
   ...groupProps

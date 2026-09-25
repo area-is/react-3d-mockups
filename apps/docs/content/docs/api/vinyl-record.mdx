@@ -9,7 +9,11 @@ hollow jacket with live front (and optional back) cover art, and a glossy
 clear the whole label - concentric track-gap sheen rings, dead-wax annulus,
 spindle hole, and the 100 mm center label as a live **circular** DOM area.
 
-<MockupExplorer component="VinylRecordMockup" props={{ rotation: [0, -0.2, 0] }} />
+The sample sleeve prints straight onto the jacket stock, so `color` is its
+field: this one is the orange it was designed on, and any other colour
+reprints it, with the type flipping to near-black on a pale stock.
+
+<MockupExplorer component="VinylRecordMockup" props={{ color: '#d8552a', rotation: [0, -0.2, 0] }} />
 
 ## `<VinylRecord>` vs `<VinylRecordMockup>`
 
@@ -41,7 +45,7 @@ Beyond the [shared screen props](/docs/screen-content):
 | --- | --- | --- | --- |
 | `vinylColor` | `string` | `'#0b0b0d'` | Disc color. Classic black; try pressing colors. |
 | `color` | `string` | `'#f2efe8'` | Jacket stock (edges and unprinted faces). |
-| `surfaceBackground` | `string` | `'#ffffff'` | CSS background behind cover, back and label. |
+| `surfaceBackground` | `string` | `color` | CSS background behind cover, back and label - the stock itself unless you set it, so whatever the content leaves clear prints on `color`. |
 | `resolution` | `number` | `520` | Virtual cover width in CSS px; the label shares its dpi. |
 
 ## Regions
@@ -73,9 +77,12 @@ what stays 3D hardware.
 `<VinylRecordMockup.BackLabel>` the disc's side-B label, so the record reads
 right from behind too.
 
-<MockupExplorer component="VinylRecordMockup" props={{ autoRotate: 1.1 }} />
+<MockupExplorer component="VinylRecordMockup" props={{ color: '#d8552a', autoRotate: 1.1 }} />
 
 ### A colored pressing
+
+`vinylColor` presses the disc in any colour. Here it is an oxblood disc in a
+navy jacket, which takes the sleeve's type to cream.
 
 <MockupExplorer
   component="VinylRecordMockup"

@@ -1,18 +1,170 @@
 ---
 title: GPU and performance
-description: How the rendering pipeline stays fast and predictable.
+description: How a mockup renders, what each part of it costs, and how to keep a page with several of them fast.
+keywords: [performance, perf, fps, frameloop, dpr, gpu, battery, slow, mobile, webgl contexts, lazy load]
 ---
 
-- Rendering is WebGL 2 via three.js with
-  `powerPreference: 'high-performance'`, so the browser prefers the discrete
-  GPU where available.
-- Screen content is composited by the browser as a CSS 3D layer. Text stays
-  vector crisp at every angle and zoom, and never burns GPU texture memory.
-- The device is procedural geometry (a few thousand triangles): no GLB parsing,
-  no texture decoding, no network requests. Lighting comes from a tiny
-  environment map rendered once on the GPU.
-- `dpr` is clamped to `[1, 2]` by default; lower the maximum on constrained
-  devices for guaranteed frame rates.
-- The MacBook's 78 keycaps render as one instanced draw call per key footprint
-  (seven in all) plus a single canvas texture for every printed legend, so the
-  keyboard costs almost nothing.
+## How a mockup renders
+
+A mockup renders on demand. The canvas draws a frame only when something
+changes: a drag and the damping that settles it, a zoom, `autoRotate` or
+`float` while they run, a prop change, a resize. A mockup that is sitting still
+renders no frames at all.
+
+It also stops completely while nobody can see it: while the canvas is scrolled
+out of the viewport, or while the tab is hidden (`pauseWhenOffscreen`, on by
+default). It picks up where it left off when it comes back.
+
+Rendering is WebGL 2 through three.js, and the browser picks the GPU
+(`powerPreference: 'default'`), so on a laptop with two GPUs a decorative
+mockup does not wake the discrete one. A page where the mockup is the main
+event can ask for it:
+
+```tsx
+<GalaxyMockup gl={{ powerPreference: 'high-performance' }}>
+  <YourApp />
+</GalaxyMockup>
+```
+
+## What costs what
+
+- **Each canvas is a WebGL context.** Every one-liner `*Mockup` creates its
+  own canvas, and browsers cap how many WebGL contexts a page can hold at once -
+  as few as about eight on mobile Chrome. Past the cap the browser drops the
+  oldest context without asking, and that mockup goes blank ("Context Lost" in
+  the console).
+- **The contact shadow** is rendered into a texture of its own, but only when
+  the model moves. A still mockup reuses the last one.
+- **Lighting** comes from a small environment map rendered once on the GPU when
+  the canvas mounts. No HDR files are fetched.
+- **Screens are not WebGL textures.** A screen is a CSS 3D layer that the
+  browser's compositor rasterizes and draws, which is why its text stays vector
+  crisp at any angle. It still costs memory - compositor memory, usually on the
+  GPU - in proportion to the screen's pixel size times the display's pixel
+  ratio. The library caps each screen's raster size against the size of the
+  canvas, since a screen can never show more pixels than the canvas has: a
+  small mockup of a laptop on a high-DPI phone does not rasterize the full
+  1512×982 display.
+- **Geometry is procedural.** No GLB parsing, no texture decoding, no network
+  requests. Hardware detail such as ports, speaker slots and mic holes is cut
+  into the chassis with CSG (constructive solid geometry) at runtime; the cut
+  is computed once per model and reused, never per frame.
+- **The MacBook keyboard** renders its 78 keycaps as one instanced draw call
+  per key footprint (seven in all), plus a single canvas texture for every
+  printed legend.
+
+To see what a mockup costs on your page, read the renderer's own counters:
+
+```tsx
+<GalaxyMockup onCreated={({ gl }) => console.log(gl.info.render)}>
+  <YourApp />
+</GalaxyMockup>
+```
+
+`gl.info.render` holds the draw calls and triangles of the last frame, and its
+`frame` counter shows whether an idle mockup is really idle.
+
+## Keeping a page fast
+
+### Render only when something changes
+
+Leave `frameloop` on its default, `'demand'`. Use `'always'` only for a
+composed `<MockupCanvas>` that holds a `useFrame` animation of your own - or
+keep `'demand'` and call react-three-fiber's `invalidate()` whenever your
+animation changes something. `'never'` freezes the canvas on its last frame.
+
+```tsx
+<MockupCanvas frameloop="always">
+  <Turntable> {/* your own useFrame animation */}
+    <Galaxy>
+      <YourApp />
+    </Galaxy>
+  </Turntable>
+</MockupCanvas>
+```
+
+`autoRotate` and `float` keep a canvas drawing every frame for as long as they
+run. They are worth it on a hero; on a page of ten mockups, leave them off.
+
+### Cap the pixel ratio
+
+A canvas costs roughly in proportion to its pixel count, and `dpr` clamps the
+device pixel ratio to `[1, 2]` by default. On large canvases or weaker GPUs,
+lower the ceiling. `dpr` is a `MockupCanvas` prop, so compose the stage
+yourself to set it:
+
+```tsx
+<MockupCanvas dpr={[1, 1.5]}>
+  <Galaxy>
+    <YourApp />
+  </Galaxy>
+</MockupCanvas>
+```
+
+### Use fewer canvases
+
+When several devices appear together, put them in one `<MockupCanvas>` rather
+than rendering one one-liner each: one WebGL context, one light rig, one
+shadow and one render loop instead of several. See
+[Composing scenes](/docs/composing).
+
+```tsx
+<MockupCanvas camera={{ position: [0, 0.5, 9], fov: 40 }}>
+  <Galaxy position={[-1.4, 0, 0]}>
+    <PhoneScreen />
+  </Galaxy>
+  <IPhone position={[1.4, 0, 0]}>
+    <PhoneScreen />
+  </IPhone>
+</MockupCanvas>
+```
+
+There is no number of canvases that is safe everywhere, because the context
+cap differs between browsers and devices. Keep the number mounted at the same
+time to a handful, and plan for the lower mobile limit.
+
+### Mount canvases near the viewport
+
+`pauseWhenOffscreen` stops an off-screen canvas from rendering, but its WebGL
+context still exists. On a long page of mockups, mount each one only while it
+is near the viewport and unmount it after, so the number of live contexts is
+bounded by what fits on the screen. Give the wrapper a fixed height so the
+layout holds while the canvas is unmounted:
+
+```tsx title="near-viewport.tsx"
+'use client'
+
+import { useEffect, useRef, useState, type ReactNode } from 'react'
+
+export function NearViewport({ height, children }: { height: number; children: ReactNode }) {
+  const ref = useRef<HTMLDivElement>(null)
+  const [near, setNear] = useState(false)
+
+  useEffect(() => {
+    const el = ref.current
+    if (!el) return
+    const observer = new IntersectionObserver(
+      (entries) => setNear(entries.some((entry) => entry.isIntersecting)),
+      { rootMargin: '300px 0px' } // mount a little before it scrolls in
+    )
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [])
+
+  return (
+    <div ref={ref} style={{ height }}>
+      {near ? children : null}
+    </div>
+  )
+}
+```
+
+The examples on this site are mounted the same way.
+
+### On mobile
+
+- Lower the `dpr` ceiling: phones have high pixel ratios and small GPUs.
+- Keep `frameloop="demand"`, and save `autoRotate` and `float` for a single
+  hero.
+- Render fewer canvases: compose devices into one stage and lazy-mount the
+  rest.

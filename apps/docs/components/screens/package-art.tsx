@@ -395,6 +395,38 @@ export function CerealTop({ material }: { material: string }) {
 }
 
 /**
+ * The bottom: what a carton's base carries and nobody designs - who made it
+ * and where, the plant code and the line time jetted on, the recycling
+ * line, and an arrow to the end that opens. Nothing big; the board is most
+ * of it.
+ */
+export function CerealBottom({ material }: { material: string }) {
+  const p = mill(material)
+  return (
+    <BoxFace material={material} style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: '3cqw 4.5cqw', gap: '4cqw' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '1.4cqw', minWidth: 0 }}>
+        <BrandTab p={p} size={2.2} />
+        <Micro style={{ fontSize: '1.9cqw', lineHeight: 1.5, opacity: 0.8 }}>
+          Made by Ridgeway Mills Co., Salina, Kansas 67401
+          <br />
+          ▲ Open other end
+        </Micro>
+      </div>
+      <JetPrint color={p.ink} size="2.8cqw" style={{ flex: 'none', whiteSpace: 'pre' }}>
+        {'PLANT 07 LINE 3\n06:31 14SEP26'}
+      </JetPrint>
+      <div style={{ flex: 'none' }}>
+        <RecycleMark
+          color={p.ink}
+          size="6cqw"
+          label={<Micro style={{ fontSize: '1.9cqw', lineHeight: 1.3, whiteSpace: 'nowrap' }}>Carton made from<br />100% recycled board</Micro>}
+        />
+      </div>
+    </BoxFace>
+  )
+}
+
+/**
  * One of the range: a small front, built from the same parts as the big
  * one - the tab, the flavour in the two faces, the bowl - so the three read
  * as this box's siblings rather than as three icons. It brings its own cream
@@ -792,6 +824,62 @@ export function MailerEnd({ material }: { material: string }) {
         <Halyard size="6.5cqw" />
       </div>
       <Mark kind="dry" ink={ink} size={13} label="Keep dry" />
+    </ShipperFace>
+  )
+}
+
+/** The back: the return address and the line a shipper prints for the courier. */
+export function MailerBack({ material }: { material: string }) {
+  const ink = materialTone(material).text
+  return (
+    <ShipperFace material={material} style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: '3cqw 5cqw', gap: '4cqw' }}>
+      <div style={{ display: 'grid', gap: '1.2cqw', minWidth: 0 }}>
+        <Micro style={{ fontSize: '1.7cqw', opacity: 0.72 }}>If undeliverable, please return to</Micro>
+        <Micro style={{ fontSize: '1.9cqw', lineHeight: 1.45 }}>
+          Halyard Coffee Roasters
+          <br />
+          44 Commercial Street, Portland, ME 04101
+        </Micro>
+      </div>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '3cqw', flex: 'none' }}>
+        <Mark kind="fragile" ink={ink} size={7} label="Handle with care" />
+        <Mark kind="up" ink={ink} size={7} label="This way up" />
+      </div>
+    </ShipperFace>
+  )
+}
+
+/**
+ * The bottom: the box maker's certificate - the round stamp every corrugated
+ * shipper carries on its base, with the board grade and the maker in it -
+ * and the recycling line. The one face that is pure compliance, printed in
+ * the same one ink as the lid.
+ */
+export function MailerBottom({ material }: { material: string }) {
+  const ink = materialTone(material).text
+  return (
+    <ShipperFace material={material} style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: '6cqw 8cqw' }}>
+      <RoundSeal
+        size="30cqw"
+        legend="BOX MAKER'S CERTIFICATE · KESTREL BOX CO · "
+        color={ink}
+        center={
+          <div style={{ fontFamily: FONT, display: 'grid', gap: '0.8cqw' }}>
+            <span style={{ fontSize: '3.4cqw', fontWeight: 800 }}>32 ECT</span>
+            <span style={{ fontSize: '1.6cqw', fontWeight: 600 }}>E-flute · single wall</span>
+            <span style={{ fontSize: '1.6cqw', fontWeight: 600 }}>Size limit 75 in</span>
+          </div>
+        }
+      />
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '3cqw', textAlign: 'right' }}>
+        <Cleat color={ink} size="9cqw" />
+        <Micro style={{ fontSize: '2cqw', lineHeight: 1.5 }}>
+          Made from 90% recycled fibre.
+          <br />
+          Flatten and recycle with cardboard.
+        </Micro>
+        <Mark kind="recycle" ink={ink} size={8} label="Recycle" />
+      </div>
     </ShipperFace>
   )
 }

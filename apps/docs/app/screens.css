@@ -385,8 +385,11 @@
   border-radius: 18px;
   background: rgba(255, 255, 255, 0.08);
   border: 1px solid rgba(255, 255, 255, 0.09);
-  backdrop-filter: blur(10px);
+  /* Prefixed first, here and below: the build treats the pair as one property
+     and keeps only the LAST, so standard-then-prefixed shipped just the
+     `-webkit-` form, which Chrome ignores - the glass had no blur there. */
   -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
   font-size: 13.5px;
   line-height: 1.45;
   color: rgba(238, 240, 246, 0.85);
@@ -458,8 +461,8 @@
   font-weight: 500;
   color: rgba(238, 240, 246, 0.85);
   background: rgba(10, 12, 20, 0.55);
-  backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
 }
 
 .mac-menubar-brand {
@@ -473,8 +476,8 @@
   background: rgba(18, 20, 30, 0.82);
   border: 1px solid rgba(255, 255, 255, 0.1);
   box-shadow: 0 24px 48px -20px rgba(0, 0, 0, 0.75);
-  backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
 }
 
 .mac-window-titlebar {
@@ -550,8 +553,8 @@
   border-radius: 20px;
   background: rgba(255, 255, 255, 0.08);
   border: 1px solid rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
 }
 
 .mac-dock span {

@@ -15,7 +15,7 @@ import { CLUB, MATCH, PASS, clock, lastGoal } from './matchday-data'
  * and the watch is the same number, handed in by the page, and it runs.
  */
 
-const HEAVY: CSSProperties = { fontWeight: 800, letterSpacing: '-0.05em', lineHeight: 0.86, textTransform: 'uppercase' }
+const HEAVY: CSSProperties = { fontWeight: 800, letterSpacing: '-0.05em', lineHeight: 0.86 }
 const TAB: CSSProperties = { fontVariantNumeric: 'tabular-nums' }
 
 /** The crest: a shield, the initials, a star for the one title. */
@@ -193,7 +193,7 @@ export function WatchTracker({ seconds }: { seconds: number }) {
 export function SeasonPass() {
   const row = (label: string, value: string) => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8cqw' }}>
-      <span style={{ fontSize: '2.8cqw', fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', opacity: 0.6 }}>{label}</span>
+      <span style={{ fontSize: '3.1cqw', fontWeight: 600, letterSpacing: '-0.01em', opacity: 0.65 }}>{label}</span>
       <span style={{ fontSize: '4.6cqw', fontWeight: 800, letterSpacing: '-0.02em' }}>{value}</span>
     </div>
   )

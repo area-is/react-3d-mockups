@@ -1,6 +1,15 @@
 'use client'
 
-import { isValidElement, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
+import {
+  isValidElement,
+  useEffect,
+  useEffectEvent,
+  useMemo,
+  useRef,
+  useState,
+  type ReactNode,
+} from 'react'
+import { Check, Copy, Link2, Zap } from 'lucide-react'
 import { MockupCanvas } from 'react-3d-mockups'
 import { ChromaSurface } from '../screens/chroma-surface'
 import { LiveCounter } from '../screens/live-counter'
@@ -8,10 +17,21 @@ import { SurfaceArt } from '../screens/surface-art'
 import { carouselArtName, carouselArtNode } from './carousel-art'
 import { SCREEN_SOURCES, SOURCE_PARTS } from '@/lib/demo-sources.generated'
 import { COMPONENT_PROPS, SHARED_PROPS, type PropDoc } from '@/lib/prop-tables.generated'
-import { ColorRow, NumberField, PanelGlyph, PropRow, ResetGlyph, Segmented, Switch } from './controls'
-import { editableProp, propAttribute, same, type EditableProp } from './prop-controls'
+import { ColorRow, NumberField, PanelGlyph, PropRow, ResetGlyph, Segmented, Switch, colorInputValue } from './controls'
+import {
+  acceptValue,
+  clamp,
+  editableProp,
+  isHexColor,
+  propAttribute,
+  same,
+  type EditableProp,
+} from './prop-controls'
 import { LazyScene } from '../lazy-scene'
+import { ModelPoster } from '../model-poster'
 import { EXPLORERS, type ExplorerSpec } from './registry'
+import { copyText, explorerId, readShared, writeShared } from './share'
+import { openInStackBlitz } from './stackblitz'
 
 /**
  * The prop explorer from the design handoff: a live mockup, an inspector that
@@ -208,6 +228,111 @@ const handWritten = (spec: ExplorerSpec, name: string) => {
     default:
       return true
   }
+}
+
+/** The fields that differ from where an explorer opens - what a share link carries. */
+type Changes = Partial<Omit<PropState, 'extra'>> & { extra?: Record<string, unknown> }
+
+/**
+ * Everything that differs from `base`: the comparison the "modified" count
+ * makes, kept as the values rather than counted. A prop that is no longer
+ * passed at all is `null`, JSON having no `undefined`.
+ */
+function changesFrom(p: PropState, base: PropState): Changes {
+  const changes: Record<string, unknown> = {}
+  for (const key of Object.keys(base) as (keyof PropState)[]) {
+    if (key !== 'extra' && p[key] !== base[key]) changes[key] = p[key]
+  }
+  const extra: Record<string, unknown> = {}
+  for (const name of new Set([...Object.keys(p.extra), ...Object.keys(base.extra)])) {
+    if (!same(p.extra[name], base.extra[name])) extra[name] = p.extra[name] ?? null
+  }
+  if (Object.keys(extra).length) changes.extra = extra
+  return changes as Changes
+}
+
+/** What the panel offers a control for here - all that a link is allowed to set. */
+interface Offered {
+  spec: ExplorerSpec
+  lockedVariant?: string
+  hasColor: boolean
+  arranged: boolean
+  /** Props an arrangement writes on its instances, which have no row. */
+  owned: Set<string>
+  /** The inferred rows, which own everything in `extra`. */
+  editable: EditableProp[]
+}
+
+/**
+ * Where a share link opens this explorer: its own starting point, with the
+ * link's changes laid over it.
+ *
+ * A link is input from anyone, so each change is taken only if the panel
+ * offers a control for it here and the value is one that control could have
+ * produced - otherwise that change is dropped and the rest still apply. Every
+ * string that survives is one of a known set or a hex colour, which also
+ * keeps a crafted link from writing code of its own into the snippet, and
+ * from there into a StackBlitz project.
+ */
+function restoreShared(base: PropState, link: Record<string, unknown>, offered: Offered): PropState {
+  const { spec, lockedVariant, hasColor, arranged, owned, editable } = offered
+  const next: PropState = { ...base, extra: { ...base.extra } }
+  const oneOf = <T,>(value: unknown, options: readonly T[]) =>
+    options.includes(value as T) ? (value as T) : undefined
+  const flag = (value: unknown) => (typeof value === 'boolean' ? value : undefined)
+  const colour = (value: unknown) => (value === '' || isHexColor(value) ? value : undefined)
+  const within = (value: unknown, min: number, max: number) =>
+    typeof value === 'number' && Number.isFinite(value) ? clamp(value, min, max) : undefined
+
+  if (spec.variants && !lockedVariant && !owned.has('variant')) {
+    next.variant = oneOf(link.variant, spec.variants.map((v) => v.id)) ?? next.variant
+    // The select clears the colour when the model changes, a colorway being
+    // one model's; a link that does the same without naming one gets that too.
+    if (next.variant !== base.variant) next.color = ''
+  }
+  if (hasColor) {
+    const ids = (spec.colorways?.[spec.variants ? next.variant : ''] ?? []).map((c) => c.id)
+    next.color = colour(link.color) ?? oneOf(link.color, ids) ?? next.color
+  }
+  if (spec.orientation && !owned.has('orientation')) {
+    next.orientation = oneOf(link.orientation, ['portrait', 'landscape'] as const) ?? next.orientation
+  }
+  if (spec.coverage && !owned.has('coverage')) {
+    next.coverage = oneOf(link.coverage, ['panel', 'full', 'perforated'] as const) ?? next.coverage
+  }
+  if (spec.openable && !owned.has('openAngle')) {
+    next.openAngle = within(link.openAngle, 0, 180) ?? next.openAngle
+  }
+  if (!arranged) next.float = flag(link.float) ?? next.float
+  next.surfaceBackground = colour(link.surfaceBackground) ?? next.surfaceBackground
+  // Zero is "not passed"; anything else is held to the field's own bounds,
+  // which the field states but a typist can step past.
+  next.resolution =
+    link.resolution === 0 ? 0 : Math.round(within(link.resolution, 200, 1600) ?? next.resolution)
+  next.controls = flag(link.controls) ?? next.controls
+  next.autoRotate = flag(link.autoRotate) ?? next.autoRotate
+  const speed = within(link.autoRotateSpeed, 0.25, 4)
+  if (speed !== undefined) next.autoRotateSpeed = Math.round(speed * 4) / 4
+  next.zoom = flag(link.zoom) ?? next.zoom
+  next.fullscreen = flag(link.fullscreen) ?? next.fullscreen
+  next.shadows = flag(link.shadows) ?? next.shadows
+  next.background = colour(link.background) ?? next.background
+
+  const extra = link.extra && typeof link.extra === 'object' && !Array.isArray(link.extra) ? link.extra : {}
+  for (const [name, value] of Object.entries(extra)) {
+    const prop = editable.find((row) => row.name === name)
+    if (!prop) continue
+    // `null` is a prop the sender stopped passing: back to where the row starts.
+    const accepted = value === null ? base.extra[name] : acceptValue(prop, value)
+    if (value !== null && accepted === undefined) continue
+    // As `rowProps` has it, landing on the documented default is not passing it.
+    if (accepted === undefined || (base.extra[name] === undefined && same(accepted, prop.fallback))) {
+      delete next.extra[name]
+    } else {
+      next.extra[name] = accepted
+    }
+  }
+  return next
 }
 
 /**
@@ -607,6 +732,7 @@ function MockupExplorerImpl({
   // Open on a wide screen, collapsed once the layout stacks. Resolved after
   // mount so the server and the first client render agree.
   const [inspectorOpen, setInspectorOpen] = useState(true)
+  const rootRef = useRef<HTMLDivElement>(null)
   const stageRef = useRef<HTMLDivElement>(null)
   const stageSize = useStageSize(stageRef)
   /*
@@ -617,7 +743,9 @@ function MockupExplorerImpl({
    * written into them, so the code panel still prints what you set.
    */
   const [spinning, setSpinning] = useState(false)
-  const firstColour = useRef(true)
+  // Compared rather than flagged: a first-run flag is spent by StrictMode's
+  // double effect in development, which then spun every explorer on load.
+  const lastColour = useRef<string | null>(null)
   const [view, setView] = useState<string>('3d')
   /**
    * Zoom on the flat view, as a factor over the fit. Kept with the view it
@@ -630,6 +758,7 @@ function MockupExplorerImpl({
   const zoomBy = (factor: number) =>
     setFlatZoom({ view, value: Math.min(FLAT_ZOOM_MAX, Math.max(FLAT_ZOOM_MIN, zoom * factor)) })
   const [copied, setCopied] = useState(false)
+  const [linked, setLinked] = useState<'idle' | 'copied' | 'failed'>('idle')
 
   const set = <K extends keyof PropState>(key: K, value: PropState[K]) =>
     setP((prev) => ({ ...prev, [key]: value }))
@@ -643,10 +772,9 @@ function MockupExplorerImpl({
     })
 
   useEffect(() => {
-    if (firstColour.current) {
-      firstColour.current = false
-      return
-    }
+    const previous = lastColour.current
+    lastColour.current = p.color
+    if (previous === null || previous === p.color) return
     setSpinning(true)
     const t = setTimeout(() => setSpinning(false), SPIN_MS)
     return () => clearTimeout(t)
@@ -661,14 +789,9 @@ function MockupExplorerImpl({
   const seedKey = JSON.stringify(seed ?? null)
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const base = useMemo(() => initialState(spec, variant, seed), [spec, variant, seedKey])
-  const modified = useMemo(() => {
-    const keys = (Object.keys(base) as (keyof PropState)[]).filter((k) => k !== 'extra')
-    const names = new Set([...Object.keys(p.extra), ...Object.keys(base.extra)])
-    return (
-      keys.filter((k) => p[k] !== base[k]).length +
-      [...names].filter((name) => !same(p.extra[name], base.extra[name])).length
-    )
-  }, [p, base])
+  const changes = useMemo(() => changesFrom(p, base), [p, base])
+  const modified =
+    Object.keys(changes).filter((key) => key !== 'extra').length + Object.keys(changes.extra ?? {}).length
 
   const { Component } = spec
 
@@ -689,6 +812,14 @@ function MockupExplorerImpl({
   }, [arranged])
 
   const hasColor = documents.has('color') && !ownedByItems.has('color')
+  /**
+   * What an unset `color` renders as, for its row to show: the component's
+   * documented default when that is a plain colour. A single near-black for
+   * everything had the row reading #101216 over a book that was plainly navy.
+   */
+  const colorDefault =
+    /^'(#[0-9a-f]{3,8})'$/i.exec(COMPONENT_PROPS[spec.name]?.find((doc) => doc.name === 'color')?.default ?? '')?.[1] ??
+    '#101216'
 
   const driven = new Set<string>([
     'float',
@@ -730,6 +861,49 @@ function MockupExplorerImpl({
       ),
     onReset: () => writeExtra(prop.name, base.extra[prop.name]),
   })
+
+  /*
+   * Share links - see `share.ts` for the hash. The id is a digest of how the
+   * page sets this explorer up, so it is the same on every load and differs
+   * between the examples on one page.
+   */
+  const shareId = explorerId({ component, variant, screen, props: seed, arrangement })
+
+  const followLink = useEffectEvent(() => {
+    const link = readShared(shareId)
+    if (!link) return
+    setP(
+      restoreShared(base, link, {
+        spec,
+        lockedVariant: variant,
+        hasColor,
+        arranged: !!arranged,
+        owned: ownedByItems,
+        editable,
+      })
+    )
+    // No element carries the hash as its id, so the browser has nothing to
+    // scroll to on its own - and the explorer a link names may be the fourth
+    // one down the page. Where it sits does not depend on the props just
+    // restored, so there is no render to wait for.
+    rootRef.current?.scrollIntoView({ block: 'start' })
+  })
+
+  // Read on arrival, and again when a link is pasted into a tab already on
+  // this page: that changes only the hash, so nothing reloads to read it.
+  useEffect(() => {
+    const onHashChange = () => followLink()
+    onHashChange()
+    window.addEventListener('hashchange', onHashChange)
+    return () => window.removeEventListener('hashchange', onHashChange)
+  }, [])
+
+  const share = async () => {
+    const url = writeShared(shareId, changes)
+    // The link is in the address bar either way, so a refused clipboard
+    // still leaves the reader something to copy - the label says where.
+    setLinked((await copyText(url)) ? 'copied' : 'failed')
+  }
 
   // Regions and measurements come straight off the component. Only the object's
   // own props reach `info()` - a transform or a camera moves the mockup on the
@@ -773,7 +947,8 @@ function MockupExplorerImpl({
    * The finish the artwork is printed onto, as a colour the art can reason
    * about. `p.color` is either a swatch id or a raw CSS colour, so the resolved
    * preset comes first; a page that sets no colour at all falls back to the
-   * first swatch, which is the finish the object is standing in anyway. The
+   * first swatch, which is the finish the object is standing in anyway, and
+   * failing that to the component's own default - a kraft bag's kraft. The
    * pieces that print onto the material flip their ink on this, so handing
    * them an id would have printed dark ink on a dark board.
    */
@@ -782,7 +957,16 @@ function MockupExplorerImpl({
     preset?.color ??
     (rawColor?.startsWith('#') ? rawColor : undefined) ??
     colorways[0]?.color ??
-    '#f2efe8'
+    colorDefault
+  /*
+   * What is behind the artwork when the reader has not picked a surface. On
+   * an object whose `color` is the stock it is printed on (`spec.stock`) the
+   * library paints that stock there, and the sample artwork has no ground of
+   * its own, so `color` changes what it is printed on. The flat view is the
+   * one place that has to paint it by hand - it is plain DOM, not the model.
+   */
+  const surfaceDoc = [...(COMPONENT_PROPS[spec.name] ?? []), ...SHARED_PROPS].find((doc) => doc.name === 'surfaceBackground')
+  const surfaceDefault = spec.stock ? finish : (/^'(#[0-9a-f]{3,8})'$/i.exec(surfaceDoc?.default ?? '')?.[1] ?? '#000000')
 
   /**
    * What is staged on one region.
@@ -802,12 +986,12 @@ function MockupExplorerImpl({
         : (artFor(region) ?? (spec.print ? 'SurfaceArt' : 'LiveCounter'))
   /** The primary face's name, which is what the `demo.tsx` snippet prints. */
   const screenName = nameFor(regions[0]?.name ?? 'screen')
-  const content = (region: string, labelOverride?: string) => {
+  const content = (region: string, labelOverride?: string, stock: string = finish) => {
     const label = labelOverride ?? REGION_LABEL(region)
     if (chroma) return <ChromaSurface label={label} />
     const art = artFor(region)
-    if (art) return carouselArtNode(art, finish)
-    return spec.print ? <SurfaceArt label={label} /> : <LiveCounter />
+    if (art) return carouselArtNode(art, stock, { region, coverage: spec.coverage ? p.coverage : undefined })
+    return spec.print ? <SurfaceArt label={label} material={spec.stock ? stock : undefined} /> : <LiveCounter />
   }
   /**
    * The props the surface is really mounted with, read off the element the
@@ -885,6 +1069,11 @@ function MockupExplorerImpl({
     const scale = fit * zoom
     return { px, scale, width: px.width * scale, height: px.height * scale }
   })()
+  // Built whichever tab is open: StackBlitz always gets `demo.tsx`, a surface
+  // file on its own being nothing that runs.
+  const demo = arranged
+    ? buildArrangedSource(spec, arranged, p, stageHeight, screenName ?? '', editable)
+    : buildSource(spec, p, stageHeight, screenName, editable)
   /*
    * One tab per surface next to demo.tsx, and the same `view` drives both -
    * so picking a panel's source shows that panel on the stage, and picking a
@@ -894,12 +1083,10 @@ function MockupExplorerImpl({
   const source =
     view !== '3d'
       ? surfaceSource(spec, view, nameFor(view) ?? '', surfaceAttributes(view), flatPx)
-      : arranged
-        ? buildArrangedSource(spec, arranged, p, stageHeight, screenName ?? '', editable)
-        : buildSource(spec, p, stageHeight, screenName, editable)
+      : demo
 
   return (
-    <div className="mx" data-inspector={inspectorOpen}>
+    <div className="mx" ref={rootRef} data-inspector={inspectorOpen}>
       <div className="mx-header">
         <span className="mx-views">
           <button
@@ -943,8 +1130,8 @@ function MockupExplorerImpl({
       <div className="mx-body" style={{ height: stageHeight }}>
         <div className="mx-stage" ref={stageRef} style={{ background: p.background || undefined }}>
           {view === '3d' ? (
-            <LazyScene>
-              {arranged ? (
+            <LazyScene poster={arranged ? null : <ModelPoster component={component} variant={spec.variants ? p.variant : undefined} />}>
+              {(ready) => arranged ? (
                 /*
                  * One canvas, the bare objects inside it - the composition the
                  * page is teaching, with the inspector driving what they share.
@@ -953,15 +1140,21 @@ function MockupExplorerImpl({
                  * books would bury that in the snippet. The other surfaces are
                  * still a tab away.
                  */
-                <MockupCanvas {...stageProps}>
+                <MockupCanvas {...stageProps} onCreated={ready}>
                   {arranged.items.map((item, i) => {
                     const itemSpec = item.component ? EXPLORERS[item.component]! : spec
                     const Bare = itemSpec.bare
+                    // An instance that brings its own stock prints on it, so its
+                    // artwork has to set its ink for that stock.
+                    const own = item.props?.color
+                    const itemStock =
+                      spec.stock && !item.component && typeof own === 'string' && own.startsWith('#') ? own : undefined
                     return (
                       <Bare key={i} {...(item.component ? {} : objectProps)} {...item.props}>
                         {content(
                           itemSpec.Component.regions?.[0]?.name ?? 'children',
-                          item.surface
+                          item.surface,
+                          itemStock ?? finish
                         )}
                       </Bare>
                     )
@@ -975,7 +1168,7 @@ function MockupExplorerImpl({
                   device page and dropped the bare children - and naming all of
                   them also means each surface gets its own region label.
                 */
-                <Component {...objectProps} {...stageProps} float={p.float}>
+                <Component {...objectProps} {...stageProps} float={p.float} onCreated={ready}>
                   {unprinted
                     ? null
                     : slots.map(([name, Slot]) => (
@@ -1005,7 +1198,7 @@ function MockupExplorerImpl({
                   style={{
                     width: flatSize.px.width,
                     height: flatSize.px.height,
-                    background: p.surfaceBackground || undefined,
+                    background: p.surfaceBackground || (spec.stock ? finish : undefined),
                     // Content still lays out at true CSS pixel size - that is the
                     // whole point of the view - and only the picture is scaled.
                     transform: `scale(${flatSize.scale})`,
@@ -1104,7 +1297,7 @@ function MockupExplorerImpl({
               <ColorRow
                 label="color"
                 value={p.color}
-                fallback="#101216"
+                fallback={colorDefault}
                 presetName={preset?.name}
                 swatch={preset?.color}
                 onChange={(v) => set('color', v)}
@@ -1167,7 +1360,7 @@ function MockupExplorerImpl({
             <ColorRow
               label="surfaceBackground"
               value={p.surfaceBackground}
-              fallback="#000000"
+              fallback={surfaceDefault}
               onChange={(v) => set('surfaceBackground', v)}
             />
             <div className="mx-row">
@@ -1230,7 +1423,7 @@ function MockupExplorerImpl({
                   type="color"
                   className="mx-color"
                   aria-label="custom background"
-                  value={p.background || '#101318'}
+                  value={colorInputValue(p.background || '#101318')}
                   onChange={(e) => set('background', e.target.value)}
                 />
               </span>
@@ -1293,17 +1486,58 @@ function MockupExplorerImpl({
               {REGION_FILE(region.name)}
             </button>
           ))}
-          <button
-            type="button"
-            className="mx-copy"
-            onClick={() => {
-              void navigator.clipboard?.writeText(source.map((l) => l.text).join('\n'))
-              setCopied(true)
-            }}
-            onMouseLeave={() => setCopied(false)}
-          >
-            {copied ? 'copied' : 'copy'}
-          </button>
+          {/* Named by aria-label, not their text: below 520px the text goes
+              and only the icon is left. */}
+          <span className="mx-actions">
+            <button
+              type="button"
+              className="mx-action"
+              aria-label="Share a link to these props"
+              title={
+                linked === 'failed'
+                  ? 'The clipboard is unavailable - copy the link from the address bar'
+                  : 'Copy a link that opens this explorer with these props'
+              }
+              onClick={share}
+              onMouseLeave={() => setLinked('idle')}
+            >
+              {linked === 'copied' ? <Check size={13} aria-hidden /> : <Link2 size={13} aria-hidden />}
+              <span className="mx-action-label">
+                {linked === 'copied' ? 'link copied' : linked === 'failed' ? 'link in address bar' : 'share'}
+              </span>
+            </button>
+            <button
+              type="button"
+              className="mx-action"
+              aria-label="Open in StackBlitz"
+              title="Open demo.tsx as a runnable Vite project on StackBlitz"
+              onClick={() => openInStackBlitz(demo.map((l) => l.text).join('\n'), spec.name)}
+            >
+              <Zap size={13} aria-hidden />
+              <span className="mx-action-label">StackBlitz</span>
+            </button>
+            <button
+              type="button"
+              className="mx-action"
+              aria-label="Copy code"
+              onClick={async () => setCopied(await copyText(source.map((l) => l.text).join('\n')))}
+              onMouseLeave={() => setCopied(false)}
+            >
+              {copied ? <Check size={13} aria-hidden /> : <Copy size={13} aria-hidden />}
+              <span className="mx-action-label">{copied ? 'copied' : 'copy'}</span>
+            </button>
+          </span>
+          {/* Beside the buttons, not in them: a button's contents are
+              presentational, and a live region inside one is never exposed. */}
+          <span className="sr-only" aria-live="polite">
+            {linked === 'copied'
+              ? 'Link copied to the clipboard'
+              : linked === 'failed'
+                ? 'Could not copy the link; it is in the address bar'
+                : copied
+                  ? 'Code copied to the clipboard'
+                  : ''}
+          </span>
         </div>
         <pre>
           {source.map((line, i) => (

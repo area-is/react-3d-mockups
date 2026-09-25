@@ -12,8 +12,8 @@
  * dimensions every position below converts from: Apple measures off the rear
  * view's top-left corner, so a front-view coordinate is
  * `half the body size - Apple's number`. Button pills, bottom-edge drilling
- * and antenna strips were measured from reference 3D scans of the retail
- * devices, normalized to the official body dimensions.
+ * and antenna strips were measured from published specifications and product
+ * photography, normalized to the official body dimensions.
  *
  * This is pure, renderer-agnostic data: the 3D model consumes it today and a
  * future 2D (CSS/SVG) renderer can consume the same numbers.
@@ -118,7 +118,7 @@ export interface IPhoneSpec {
 /**
  * iPhone 17 - 149.6 x 71.5 x 7.95 mm, 6.3" 2622x1206 display, Dynamic Island,
  * vertical two-lens camera pill. Logical resolution 402x874 pt. Button and
- * edge detail follows the family scan geometry.
+ * edge detail follows the rest of the family's measurements.
  */
 const IPHONE_17: IPhoneSpec = {
   body: { width: 1.925, height: 4.027, depth: 0.214, radius: 0.34, bevel: 0.02 },
@@ -182,7 +182,7 @@ const IPHONE_17_AIR: IPhoneSpec = {
   display: { width: 1.873, height: 4.066, radius: 0.276 },
   island: { width: 0.557, height: 0.168, offsetY: 0.183 },
   resolution: 420,
-  // Scan: Action 6.3 mm at +45.2, volumes 10.8/10.9 at +30.8/+16.4 (left rail);
+  // Measured: Action 6.3 mm at +45.2, volumes 10.8/10.9 at +30.8/+16.4 (left rail);
   // side key 17.7 mm at +23.1, flush Camera Control 17.4 mm at -26.8 (right rail).
   buttons: [
     { edge: 'left', y: 1.216, length: 0.17 },
@@ -229,7 +229,8 @@ const IPHONE_17_AIR: IPhoneSpec = {
  * as the 17). Aluminum unibody with the full-width camera plateau: triangular
  * 48MP trio on one side, flash + mic + LiDAR column on the other, and the
  * Ceramic Shield charging window on the lower back. Logical resolution
- * 402x874 pt. Detail geometry from a retail-unit scan.
+ * 402x874 pt. Detail geometry from published specifications and product
+ * photography.
  */
 const IPHONE_17_PRO: IPhoneSpec = {
   body: { width: 1.935, height: 4.038, depth: 0.2355, radius: 0.289, bevel: 0.02 },
@@ -237,7 +238,7 @@ const IPHONE_17_PRO: IPhoneSpec = {
   display: { width: 1.8, height: 3.9134, radius: 0.23 },
   island: { width: 0.528, height: 0.16, offsetY: 0.15 },
   resolution: 402,
-  // Scan: Action 6.7 mm at +43.0, volumes 10.6 at +29.8/+16.6; side key 16.9 mm
+  // Measured: Action 6.7 mm at +43.0, volumes 10.6 at +29.8/+16.6; side key 16.9 mm
   // at +23.4; flush Camera Control at -29.6.
   buttons: [
     { edge: 'left', y: 1.159, length: 0.179 },
@@ -290,8 +291,8 @@ const IPHONE_17_PRO: IPhoneSpec = {
     usb: { x: 0, width: 0.239, height: 0.073 },
     screws: [{ x: 0.183, r: 0.02 }, { x: -0.183, r: 0.02 }],
     speakers: [
-      // Scan: six drilled holes per side, slightly asymmetric groups. Hole
-      // radius from the retail drilling (~1.8 mm bore) - the scan's clusters
+      // Six drilled holes per side, slightly asymmetric groups. Hole radius
+      // from the retail drilling (~1.8 mm bore) - the clusters in photographs
       // read wider because they include each hole's chamfer, which would make
       // neighboring cavities intersect.
       { x: -0.552, r: 0.024 },
@@ -318,8 +319,8 @@ const IPHONE_17_PRO: IPhoneSpec = {
 /**
  * iPhone 17 Pro Max - 163.4 x 78.0 x 8.75 mm, 6.9" 2868x1320 display. Same
  * plateau architecture as the Pro at the larger size, plus the top-edge RF
- * window. Logical resolution 440x956 pt. Detail geometry from a retail-unit
- * scan (dimensionally the cleanest of the family models).
+ * window. Logical resolution 440x956 pt. Detail geometry from published
+ * specifications and product photography.
  */
 const IPHONE_17_PRO_MAX: IPhoneSpec = {
   body: { width: 2.1, height: 4.398, depth: 0.2355, radius: 0.34, bevel: 0.02 },
@@ -327,7 +328,7 @@ const IPHONE_17_PRO_MAX: IPhoneSpec = {
   display: { width: 1.962, height: 4.263, radius: 0.274 },
   island: { width: 0.561, height: 0.163, offsetY: 0.142 },
   resolution: 440,
-  // Scan: Action 6.9 mm at +47.4, volumes 11.2 at +33.3/+19.1; side key 17.7 mm
+  // Measured: Action 6.9 mm at +47.4, volumes 11.2 at +33.3/+19.1; side key 17.7 mm
   // at +26.2; flush Camera Control at -30.1. All 2.7 mm thick, 0.45 mm proud.
   buttons: [
     { edge: 'left', y: 1.276, length: 0.186 },
@@ -416,8 +417,8 @@ const IPHONE_18_PRO: IPhoneSpec = {
 
 /**
  * iPhone 18 Pro Max - the 17 Pro Max's chassis, likewise: 163.4 x 78.0 x
- * 8.75 mm, the 6.9" 2868x1320 panel, the top-edge RF window and the scan's
- * detail geometry, with the generation's narrower Dynamic Island. Logical
+ * 8.75 mm, the 6.9" 2868x1320 panel, the top-edge RF window and the 17 Pro
+ * Max's measured detail geometry, with the generation's narrower Dynamic Island. Logical
  * resolution 440x956 pt.
  */
 const IPHONE_18_PRO_MAX: IPhoneSpec = {
