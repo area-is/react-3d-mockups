@@ -1,6 +1,6 @@
 /**
- * Galaxy Z Fold-style device dimensions - the Galaxy Z Fold 7, the Galaxy
- * Z Fold 8 and the Galaxy Z Fold 8 Ultra.
+ * Book-fold device dimensions - the Galaxy Z Fold 7, the Galaxy Z Fold 8, the
+ * Galaxy Z Fold 8 Ultra, and Apple's iPhone Duo.
  *
  * A book-fold foldable has two form factors, and this spec carries both so the
  * one device can render either:
@@ -26,6 +26,11 @@
  * unfolded a landscape 123.9 x 161.4 x 4.5 mm tablet whose 7.6" 2448x1848
  * inner panel is natively 4:3 landscape. The hinge still runs vertically, so
  * the same spec shape carries it; it is simply wider than it is tall.
+ * Real iPhone Duo: the same passport shape - folded 117.8 x 84.1 x 11.3 mm
+ * (5.4" 1398x2034 cover), unfolded a landscape 117.8 x 164.6 x 5.2 mm tablet
+ * with a 7.6" 2670x1878 inner panel and no inner camera hole at all. It is
+ * a different brand on the same spec shape: `brand` picks the marks and the
+ * system chrome, and the Duo simply leaves out the Samsung-only parts.
  */
 
 import type { Orientation } from '../../orientation'
@@ -38,12 +43,30 @@ interface FoldRearCamera {
   plateau: { x: number; y: number; width: number; height: number; radius: number; raise: number }
   /** Dark pill seating the lens column (scan: 15.2 x 48.6 mm, +2.2 mm more). */
   island: { x: number; y: number; width: number; height: number; radius: number; raise: number }
-  /** Lens collars, top to bottom (r 7.9 mm on a 16.7 mm pitch); `pupil` is the front element's fraction of the ring radius. */
-  rings: { y: number; r: number; pupil?: number }[]
+  /**
+   * Lens collars, top to bottom (r 7.9 mm on a 16.7 mm pitch); `pupil` is the
+   * front element's fraction of the ring radius, `glint` its coating flare.
+   */
+  rings: { y: number; r: number; pupil?: number; glint?: string }[]
   flash: { x: number; y: number; r: number }
+  /**
+   * How far the collars stand proud of the island, and where each collar's
+   * metal ends and its cover glass begins (as a fraction of the ring radius).
+   * Both default to the Galaxy rings' machined figures; the iPhone Duo's are
+   * the iPhone 17's taller, thin-rimmed glossy rings.
+   */
+  ringProud?: number
+  ringCollar?: number
 }
 
 export interface FoldSpec {
+  /**
+   * Whose book-fold this is. It decides the marks and the system chrome: a
+   * Samsung carries the SAMSUNG emboss on its spine and draws One UI's status
+   * bar; an Apple carries the badge on the camera half's back and draws
+   * iOS's. Defaults to `samsung`.
+   */
+  brand?: 'samsung' | 'apple'
   /**
    * Folded candy-bar: two stacked slabs (`body.depth` is the whole stack)
    * with the visible crevice of `gap` air between them, like the real folded
@@ -65,8 +88,13 @@ export interface FoldSpec {
     body: { width: number; height: number; depth: number; radius: number; bevel: number }
     /** Inner display (content maps here when open). */
     display: { width: number; height: number; radius: number }
-    /** Inner-display punch hole; `offsetX` is signed distance from center. */
-    punchHole: { radius: number; offsetX: number; offsetY: number }
+    /**
+     * Inner-display punch hole; `offsetX` is signed distance from center.
+     * Absent when the inner camera sits under the panel (the iPhone Duo),
+     * which leaves the open display uninterrupted and gives the status bar
+     * nothing to clear.
+     */
+    punchHole?: { radius: number; offsetX: number; offsetY: number }
     /**
      * Default CSS px width of the inner display in the unrotated pose. That
      * pose is portrait on the Fold 7 / Fold 8 Ultra; the Fold 8's inner panel
@@ -85,9 +113,10 @@ export interface FoldSpec {
   /**
    * The hinge: open, a recessed spine channel down the center of the back;
    * closed, a flat band capping the left edge (protruding `overhang` beyond
-   * the frame). `emboss` is the vertical SAMSUNG wordmark on the spine.
+   * the frame). `emboss` is the vertical SAMSUNG wordmark on the spine - the
+   * iPhone Duo's spine is bare, micro-blasted titanium, so it carries none.
    */
-  hinge: { width: number; overhang: number; emboss: { length: number } }
+  hinge: { width: number; overhang: number; emboss?: { length: number } }
   /**
    * Bottom-edge machining per pose (x positions in that pose's coordinates).
    * Folded, the USB lives on the camera half (rear slab) and the speaker on
@@ -106,6 +135,12 @@ export interface FoldSpec {
   }
   /** Antenna seams on the side rails: y positions, mirrored onto both edges. */
   antennaLines?: number[]
+  /**
+   * Brand badge on the camera half's back (the iPhone Duo's Apple mark),
+   * boxed `width` x `height` and centred at each pose's own back-face
+   * coordinates, like the camera.
+   */
+  logo?: { width: number; height: number; closed: { x: number; y: number }; open: { x: number; y: number } }
 }
 
 const FOLD7: FoldSpec = {
@@ -300,50 +335,187 @@ export type FoldVariant = keyof typeof FOLD_VARIANTS
 export const FOLD_DEFAULT_VARIANT: FoldVariant = 'fold7'
 
 /**
- * Grounded by default: the shadow plane kisses the bottom edge of the body -
- * the halves' folded extent at partial angles in landscape.
+ * iPhone Duo - Apple's first foldable, on the Fold 8's passport shape: folded
+ * a broad 117.8 x 84.1 x 11.3 mm bar with a 5.4" 1398x2034 cover panel,
+ * unfolding around the same vertical hinge into a landscape
+ * 117.8 x 164.6 x 5.2 mm tablet whose 7.6" 2670x1878 inner panel is natively
+ * landscape. Body and panel figures are Apple's tech specs; the diagonals
+ * put the cover at 77.7 x 113.0 mm and the inner panel at 157.9 x 111.1 mm,
+ * symmetrical 3.3 mm bezels all round.
+ *
+ * What makes it an iPhone rather than a Galaxy on the same spec shape:
+ *
+ * - No inner camera hole. The inner FaceTime camera sits under the display,
+ *   so `open.punchHole` is absent and the open pose is one clean panel. The
+ *   outer 12 MP Center Stage camera is a centred hole in the cover screen.
+ * - Two rear cameras (48 MP Fusion main and ultra wide) in the iPhone 17's
+ *   own vertical glossy pill at the top of the camera half - the pill's
+ *   size, corner clearance, lens pitch and flash placement are the 17's
+ *   dimensional drawing transposed onto this half, since Apple has not
+ *   published the Duo's own; the pill and its lens seat are one body-colour
+ *   glass pedestal rather than the Galaxy's two-tone plateau and island.
+ * - Touch ID in the side button: volume up, volume down and the side button
+ *   ride the camera half's free rail, no Camera Control.
+ * - A bare, micro-blasted 3D-printed hinge cover with no wordmark, and the
+ *   Apple badge on the camera half's back below the pill.
+ * - A mirror-polished grade 5 titanium frame (`brand: 'apple'` is what the
+ *   renderer keys the finish and iOS's status bar off).
+ *
+ * Resolutions are Apple's exact point grids at 3x: 890x626 inner (given as
+ * the unrotated landscape width, as the Fold 8's is), 466x678 cover. Key
+ * positions, the antenna seam and the bottom-edge machining are adapted
+ * from the Fold 8 and the slab iPhones' rails pending Apple's accessory
+ * drawings for the Duo.
  */
+const IPHONE_DUO: FoldSpec = {
+  brand: 'apple',
+  closed: {
+    body: { width: 2.294, height: 3.213, depth: 0.308, radius: 0.3, bevel: 0.02 },
+    gap: 0.012,
+    // 77.7 x 113.0 mm cover panel (5.4", 1398x2034), centred.
+    display: { width: 2.119, height: 3.083, radius: 0.26 },
+    punchHole: { radius: 0.053, offsetY: 0.13 },
+    resolution: 466,
+  },
+  open: {
+    body: { width: 4.49, height: 3.213, depth: 0.142, radius: 0.3, bevel: 0.012 },
+    // 157.9 x 111.1 mm inner panel (7.6", 2670x1878, landscape).
+    display: { width: 4.307, height: 3.03, radius: 0.06 },
+    resolution: 890,
+  },
+  rearCamera: {
+    // Folded: the iPhone 17's pill at the 17's own margins - 13.65 mm in from
+    // the free edge, 22.5 mm down from the top - on the camera half's back:
+    // 24.88 x 42.28 mm base, two Ø16 lenses 17.72 mm apart on its axis, the
+    // Ø6.28 flash out on the flat back on the lens pair's centre line. The
+    // island is the pill's own lens seat in the same colour, standing the
+    // 17's 1.67 mm collars off the glass with its thin, glossy rims.
+    closed: {
+      plateau: { x: 0.775, y: 0.993, width: 0.679, height: 1.153, radius: 0.3395, raise: 0.048 },
+      island: { x: 0.775, y: 0.993, width: 0.6, height: 1.074, radius: 0.3, raise: 0.02 },
+      // Top to bottom: 48 MP main, 48 MP ultra-wide.
+      rings: [
+        { y: 1.235, r: 0.218, pupil: 0.5, glint: '#3f4f7a' },
+        { y: 0.751, r: 0.218, pupil: 0.46, glint: '#4b4270' },
+      ],
+      flash: { x: 0.317, y: 0.993, r: 0.086 },
+      ringProud: 0.045,
+      ringCollar: 0.86,
+    },
+    // Unfolded: the same module riding the camera half (right of the spine).
+    open: {
+      plateau: { x: 1.873, y: 0.993, width: 0.679, height: 1.153, radius: 0.3395, raise: 0.048 },
+      island: { x: 1.873, y: 0.993, width: 0.6, height: 1.074, radius: 0.3, raise: 0.02 },
+      rings: [
+        { y: 1.235, r: 0.218, pupil: 0.5, glint: '#3f4f7a' },
+        { y: 0.751, r: 0.218, pupil: 0.46, glint: '#4b4270' },
+      ],
+      flash: { x: 1.415, y: 0.993, r: 0.086 },
+      ringProud: 0.045,
+      ringCollar: 0.86,
+    },
+  },
+  // Volume up, volume down, then the Touch ID side button, on the free rail.
+  buttons: [
+    { y: 0.74, length: 0.29 },
+    { y: 0.36, length: 0.29 },
+    { y: -0.3, length: 0.5 },
+  ],
+  buttonProfile: { protrusion: 0.011, thickness: 0.06 },
+  // The bare titanium hinge cover: no emboss.
+  hinge: { width: 0.166, overhang: 0.03 },
+  bottomEdge: {
+    closed: {
+      usb: { x: 0, width: 0.245, height: 0.075 },
+      speaker: { x: 0, width: 0.366, height: 0.045 },
+    },
+    open: {
+      usb: { x: 1.098, width: 0.245, height: 0.075 },
+      speakers: [{ x: -1.098, width: 0.366, height: 0.045 }],
+      mics: [{ x: 1.95, r: 0.026 }, { x: -1.92, r: 0.023 }],
+    },
+  },
+  antennaLines: [0.9],
+  // The 17's 15.75 x 19.34 mm badge, centred on the camera half below the pill.
+  logo: { width: 0.43, height: 0.528, closed: { x: 0, y: -0.5 }, open: { x: 1.098, y: -0.5 } },
+}
+
+/** The iPhone Duo family - one model today. */
+export const IPHONE_DUO_VARIANTS: Record<'duo', FoldSpec> = {
+  duo: IPHONE_DUO,
+}
+
+export type IPhoneDuoVariant = keyof typeof IPHONE_DUO_VARIANTS
+
+/** The variant the iPhone Duo binding defaults to. */
+export const IPHONE_DUO_DEFAULT_VARIANT: IPhoneDuoVariant = 'duo'
+
 /** Millimetres per world unit - shared with the Galaxy phones. */
 export const FOLD_MM_PER_UNIT = 36.66
+
+/** The pose props a book-fold's geometry depends on. */
+export interface FoldPoseProps<V extends string = FoldVariant> {
+  variant?: V
+  openAngle?: boolean | number
+  orientation?: Orientation
+}
 
 /**
  * Live geometry of whichever panel is facing the viewer: the big inner
  * display when open, the tall cover display when closed.
+ *
+ * Built per family so an omitted `variant` falls back to the family the
+ * mockup belongs to - the Galaxy Z Fold and the iPhone Duo share the spec
+ * shape and this math, not a default (see the watch framings for the same
+ * reasoning). `V` is inferred from the variant table alone: a module-level
+ * default is narrowed to its literal at the call site, and inferring from it
+ * too would type the whole family as that one variant.
  */
-export const FOLD_METRICS = {
-  mmPerUnit: FOLD_MM_PER_UNIT,
-  regions: ({ variant, openAngle, orientation }) => {
-    const spec = FOLD_VARIANTS[variant ?? FOLD_DEFAULT_VARIANT]
-    const { display, resolution } = foldOpenAngle(openAngle) < 0.5 ? spec.closed : spec.open
-    const landscape = orientation === 'landscape'
-    return {
-      screen: {
-        width: landscape ? display.height : display.width,
-        height: landscape ? display.width : display.height,
-        radius: display.radius,
-        resolution: Math.round(resolution * (landscape ? display.height / display.width : 1)),
-      },
-    }
-  },
-} as const satisfies MockupMetrics<{ variant?: FoldVariant; openAngle?: boolean | number; orientation?: Orientation }>
+function foldMetrics<V extends string>(variants: Record<V, FoldSpec>, defaultVariant: NoInfer<V>) {
+  return {
+    mmPerUnit: FOLD_MM_PER_UNIT,
+    regions: ({ variant, openAngle, orientation }: FoldPoseProps<V>) => {
+      const spec = variants[variant ?? defaultVariant]
+      const { display, resolution } = foldOpenAngle(openAngle) < 0.5 ? spec.closed : spec.open
+      const landscape = orientation === 'landscape'
+      return {
+        screen: {
+          width: landscape ? display.height : display.width,
+          height: landscape ? display.width : display.height,
+          radius: display.radius,
+          resolution: Math.round(resolution * (landscape ? display.height / display.width : 1)),
+        },
+      }
+    },
+  } as const satisfies MockupMetrics<FoldPoseProps<V>>
+}
 
-export const FOLD_FRAMING = {
-  contactGap: 0.05,
-  extent: ({ variant, openAngle, orientation }) => {
-    const spec = FOLD_VARIANTS[variant ?? FOLD_DEFAULT_VARIANT]
-    const angle = foldOpenAngle(openAngle)
-    const state = angle > 3 ? spec.open : spec.closed
-    const foldCos = Math.cos((((180 - angle) / 2) * Math.PI) / 180)
-    const extent =
-      orientation === 'landscape'
-        ? angle > 3 && angle < 177
-          ? state.body.width * foldCos
-          : state.body.width
-        : state.body.height
-    return extent / 2
-  },
-} as const satisfies MockupFraming<{
-  variant?: FoldVariant
-  openAngle?: boolean | number
-  orientation?: Orientation
-}>
+/**
+ * Grounded by default: the shadow plane kisses the bottom edge of the body -
+ * the halves' folded extent at partial angles in landscape.
+ */
+function foldFraming<V extends string>(variants: Record<V, FoldSpec>, defaultVariant: NoInfer<V>) {
+  return {
+    contactGap: 0.05,
+    extent: ({ variant, openAngle, orientation }: FoldPoseProps<V>) => {
+      const spec = variants[variant ?? defaultVariant]
+      const angle = foldOpenAngle(openAngle)
+      const state = angle > 3 ? spec.open : spec.closed
+      const foldCos = Math.cos((((180 - angle) / 2) * Math.PI) / 180)
+      const extent =
+        orientation === 'landscape'
+          ? angle > 3 && angle < 177
+            ? state.body.width * foldCos
+            : state.body.width
+          : state.body.height
+      return extent / 2
+    },
+  } as const satisfies MockupFraming<FoldPoseProps<V>>
+}
+
+export const FOLD_METRICS = foldMetrics(FOLD_VARIANTS, FOLD_DEFAULT_VARIANT)
+export const FOLD_FRAMING = foldFraming(FOLD_VARIANTS, FOLD_DEFAULT_VARIANT)
+
+/** Live geometry of the iPhone Duo's inner or cover display. */
+export const IPHONE_DUO_METRICS = foldMetrics(IPHONE_DUO_VARIANTS, IPHONE_DUO_DEFAULT_VARIANT)
+export const IPHONE_DUO_FRAMING = foldFraming(IPHONE_DUO_VARIANTS, IPHONE_DUO_DEFAULT_VARIANT)

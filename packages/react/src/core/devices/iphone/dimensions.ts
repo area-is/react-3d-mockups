@@ -1,5 +1,5 @@
 /**
- * iPhone device dimensions - the full iPhone 17 family.
+ * iPhone device dimensions - the full iPhone 17 family and the iPhone 18 Pros.
  *
  * All variants share one world scale (~37.15 mm per unit, set so the base
  * iPhone 17's display is exactly 1.8 units wide), so the variants keep their
@@ -387,11 +387,51 @@ const IPHONE_17_PRO_MAX: IPhoneSpec = {
   logo: { y: -0.5464, width: 0.4393, height: 0.5394 },
 }
 
-export const IPHONE_VARIANTS: Record<'17' | 'air' | 'pro' | 'promax', IPhoneSpec> = {
+/**
+ * The Dynamic Island the iPhone 18 Pro generation shrank to. Apple moved the
+ * infrared camera under the display, and the cutout that is left measures
+ * 13.49 mm across against the 17 Pro's 20.76 - the pre-launch measurement of
+ * the panel cutout, which the retail units bore out and which Apple's own
+ * accessory drawings for this generation have yet to publish. The pill's
+ * height and its distance from the top edge are the 17 Pro's.
+ */
+const IPHONE_18_ISLAND_WIDTH = 0.363
+
+/**
+ * iPhone 18 Pro - the 17 Pro's chassis to the published tenth of a
+ * millimetre: 150.0 x 71.9 x 8.75 mm, the same 6.3" 2622x1206 panel, the same
+ * forged plateau and lens trio, the same keys. So every body, camera and edge
+ * figure is carried over from the 17 Pro spec, deliberately. What the
+ * generation changed is visible from the front and the back: the Dynamic
+ * Island is ~35% narrower, and the Ceramic Shield charging window is now
+ * colour-matched to the aluminium unibody rather than the lighter two-tone
+ * panel - the window is still there (it is what the model draws glossier than
+ * the bead-blasted metal around it), it is just the body's own colour.
+ * Logical resolution 402x874 pt.
+ */
+const IPHONE_18_PRO: IPhoneSpec = {
+  ...IPHONE_17_PRO,
+  island: { ...IPHONE_17_PRO.island, width: IPHONE_18_ISLAND_WIDTH },
+}
+
+/**
+ * iPhone 18 Pro Max - the 17 Pro Max's chassis, likewise: 163.4 x 78.0 x
+ * 8.75 mm, the 6.9" 2868x1320 panel, the top-edge RF window and the scan's
+ * detail geometry, with the generation's narrower Dynamic Island. Logical
+ * resolution 440x956 pt.
+ */
+const IPHONE_18_PRO_MAX: IPhoneSpec = {
+  ...IPHONE_17_PRO_MAX,
+  island: { ...IPHONE_17_PRO_MAX.island, width: IPHONE_18_ISLAND_WIDTH },
+}
+
+export const IPHONE_VARIANTS: Record<'17' | 'air' | 'pro' | 'promax' | '18pro' | '18promax', IPhoneSpec> = {
   '17': IPHONE_17,
   air: IPHONE_17_AIR,
   pro: IPHONE_17_PRO,
   promax: IPHONE_17_PRO_MAX,
+  '18pro': IPHONE_18_PRO,
+  '18promax': IPHONE_18_PRO_MAX,
 }
 
 export type IPhoneVariant = keyof typeof IPHONE_VARIANTS

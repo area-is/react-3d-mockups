@@ -6,16 +6,17 @@ any angle, videos play, iframes load, React state and effects keep running. Mock
 decorative: you rotate and zoom them, and the hardware masks the screen pixel for pixel
 ([why](#screens-are-display-only)).
 
-- **Twenty-seven devices** - the Galaxy S26 line (S26, S26 Ultra), two foldable
-  generations (Z Fold 7, the wide Z Fold 8, Z Fold 8 Ultra, Z Flip 7, Z Flip 8), the
-  full iPhone 17 family (17, 17 Air, 17 Pro, 17 Pro Max), MacBook
-  Air 13"/15" and MacBook Pro 14"/16" (M5), iPad Pro 13"/11" (M5), iPad Air 13"/11" (M4),
-  iPad (A16), Galaxy Tab S11 / S11 Ultra, an Apple Watch Series 11 and the Galaxy
-  Watch 8, Watch 9 and Watch Ultra 2 on
+- **Thirty-three devices** - the Galaxy S26 line (S26, S26 Ultra), two foldable
+  generations (Z Fold 7, the wide Z Fold 8, Z Fold 8 Ultra, Z Flip 7, Z Flip 8) and
+  Apple's foldable iPhone Duo, the full iPhone 17 family (17, 17 Air, 17 Pro, 17 Pro
+  Max) and the iPhone 18 Pro / Pro Max, MacBook Air 13"/15", MacBook Pro 14"/16" (M5)
+  and the MacBook Neo 13", iPad Pro 13"/11" (M5), iPad Air 13"/11" (M4), iPad (A16),
+  Galaxy Tab S11 / S11 Ultra, the Apple Watch Series 11, Series 12 and Ultra 4 and the
+  Galaxy Watch 8, Watch 9 and Watch Ultra 2 on
   full wristbands, and a Studio Display-style 27" monitor, all procedurally generated
   at runtime. No GLB files, no
-  hosting, no pop-in - importing one mockup costs 7.4–48.8 KB gzipped (the whole
-  library: 103.8 KB), peers excluded. The phone, foldable, and
+  hosting, no pop-in - importing one mockup costs 8.1–52.3 KB gzipped (the whole
+  library: 122.2 KB), peers excluded. The phone, foldable, and
   laptop families carry a small CSG engine that machines their ports and speaker/mic
   holes into the chassis as real cavities; it tree-shakes away for every other mockup.
 - **True-to-device screens** - each virtual display matches the real device's logical
@@ -26,7 +27,7 @@ decorative: you rotate and zoom them, and the hardware masks the screen pixel fo
 - **Any content on screen** - pass React components, an `<iframe>` or a `<video>` as
   children. State, effects and media playback keep running, and every surface is masked
   per-pixel by the hardware in front of it.
-- **Composable** - use the one-liners `<GalaxyMockup>` / `<IPhoneMockup>` / `<LaptopMockup>`
+- **Composable** - use the one-liners `<GalaxyMockup>` / `<IPhoneMockup>` / `<IPhoneDuoMockup>` / `<LaptopMockup>`
   / `<IPadMockup>` / `<GalaxyTabMockup>` / `<AppleWatchMockup>` / `<GalaxyWatchMockup>` / `<StudioDisplayMockup>`, or
   drop `<Galaxy>` / `<IPhone>` / `<Laptop>` / `<IPad>` / `<GalaxyTab>` / `<AppleWatch>` / `<GalaxyWatch>` /
   `<StudioDisplay>` into your own react-three-fiber scene.
@@ -142,20 +143,33 @@ Render inside any r3f `<Canvas>`. Accepts all group props (`position`, `rotation
 | `resolution` | `number` | per variant | Virtual display width in CSS px (see resolution table) |
 | `surfaceStyle` | `CSSProperties` | - | Extra styles for the screen wrapper |
 
-### `<IPhone>` - iPhone 17 family
+### `<IPhone>` - iPhone 17 family and iPhone 18 Pro
 
-Same API as `<Galaxy>`, except: `variant` is `'17' | 'air' | 'pro' | 'promax'`, and
-`resolution` defaults to the variant's logical point grid (see resolution table). Camera architecture follows the real devices: two-lens
-pill (17), ultra-thin single-lens bar (Air), full-width triple-lens plateau with flash +
-LiDAR (Pro / Pro Max).
+Same API as `<Galaxy>`, except: `variant` is `'17' | 'air' | 'pro' | 'promax' | '18pro' |
+'18promax'`, and `resolution` defaults to the variant's logical point grid (see resolution
+table). Camera architecture follows the real devices: two-lens pill (17), ultra-thin
+single-lens bar (Air), full-width triple-lens plateau with flash + LiDAR (the Pros). The
+18 Pros are the 17 Pros' chassis under the generation's narrower Dynamic Island and
+colour-matched back.
 
-### `<Laptop>` - MacBook Air 13" / MacBook Pro 14" (M5)-style
+### `<IPhoneDuo>` - iPhone Duo
+
+Apple's foldable, on the same spec shape and pose vocabulary as `<Fold>`: `openAngle`
+(`true` open onto the landscape 7.6" inner display, `false` shut onto the 5.4" cover,
+or degrees for any Flex angle between), `orientation`, `statusBar` (iOS's), `color` (an
+`IPHONE_DUO_COLORWAYS` id - `'nightsky'`, `'starwhite'` - or any CSS color). The inner
+display has no camera hole - the FaceTime camera sits under the glass - so nothing
+interrupts your layout there.
+
+### `<Laptop>` - MacBook Air, MacBook Pro and MacBook Neo
 
 Same screen API (`surfaceBackground`, `resolution`, `surfaceStyle`), plus
 `openAngle` (lid angle, default `110`), and `resolution`
-defaulting to the variant's scaled desktop (Air 1280×832, Pro 14 1512×982 - desktop breakpoints
-apply). `color` sets the aluminum finish - a `LAPTOP_COLORWAYS` id (`'skyblue'`,
-`'starlight'`, `'midnight'`) or any CSS color.
+defaulting to the variant's scaled desktop (Air 1280×832, Pro 14 1512×982, Neo 1204×753 -
+desktop breakpoints apply). `color` sets the aluminum finish - a `LAPTOP_COLORWAYS` id
+(`'skyblue'`, `'starlight'`, `'midnight'`, the Neo's `'citrus'` and `'indigo'`) or any CSS
+color. The Neo (`'neo13'`) is the notchless one: its camera sits in the bezel above a
+square-cornered panel.
 
 ## Screens are display-only
 
@@ -198,10 +212,14 @@ Every variant's screen defaults to the real device's logical resolution (CSS px)
 | iPhone 17 Air | `air` | 420×912 | 912×420 | 2736×1260 @ 3x point grid |
 | iPhone 17 Pro | `pro` | 402×874 | 874×402 | 2622×1206 @ 3x point grid |
 | iPhone 17 Pro Max | `promax` | 440×956 | 956×440 | 2868×1320 @ 3x point grid |
+| iPhone 18 Pro | `18pro` | 402×874 | 874×402 | 2622×1206 @ 3x point grid |
+| iPhone 18 Pro Max | `18promax` | 440×956 | 956×440 | 2868×1320 @ 3x point grid |
+| iPhone Duo (open / folded) | `duo` | 890×626 / 466×678 | swapped | inner 2670×1878 (natively landscape) and cover 1398×2034 @ 3x point grid |
 | MacBook Air 13" (M5) | `air13` | - | 1280×832 | 2560×1664 @ 2x default scaled |
 | MacBook Air 15" (M5) | `air15` | - | 1440×932 | 2880×1864 @ 2x default scaled |
 | MacBook Pro 14" (M5) | `pro14` | - | 1512×982 | 3024×1964 @ 2x default scaled |
 | MacBook Pro 16" (M5) | `pro16` | - | 1728×1117 | 3456×2234 @ 2x default scaled |
+| MacBook Neo 13" | `neo13` | - | 1204×753 | 2408×1506 @ 2x default scaled |
 | iPad Pro 13" (M5) | `ipadpro13` | 1032×1376 | 1376×1032 | 2752×2064 @ 2x point grid |
 | iPad Pro 11" (M5) | `ipadpro11` | 834×1210 | 1210×834 | 2420×1668 @ 2x point grid |
 | iPad Air 13" (M4) | `ipadair13` | 1024×1366 | 1366×1024 | 2732×2048 @ 2x point grid |
@@ -210,6 +228,8 @@ Every variant's screen defaults to the real device's logical resolution (CSS px)
 | Galaxy Tab S11 | `tabs11` | 800×1280 | 1280×800 | 2560×1600 panel at ½ (xhdpi) |
 | Galaxy Tab S11 Ultra | `tabs11ultra` | 924×1480 | 1480×924 | 2960×1848 panel at ½ (xhdpi) |
 | Apple Watch Series 11 46mm | `series11` | 208×248 | - | 416×496 @ 2x point grid |
+| Apple Watch Series 12 46mm | `series12` | 208×248 | - | 416×496 @ 2x point grid |
+| Apple Watch Ultra 4 49mm | `ultra4` | 211×257 | - | 422×514 @ 2x point grid |
 | Galaxy Watch 8 44mm | `watch8` | 240×240 | - | 480×480 round panel at ½ |
 | Galaxy Watch 9 44mm | `watch9` | 240×240 | - | 480×480 round panel at ½ |
 | Galaxy Watch Ultra 2 47mm | `watchultra2` | 249×249 | - | 498×498 round panel at ½ |
@@ -229,9 +249,11 @@ the backs; landscape-edge front cameras, USB-C and machined edge buttons on all.
 
 ### `<AppleWatch>` / `<GalaxyWatch>` - smartwatches · `<StudioDisplay>` - Studio Display-style
 
-Both watches add `bandColor` and skip orientation. Every device draws its front camera unconditionally - a punch hole, Dynamic Island or notch is hardware, and it obstructs your layout here exactly as it would on the real panel. `<AppleWatch>` is the Series 11:
-squircle case, knurled Digital Crown, flush side button, sensor back, worn on the
-seamless Solo Loop - which has no closure, so it takes no `bandOpen`.
+Both watches add `bandColor` and skip orientation. Every device draws its front camera unconditionally - a punch hole, Dynamic Island or notch is hardware, and it obstructs your layout here exactly as it would on the real panel. `<AppleWatch>` is the Apple Watch family (`'series11' | 'series12' | 'ultra4'`):
+the Series' squircle case with the knurled Digital Crown, flush side button and sensor
+back, worn on the seamless Solo Loop - which has no closure, so it takes no `bandOpen` -
+and the Ultra 4's 49 mm flat-sided titanium case with its crown guard and orange Action
+button, on its buckled Ocean Band.
 `<GalaxyWatch>` is the Galaxy Watch family (`'watch8' | 'watch9' | 'watchultra2'`):
 cushion case, round display on its dial puck, flat keys (the 47 mm titanium
 Ultra 2 adds its orange Quick Button), BioActive puck, worn on a buckled
@@ -241,8 +263,8 @@ camera, the tight rear 2× Thunderbolt 5 + 2× USB-C slot cluster, the captive p
 cord's circular recess framed by the stand's cable hole and, faithfully, no power
 button.
 
-Renderer-agnostic device specs (`GALAXY_VARIANTS`, `IPHONE_VARIANTS`, `IPAD_VARIANTS`,
-`APPLE_WATCH_VARIANTS`, `GALAXY_WATCH_VARIANTS`,
+Renderer-agnostic device specs (`GALAXY_VARIANTS`, `IPHONE_VARIANTS`, `IPHONE_DUO_VARIANTS`,
+`IPAD_VARIANTS`, `APPLE_WATCH_VARIANTS`, `GALAXY_WATCH_VARIANTS`,
 `PHONE`, `IPHONE`, `LAPTOP`… plus each object's region registry and stage framing) are
 available from the `react-3d-mockups/core` subpath. It carries no `'use client'`
 directive, so a server component can import a spec for layout math.

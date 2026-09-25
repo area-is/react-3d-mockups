@@ -1,6 +1,6 @@
 /**
- * Watch device dimensions - the Apple Watch Series 11 and the Samsung Galaxy
- * Watch 8, Watch 9 and Watch Ultra 2.
+ * Watch device dimensions - the Apple Watch Series 11, Series 12 and Ultra 4,
+ * and the Samsung Galaxy Watch 8, Watch 9 and Watch Ultra 2.
  *
  * All variants share one world scale (~17.7 mm per unit) so they keep true
  * relative sizes side by side:
@@ -13,6 +13,15 @@
  *   machined recess below center. Left edge: a fine perforated speaker
  *   grille. The Solo Loop slides into dark band slots in the case's flat
  *   top/bottom edges, offset toward the case back.
+ * - Apple Watch Series 12, 46 mm: the Series 11 case to the published
+ *   millimetre (46 x 40 x 9.7 mm, the same 416x496 panel); the generation is
+ *   the S11 chip, the sensors and a ceramic case option, none of it a change
+ *   to the exterior this models.
+ * - Apple Watch Ultra 4, 49 mm: 49 x 44 x 12 mm flat-sided titanium case with
+ *   tighter corners than the squircle Series, a flat sapphire crystal over
+ *   the 422x514 panel, a raised crown guard on the right flank enclosing a
+ *   larger Digital Crown and the side button, and the orange Action button
+ *   on the left flank between two speaker slots. The same case as the Ultra 3.
  * - Galaxy Watch 8, 44 mm: 46.0 x 43.7 x 8.6 mm "cushion" case (squircle
  *   aluminum armor with a flat top) carrying a RAISED round dial - the fully
  *   round 1.47" 480x480 sAMOLED sits on a slightly protruding black puck, so
@@ -62,9 +71,26 @@ export interface WatchSpec {
    * Watch Ultra 2's three-key run. `length` runs along the edge (y), `width`
    * across the case depth (z), `proud` is the protrusion past the case wall.
    * `color` is for a key with its own finish whatever the case colorway -
-   * the Ultra 2's orange Quick Button is hardware, not a colorway.
+   * the Ultra 2's orange Quick Button is hardware, not a colorway. `edge`
+   * puts a key on the left flank instead (the Apple Watch Ultra's Action
+   * button); it defaults to the right.
    */
-  buttons: { y: number; length: number; width: number; proud: number; color?: string }[]
+  buttons: {
+    y: number
+    length: number
+    width: number
+    proud: number
+    color?: string
+    edge?: 'left' | 'right'
+  }[]
+  /**
+   * The raised titanium boss on the right flank that shields the crown and
+   * side button (Apple Watch Ultra): `length` runs along the edge, `thickness`
+   * across the case depth, `proud` is how far it stands off the case wall and
+   * `radius` rounds its edges. The crown and side button it encloses must
+   * stand prouder than it to show.
+   */
+  crownGuard?: { y: number; length: number; proud: number; thickness: number; radius: number }
   /** Microphone hole drilled into the right edge. */
   mic?: { y: number; radius: number; z?: number }
   /** Machined speaker slots in the left edge (Apple: one long; Galaxy: two short). */
@@ -269,9 +295,88 @@ const GALAXY_WATCH_8: WatchSpec = {
   },
 }
 
-/** The Apple Watch family, worn on a seamless Solo Loop. */
-export const APPLE_WATCH_VARIANTS: Record<'series11', WatchSpec> = {
+/**
+ * Apple Watch Series 12, 46 mm. Apple publishes the same case as the Series
+ * 11 - 46 x 40 x 9.7 mm in aluminium and titanium, the same 416x496 panel and
+ * the same 1196 mm² display area - so the geometry is carried over
+ * deliberately, and the generation shows in the colorways. The new ceramic
+ * case is a millimetre taller and wider and 0.15 mm deeper; that is not
+ * modelled as separate geometry.
+ */
+const SERIES_12: WatchSpec = {
+  ...SERIES_11,
+}
+
+/**
+ * Apple Watch Ultra 4, 49 mm - the Ultra 3's case unchanged: 49 x 44 x 12 mm
+ * of grade 5 titanium with flat sides and much tighter corners than the
+ * Series squircle, a flat sapphire crystal over the 1.98" 422x514 panel
+ * (211x257 pt), the crown guard on the right flank enclosing a bigger
+ * Digital Crown and the side button, the International Orange Action button
+ * on the left between two speaker slots, and the sensor back sunk into a
+ * body-colour plate. Body, panel and display figures are Apple's tech
+ * specs; the guard, key and crown proportions are read off Apple's product
+ * renders scaled to the published width. It wears the Ocean Band - a
+ * fluoroelastomer strap closing with a titanium buckle over round
+ * adjustment holes - on the shared wrist loop at the Ultra's wider strap.
+ */
+const ULTRA_4: WatchSpec = {
+  style: 'apple',
+  body: { width: 2.486, height: 2.768, depth: 0.678, radius: 0.5, bevel: 0.08 },
+  glass: { width: 2.24, height: 2.5, radius: 0.4 },
+  // 1.98" at 422:514 - 31.9 x 38.9 mm.
+  display: { width: 1.802, height: 2.198, radius: 0.4 },
+  resolution: 211,
+  // The larger Ultra crown, standing clear of the guard by ~2 mm.
+  crown: { y: 0.34, radius: 0.235, thickness: 0.2, proud: 0.26, teeth: 48, toothDepth: 0.009 },
+  // The guard: a raised boss the height of crown and side button together.
+  crownGuard: { y: 0, length: 1.36, proud: 0.14, thickness: 0.46, radius: 0.09 },
+  buttons: [
+    // side button, inside the guard, a hair proud of its face
+    { y: -0.36, length: 0.5, width: 0.16, proud: 0.165 },
+    // the Action button: orange whatever the case finish
+    { edge: 'left', y: 0, length: 0.62, width: 0.2, proud: 0.09, color: '#e8622a' },
+  ],
+  // Two speaker slots flanking the Action button on the left flank.
+  speaker: [
+    { y: 0.7, length: 0.46, height: 0.06 },
+    { y: -0.7, length: 0.46, height: 0.06 },
+  ],
+  bandSlot: { width: 1.5, height: 0.26, z: -0.2 },
+  back: {
+    radius: 0.66,
+    raise: -0.012,
+    hubRadius: 0.17,
+    leds: { count: 4, ring: 0.34, radius: 0.08 },
+    electrode: { inner: 0.66, outer: 0.74 },
+    coilRing: 0.92,
+  },
+  // Ocean Band: the buckled two-strap rig at the Ultra's ~24 mm strap, with
+  // round holes rather than the Galaxy band's slots, on the same wrist loop
+  // the Series wears.
+  band: {
+    closure: 'buckle',
+    lugWidth: 1.45,
+    width: 1.3,
+    tipWidth: 1.16,
+    thickness: 0.16,
+    crown: 0.045,
+    pinStrapEnd: 198,
+    tailEnd: 98,
+    holes: [0.465, 0.527, 0.588, 0.649, 0.711, 0.772],
+    holeRadius: 0.05,
+    holeLength: 0.1,
+    closureHole: 2,
+    keeperT: 0.72,
+    loop: { ryFront: 1.8, ryBack: 1.52, rz: 1.29, centerZ: -1.07, startAngle: 30 },
+  },
+}
+
+/** The Apple Watch family: the Series on a seamless Solo Loop, the Ultra on its buckled Ocean Band. */
+export const APPLE_WATCH_VARIANTS: Record<'series11' | 'series12' | 'ultra4', WatchSpec> = {
   series11: SERIES_11,
+  series12: SERIES_12,
+  ultra4: ULTRA_4,
 }
 
 /**

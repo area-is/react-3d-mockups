@@ -51,7 +51,12 @@ import {
   type GalaxyWatchVariant,
 } from './devices/watch/dimensions'
 import { STUDIO_DISPLAY_METRICS } from './devices/studio-display/dimensions'
-import { FOLD_METRICS, type FoldVariant } from './devices/fold/dimensions'
+import {
+  FOLD_METRICS,
+  IPHONE_DUO_METRICS,
+  type FoldVariant,
+  type IPhoneDuoVariant,
+} from './devices/fold/dimensions'
 import { FLIP_METRICS, type FlipVariant } from './devices/flip/dimensions'
 
 import { BOOK_METRICS, BOOK_REGIONS, type BookSize } from './objects/book/dimensions'
@@ -106,6 +111,7 @@ export interface MockupPropsMap {
   galaxyWatch: { variant?: GalaxyWatchVariant }
   studioDisplay: Record<string, never>
   fold: { variant?: FoldVariant; openAngle?: boolean | number; orientation?: Orientation }
+  iphoneDuo: { variant?: IPhoneDuoVariant; openAngle?: boolean | number; orientation?: Orientation }
   flip: { variant?: FlipVariant; openAngle?: boolean | number; orientation?: Orientation }
   book: { size?: BookSize }
   magazine: { size?: MagazineSize }
@@ -165,6 +171,7 @@ const REGISTRY: Record<MockupKind, Entry> = {
   galaxyWatch: { regions: SCREEN_REGIONS, metrics: GALAXY_WATCH_METRICS },
   studioDisplay: { regions: SCREEN_REGIONS, metrics: STUDIO_DISPLAY_METRICS },
   fold: { regions: SCREEN_REGIONS, metrics: FOLD_METRICS },
+  iphoneDuo: { regions: SCREEN_REGIONS, metrics: IPHONE_DUO_METRICS },
   flip: { regions: SCREEN_REGIONS, metrics: FLIP_METRICS },
   book: { regions: BOOK_REGIONS, metrics: BOOK_METRICS },
   magazine: { regions: MAGAZINE_REGIONS, metrics: MAGAZINE_METRICS },

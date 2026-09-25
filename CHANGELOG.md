@@ -7,6 +7,37 @@ Notable changes to `react-3d-mockups`. This project follows
 
 ### Added
 
+- **The September 2026 Apple generation: six new devices.** `IPhoneDuoMockup`
+  is new - Apple's first foldable, on the wide Z Fold 8's passport shape: the
+  same `openAngle` pose vocabulary as `FoldMockup` (open, shut, or any Flex
+  angle between), a landscape 7.6" inner panel (890×626 logical) with *no*
+  camera hole because the inner FaceTime camera sits under the glass, a 5.4"
+  cover screen (466×678) behind a centred hole, the iPhone 17's two-lens
+  glossy pill and the Apple badge on the camera half's back, Touch ID in the
+  side button, a mirror-polished titanium frame, a bare hinge cover with no
+  wordmark, and iOS's status bar rather than One UI's. It is built on the
+  same spec shape and scene body as the Galaxy Z Fold - `FoldSpec` gained a
+  `brand`, an optional inner punch hole and spine emboss, per-ring finish
+  figures and a back badge - and measures under the new `iphoneDuo` kind.
+  `IPhoneMockup` gains `variant="18pro"` and `variant="18promax"`: the 17
+  Pros' chassis to the tenth of a millimetre under the generation's ~35%
+  narrower Dynamic Island and colour-matched Ceramic Shield back, in Black,
+  Silver, Glacier and Burgundy. `AppleWatchMockup` gains `variant="series12"`
+  (the Series 11's case, the generation's eight aluminium, titanium and
+  ceramic finishes) and `variant="ultra4"` - the 49 mm flat-sided titanium
+  case the Ultra 3 introduced, with its raised crown guard, the orange Action
+  button on the left flank (orange whatever the finish, because on the
+  hardware it is), a flat crystal over the 422×514 panel (211×257 logical)
+  and the buckled Ocean Band; watch keys can now sit on either flank.
+  `LaptopMockup` gains `variant="neo13"`, the MacBook Neo 13": the first
+  notchless MacBook in the catalog - `LaptopSpec.notch` is optional now and a
+  `bezelCamera` puts the 1080p camera in the deeper bezel above a
+  square-cornered 2408×1506 panel (1204×753 logical) - on a body a hair
+  smaller and thicker than the Air 13's, with two USB-C ports and no MagSafe,
+  in Silver, Blush, Citrus and Indigo. Every body and panel figure is Apple's
+  published dimension; the detail geometry each spec carries over from a
+  measured predecessor says so in its comment.
+
 - **The 2026 Samsung generation: five new devices.** `FoldMockup` gains
   `variant="fold8"` - the generation's new *wide* form factor, folding open
   around the same vertical hinge into a landscape 4:3 tablet (1020×770

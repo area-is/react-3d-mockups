@@ -44,10 +44,11 @@ export interface IPhoneProps extends Omit<GroupProps, 'children' | 'color'>, Sur
    */
   children?: React.ReactNode
   /**
-   * Which iPhone 17-family device to render. All variants use their true
-   * relative sizes: `'17'` (6.3", two-lens pill), `air` (6.5", ultra-thin,
-   * single-lens bar), `pro` (6.3") and `promax` (6.9") with the full-width
-   * triple-lens plateau.
+   * Which iPhone to render. All variants use their true relative sizes:
+   * `'17'` (6.3", two-lens pill), `air` (6.5", ultra-thin, single-lens bar),
+   * `pro` (6.3") and `promax` (6.9") with the full-width triple-lens plateau,
+   * and `'18pro'` / `'18promax'` - the same two Pro bodies with the
+   * generation's narrower Dynamic Island and colour-matched back.
    */
   variant?: IPhoneVariant
   /**
@@ -64,8 +65,9 @@ export interface IPhoneProps extends Omit<GroupProps, 'children' | 'color'>, Sur
   statusBar?: StatusBarOption
   /**
    * Back glass color, and the whole finish: the chassis rail, buttons and
-   * camera rings follow from it. A retail colorway id from `IPHONE_COLORWAYS`
-   * (`'black'`, `'mistblue'`, `'cosmicorange'`…) gets that model's measured
+   * camera rings follow from it. A retail colorway id from
+   * `IPHONE_COLORWAYS[variant]` (`'black'`, `'mistblue'`, `'cosmicorange'`,
+   * the 18 Pros' `'glacier'` and `'burgundy'`…) gets that model's measured
    * rail; any other CSS color gets one derived from it (see `railColor`). A
    * colorway id wins over a CSS color of the same name - pass hex if you meant
    * the CSS one.
@@ -81,11 +83,11 @@ export interface IPhoneProps extends Omit<GroupProps, 'children' | 'color'>, Sur
 }
 
 /**
- * A procedurally built Apple iPhone 17-family phone: flat frame, Dynamic
- * Island, and the per-model rear camera architecture (vertical pill on the 17,
- * single-lens bar on the Air, full-width triple-lens plateau on the Pros). No
- * 3D asset files are loaded - the whole device is generated from geometry at
- * runtime.
+ * A procedurally built Apple iPhone - the 17 family and the 18 Pros: flat
+ * frame, Dynamic Island (the 18 Pros' narrower one), and the per-model rear
+ * camera architecture (vertical pill on the 17, single-lens bar on the Air,
+ * full-width triple-lens plateau on the Pros). No 3D asset files are loaded -
+ * the whole device is generated from geometry at runtime.
  *
  * Must be rendered inside a react-three-fiber `<Canvas>` (or `<MockupCanvas>`).
  */

@@ -1,3 +1,13 @@
+---
+title: Apple Watch Ultra 4
+description: The Apple Watch Ultra 4 in WebGL, with a live prop explorer and the full AppleWatchMockup reference.
+---
+
+Drive every prop from the inspector; the `demo.tsx` panel rewrites itself to
+exactly what is being passed. The explorer is pinned to `variant="ultra4"`; everything below applies to the whole family.
+
+<MockupExplorer component="AppleWatchMockup" variant="ultra4" />
+
 `<AppleWatch>` and `<AppleWatchMockup>` render an Apple Watch - the Series 11,
 the Series 12 or the Ultra 4, chosen with `variant` - wearing a real wristband
 on an invisible wrist directly behind the case: the band sliding into the
@@ -22,11 +32,6 @@ hardware anywhere on it - it just flares into the lug slots at both ends. The
 Ultra wears its Ocean Band, a buckled two-strap band at the Ultra's wider strap
 width. Neither unfastens here, which is why this component has no `bandOpen`
 prop. For a band that lays open, see [Galaxy Watch](/docs/api/galaxy-watch-8).
-
-<MockupExplorer
-  component="AppleWatchMockup"
-  props={{ float: true, color: '#1c1d21', bandColor: '#33415c', rotation: [0, -0.35, 0] }}
-/>
 
 ## `<AppleWatch>` vs `<AppleWatchMockup>`
 
@@ -65,29 +70,6 @@ There is no `orientation` prop, and no `bandOpen`.
 
 ## The models
 
-### Apple Watch Series 11
-
-The 46 mm aluminium squircle with the 1.96″ 416×496 panel (208×248 logical).
-Retail finishes: `jetblack`, `spacegray`, `rosegold`, `silver`.
-
-<MockupExplorer
-  component="AppleWatchMockup"
-  props={{ variant: 'series11', color: 'jetblack', bandColor: '#33415c', rotation: [0, -0.35, 0] }}
-/>
-
-### Apple Watch Series 12
-
-The Series 11's case to the published millimetre - the generation is the S11
-chip, the sensors and a ceramic case option, none of it visible from outside
-- so the model shares the Series 11's geometry deliberately and the finishes
-carry the year: aluminium `darkbronze`, `lightgold`, `black`, `spacegray`;
-titanium `radiantgold`, `natural`; ceramic `pearlwhite`, `nightblue`.
-
-<MockupExplorer
-  component="AppleWatchMockup"
-  props={{ variant: 'series12', color: 'darkbronze', bandColor: '#5b4a3c', rotation: [0, -0.35, 0] }}
-/>
-
 ### Apple Watch Ultra 4
 
 The 49 mm grade 5 titanium case the Ultra 3 introduced: flat sides, tighter
@@ -97,7 +79,8 @@ Band. Retail finishes: `natural`, `black`.
 
 <MockupExplorer
   component="AppleWatchMockup"
-  props={{ variant: 'ultra4', color: 'black', bandColor: '#1f2124', rotation: [0, -0.35, 0] }}
+  variant="ultra4"
+  props={{ color: 'black', bandColor: '#1f2124', rotation: [0, -0.35, 0] }}
 />
 
 ## Mockup-able areas
@@ -106,4 +89,6 @@ Every live surface filled with chroma green, labeled with the prop that
 feeds it - the fastest way to see exactly where your content lands and
 what stays 3D hardware.
 
-<MockupExplorer component="AppleWatchMockup" screen="chroma" />
+<MockupExplorer component="AppleWatchMockup" variant="ultra4" screen="chroma" />
+
+<DeviceDisclaimer brands="Apple" />

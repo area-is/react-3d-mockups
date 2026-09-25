@@ -6,6 +6,7 @@ import {
   findColorway,
   LAPTOP_VARIANTS,
   LAPTOP_DEFAULT_VARIANT,
+  LAPTOP_RESOLUTIONS,
   LAPTOP_STAGE_OFFSET_Y,
   SCREEN_REGIONS,
   type LaptopVariant,
@@ -27,23 +28,27 @@ export interface LaptopProps extends Omit<GroupProps, 'children' | 'color'>, Sur
   children?: React.ReactNode
   /**
    * Which laptop to render, at true relative sizes: `air13` / `air15`
-   * (MacBook Air 13" / 15", uniform thin slab, clean deck) or `pro14` /
+   * (MacBook Air 13" / 15", uniform thin slab, clean deck), `pro14` /
    * `pro16` (MacBook Pro 14" / 16", thicker body, HDMI/SDXC ports,
-   * perforated speaker grilles, larger feet and a deeper notch).
+   * perforated speaker grilles, larger feet and a deeper notch) or `neo13`
+   * (MacBook Neo 13", the entry model: a notchless square-cornered panel
+   * with the camera in a deeper bezel, two USB-C ports and no MagSafe).
    */
   variant?: LaptopVariant
   /**
    * Aluminum color (lid, deck, bottom). Takes a retail colorway id from
-   * `LAPTOP_COLORWAYS` (`'skyblue'`, `'starlight'`, `'midnight'`…) or any
-   * CSS color for a custom finish. A colorway id wins over a CSS color of
-   * the same name - pass hex if you meant the CSS one.
+   * `LAPTOP_COLORWAYS[variant]` (`'skyblue'`, `'starlight'`, `'midnight'`, the
+   * Neo's `'citrus'` and `'indigo'`…) or any CSS color for a custom finish. A
+   * colorway id wins over a CSS color of the same name - pass hex if you
+   * meant the CSS one.
    */
   color?: string
   /**
-   * CSS pixel width of the virtual display. Height follows the 13.6" panel's
-   * aspect. The default 1280 gives a 1280x832 screen - exactly the MacBook
-   * Air's default scaled resolution (2560x1664 at 2x) - so desktop layouts and
-   * breakpoints behave like on the real machine. Style your content with % / flex.
+   * CSS pixel width of the virtual display. Height follows the panel's
+   * aspect. The default is the variant's own scaled resolution - 1280x832
+   * on the Air 13 (2560x1664 at 2x), 1204x753 on the Neo - so desktop
+   * layouts and breakpoints behave like on the real machine. Style your
+   * content with % / flex.
    */
   resolution?: number
   /** Lid angle in degrees between deck and screen (90 = upright). */
@@ -650,10 +655,11 @@ function Keys({ keyboard }: { keyboard: { width: number; depth: number; offsetZ:
 }
 
 /**
- * A procedurally built Apple MacBook Air 13" (M5)-style laptop: rounded
- * unibody base with a Magic-Keyboard deck and Force Touch trackpad, and a thin
- * hinged lid whose notched display carries your live content. No 3D asset
- * files - everything is generated from geometry at runtime.
+ * A procedurally built Apple MacBook: rounded unibody base with a
+ * Magic-Keyboard deck and Force Touch trackpad, and a thin hinged lid whose
+ * display carries your live content - notched on the Airs and Pros, set in a
+ * deeper camera bezel on the Neo. No 3D asset files - everything is generated
+ * from geometry at runtime.
  *
  * The opened pose (deck + raised lid) is centered on the group origin, the
  * pose the stage camera and shadow framing are tuned for.
@@ -677,10 +683,11 @@ function LaptopImpl({
   // color. Ids win over same-named CSS colors - pass hex for those.
   const retail = findColorway(LAPTOP_COLORWAYS[variant], colorProp)
   const color = retail?.color ?? colorProp ?? '#e3e4e6'
-  const { footprint, base, lid, display, notch: notchDims, keyboard, trackpad } = spec
+  const { footprint, base, lid, display, notch: notchDims, bezelCamera, keyboard, trackpad } = spec
   // Default scaled desktops (native/2): 1280x832 / 1440x932 on the Airs,
-  // 1512x982 / 1728x1117 on the Pros.
-  const res = resolution ?? { air13: 1280, air15: 1440, pro14: 1512, pro16: 1728 }[variant]
+  // 1512x982 / 1728x1117 on the Pros, 1204x753 on the Neo - from core, so the
+  // rendered grid and the measured one cannot disagree.
+  const res = resolution ?? LAPTOP_RESOLUTIONS[variant]
   const lidAngle = openAngle ?? spec.openAngle
 
   // Base chassis: the slab is baked into its resting orientation (footprint in
@@ -1008,6 +1015,33 @@ function LaptopImpl({
             <meshPhysicalMaterial color="#050608" metalness={0.1} roughness={0.09} clearcoat={1} />
           </mesh>
 
+          {/* the notchless Neo's camera, set in the bezel above the panel: a
+              dark ring around the lens, sitting on the cover glass */}
+          {bezelCamera && (
+            <group
+              position={[
+                0,
+                footprint.depth / 2 + display.offsetY + display.height / 2 + bezelCamera.offsetY,
+                lid.thickness / 2 + 0.0035,
+              ]}
+            >
+              <mesh>
+                <ringGeometry args={[bezelCamera.radius * 0.78, bezelCamera.radius, 32]} />
+                <meshPhysicalMaterial color="#23262d" metalness={0.5} roughness={0.35} />
+              </mesh>
+              <mesh position-z={0.0004}>
+                <circleGeometry args={[bezelCamera.radius * 0.78, 32]} />
+                <meshPhysicalMaterial
+                  color="#0a1220"
+                  metalness={0.2}
+                  roughness={0.08}
+                  clearcoat={1}
+                  clearcoatRoughness={0.05}
+                />
+              </mesh>
+            </group>
+          )}
+
           {/* the live screen */}
           <DeviceScreen
             width={display.width}
@@ -1022,7 +1056,9 @@ function LaptopImpl({
             // The camera notch is part of the hardware, so it is always drawn:
             // it eats the same strip of your layout here that it eats on the
             // real panel, which is most of the point of looking at a mockup.
+            // (The Neo has none - its camera is in the bezel above.)
             overlay={
+              notchDims && (
               <div
                 aria-hidden
                 style={{
@@ -1051,6 +1087,7 @@ function LaptopImpl({
                   }}
                 />
               </div>
+              )
             }
           >
             {screen?.children}

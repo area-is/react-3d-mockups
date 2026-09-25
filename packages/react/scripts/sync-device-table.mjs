@@ -40,10 +40,15 @@ const ROWS = {
   air: ['iphone', { variant: 'air' }],
   pro: ['iphone', { variant: 'pro' }],
   promax: ['iphone', { variant: 'promax' }],
+  '18pro': ['iphone', { variant: '18pro' }],
+  '18promax': ['iphone', { variant: '18promax' }],
+  'duo-open': ['iphoneDuo', { variant: 'duo', openAngle: true }],
+  'duo-closed': ['iphoneDuo', { variant: 'duo', openAngle: false }],
   air13: ['laptop', { variant: 'air13' }],
   air15: ['laptop', { variant: 'air15' }],
   pro14: ['laptop', { variant: 'pro14' }],
   pro16: ['laptop', { variant: 'pro16' }],
+  neo13: ['laptop', { variant: 'neo13' }],
   ipadpro13: ['ipad', { variant: 'ipadpro13' }],
   ipadpro11: ['ipad', { variant: 'ipadpro11' }],
   ipadair13: ['ipad', { variant: 'ipadair13' }],
@@ -52,6 +57,8 @@ const ROWS = {
   tabs11: ['galaxyTab', { variant: 'tabs11' }],
   tabs11ultra: ['galaxyTab', { variant: 'tabs11ultra' }],
   series11: ['appleWatch', { variant: 'series11' }],
+  series12: ['appleWatch', { variant: 'series12' }],
+  ultra4: ['appleWatch', { variant: 'ultra4' }],
   watch8: ['galaxyWatch', { variant: 'watch8' }],
   watch9: ['galaxyWatch', { variant: 'watch9' }],
   watchultra2: ['galaxyWatch', { variant: 'watchultra2' }],
@@ -79,7 +86,7 @@ function parseDoc() {
     if (!/\d/.test(display)) continue
 
     let key = variantCell.replace(/`/g, '').trim()
-    const foldable = key.match(/^((?:fold|flip)\w*)/)
+    const foldable = key.match(/^((?:fold|flip|duo)\w*)/)
     if (foldable) key = `${foldable[1]}-${key.includes('false') ? 'closed' : 'open'}`
     else if (key === '-' || key === '') key = 'studiodisplay'
 
@@ -205,7 +212,7 @@ if (WRITE) {
     const cells = line.split('|')
     if (cells.length < 8) continue
     let key = cells[2].replace(/`/g, '').trim()
-    const foldable = key.match(/^((?:fold|flip)\w*)/)
+    const foldable = key.match(/^((?:fold|flip|duo)\w*)/)
     if (foldable) key = `${foldable[1]}-${key.includes('false') ? 'closed' : 'open'}`
     else if (key === '-' || key === '') key = 'studiodisplay'
     const row = rows.find((r) => r.key === key)

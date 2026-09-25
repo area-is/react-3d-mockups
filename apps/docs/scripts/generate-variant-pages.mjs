@@ -25,6 +25,7 @@ const SHARED = join(here, '..', 'content', 'family-reference')
 const FAMILY_OF = {
   GalaxyMockup: 'galaxy',
   IPhoneMockup: 'iphone',
+  IPhoneDuoMockup: 'iphone-duo',
   FoldMockup: 'fold',
   FlipMockup: 'flip',
   LaptopMockup: 'laptop',
@@ -44,6 +45,7 @@ const BRANDS = {
   GalaxyTabMockup: 'Samsung',
   GalaxyWatchMockup: 'Samsung',
   IPhoneMockup: 'Apple',
+  IPhoneDuoMockup: 'Apple',
   IPadMockup: 'Apple',
   LaptopMockup: 'Apple',
   AppleWatchMockup: 'Apple',
