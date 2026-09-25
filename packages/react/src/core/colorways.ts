@@ -1,7 +1,7 @@
 import { Color, SRGBColorSpace } from 'three'
 import type { GalaxyVariant } from './devices/galaxy/dimensions'
 import type { IPhoneVariant } from './devices/iphone/dimensions'
-import type { FoldVariant } from './devices/fold/dimensions'
+import type { FoldVariant, IPhoneDuoVariant } from './devices/fold/dimensions'
 import type { FlipVariant } from './devices/flip/dimensions'
 import type { LaptopVariant } from './devices/laptop/dimensions'
 import type { GalaxyTabVariant, IPadVariant } from './devices/tablet/dimensions'
@@ -45,6 +45,19 @@ export const GALAXY_COLORWAYS: Record<GalaxyVariant, Colorway[]> = {
   ],
 }
 
+/**
+ * The 18 Pro generation's four finishes - Black, Silver, the light-blue
+ * Glacier and the wine-dark Burgundy - sampled from the rails on Apple's
+ * product-bezel renders and the backs in its launch photography. The rail is the anodized unibody, so it follows
+ * the body closely on every one.
+ */
+const IPHONE_18_PRO_COLORS: Colorway[] = [
+  { id: 'black', name: 'Black', color: '#1e1f23', frameColor: '#3a3d43' },
+  { id: 'silver', name: 'Silver', color: '#dfe0e2', frameColor: '#c6c8cc' },
+  { id: 'glacier', name: 'Glacier', color: '#b7c5d5', frameColor: '#adbacb' },
+  { id: 'burgundy', name: 'Burgundy', color: '#552a32', frameColor: '#5e3238' },
+]
+
 export const IPHONE_COLORWAYS: Record<IPhoneVariant, Colorway[]> = {
   '17': [
     { id: 'black', name: 'Black', color: '#1a1c20', frameColor: '#3f434b' },
@@ -68,6 +81,21 @@ export const IPHONE_COLORWAYS: Record<IPhoneVariant, Colorway[]> = {
     { id: 'silver', name: 'Silver', color: '#dfe0e2', frameColor: '#c6c8cc' },
     { id: 'cosmicorange', name: 'Cosmic Orange', color: '#c96b34', frameColor: '#b25c2a' },
     { id: 'deepblue', name: 'Deep Blue', color: '#2b3a55', frameColor: '#3d4d6b' },
+  ],
+  '18pro': IPHONE_18_PRO_COLORS,
+  '18promax': IPHONE_18_PRO_COLORS,
+}
+
+/**
+ * The iPhone Duo's two finishes. The frame is mirror-polished grade 5
+ * titanium, so the rail is a brighter, cooler cut of the back rather than
+ * the near-match of an anodized unibody. Eyeballed from Apple's launch
+ * imagery pending measured swatches.
+ */
+export const IPHONE_DUO_COLORWAYS: Record<IPhoneDuoVariant, Colorway[]> = {
+  duo: [
+    { id: 'nightsky', name: 'Night Sky', color: '#2a323e', frameColor: '#3a4250' },
+    { id: 'starwhite', name: 'Star White', color: '#f1f0ec', frameColor: '#d6d5d1' },
   ],
 }
 
@@ -124,11 +152,20 @@ const MACBOOK_PRO_COLORS: Colorway[] = [
   { id: 'silver', name: 'Silver', color: '#e3e4e6' },
 ]
 
+/** The Neo's four finishes, sampled from Apple's bezel renders and launch photography. */
+const MACBOOK_NEO_COLORS: Colorway[] = [
+  { id: 'silver', name: 'Silver', color: '#e3e4e6' },
+  { id: 'blush', name: 'Blush', color: '#e9cfd0' },
+  { id: 'citrus', name: 'Citrus', color: '#dedb92' },
+  { id: 'indigo', name: 'Indigo', color: '#505b73' },
+]
+
 export const LAPTOP_COLORWAYS: Record<LaptopVariant, Colorway[]> = {
   air13: MACBOOK_AIR_COLORS,
   air15: MACBOOK_AIR_COLORS,
   pro14: MACBOOK_PRO_COLORS,
   pro16: MACBOOK_PRO_COLORS,
+  neo13: MACBOOK_NEO_COLORS,
 }
 
 const IPAD_PRO_COLORS: Colorway[] = [
@@ -172,6 +209,23 @@ export const APPLE_WATCH_COLORWAYS: Record<AppleWatchVariant, Colorway[]> = {
     { id: 'spacegray', name: 'Space Gray', color: '#7a7d82' },
     { id: 'rosegold', name: 'Rose Gold', color: '#e7c4bb' },
     { id: 'silver', name: 'Silver', color: '#e2e3e5' },
+  ],
+  // The Series 12's three case materials: four aluminium finishes, two
+  // titanium and the new ceramic pair. Eyeballed from Apple's launch imagery.
+  series12: [
+    { id: 'darkbronze', name: 'Dark Bronze', color: '#5a4636' },
+    { id: 'lightgold', name: 'Light Gold', color: '#e6d9c0' },
+    { id: 'black', name: 'Black', color: '#1c1d21' },
+    { id: 'spacegray', name: 'Space Gray', color: '#7a7d82' },
+    { id: 'radiantgold', name: 'Radiant Gold', color: '#d9b986' },
+    { id: 'natural', name: 'Natural', color: '#c9c8c3' },
+    { id: 'pearlwhite', name: 'Pearl White', color: '#efeeea' },
+    { id: 'nightblue', name: 'Night Blue', color: '#232c45' },
+  ],
+  // The Ultra's two titanium finishes.
+  ultra4: [
+    { id: 'natural', name: 'Natural', color: '#cdc6bd' },
+    { id: 'black', name: 'Black', color: '#2b2c2e' },
   ],
 }
 

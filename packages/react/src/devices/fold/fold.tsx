@@ -3,14 +3,20 @@ import * as THREE from 'three'
 import type { ThreeElements } from '@react-three/fiber'
 import {
   FOLD_COLORWAYS,
+  IPHONE_DUO_COLORWAYS,
   findColorway,
   foldOpenAngle,
   FLAT_EPSILON,
   railColor,
   FOLD_VARIANTS,
   FOLD_DEFAULT_VARIANT,
+  IPHONE_DUO_VARIANTS,
+  IPHONE_DUO_DEFAULT_VARIANT,
   SCREEN_REGIONS,
+  type Colorway,
+  type FoldSpec,
   type FoldVariant,
+  type IPhoneDuoVariant,
   roundedRectShape,
 } from '../../core'
 import { DeviceScreen } from '../../screen/device-screen'
@@ -38,14 +44,17 @@ import { collectSlots, createSlots, resolveSurface, type SurfaceProps } from '..
 
 type GroupProps = ThreeElements['group']
 
-export interface FoldProps extends Omit<GroupProps, 'children' | 'color'>, SurfaceProps {
+/**
+ * Everything both book-folds take. Each brand's component adds its own
+ * `variant` union on top.
+ */
+export interface FoldCommonProps extends Omit<GroupProps, 'children' | 'color'>, SurfaceProps {
   /**
    * Anything you want on the active display: React components, an <iframe>, a
-   * <video>… Wrap in `<Fold.Screen>` to set per-screen surface props.
+   * <video>… Wrap in `<Fold.Screen>` / `<IPhoneDuo.Screen>` to set per-screen
+   * surface props.
    */
   children?: React.ReactNode
-  /** Which Galaxy Z Fold device to render. */
-  variant?: FoldVariant
   /**
    * How far the book is open, as a boolean for the two poses or a number of
    * degrees for anything between.
@@ -73,17 +82,21 @@ export interface FoldProps extends Omit<GroupProps, 'children' | 'color'>, Surfa
   orientation?: 'portrait' | 'landscape'
   /**
    * Draw the system status bar across the top of the screen: `true` for the
-   * platform's defaults, or an object to set the clock, the meters and the
-   * ink. It is placed from this device's own punch hole - including the inner
-   * display's off-centre one - so it clears the camera on every face.
+   * platform's defaults - One UI's on a Galaxy Z Fold, iOS's on the iPhone
+   * Duo - or an object to set the clock, the meters and the ink. It is
+   * placed from this device's own punch hole - including the inner display's
+   * off-centre one - so it clears the camera on every face, and falls back
+   * to a plain strip on a face with no camera hole at all (the Duo's inner
+   * display).
    */
   statusBar?: StatusBarOption
   /**
    * Back panel color, and the whole finish: the metal frame, buttons, hinge
-   * and camera rings follow from it. A retail colorway id from
-   * `FOLD_COLORWAYS` gets that model's measured rail; any other CSS color gets
-   * one derived from it (see `railColor`). A colorway id wins over a CSS color
-   * of the same name - pass hex if you meant the CSS one.
+   * and camera rings follow from it. A retail colorway id from the family's
+   * catalog (`FOLD_COLORWAYS`, `IPHONE_DUO_COLORWAYS`) gets that model's
+   * measured rail; any other CSS color gets one derived from it (see
+   * `railColor`). A colorway id wins over a CSS color of the same name - pass
+   * hex if you meant the CSS one.
    */
   color?: string
   /**
@@ -94,9 +107,33 @@ export interface FoldProps extends Omit<GroupProps, 'children' | 'color'>, Surfa
   resolution?: number
 }
 
+/** The shared implementation's props: the spec to build and the catalog its `color` resolves against. */
+interface FoldBodyProps extends FoldCommonProps {
+  spec: FoldSpec
+  catalog: Colorway[]
+}
+
 /** An extruded rounded-rect slab with a soft edge bevel (a fold half / the open body). */
-function slabGeometry(width: number, height: number, radius: number, depth: number, bevel: number) {
-  const shape = roundedRectShape(width - bevel * 2, height - bevel * 2, radius - bevel)
+function slabGeometry(
+  width: number,
+  height: number,
+  radius: number,
+  depth: number,
+  bevel: number,
+  hingeRadius?: number
+) {
+  // The hinge runs down the left edge: a spec that rounds its hinge corners
+  // differently gets true arcs on all four (the Duo's near-square hinge ends
+  // beside its round free corners); otherwise the shared quadratic corners.
+  const shape =
+    hingeRadius === undefined
+      ? roundedRectShape(width - bevel * 2, height - bevel * 2, radius - bevel)
+      : mixedRoundedRectShape(width - bevel * 2, height - bevel * 2, {
+          tl: hingeRadius - bevel,
+          tr: radius - bevel,
+          br: radius - bevel,
+          bl: hingeRadius - bevel,
+        })
   const core = depth - bevel * 2
   const g = new THREE.ExtrudeGeometry(shape, {
     depth: core,
@@ -111,18 +148,21 @@ function slabGeometry(width: number, height: number, radius: number, depth: numb
 }
 
 /**
- * A procedurally built Samsung Galaxy Z Fold - the Z Fold 7, the wide Z Fold 8
- * or the Z Fold 8 Ultra, chosen with `variant`. One device, two form factors:
- * the unfolded tablet (big inner display) and the folded candy-bar - two
- * stacked slabs with the real crevice of air between them - switched with the
- * `openAngle` prop. No 3D asset files are loaded - the whole device is generated
- * from geometry at runtime.
- *
- * Must be rendered inside a react-three-fiber `<Canvas>` (or `<MockupCanvas>`).
+ * The book-fold both brands are built from - a device machined out of its
+ * `FoldSpec`, whichever name is on it. One device, two form factors: the
+ * unfolded tablet (big inner display) and the folded candy-bar - two stacked
+ * slabs with the real crevice of air between them - switched with the
+ * `openAngle` prop. The spec's `brand` decides the rest: a Samsung wears the
+ * SAMSUNG emboss on its spine, its two-tone camera plateau and One UI's
+ * status bar; an Apple the badge on the camera half's back, the iPhone's
+ * glossy camera pill, a mirror-polished frame and iOS's status bar. No 3D
+ * asset files are loaded - the whole device is generated from geometry at
+ * runtime.
  */
-function FoldImpl({
+function FoldBody({
   children,
-  variant = FOLD_DEFAULT_VARIANT,
+  spec,
+  catalog,
   openAngle = true,
   orientation = 'portrait',
   color: colorProp,
@@ -131,13 +171,13 @@ function FoldImpl({
   surfaceStyle,
   statusBar,
   ...groupProps
-}: FoldProps) {
+}: FoldBodyProps) {
   const screenSlot = collectSlots(children, SCREEN_REGIONS).screen
-  const spec = FOLD_VARIANTS[variant]
+  const brand = spec.brand ?? 'samsung'
   // `color` doubles as the colorway selector: a catalog id resolves to
   // that retail finish, anything else is passed through as a raw CSS
   // color. Ids win over same-named CSS colors - pass hex for those.
-  const retail = findColorway(FOLD_COLORWAYS[variant], colorProp)
+  const retail = findColorway(catalog, colorProp)
   const color = retail?.color ?? colorProp ?? '#3a3d42'
   const frameColor = retail?.frameColor ?? railColor(color)
   // Resolve the pose: an explicit fold angle wins over the boolean; the
@@ -216,7 +256,7 @@ function FoldImpl({
       // the cover (front) half, the USB-C on the camera (rear) half.
       const b = spec.closed.body
       const { speaker, usb } = spec.bottomEdge.closed
-      const slab = () => slabGeometry(b.width, b.height, b.radius, halfDepth, b.bevel)
+      const slab = () => slabGeometry(b.width, b.height, b.radius, halfDepth, b.bevel, b.hingeRadius)
       return {
         mode: 'closed' as const,
         front: cutGeometry(slab(), [
@@ -293,22 +333,29 @@ function FoldImpl({
     [shell]
   )
 
+  // The back plate and the cover-glass ring follow the pose's body outline,
+  // inset - with the folded pose's hinge corners where the spec rounds them
+  // differently (only then do the corners become true arcs).
+  const bodyPlate = React.useCallback(
+    (inset: number, rInset: number) => {
+      const r = Math.max(0.02, body.radius - rInset)
+      const hinge = mode === 'closed' ? spec.closed.body.hingeRadius : undefined
+      if (hinge === undefined)
+        return roundedRectShape(body.width - inset, body.height - inset, r)
+      const rh = Math.max(0.02, hinge - rInset)
+      return mixedRoundedRectShape(body.width - inset, body.height - inset, { tl: rh, tr: r, br: r, bl: rh })
+    },
+    [body, mode, spec.closed.body.hingeRadius]
+  )
+
   const backGeometry = React.useMemo(
-    () =>
-      new THREE.ShapeGeometry(
-        roundedRectShape(body.width - 0.05, body.height - 0.05, Math.max(0.02, body.radius - 0.025)),
-        16
-      ),
-    [body]
+    () => new THREE.ShapeGeometry(bodyPlate(0.05, 0.025), 16),
+    [bodyPlate]
   )
 
   const glassGeometry = React.useMemo(
-    () =>
-      new THREE.ShapeGeometry(
-        roundedRectShape(body.width - 0.03, body.height - 0.03, Math.max(0.02, body.radius - 0.015)),
-        16
-      ),
-    [body]
+    () => new THREE.ShapeGeometry(bodyPlate(0.03, 0.015), 16),
+    [bodyPlate]
   )
 
   // Camera pedestal: the light plateau plate with the dark pill on top of it.
@@ -325,30 +372,56 @@ function FoldImpl({
     })
   }
   const plateauGeometry = React.useMemo(() => pillGeometry(cam.plateau), [cam.plateau])
-  const islandGeometry = React.useMemo(() => pillGeometry(cam.island), [cam.island])
+  const islandGeometry = React.useMemo(() => (cam.island ? pillGeometry(cam.island) : null), [cam.island])
+  // The mic grille pill on the plateau's face (the Duo).
+  const micGeometry = React.useMemo(
+    () => (cam.mic ? new THREE.ShapeGeometry(roundedRectShape(cam.mic.width, cam.mic.height, cam.mic.height / 2), 12) : null),
+    [cam.mic]
+  )
 
   // The (off) cover-display glass on the back of the open pose's left half.
+  // Drawn mirrored (it faces backward), so its hinge-side corners are given
+  // on the shape's left and land against the spine.
   const coverGlassGeometry = React.useMemo(() => {
     if (mode === 'closed') return null
     const c = spec.closed
+    const r = c.display.radius + 0.02
+    const rh = (c.display.hingeRadius ?? c.display.radius) + 0.02
     return new THREE.ShapeGeometry(
-      roundedRectShape(c.display.width + 0.03, c.display.height + 0.06, c.display.radius + 0.02),
+      mixedRoundedRectShape(c.display.width + 0.03, c.display.height + 0.06, { tl: rh, tr: r, br: r, bl: rh }),
       16
     )
   }, [mode, spec.closed])
   React.useEffect(() => () => coverGlassGeometry?.dispose(), [coverGlassGeometry])
 
-  // Where the (off) cover screen sits on the back of the open device: centered
-  // on the cover half, i.e. inset from the open body's left edge by half the
-  // folded width - and its punch camera, mirrored from the cover-screen spec.
+  // Where the (off) cover screen sits on the back of the open device: on the
+  // cover half, inset from the open body's left edge by half the folded
+  // width, shifted by the display's own offset - which points at the free
+  // edge, the far left of the open back, so it is negated here along with
+  // the punch camera's offset, mirrored from the cover-screen spec.
   const coverBackX = (spec.open.body.width - spec.closed.body.width) / 2
+  const coverDisplayX = -(spec.closed.display.offsetX ?? 0)
+  const coverPunchX = coverDisplayX - (spec.closed.punchHole.offsetX ?? 0)
   const coverPunchY = spec.closed.display.height / 2 - spec.closed.punchHole.offsetY
   const coverPunchR = spec.closed.punchHole.radius
 
-  // The vertical SAMSUNG emboss on the hinge spine - vector geometry from the SVG.
+  // The vertical SAMSUNG emboss on the hinge spine - vector geometry from the
+  // SVG. The iPhone Duo's spine is bare titanium and carries none.
+  const emboss = spec.hinge.emboss
   const spineLogoGeometry = React.useMemo(
-    () => createLogoGeometry('samsung', spec.hinge.emboss.length, spec.hinge.emboss.length * 0.155),
-    [spec.hinge.emboss.length]
+    () => (emboss ? createLogoGeometry('samsung', emboss.length, emboss.length * 0.155) : null),
+    [emboss]
+  )
+  // The Apple badge on the camera half's back (iPhone Duo): the same
+  // tone-on-tone glossy inlay the slab iPhones carry - a touch darker than
+  // the glass, glinting lighter only as it catches light.
+  const backLogoGeometry = React.useMemo(
+    () => (spec.logo ? createLogoGeometry('apple', spec.logo.width, spec.logo.height) : null),
+    [spec.logo]
+  )
+  const backLogoColor = React.useMemo(
+    () => `#${new THREE.Color(color).lerp(new THREE.Color('#000000'), 0.15).getHexString()}`,
+    [color]
   )
 
   React.useEffect(() => {
@@ -356,27 +429,42 @@ function FoldImpl({
       backGeometry.dispose()
       glassGeometry.dispose()
       plateauGeometry.dispose()
-      islandGeometry.dispose()
-      spineLogoGeometry.dispose()
+      islandGeometry?.dispose()
+      micGeometry?.dispose()
+      spineLogoGeometry?.dispose()
+      backLogoGeometry?.dispose()
     }
   }, [
     backGeometry,
     glassGeometry,
     plateauGeometry,
     islandGeometry,
+    micGeometry,
     spineLogoGeometry,
+    backLogoGeometry,
   ])
 
   // CSS px per world unit for display overlays.
   const pxPerUnit = res / (landscape ? display.height : display.width)
   const px = (units: number) => units * pxPerUnit
 
-  const holeX = isOpenFace ? spec.open.punchHole.offsetX : 0
-  const holeOffsetY = state.punchHole.offsetY
-  const holeR = state.punchHole.radius
+  // The front camera on the face being drawn. The cover screen always has a
+  // hole; the inner display may not - the iPhone Duo's inner camera sits
+  // under the panel, so there is nothing to draw and nothing for the status
+  // bar to clear.
+  const hole = isOpenFace ? spec.open.punchHole : spec.closed.punchHole
+  const holeX = (isOpenFace ? spec.open.punchHole?.offsetX : spec.closed.punchHole.offsetX) ?? 0
+  const holeOffsetY = hole?.offsetY ?? 0
+  const holeR = hole?.radius ?? 0
 
+  // Samsung's Armor Aluminum is a satin finish; the Duo's grade 5 titanium is
+  // mirror-polished, the one finish Apple calls out on the enclosure.
   const chassisMaterial = (
-    <meshPhysicalMaterial color={frameColor} metalness={0.85} roughness={0.32} />
+    <meshPhysicalMaterial
+      color={frameColor}
+      metalness={brand === 'apple' ? 0.92 : 0.85}
+      roughness={brand === 'apple' ? 0.14 : 0.32}
+    />
   )
 
   const spineLogoMaterial = (
@@ -403,39 +491,114 @@ function FoldImpl({
       </mesh>
       {/* the lens housing matches the body color on the real device - an
           anodized boss, not a black plate (only the lens glass is dark) */}
-      <mesh
-        geometry={islandGeometry}
-        rotation-y={Math.PI}
-        position={[cam.island.x, cam.island.y, backZ - cam.plateau.raise]}
-      >
-        <meshPhysicalMaterial color={color} metalness={0.4} roughness={0.32} clearcoat={0.8} />
-      </mesh>
-      {cam.rings.map(({ y, r, pupil }, i) => (
-        <group key={i} position={[cam.island.x, y, backZ - cam.plateau.raise - cam.island.raise]}>
-          <LensRing r={r} proud={0.028} seat={0.03} frameColor={frameColor} pupil={pupil} />
+      {cam.island && islandGeometry && (
+        <mesh
+          geometry={islandGeometry}
+          rotation-y={Math.PI}
+          position={[cam.island.x, cam.island.y, backZ - cam.plateau.raise]}
+        >
+          <meshPhysicalMaterial color={color} metalness={0.4} roughness={0.32} clearcoat={0.8} />
+        </mesh>
+      )}
+      {cam.rings.map(({ x, y, r, pupil, glint }, i) => (
+        <group
+          key={i}
+          position={[
+            x ?? cam.island?.x ?? cam.plateau.x,
+            y,
+            backZ - cam.plateau.raise - (cam.island?.raise ?? 0),
+          ]}
+        >
+          <LensRing
+            r={r}
+            proud={cam.ringProud ?? 0.028}
+            seat={0.03}
+            frameColor={frameColor}
+            pupil={pupil}
+            collar={cam.ringCollar}
+            glint={glint}
+          />
         </group>
       ))}
-      {/* the LED flash window, seated on the back beside the plateau */}
-      <group position={[cam.flash.x, cam.flash.y, backZ - 0.002]}>
+      {/* the mic grille pill on the plateau's face (the Duo) */}
+      {cam.mic && micGeometry && (
+        <mesh
+          geometry={micGeometry}
+          rotation-y={Math.PI}
+          position={[cam.mic.x, cam.mic.y, backZ - cam.plateau.raise - 0.0015]}
+        >
+          <meshStandardMaterial color="#3a3c40" metalness={0.5} roughness={0.55} />
+        </mesh>
+      )}
+      {/* the LED flash window, seated on the back beside the plateau - or up
+          on the plateau's face where the spec puts it there */}
+      <group
+        position={[
+          cam.flash.x,
+          cam.flash.y,
+          cam.flash.seat === 'plateau' ? backZ - cam.plateau.raise - 0.0015 : backZ - 0.002,
+        ]}
+      >
         <FlashModule r={cam.flash.r} />
       </group>
     </>
   )
 
+  // The brand badge on the camera half's back, given that back face's z and
+  // the badge's centre in the pose's own back-face coordinates.
+  const backLogo = (backZ: number, at: { x: number; y: number }) =>
+    backLogoGeometry && (
+      <mesh geometry={backLogoGeometry} rotation-y={Math.PI} position={[at.x, at.y, backZ - 0.0085]}>
+        <meshPhysicalMaterial
+          color={backLogoColor}
+          metalness={0.55}
+          roughness={0.08}
+          clearcoat={1}
+          clearcoatRoughness={0.05}
+          envMapIntensity={1.2}
+          polygonOffset
+          polygonOffsetFactor={-1}
+        />
+      </mesh>
+    )
+
   // Side keys on the right rail (closed: they ride the camera slab).
   const sideKeys = (railX: number) =>
-    spec.buttons.map(({ y, length }, i) => (
-      <SideKey
-        key={i}
-        side={1}
-        railX={railX}
-        y={y}
-        length={length}
-        thickness={spec.buttonProfile.thickness}
-        protrusion={spec.buttonProfile.protrusion}
-        color={frameColor}
-      />
-    ))
+    spec.buttons.map((key, i) =>
+      key.edge === 'top' ? null : (
+        <SideKey
+          key={i}
+          side={1}
+          railX={railX}
+          y={key.y}
+          length={key.length}
+          thickness={spec.buttonProfile.thickness}
+          protrusion={spec.buttonProfile.protrusion}
+          color={frameColor}
+        />
+      )
+    )
+
+  // Keys on the camera half's top edge (the Duo's volume keys): the same
+  // pill, turned a quarter to stand on the top rail. `shift` carries the
+  // closed pose's x across onto the camera half in the open pose. A quarter
+  // turn about z maps the key's rail axis onto -x, hence the negated x.
+  const topKeys = (shift: number) =>
+    spec.buttons.map((key, i) =>
+      key.edge !== 'top' ? null : (
+        <group key={i} rotation-z={Math.PI / 2}>
+          <SideKey
+            side={1}
+            railX={body.height / 2}
+            y={-(key.x + shift)}
+            length={key.length}
+            thickness={spec.buttonProfile.thickness}
+            protrusion={spec.buttonProfile.protrusion}
+            color={frameColor}
+          />
+        </group>
+      )
+    )
 
   // Antenna seam inserts on both rails, sized to the slab that carries them.
   const antennaSeams = (depth: number) =>
@@ -471,24 +634,27 @@ function FoldImpl({
     />
   )
   /*
-   * One UI on both faces, but the inner display is a tablet and the cover is a
-   * phone, and Samsung sets them at different sizes. The hole is off-centre on
-   * the inner display, so its signed offset is passed through and the bar
-   * clears it rather than assuming a centred camera.
+   * The brand's system on both faces, but the inner display is a tablet and
+   * the cover is a phone, and both systems set them at different sizes. The
+   * hole is off-centre on the Galaxy's inner display, so its signed offset is
+   * passed through and the bar clears it rather than assuming a centred
+   * camera; a face with no hole (the Duo's inner display) gets the plain
+   * strip.
    */
   const statusBarPlacement = {
-    platform: 'oneui',
+    platform: brand === 'apple' ? 'ios' : 'oneui',
     formFactor: isOpenFace ? 'tablet' : 'phone',
     width: res,
     corner: px(display.radius),
-    cutout: landscape
-      ? undefined
-      : { halfWidth: px(holeR), centerY: px(holeOffsetY), offsetX: px(holeX) },
+    cutout:
+      landscape || !hole
+        ? undefined
+        : { halfWidth: px(holeR), centerY: px(holeOffsetY), offsetX: px(holeX) },
   } satisfies StatusBarPlacement
   const statusBarOverlay = renderStatusBar(statusBar, statusBarPlacement)
   /* The strip the bar costs the content on whichever face is being drawn. */
   const safeTop = statusBarSafeAreaTop(statusBar, statusBarPlacement)
-  const punchHoleOverlay = (
+  const punchHoleOverlay = hole && (
     <div
       aria-hidden
       style={{
@@ -515,12 +681,20 @@ function FoldImpl({
     />
   )
 
+  // The cover display may round its hinge-side corners differently and sit
+  // off the body's centre line; the inner display is centred and uniform.
+  const closedDisplay = spec.closed.display
+  const screenRadius: number | [number, number, number, number] =
+    isOpenFace || closedDisplay.hingeRadius === undefined
+      ? display.radius
+      : [closedDisplay.hingeRadius, display.radius, display.radius, closedDisplay.hingeRadius]
+  const screenX = isOpenFace ? 0 : (closedDisplay.offsetX ?? 0)
   const screen = (surfaceZ: number) => (
     <DeviceScreen
       width={landscape ? display.height : display.width}
       height={landscape ? display.width : display.height}
-      radius={display.radius}
-      position={[0, 0, surfaceZ]}
+      radius={screenRadius}
+      position={[screenX, 0, surfaceZ]}
       rotation={landscape ? [0, 0, -Math.PI / 2] : [0, 0, 0]}
       {...resolveSurface(screenSlot, {
         surfaceBackground,
@@ -570,7 +744,7 @@ function FoldImpl({
     const capT = 0.05
     // The vertical SAMSUNG engraving fits only while the exposed band is
     // wider than the wordmark; flatter than that the spine has retracted.
-    const showEmboss = 2 * spineR * Math.sin(alpha) > spec.hinge.emboss.length * 0.155 + 0.06
+    const showEmboss = !!emboss && 2 * spineR * Math.sin(alpha) > emboss.length * 0.155 + 0.06
     // Sector filling the V at each end: center at the axis, arc radius
     // `spineR`, spanning the same ±alpha - the exact cross-section of the
     // fold's opening (shape v runs toward the back; world z = pz − v).
@@ -662,10 +836,14 @@ function FoldImpl({
               <group position-x={hw / 2}>
                 {coverGlassGeometry && (
                   <group position={[-coverBackX, 0, 0]}>
-                    <mesh geometry={coverGlassGeometry} rotation-y={Math.PI} position-z={-b.depth / 2 - 0.003}>
+                    <mesh
+                      geometry={coverGlassGeometry}
+                      rotation-y={Math.PI}
+                      position={[coverDisplayX, 0, -b.depth / 2 - 0.003]}
+                    >
                       <meshPhysicalMaterial color="#0a0b0f" metalness={0.15} roughness={0.14} clearcoat={1} clearcoatRoughness={0.1} />
                     </mesh>
-                    <mesh rotation-x={Math.PI / 2} position={[0, coverPunchY, -b.depth / 2 - 0.005]}>
+                    <mesh rotation-x={Math.PI / 2} position={[coverPunchX, coverPunchY, -b.depth / 2 - 0.005]}>
                       <cylinderGeometry args={[coverPunchR, coverPunchR, 0.004, 20]} />
                       <meshPhysicalMaterial color="#1a2130" metalness={0.4} roughness={0.2} clearcoat={1} />
                     </mesh>
@@ -702,7 +880,9 @@ function FoldImpl({
               </mesh>
               <group position-x={-hw / 2}>
                 {cameraCluster(-b.depth / 2)}
+                {spec.logo && backLogo(-b.depth / 2, spec.logo.open)}
                 {sideKeys(b.width / 2)}
+                {topKeys(coverBackX)}
                 <UsbC
                   x={spec.bottomEdge.open.usb.x}
                   y={-b.height / 2}
@@ -749,7 +929,7 @@ function FoldImpl({
                 <meshPhysicalMaterial color={frameColor} metalness={0.8} roughness={0.4} />
               </mesh>
             ))}
-            {showEmboss && (
+            {showEmboss && spineLogoGeometry && (
               <mesh
                 geometry={spineLogoGeometry}
                 rotation={[0, Math.PI, Math.PI / 2]}
@@ -815,12 +995,12 @@ function FoldImpl({
               <mesh
                 geometry={coverGlassGeometry}
                 rotation-y={Math.PI}
-                position-z={-body.depth / 2 - 0.003}
+                position={[coverDisplayX, 0, -body.depth / 2 - 0.003]}
               >
                 <meshPhysicalMaterial color="#0a0b0f" metalness={0.15} roughness={0.14} clearcoat={1} clearcoatRoughness={0.1} />
               </mesh>
-              {/* its punch camera, top center of the cover panel */}
-              <mesh rotation-x={Math.PI / 2} position={[0, coverPunchY, -body.depth / 2 - 0.005]}>
+              {/* its punch camera, where the cover panel's spec puts it */}
+              <mesh rotation-x={Math.PI / 2} position={[coverPunchX, coverPunchY, -body.depth / 2 - 0.005]}>
                 <cylinderGeometry args={[coverPunchR, coverPunchR, 0.004, 20]} />
                 <meshPhysicalMaterial color="#1a2130" metalness={0.4} roughness={0.2} clearcoat={1} />
               </mesh>
@@ -828,7 +1008,9 @@ function FoldImpl({
           )}
 
           {cameraCluster(-body.depth / 2)}
+          {spec.logo && backLogo(-body.depth / 2, spec.logo.open)}
           {sideKeys(body.width / 2)}
+          {topKeys(coverBackX)}
           {antennaSeams(body.depth)}
 
           {/* bottom edge: the machined cavities' interiors */}
@@ -893,7 +1075,9 @@ function FoldImpl({
             />
           </mesh>
           {cameraCluster(-halfDepth / 2)}
+          {spec.logo && backLogo(-halfDepth / 2, spec.logo.closed)}
           {sideKeys(body.width / 2)}
+          {topKeys(0)}
           {antennaSeams(halfDepth)}
           <UsbC
             x={spec.bottomEdge.closed.usb.x}
@@ -928,13 +1112,15 @@ function FoldImpl({
                   <meshStandardMaterial color="#101216" transparent opacity={0.55} roughness={0.7} />
                 </mesh>
               ))}
-              <mesh
-                geometry={spineLogoGeometry}
-                rotation={[0, -Math.PI / 2, Math.PI / 2]}
-                position-x={-spineR - 0.002}
-              >
-                {spineLogoMaterial}
-              </mesh>
+              {spineLogoGeometry && (
+                <mesh
+                  geometry={spineLogoGeometry}
+                  rotation={[0, -Math.PI / 2, Math.PI / 2]}
+                  position-x={-spineR - 0.002}
+                >
+                  {spineLogoMaterial}
+                </mesh>
+              )}
             </group>
           )
         })()}
@@ -942,9 +1128,57 @@ function FoldImpl({
     </group>
   )
 }
-FoldImpl.displayName = 'Fold'
+FoldBody.displayName = 'FoldBody'
 
-/** The device's compound slots, shared by `<Fold>` and `<FoldMockup>`. */
+/** The compound slots both book-folds share with their mockups. */
 export const foldSlots = createSlots(SCREEN_REGIONS)
 
+export interface FoldProps extends FoldCommonProps {
+  /** Which Galaxy Z Fold device to render. */
+  variant?: FoldVariant
+}
+
+/**
+ * A procedurally built Samsung Galaxy Z Fold - the Z Fold 7, the wide Z Fold 8
+ * or the Z Fold 8 Ultra, chosen with `variant`. One device, two form factors:
+ * the unfolded tablet (big inner display) and the folded candy-bar - two
+ * stacked slabs with the real crevice of air between them - switched with the
+ * `openAngle` prop. No 3D asset files are loaded - the whole device is generated
+ * from geometry at runtime.
+ *
+ * Must be rendered inside a react-three-fiber `<Canvas>` (or `<MockupCanvas>`).
+ */
+function FoldImpl({ variant = FOLD_DEFAULT_VARIANT, ...props }: FoldProps) {
+  return <FoldBody spec={FOLD_VARIANTS[variant]} catalog={FOLD_COLORWAYS[variant]} {...props} />
+}
+FoldImpl.displayName = 'Fold'
+
 export const Fold = Object.assign(FoldImpl, foldSlots)
+
+export interface IPhoneDuoProps extends FoldCommonProps {
+  /**
+   * Which iPhone Duo to render: `duo` (the 2026 original - the default and
+   * only model today).
+   */
+  variant?: IPhoneDuoVariant
+}
+
+/**
+ * A procedurally built Apple iPhone Duo: the passport-shaped book-fold that
+ * opens around a vertical hinge into a landscape 7.6" tablet with no camera
+ * hole in its inner panel, and folds to a 5.4" cover screen with the
+ * two-lens pill and the Apple badge on its back. Mirror-polished titanium
+ * frame, bare hinge cover, Touch ID in the side button. It shares its
+ * `openAngle` pose vocabulary - the two poses and every Flex angle between -
+ * with `<Fold>`, and draws iOS's status bar rather than One UI's.
+ *
+ * Must be rendered inside a react-three-fiber `<Canvas>` (or `<MockupCanvas>`).
+ */
+function IPhoneDuoImpl({ variant = IPHONE_DUO_DEFAULT_VARIANT, ...props }: IPhoneDuoProps) {
+  return (
+    <FoldBody spec={IPHONE_DUO_VARIANTS[variant]} catalog={IPHONE_DUO_COLORWAYS[variant]} {...props} />
+  )
+}
+IPhoneDuoImpl.displayName = 'IPhoneDuo'
+
+export const IPhoneDuo = Object.assign(IPhoneDuoImpl, foldSlots)

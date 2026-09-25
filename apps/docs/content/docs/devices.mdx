@@ -33,10 +33,15 @@ orientations.
 | Apple iPhone 17 Air | `air` | 156.2×74.7×5.64 | 6.5" 2736×1260 | 420×912 | 912×420 |
 | Apple iPhone 17 Pro | `pro` | 150.0×71.9×8.75 | 6.3" 2622×1206 | 402×874 | 874×402 |
 | Apple iPhone 17 Pro Max | `promax` | 163.4×78.0×8.75 | 6.9" 2868×1320 | 440×956 | 956×440 |
+| Apple iPhone 18 Pro | `18pro` | 150.0×71.9×8.75 | 6.3" 2622×1206 | 402×874 | 874×402 |
+| Apple iPhone 18 Pro Max | `18promax` | 163.4×78.0×8.75 | 6.9" 2868×1320 | 440×956 | 956×440 |
+| Apple iPhone Duo (open) | `duo` · `openAngle` | 117.8×164.6×5.2 | 7.6" 2670×1878 | 890×626 | 626×890 |
+| Apple iPhone Duo (folded) | `duo` · `openAngle={false}` | 117.8×84.1×11.3 | 5.4" 1398×2034 | 466×678 | 678×466 |
 | Apple MacBook Air 13" (M5) | `air13` | 304.1×215×11.3 | 13.6" 2560×1664 | - | 1280×832 |
 | Apple MacBook Air 15" (M5) | `air15` | 340.4×237.6×11.5 | 15.3" 2880×1864 | - | 1440×932 |
 | Apple MacBook Pro 14" (M5) | `pro14` | 312.6×221.2×15.5 | 14.2" 3024×1964 | - | 1512×982 |
 | Apple MacBook Pro 16" (M5) | `pro16` | 355.7×248.1×16.8 | 16.2" 3456×2234 | - | 1728×1117 |
+| Apple MacBook Neo 13" (A18 Pro) | `neo13` | 297.5×206.4×12.7 | 13" 2408×1506 | - | 1204×753 |
 | Apple iPad Pro 13" (M5) | `ipadpro13` | 281.6×215.5×5.1 | 13" 2752×2064 | 1032×1376 | 1376×1032 |
 | Apple iPad Pro 11" (M5) | `ipadpro11` | 249.7×177.5×5.3 | 11" 2420×1668 | 834×1210 | 1210×834 |
 | Apple iPad Air 13" (M4) | `ipadair13` | 280.6×214.9×6.1 | 12.9" 2732×2048 | 1024×1366 | 1366×1024 |
@@ -45,6 +50,8 @@ orientations.
 | Samsung Galaxy Tab S11 | `tabs11` | 253.8×165.3×5.5 | 11" 2560×1600 | 800×1280 | 1280×800 |
 | Samsung Galaxy Tab S11 Ultra | `tabs11ultra` | 326.3×208.5×5.1 | 14.6" 2960×1848 | 924×1480 | 1480×924 |
 | Apple Watch Series 11 (46mm) | `series11` | 46×39×9.7 | 1.96" 416×496 | 208×248 | - |
+| Apple Watch Series 12 (46mm) | `series12` | 46×39×9.7 | 1.96" 416×496 | 208×248 | - |
+| Apple Watch Ultra 4 (49mm) | `ultra4` | 49×44×12 | 1.98" 422×514 | 211×257 | - |
 | Samsung Galaxy Watch 8 (44mm) | `watch8` | 46×43.7×8.6 | 1.47" 480×480 round | 240×240 | - |
 | Samsung Galaxy Watch 9 (44mm) | `watch9` | 46×43.7×8.6 | 1.47" 480×480 round | 240×240 | - |
 | Samsung Galaxy Watch Ultra 2 (47mm) | `watchultra2` | 47.4×47.1×10.7 | 1.52" 498×498 round | 249×249 | - |
@@ -57,8 +64,9 @@ density bucket nearest its true 163 dp/in), its 2448×1848 inner panel divides
 by the Fold 7 inner's own 2.4, and the Fold 8 Ultra's sharper inner panel
 keeps the Fold 7's 910×820 grid outright (2504/910 = 2256/820 = 2.75). Galaxy Tabs use their xhdpi dp grid (panel at half scale,
 an estimate since Samsung does not publish logical grids). iPhones, iPads, the
-Watch, the MacBooks, and the Studio Display use their exact point grids
-(2x or 3x).
+Watches, the MacBooks, and the Studio Display use their exact point grids
+(2x or 3x) - the iPhone Duo's inner 2670×1878 panel at 3x is 890×626, given
+open as the unrotated landscape width, as the Fold 8's is.
 
 ## Orientation
 
@@ -66,12 +74,13 @@ Pass `orientation="landscape"` on any phone or tablet to lay the device on its
 side. The virtual viewport swaps to the landscape resolution and your content
 renders upright, exactly like rotating the real device.
 
-One device runs the other way: the open Galaxy Z Fold 8 is wider than it is
-tall, and its unrotated pose already shows the 1020×770 landscape grid - that
-is what the Portrait column above holds, since the columns describe the
-unrotated and rotated poses rather than the shape of the panel.
-`orientation="landscape"` stands it upright into 770×1020, exactly like
-turning the real tablet onto its short edge. Hardware details ride
+Two devices run the other way: the open Galaxy Z Fold 8 and the open iPhone
+Duo are wider than they are tall, and their unrotated poses already show the
+1020×770 and 890×626 landscape grids - that is what the Portrait column above
+holds, since the columns describe the unrotated and rotated poses rather than
+the shape of the panel. `orientation="landscape"` stands either upright
+(770×1020, 626×890), exactly like turning the real tablet onto its short
+edge. Hardware details ride
 along: the Tab S11 Ultra's droplet notch, for example, sits on the right edge
 in portrait and top center in landscape, matching the physical device.
 
@@ -83,41 +92,42 @@ Tree-shaken cost of importing each family, minified, with `three`,
 
 | Import | Minified | Gzip |
 | --- | --- | --- |
-| `GalaxyMockup` (Galaxy family) | 140.1 KB | 46.1 KB |
-| `IPhoneMockup` (iPhone family) | 143.4 KB | 46.9 KB |
-| `FoldMockup` (Galaxy Z Fold family) | 147.3 KB | 47.5 KB |
-| `FlipMockup` (Galaxy Z Flip family) | 145.3 KB | 47.3 KB |
-| `LaptopMockup` (MacBook Air + Pro) | 147.8 KB | 48.8 KB |
-| `IPadMockup` (iPad family) | 145.0 KB | 47.2 KB |
-| `GalaxyTabMockup` (Galaxy Tab family) | 145.3 KB | 47.3 KB |
-| `AppleWatchMockup` (Apple Watch) | 139.4 KB | 45.2 KB |
-| `GalaxyWatchMockup` (Galaxy Watch) | 139.4 KB | 45.2 KB |
-| `StudioDisplayMockup` (Studio Display) | 29.5 KB | 11.9 KB |
-| `BookMockup` (hardcover) | 21.4 KB | 8.2 KB |
-| `MagazineMockup` (glossy monthly) | 20.5 KB | 7.9 KB |
-| `BrochureMockup` (tri-fold) | 20.0 KB | 7.9 KB |
-| `BusinessCardMockup` (32 pt card) | 19.5 KB | 7.6 KB |
-| `IDCardMockup` (badge + lanyard) | 23.4 KB | 9.0 KB |
-| `PosterFrameMockup` (18×24 frame) | 21.1 KB | 8.2 KB |
-| `ProductBoxMockup` (retail carton) | 20.9 KB | 8.0 KB |
-| `RollupBannerMockup` (850×2000 stand) | 20.6 KB | 7.9 KB |
-| `BillboardMockup` (14×48 bulletin) | 22.2 KB | 8.3 KB |
-| `BusMockup` (transit bus) | 35.6 KB | 12.9 KB |
-| `VanMockup` (cargo van) | 36.2 KB | 12.7 KB |
-| `BusShelterMockup` (6-sheet shelter) | 26.0 KB | 9.7 KB |
-| `GreetingCardMockup` (A7 card) | 19.6 KB | 7.7 KB |
-| `VinylRecordMockup` (12" LP) | 23.0 KB | 8.6 KB |
-| `TVSetMockup` (65" TV) | 32.1 KB | 12.7 KB |
-| `AFrameSignMockup` (sandwich board) | 20.5 KB | 8.0 KB |
-| `DOOHTotemMockup` (digital totem) | 20.6 KB | 8.0 KB |
-| `StorefrontMockup` (shop façade) | 25.5 KB | 9.1 KB |
-| `SemiTrailerMockup` (53 ft dry van) | 27.7 KB | 9.6 KB |
-| `MailerBoxMockup` (shipper box) | 22.3 KB | 8.3 KB |
-| `MilkCartonMockup` (gable-top carton) | 22.2 KB | 8.5 KB |
-| `ShoppingBagMockup` (kraft carrier) | 21.9 KB | 8.5 KB |
-| `CustomPanelMockup` (any-size sheet) | 18.9 KB | 7.5 KB |
-| `CustomBoxMockup` (any-size box) | 19.5 KB | 7.6 KB |
-| Whole library (27 devices + 24 objects) | 368.3 KB | 105.8 KB |
+| `GalaxyMockup` (Galaxy family) | 160.3 KB | 53.3 KB |
+| `IPhoneMockup` (iPhone family) | 165.0 KB | 54.4 KB |
+| `IPhoneDuoMockup` (iPhone Duo) | 171.9 KB | 55.7 KB |
+| `FoldMockup` (Galaxy Z Fold family) | 172.0 KB | 55.8 KB |
+| `FlipMockup` (Galaxy Z Flip family) | 166.1 KB | 54.6 KB |
+| `LaptopMockup` (MacBook Air, Pro + Neo) | 159.3 KB | 52.9 KB |
+| `IPadMockup` (iPad family) | 164.3 KB | 54.1 KB |
+| `GalaxyTabMockup` (Galaxy Tab family) | 164.6 KB | 54.2 KB |
+| `AppleWatchMockup` (Apple Watch) | 152.5 KB | 49.8 KB |
+| `GalaxyWatchMockup` (Galaxy Watch) | 152.5 KB | 49.8 KB |
+| `StudioDisplayMockup` (Studio Display) | 38.9 KB | 15.4 KB |
+| `BookMockup` (hardcover) | 30.8 KB | 11.7 KB |
+| `MagazineMockup` (glossy monthly) | 29.9 KB | 11.4 KB |
+| `BrochureMockup` (tri-fold) | 29.4 KB | 11.3 KB |
+| `BusinessCardMockup` (32 pt card) | 28.9 KB | 11.1 KB |
+| `IDCardMockup` (badge + lanyard) | 32.8 KB | 12.4 KB |
+| `PosterFrameMockup` (18×24 frame) | 30.5 KB | 11.6 KB |
+| `ProductBoxMockup` (retail carton) | 30.3 KB | 11.4 KB |
+| `RollupBannerMockup` (850×2000 stand) | 30.0 KB | 11.4 KB |
+| `BillboardMockup` (14×48 bulletin) | 31.6 KB | 11.7 KB |
+| `BusMockup` (transit bus) | 52.3 KB | 18.2 KB |
+| `VanMockup` (cargo van) | 55.3 KB | 18.8 KB |
+| `BusShelterMockup` (6-sheet shelter) | 35.4 KB | 13.1 KB |
+| `GreetingCardMockup` (A7 card) | 28.9 KB | 11.1 KB |
+| `VinylRecordMockup` (12" LP) | 32.3 KB | 12.0 KB |
+| `TVSetMockup` (65" TV) | 44.5 KB | 17.2 KB |
+| `AFrameSignMockup` (sandwich board) | 29.9 KB | 11.4 KB |
+| `DOOHTotemMockup` (digital totem) | 30.0 KB | 11.4 KB |
+| `StorefrontMockup` (shop façade) | 34.8 KB | 12.6 KB |
+| `SemiTrailerMockup` (53 ft dry van) | 44.0 KB | 14.9 KB |
+| `MailerBoxMockup` (shipper box) | 31.8 KB | 11.8 KB |
+| `MilkCartonMockup` (gable-top carton) | 36.8 KB | 13.9 KB |
+| `ShoppingBagMockup` (kraft carrier) | 31.2 KB | 11.9 KB |
+| `CustomPanelMockup` (any-size sheet) | 28.9 KB | 11.1 KB |
+| `CustomBoxMockup` (any-size box) | 28.9 KB | 11.1 KB |
+| Whole library (33 devices + 24 objects) | 433.7 KB | 126.0 KB |
 
 Every device family bundles a small CSG engine
 ([`three-bvh-csg`](https://github.com/gkjohnson/three-bvh-csg)) that machines
@@ -134,6 +144,7 @@ The raw device dimensions are exported as plain data from the `/core` subpath:
 import {
   GALAXY_VARIANTS,
   IPHONE_VARIANTS,
+  IPHONE_DUO_VARIANTS,
   FOLD_VARIANTS,
   FLIP_VARIANTS,
   LAPTOP_VARIANTS,

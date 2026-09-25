@@ -52,18 +52,21 @@ export interface WatchCommonProps extends Omit<GroupProps, 'children' | 'color'>
   children?: React.ReactNode
   /**
    * Case color. Takes a retail colorway id from the family's catalog
-   * (`APPLE_WATCH_COLORWAYS` / `GALAXY_WATCH_COLORWAYS` - Apple aluminum Jet
-   * Black / Silver / Rose Gold, Galaxy Graphite and Silver) or any CSS color
-   * for a custom finish. A colorway id wins over a CSS color of the same
-   * name - pass hex if you meant the CSS one.
+   * (`APPLE_WATCH_COLORWAYS[variant]` / `GALAXY_WATCH_COLORWAYS[variant]` -
+   * the Series 11's aluminium Jet Black / Silver / Rose Gold, the Series 12's
+   * aluminium, titanium and ceramic finishes, the Ultra 4's Natural and Black
+   * titanium; Galaxy Graphite and Silver) or any CSS color for a custom
+   * finish. A colorway id wins over a CSS color of the same name - pass hex
+   * if you meant the CSS one.
    */
   color?: string
   /** Strap colorway (fluoroelastomer sport band). Defaults to a dark band. */
   bandColor?: string
   /**
    * CSS pixel width of the virtual display. The default matches the device's
-   * logical grid: 208 gives 208×248 on the Apple Watch; 240 gives a round
-   * 240×240 on the Galaxy Watch - so content lays out like on the real device.
+   * logical grid: 208 gives 208×248 on the Apple Watch Series, 211 gives
+   * 211×257 on the Ultra; 240 gives a round 240×240 on the Galaxy Watch - so
+   * content lays out like on the real device.
    */
   resolution?: number
 }
@@ -109,7 +112,7 @@ function WatchBody({
   // color. Ids win over same-named CSS colors - pass hex for those.
   const retail = findColorway(catalog, colorProp)
   const color = retail?.color ?? colorProp ?? '#1c1d21'
-  const { body, glass, display, crown, buttons, mic, speaker, bandSlot, band } = spec
+  const { body, glass, display, crown, crownGuard, buttons, mic, speaker, bandSlot, band } = spec
   const res = resolution ?? spec.resolution
 
   // Squircle / cushion case: extruded rounded-rect with a deep bevel for the
@@ -152,9 +155,10 @@ function WatchBody({
     }
     for (const button of buttons) {
       // Shallow machined recess the key sits in; where the case wall curves
-      // away near the corners the recess (and key) fade out naturally.
+      // away near the corners the recess (and key) fade out naturally. A key
+      // on the left flank (the Ultra's Action button) is recessed there.
       const cutter = stadiumCutter(button.width + 0.06, button.length + 0.06, 0.024, 'x')
-      cutter.translate(wall, button.y, 0)
+      cutter.translate(button.edge === 'left' ? -wall : wall, button.y, 0)
       cutters.push(cutter)
     }
     if (bandSlot) {
@@ -563,6 +567,26 @@ function WatchBody({
         )
       })()}
 
+      {/* the Ultra's crown guard: a raised titanium boss on the right flank
+          shielding the crown and side button, both of which stand proud of
+          it - it reaches into the case so the join never shows a seam */}
+      {crownGuard && (
+        <RoundedBox
+          args={[crownGuard.proud + 0.16, crownGuard.length, crownGuard.thickness]}
+          radius={crownGuard.radius}
+          smoothness={4}
+          position={[body.width / 2 + (crownGuard.proud - 0.16) / 2, crownGuard.y, 0]}
+        >
+          <meshPhysicalMaterial
+            color={color}
+            metalness={0.85}
+            roughness={0.3}
+            clearcoat={0.25}
+            clearcoatRoughness={0.4}
+          />
+        </RoundedBox>
+      )}
+
       {/* Digital Crown, Apple only - a knurled gear-toothed barrel protruding
           ~2 mm past the case, with a flat end cap and a dark seam ring where
           the cap meets the teeth (per Apple's product macros) */}
@@ -587,15 +611,26 @@ function WatchBody({
             />
             <meshPhysicalMaterial color={color} metalness={0.9} roughness={0.22} clearcoat={0.4} />
           </mesh>
+          {/* the Ultra's International Orange ring inlaid around the cap's face */}
+          {crown.ring && (
+            <mesh rotation-y={Math.PI / 2} position-x={crown.proud + 0.0086}>
+              <ringGeometry
+                args={[(crown.radius - crown.toothDepth - 0.012) * 0.74, (crown.radius - crown.toothDepth - 0.012) * 0.92, 48]}
+              />
+              <meshPhysicalMaterial color={crown.ring} metalness={0.2} roughness={0.5} />
+            </mesh>
+          )}
         </group>
       )}
 
-      {/* keys on the right edge, seated in their machined recesses: Apple's
-          near-flush side button, the Galaxy's two raised chamfered keys */}
-      {buttons.map(({ y, length, width, proud, color: keyColor }) => (
+      {/* keys seated in their machined recesses: Apple's near-flush side
+          button and the Ultra's orange Action button on the left flank, the
+          Galaxy's two raised chamfered keys - the right edge unless the spec
+          says otherwise */}
+      {buttons.map(({ y, length, width, proud, color: keyColor, edge }) => (
         <SideKey
-          key={y}
-          side={1}
+          key={`${edge ?? 'right'}${y}`}
+          side={edge === 'left' ? -1 : 1}
           railX={body.width / 2}
           y={y}
           length={length}
@@ -773,22 +808,26 @@ export const watchSlots = createSlots(SCREEN_REGIONS)
 
 export interface AppleWatchProps extends WatchCommonProps {
   /**
-   * Which Apple Watch to render: `series11` (Series 11, 46 mm - the default and
-   * only model today).
+   * Which Apple Watch to render: `series11` (Series 11, 46 mm - the default),
+   * `series12` (Series 12, 46 mm - the same case, the generation's finishes)
+   * or `ultra4` (Apple Watch Ultra 4, 49 mm - the flat-sided titanium case
+   * with the crown guard and the orange Action button, the Ultra 3's case).
    */
   variant?: AppleWatchVariant
 }
 
 /**
- * A procedurally built Apple Watch Series 11: 46 mm squircle case with the
- * knurled Digital Crown, the flush side button, an edge-to-edge crystal over
- * the 416x496 display, and the optical sensor back sunk flush into a
- * body-colour plate.
+ * A procedurally built Apple Watch - the Series 11 or Series 12's 46 mm
+ * squircle case, or the Ultra 4's 49 mm titanium one, chosen with `variant`:
+ * the knurled Digital Crown, the flush side button, an edge-to-edge crystal
+ * over the display, and the optical sensor back sunk flush into a body-colour
+ * plate. The Ultra adds the raised crown guard, the orange Action button on
+ * the left flank and a flat crystal in tighter corners.
  *
- * It wears the Solo Loop - ONE seamless stretchy band with no closure, no
- * adjustment holes and no hardware, flaring into the lug slots at both ends.
- * There is nothing to unfasten, so unlike `<GalaxyWatch>` it takes no
- * `bandOpen`.
+ * The Series wear the Solo Loop - ONE seamless stretchy band with no closure,
+ * no adjustment holes and no hardware, flaring into the lug slots at both
+ * ends - and the Ultra its buckled Ocean Band. Neither unfastens here, so
+ * unlike `<GalaxyWatch>` this takes no `bandOpen`.
  *
  * Must be rendered inside a react-three-fiber `<Canvas>` (or `<MockupCanvas>`).
  */

@@ -30,6 +30,8 @@ import {
   type FlipVariant,
   FoldMockup,
   type FoldVariant,
+  IPhoneDuoMockup,
+  type IPhoneDuoVariant,
   IDCardMockup,
   Laptop,
   type LaptopVariant,
@@ -44,6 +46,7 @@ import {
   TVSetMockup,
   VanMockup,
   AppleWatch,
+  type AppleWatchVariant,
   GalaxyWatch,
   type GalaxyWatchVariant,
 } from 'react-3d-mockups'
@@ -158,14 +161,14 @@ function regionProbe(Mockup: object): React.ReactNode {
  * high-resolution frames for model-vs-photo comparisons.
  *
  * Params:
- *   device      tablet | monitor | flip | fold | watch | laptop
+ *   device      tablet | monitor | flip | fold | iphoneduo | watch | laptop
  *               | phone | iphone | bus | van | shelter | tv | idcard
  *               | store | magazine (default tablet)
  *   pvariant    device variant id                  (phone, iphone)
- *   fvariant    device variant id                  (fold)
+ *   fvariant    device variant id                  (fold, iphoneduo)
  *   flvariant   device variant id                  (flip)
- *   wvariant    watch8 | watch9 | watchultra2 - selects the Galaxy watch
- *               (anything else is the Apple watch)
+ *   wvariant    watch8 | watch9 | watchultra2 - selects the Galaxy watch;
+ *               series11 | series12 | ultra4 - the Apple watch (default)
  *   bandOpen    1 | 0 - unbuckled band             (watch)
  *   variant     device variant id                  (tablet only)
  *   color       retail colorway id, or any CSS color (colorway= also accepted)
@@ -507,6 +510,27 @@ function HarnessScene() {
     )
   }
 
+  // The Duo is the Fold's shape under Apple's name, so it takes the fold's
+  // pose params.
+  if (device === 'iphoneduo') {
+    const dist = Number(params.get('dist') ?? 8.4)
+    return (
+      <IPhoneDuoMockup
+        variant={(params.get('fvariant') ?? undefined) as IPhoneDuoVariant | undefined}
+        openAngle={params.get('openAngle') ? Number(params.get('openAngle')) : params.get('open') !== '0'}
+        orientation={orientation}
+        color={color}
+        statusBar={statusBar}
+        controls={controls}
+        camera={{ position: [0, cy, dist], fov: 40 }}
+        shadows={shadows}
+        rotation={[rx, ry, 0]}
+      >
+        {screen}
+      </IPhoneDuoMockup>
+    )
+  }
+
   if (device === 'phone' || device === 'iphone') {
     const dist = Number(params.get('dist') ?? 7.4)
     const Device = device === 'phone' ? Galaxy : IPhone
@@ -527,7 +551,8 @@ function HarnessScene() {
 
   // The two watches are separate components; any `wvariant` beginning with
   // `watch` (watch8, watch9, watchultra2) selects that Galaxy model, so
-  // existing `wvariant=watch8` probe URLs keep working.
+  // existing `wvariant=watch8` probe URLs keep working. Anything else
+  // (series11, series12, ultra4, or nothing) is the Apple watch.
   if (device === 'watch') {
     const dist = Number(params.get('dist') ?? 6.4)
     const wvariant = params.get('wvariant')
@@ -548,7 +573,9 @@ function HarnessScene() {
             {screen}
           </GalaxyWatch>
         ) : (
-          <AppleWatch {...shared}>{screen}</AppleWatch>
+          <AppleWatch {...shared} variant={(wvariant ?? undefined) as AppleWatchVariant | undefined}>
+            {screen}
+          </AppleWatch>
         )}
       </MockupCanvas>
     )

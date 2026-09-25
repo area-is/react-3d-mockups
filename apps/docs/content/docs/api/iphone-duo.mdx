@@ -1,0 +1,108 @@
+---
+title: iPhone Duo
+description: The iPhone Duo in WebGL, with a live prop explorer and the full IPhoneDuoMockup reference.
+---
+
+Drive every prop from the inspector; the `demo.tsx` panel rewrites itself to
+exactly what is being passed. The explorer is pinned to `variant="duo"`; everything below applies to the whole family.
+
+<MockupExplorer component="IPhoneDuoMockup" variant="duo" />
+
+`<IPhoneDuo>` and `<IPhoneDuoMockup>` render Apple's iPhone Duo - the first
+foldable iPhone, on the same passport shape as the wide Galaxy Z Fold 8. One
+device, two form factors: **open** (default) fills your content onto the
+landscape 7.6″ inner display, which has no camera hole to design around - a
+faint crease runs down its center - and **closed** (`openAngle={false}`) folds
+to the 5.4″ cover screen with the corner camera, and the two-lens plateau and
+the Apple badge on the back.
+
+## `<IPhoneDuo>` vs `<IPhoneDuoMockup>`
+
+<BareVsMockup object="IPhoneDuo" kind="iphoneDuo" slot="Screen" />
+
+```tsx
+import { MockupCanvas, IPhoneDuo, IPhoneDuoMockup } from 'react-3d-mockups'
+
+// The one-liner: its own canvas, with lighting, a ground shadow, drag-to-orbit
+// controls and a camera already framed on the object.
+<IPhoneDuoMockup float style={{ height: 520 }}>
+  <YourApp />
+</IPhoneDuoMockup>
+
+// The same model with no stage of its own. Inside a canvas you arrange
+// yourself it can be posed, animated, lit and joined by anything else.
+<MockupCanvas>
+  <IPhoneDuo rotation={[0, 0.4, 0]}>
+    <YourApp />
+  </IPhoneDuo>
+</MockupCanvas>
+```
+
+## Props
+
+Beyond the [shared screen props](/docs/screen-content) and, on the mockup, the
+[shared mockup props](/docs/api):
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `variant` | `'duo'` | `'duo'` | Which iPhone Duo to render - the 2026 original is the only model today. |
+| `openAngle` | `boolean \| number` | `true` | How far the book is open. `true` is the unfolded tablet (content on the landscape inner display, with a center crease), `false` the folded bar (content on the cover display, camera pill and badge showing). A number is degrees (0 = shut, 180 = flat) and renders the real book pose: the panels pivot around the hinge while its bare titanium cover stays tangent to both back shells, wrapping the fold at every angle, and your content bends across the crease on two composited planes. The pose is continuous: every angle renders its own pose, and only the extremes hand over to the dedicated folded (~0°) and flat (180°) poses, which draw the crease as one seamless screen. |
+| `orientation` | `'portrait' \| 'landscape'` | `'portrait'` | Rotates the device a quarter turn and swaps the virtual display with upright content. The open Duo is natively landscape, so `landscape` stands it upright into 626×890, like turning the real tablet onto its short edge. |
+| `statusBar` | `boolean \| StatusBarContent` | `false` | Draw the system status bar across the top of the screen. `true` gives iOS's defaults - on the cover screen the clock and the meters sit in the ears either side of the camera hole; the inner display has no hole, so it takes iOS's plain tablet strip; an object sets the clock, the meters and the ink (`{{ time: '14:05', battery: 0.42, batteryPercent: true, color: '#1c1c1e' }}`). See [Status bar](/docs/screen-content#status-bar). |
+| `color` | `string` | `'#3a3d42'` | Back glass. Takes a retail colorway id from `IPHONE_DUO_COLORWAYS` (`nightsky`, `starwhite`), which brings the mirror-polished titanium rail with it, or any CSS color - the metal is then derived from it. |
+| `resolution` | `number` | per state | CSS pixel width of the active display; height follows the panel aspect. Defaults to Apple's point grids for whichever screen is showing - 890×626 open, 466×678 closed - see the [device table](/docs/devices). |
+
+## The two states
+
+The active display is whichever screen is showing, so your content maps onto
+the inner display when open and the cover display when closed. Switch with a
+single prop:
+
+<MockupExplorer
+  component="IPhoneDuoMockup"
+  variant="duo"
+  props={{ openAngle: false, autoRotate: true, float: true, color: 'starwhite', surfaceBackground: '#000' }}
+/>
+
+## Any angle in between
+
+`openAngle` takes a number of degrees to pose the book at any openness - the
+half-open standing pose with the hinge cover wrapping the fold and your content
+bending across the crease:
+
+<MockupExplorer
+  component="IPhoneDuoMockup"
+  variant="duo"
+  props={{ openAngle: 110, color: 'nightsky', rotation: [0, -0.35, 0] }}
+/>
+
+## The hardware
+
+Apple's published body: folded 117.8 × 84.1 × 11.3 mm, unfolded 117.8 × 164.6
+× 5.2 mm, on the same vertical hinge as the Galaxy Z Fold. The cover is a 5.4″
+1398×2034 panel with a 6 mm camera hole in its top-right corner; the inner
+display a 7.6″ 2670×1878 panel with its FaceTime camera *under* the glass, so
+nothing interrupts it. The detail geometry follows Apple's own product-bezel
+drawings: the two 48 MP cameras sit side by side on a horizontal 56 × 21 mm
+plateau across the top of the camera half, with the mic grille and flash at
+its inner end and the badge centred below; the free-edge corners are 12.4 mm
+round while the hinge ends are nearly square. Touch ID lives in the side
+button, alone on the free rail; the two volume keys ride the camera half's top
+edge; there is no Camera Control. The frame is mirror-polished grade 5
+titanium and the hinge cover is bare, micro-blasted titanium with no wordmark.
+
+## Colorways
+
+Pass an id from `IPHONE_DUO_COLORWAYS` for the retail finish - Night Sky
+`#2a323e` or Star White `#f1f0ec` - and the polished rail comes with it. A CSS
+color gets metal derived from it instead.
+
+## Mockup-able areas
+
+Every live surface filled with chroma green, labeled with the slot that
+feeds it - the fastest way to see exactly where your content lands and
+what stays 3D hardware.
+
+<MockupExplorer component="IPhoneDuoMockup" variant="duo" screen="chroma" />
+
+<DeviceDisclaimer brands="Apple" />

@@ -8,11 +8,13 @@ exactly what is being passed. The explorer is pinned to `variant="promax"`; ever
 
 <MockupExplorer component="IPhoneMockup" variant="promax" />
 
-`<IPhone>` and `<IPhoneMockup>` render an iPhone 17 family device: flat frame,
-Dynamic Island, Action button, Camera Control, and per-model rear cameras. The
-camera architecture follows the real devices: two-lens pill (17), ultra-thin
-single-lens bar (Air), full-width triple-lens plateau with flash and LiDAR
-(Pro and Pro Max).
+`<IPhone>` and `<IPhoneMockup>` render an iPhone 17 family device or an
+iPhone 18 Pro: flat frame, Dynamic Island, Action button, Camera Control, and
+per-model rear cameras. The camera architecture follows the real devices:
+two-lens pill (17), ultra-thin single-lens bar (Air), full-width triple-lens
+plateau with flash and LiDAR (the Pros). The 18 Pro and 18 Pro Max are the
+17 Pros' chassis under the generation's narrower Dynamic Island and
+colour-matched back. For the foldable, see [iPhone Duo](/docs/api/iphone-duo).
 
 ## `<IPhone>` vs `<IPhoneMockup>`
 
@@ -42,17 +44,18 @@ Same API as [`Galaxy`](/docs/api/galaxy-s26), except:
 
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
-| `variant` | `'17' \| 'air' \| 'pro' \| 'promax'` | `'17'` | Which iPhone 17 family device: 17 (two-lens pill), air (ultra-thin, single-lens bar), pro and promax (full-width plateau, flash + LiDAR). |
+| `variant` | `'17' \| 'air' \| 'pro' \| 'promax' \| '18pro' \| '18promax'` | `'17'` | Which iPhone: 17 (two-lens pill), air (ultra-thin, single-lens bar), pro and promax (full-width plateau, flash + LiDAR), 18pro and 18promax (the same two Pro bodies with the narrower Dynamic Island and colour-matched back). |
 | `orientation` | `'portrait' \| 'landscape'` | `'portrait'` | Landscape lays the device on its side and swaps the virtual display (for example 874×402 on the 17) with upright content. |
 | `statusBar` | `boolean \| StatusBarContent` | `false` | Draw the system status bar across the top of the screen. `true` gives the platform's defaults - iOS's, with the clock centred in the ear left of the Dynamic Island and the meters in the ear right of it; an object sets the clock, the meters and the ink (`{{ time: '14:05', battery: 0.42, batteryPercent: true, color: '#1c1c1e' }}`). It is placed from this device's own camera cutout and logical grid, so it lines up with the hardware on every variant. See [Status bar](/docs/screen-content#status-bar). |
-| `resolution` | `number` | per variant | Defaults to the variant's point grid: 402×874 (17, pro), 420×912 (air), 440×956 (promax). |
-| `color` | `string` | `'#1a1c20'` | Back glass. Takes a retail colorway id from `IPHONE_COLORWAYS` - 17 `black`, `white`, `lavender`, `mistblue`, `sage`; Air `spaceblack`, `cloudwhite`, `lightgold`, `skyblue`; Pro/Pro Max `silver`, `cosmicorange`, `deepblue` - which brings that model's matching chassis rail with it, or any CSS color - the rail is then derived from it. |
+| `resolution` | `number` | per variant | Defaults to the variant's point grid: 402×874 (17, pro, 18pro), 420×912 (air), 440×956 (promax, 18promax). |
+| `color` | `string` | `'#1a1c20'` | Back glass. Takes a retail colorway id from `IPHONE_COLORWAYS[variant]` - 17 `black`, `white`, `lavender`, `mistblue`, `sage`; Air `spaceblack`, `cloudwhite`, `lightgold`, `skyblue`; 17 Pro/Pro Max `silver`, `cosmicorange`, `deepblue`; 18 Pro/Pro Max `black`, `silver`, `glacier`, `burgundy` - which brings that model's matching chassis rail with it, or any CSS color - the rail is then derived from it. |
 
 ## Colorways
 
 17: Lavender `#cfc4e6`, Mist Blue `#b7c9dd`, Sage `#aebfae`. Air: Sky Blue
-`#bfd4e6`, Light Gold `#e6d9c0`. Pro: Cosmic Orange `#c96b34`, Deep Blue
-`#2b3a55`, Silver `#dfe0e2`.
+`#bfd4e6`, Light Gold `#e6d9c0`. 17 Pro: Cosmic Orange `#c96b34`, Deep Blue
+`#2b3a55`, Silver `#dfe0e2`. 18 Pro: Glacier `#c4d8e6`, Burgundy `#6a2b3e`,
+Black `#1e1f23`, Silver `#dfe0e2`.
 
 ## This model
 

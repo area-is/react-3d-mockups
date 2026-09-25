@@ -21,6 +21,7 @@ const root = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const FAMILY_OF = {
   GalaxyMockup: 'galaxy',
   IPhoneMockup: 'iphone',
+  IPhoneDuoMockup: 'iphone-duo',
   FoldMockup: 'fold',
   FlipMockup: 'flip',
   LaptopMockup: 'laptop',

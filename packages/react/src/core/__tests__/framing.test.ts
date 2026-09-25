@@ -133,7 +133,7 @@ describe('foldOpenAngle', () => {
 })
 
 describe('foldable measurement follows openAngle', () => {
-  it.each(['fold', 'flip'] as const)('%s measures the cover display only when shut', (kind) => {
+  it.each(['fold', 'flip', 'iphoneDuo'] as const)('%s measures the cover display only when shut', (kind) => {
     const flat = mockupInfo(kind, { openAngle: true }).primary.px
     const shut = mockupInfo(kind, { openAngle: false }).primary.px
     const nearlyFlat = mockupInfo(kind, { openAngle: 179 }).primary.px

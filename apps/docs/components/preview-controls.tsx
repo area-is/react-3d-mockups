@@ -18,6 +18,7 @@ import {
   GreetingCardMockup,
   IDCardMockup,
   IPhoneMockup,
+  IPhoneDuoMockup,
   LaptopMockup,
   MagazineMockup,
   MailerBoxMockup,
@@ -42,6 +43,7 @@ import {
   FOLD_COLORWAYS,
   GALAXY_COLORWAYS,
   IPHONE_COLORWAYS,
+  IPHONE_DUO_COLORWAYS,
   LAPTOP_COLORWAYS,
   STUDIO_DISPLAY_COLORWAYS,
   IPAD_COLORWAYS,
@@ -207,9 +209,19 @@ const MODELS = new Map<unknown, ModelControls>([
         { value: 'air', label: 'iPhone 17 Air' },
         { value: 'pro', label: 'iPhone 17 Pro' },
         { value: 'promax', label: 'iPhone 17 Pro Max' },
+        { value: '18pro', label: 'iPhone 18 Pro' },
+        { value: '18promax', label: 'iPhone 18 Pro Max' },
       ],
       catalogs: IPHONE_COLORWAYS as Record<string, Colorway[]>,
       controls: [ORIENTATION, toggle('dynamicIsland', 'dynamic island', true)],
+    },
+  ],
+  [
+    IPhoneDuoMockup,
+    {
+      variants: [{ value: 'duo', label: 'iPhone Duo' }],
+      catalogs: IPHONE_DUO_COLORWAYS as Record<string, Colorway[]>,
+      controls: [ORIENTATION, openAngle(0, 180, 180, 'open')],
     },
   ],
   [
@@ -245,6 +257,7 @@ const MODELS = new Map<unknown, ModelControls>([
         { value: 'air15', label: 'MacBook Air 15″' },
         { value: 'pro14', label: 'MacBook Pro 14″' },
         { value: 'pro16', label: 'MacBook Pro 16″' },
+        { value: 'neo13', label: 'MacBook Neo 13″' },
       ],
       catalogs: LAPTOP_COLORWAYS as Record<string, Colorway[]>,
       controls: [openAngle(40, 130, 110), toggle('notch', 'notch', true)],
@@ -285,9 +298,14 @@ const MODELS = new Map<unknown, ModelControls>([
   [
     AppleWatchMockup,
     {
-      variants: [{ value: 'series11', label: 'Apple Watch S11' }],
+      variants: [
+        { value: 'series11', label: 'Apple Watch S11' },
+        { value: 'series12', label: 'Apple Watch S12' },
+        { value: 'ultra4', label: 'Apple Watch Ultra 4' },
+      ],
       catalogs: APPLE_WATCH_COLORWAYS as Record<string, Colorway[]>,
-      // No `bandOpen` here: the Solo Loop is seamless, with no closure to undo.
+      // No `bandOpen` here: the Solo Loop is seamless, with no closure to
+      // undo, and the Ultra's band stays worn.
       controls: [swatch('bandColor', 'band')],
     },
   ],

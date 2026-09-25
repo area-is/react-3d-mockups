@@ -68,6 +68,15 @@ export const DEVICES = [
   device('iphone-17-pro-max', 'iPhone 17 Pro Max', 'IPhoneMockup', 'promax', 'device=iphone&pvariant=promax&color=deepblue&ry=-24', 'Phones', [
     'iphone pro max', 'pro max', 'promax', 'ios', 'phone', 'smartphone',
   ]),
+  device('iphone-18-pro', 'iPhone 18 Pro', 'IPhoneMockup', '18pro', 'device=iphone&pvariant=18pro&color=burgundy&ry=-24', 'Phones', [
+    'iphone 18', 'iphone 18 pro', '18pro', 'ios', 'phone', 'smartphone',
+  ]),
+  device('iphone-18-pro-max', 'iPhone 18 Pro Max', 'IPhoneMockup', '18promax', 'device=iphone&pvariant=18promax&color=glacier&ry=-24', 'Phones', [
+    'iphone 18 pro max', '18promax', 'ios', 'phone', 'smartphone',
+  ]),
+  device('iphone-duo', 'iPhone Duo', 'IPhoneDuoMockup', 'duo', 'device=iphoneduo&openAngle=150&color=nightsky&ry=-20', 'Foldables', [
+    'iphone duo', 'iphone fold', 'foldable iphone', 'folding iphone', 'apple foldable', 'foldable', 'foldable phone', 'folding phone', 'duo', 'ios',
+  ]),
   device('galaxy-z-fold7', 'Galaxy Z Fold 7', 'FoldMockup', 'fold7', 'device=fold&openAngle=150&color=blueshadow&ry=-20', 'Foldables', [
     'fold', 'z fold', 'galaxy fold', 'foldable', 'foldable phone', 'folding phone', 'fold7', 'samsung',
   ]),
@@ -95,6 +104,9 @@ export const DEVICES = [
   device('macbook-pro-16', 'MacBook Pro 16″', 'LaptopMockup', 'pro16', 'device=laptop&lvariant=pro16&color=silver&ry=-18', 'Laptops and displays', [
     'laptop', 'notebook', 'mac', 'pro16',
   ]),
+  device('macbook-neo-13', 'MacBook Neo 13″', 'LaptopMockup', 'neo13', 'device=laptop&lvariant=neo13&color=indigo&ry=-18', 'Laptops and displays', [
+    'macbook neo', 'neo', 'laptop', 'notebook', 'mac', 'budget macbook', 'neo13',
+  ]),
   device('ipad-pro-13', 'iPad Pro 13″', 'IPadMockup', 'ipadpro13', 'device=tablet&variant=ipadpro13&color=spaceblack&ry=-22', 'Tablets', [
     'ipad pro', 'tablet', 'ipados', 'ipadpro13',
   ]),
@@ -116,8 +128,14 @@ export const DEVICES = [
   device('galaxy-tab-s11-ultra', 'Galaxy Tab S11 Ultra', 'GalaxyTabMockup', 'tabs11ultra', 'device=tablet&variant=tabs11ultra&color=silver&ry=-22', 'Tablets', [
     'tab ultra', 'samsung tablet', 'android tablet', 'tablet', 'tabs11ultra',
   ]),
-  device('apple-watch-series-11', 'Apple Watch Series 11', 'AppleWatchMockup', undefined, 'device=watch&color=jetblack&ry=-18', 'Wearables', [
+  device('apple-watch-series-11', 'Apple Watch Series 11', 'AppleWatchMockup', 'series11', 'device=watch&wvariant=series11&color=jetblack&ry=-18', 'Wearables', [
     'apple watch', 'watch', 'smartwatch', 'wearable', 'watchos', 'series 11',
+  ]),
+  device('apple-watch-series-12', 'Apple Watch Series 12', 'AppleWatchMockup', 'series12', 'device=watch&wvariant=series12&color=darkbronze&ry=-18', 'Wearables', [
+    'watch', 'smartwatch', 'wearable', 'watchos', 'series 12', 'series12',
+  ]),
+  device('apple-watch-ultra-4', 'Apple Watch Ultra 4', 'AppleWatchMockup', 'ultra4', 'device=watch&wvariant=ultra4&color=black&ry=-18', 'Wearables', [
+    'apple watch ultra', 'watch ultra', 'ultra', 'watch', 'smartwatch', 'wearable', 'watchos', 'titanium watch', 'ultra4',
   ]),
   device('galaxy-watch-8', 'Galaxy Watch 8', 'GalaxyWatchMockup', 'watch8', 'device=watch&wvariant=watch8&color=graphite&ry=-18', 'Wearables', [
     'galaxy watch', 'watch', 'smartwatch', 'wearable', 'wear os', 'round watch', 'watch8',

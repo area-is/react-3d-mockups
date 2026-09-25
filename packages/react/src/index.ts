@@ -8,6 +8,7 @@ export { AppleWatchMockup, type AppleWatchMockupProps } from './apple-watch-mock
 export { GalaxyWatchMockup, type GalaxyWatchMockupProps } from './galaxy-watch-mockup'
 export { StudioDisplayMockup, type StudioDisplayMockupProps } from './studio-display-mockup'
 export { FoldMockup, type FoldMockupProps } from './fold-mockup'
+export { IPhoneDuoMockup, type IPhoneDuoMockupProps } from './iphone-duo-mockup'
 export { FlipMockup, type FlipMockupProps } from './flip-mockup'
 export { TumbleControls, type TumbleControlsProps, type TumbleControlsHandle } from './tumble-controls'
 export { usePrefersReducedMotion } from './use-reduced-motion'
@@ -112,7 +113,7 @@ export {
   type WatchCommonProps,
 } from './devices/watch/watch'
 export { StudioDisplay, type StudioDisplayProps } from './devices/studio-display/studio-display'
-export { Fold, type FoldProps } from './devices/fold/fold'
+export { Fold, type FoldProps, IPhoneDuo, type IPhoneDuoProps, type FoldCommonProps } from './devices/fold/fold'
 export { Flip, type FlipProps } from './devices/flip/flip'
 export { Book, type BookProps } from './objects/book/book'
 export { Magazine, type MagazineProps } from './objects/magazine/magazine'
@@ -154,6 +155,7 @@ export {
   type Colorway,
   GALAXY_COLORWAYS,
   IPHONE_COLORWAYS,
+  IPHONE_DUO_COLORWAYS,
   FOLD_COLORWAYS,
   FLIP_COLORWAYS,
   LAPTOP_COLORWAYS,
@@ -173,6 +175,7 @@ export type {
   AppleWatchVariant,
   GalaxyWatchVariant,
   FoldVariant,
+  IPhoneDuoVariant,
   FlipVariant,
   TVVariant,
 } from './core'

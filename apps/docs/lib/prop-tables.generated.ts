@@ -48,11 +48,19 @@ export const COMPONENT_PROPS: Record<string, PropDoc[]> = {
     {"name":"resolution","type":"number","default":"per variant","description":"CSS pixel width of the virtual display; height follows the panel aspect (360 gives 360×780 on the S26)."},
   ],
   "IPhoneMockup": [
-    {"name":"variant","type":"'17' | 'air' | 'pro' | 'promax'","default":"'17'","description":"Which iPhone 17 family device: 17 (two-lens pill), air (ultra-thin, single-lens bar), pro and promax (full-width plateau, flash + LiDAR)."},
+    {"name":"variant","type":"'17' | 'air' | 'pro' | 'promax' | '18pro' | '18promax'","default":"'17'","description":"Which iPhone: 17 (two-lens pill), air (ultra-thin, single-lens bar), pro and promax (full-width plateau, flash + LiDAR), 18pro and 18promax (the same two Pro bodies with the narrower Dynamic Island and colour-matched back)."},
     {"name":"orientation","type":"'portrait' | 'landscape'","default":"'portrait'","description":"Landscape lays the device on its side and swaps the virtual display (for example 874×402 on the 17) with upright content."},
     {"name":"statusBar","type":"boolean | StatusBarContent","default":"false","description":"Draw the system status bar across the top of the screen. true gives the platform's defaults - iOS's, with the clock centred in the ear left of the Dynamic Island and the meters in the ear right of it; an object sets the clock, the meters and the ink ({{ time: '14:05', battery: 0.42, batteryPercent: true, color: '#1c1c1e' }}). It is placed from this device's own camera cutout and logical grid, so it lines up with the hardware on every variant. See Status bar."},
-    {"name":"resolution","type":"number","default":"per variant","description":"Defaults to the variant's point grid: 402×874 (17, pro), 420×912 (air), 440×956 (promax)."},
-    {"name":"color","type":"string","default":"'#1a1c20'","description":"Back glass. Takes a retail colorway id from IPHONE_COLORWAYS - 17 black, white, lavender, mistblue, sage; Air spaceblack, cloudwhite, lightgold, skyblue; Pro/Pro Max silver, cosmicorange, deepblue - which brings that model's matching chassis rail with it, or any CSS color - the rail is then derived from it."},
+    {"name":"resolution","type":"number","default":"per variant","description":"Defaults to the variant's point grid: 402×874 (17, pro, 18pro), 420×912 (air), 440×956 (promax, 18promax)."},
+    {"name":"color","type":"string","default":"'#1a1c20'","description":"Back glass. Takes a retail colorway id from IPHONE_COLORWAYS[variant] - 17 black, white, lavender, mistblue, sage; Air spaceblack, cloudwhite, lightgold, skyblue; 17 Pro/Pro Max silver, cosmicorange, deepblue; 18 Pro/Pro Max black, silver, glacier, burgundy - which brings that model's matching chassis rail with it, or any CSS color - the rail is then derived from it."},
+  ],
+  "IPhoneDuoMockup": [
+    {"name":"variant","type":"'duo'","default":"'duo'","description":"Which iPhone Duo to render - the 2026 original is the only model today."},
+    {"name":"openAngle","type":"boolean | number","default":"true","description":"How far the book is open. true is the unfolded tablet (content on the landscape inner display, with a center crease), false the folded bar (content on the cover display, camera pill and badge showing). A number is degrees (0 = shut, 180 = flat) and renders the real book pose: the panels pivot around the hinge while its bare titanium cover stays tangent to both back shells, wrapping the fold at every angle, and your content bends across the crease on two composited planes. The pose is continuous: every angle renders its own pose, and only the extremes hand over to the dedicated folded (~0°) and flat (180°) poses, which draw the crease as one seamless screen."},
+    {"name":"orientation","type":"'portrait' | 'landscape'","default":"'portrait'","description":"Rotates the device a quarter turn and swaps the virtual display with upright content. The open Duo is natively landscape, so landscape stands it upright into 626×890, like turning the real tablet onto its short edge."},
+    {"name":"statusBar","type":"boolean | StatusBarContent","default":"false","description":"Draw the system status bar across the top of the screen. true gives iOS's defaults - on the cover screen the clock and the meters sit in the ears either side of the camera hole; the inner display has no hole, so it takes iOS's plain tablet strip; an object sets the clock, the meters and the ink ({{ time: '14:05', battery: 0.42, batteryPercent: true, color: '#1c1c1e' }}). See Status bar."},
+    {"name":"color","type":"string","default":"'#3a3d42'","description":"Back glass. Takes a retail colorway id from IPHONE_DUO_COLORWAYS (nightsky, starwhite), which brings the mirror-polished titanium rail with it, or any CSS color - the metal is then derived from it."},
+    {"name":"resolution","type":"number","default":"per state","description":"CSS pixel width of the active display; height follows the panel aspect. Defaults to Apple's point grids for whichever screen is showing - 890×626 open, 466×678 closed - see the device table."},
   ],
   "FoldMockup": [
     {"name":"variant","type":"'fold7' | 'fold8' | 'fold8ultra'","default":"'fold7'","description":"Which Galaxy Z Fold to render. fold7 and fold8ultra share the tall book chassis; fold8 is the generation's wide form factor, opening into a landscape 4:3 tablet."},
@@ -71,10 +79,10 @@ export const COMPONENT_PROPS: Record<string, PropDoc[]> = {
     {"name":"resolution","type":"number","default":"per state","description":"CSS pixel width of the active display; height follows the panel aspect."},
   ],
   "LaptopMockup": [
-    {"name":"variant","type":"'air13' | 'air15' | 'pro14' | 'pro16'","default":"'air13'","description":"MacBook Air 13\"/15\" or MacBook Pro 14\"/16\" - true relative sizes, per-model ports, feet, speaker grilles and notch."},
-    {"name":"color","type":"string","default":"'#e3e4e6'","description":"Aluminum finish. Takes a retail colorway id from LAPTOP_COLORWAYS - Airs silver, starlight, midnight, skyblue; Pros spaceblack, silver - or any CSS color."},
+    {"name":"variant","type":"'air13' | 'air15' | 'pro14' | 'pro16' | 'neo13'","default":"'air13'","description":"MacBook Air 13\"/15\", MacBook Pro 14\"/16\" or MacBook Neo 13\" - true relative sizes, per-model ports, feet, speaker grilles, and the notch (the Neo has none: its camera sits in the bezel)."},
+    {"name":"color","type":"string","default":"'#e3e4e6'","description":"Aluminum finish. Takes a retail colorway id from LAPTOP_COLORWAYS[variant] - Airs silver, starlight, midnight, skyblue; Pros spaceblack, silver; Neo silver, blush, citrus, indigo - or any CSS color."},
     {"name":"openAngle","type":"number","default":"110","description":"Lid angle in degrees between deck and screen (90 is upright)."},
-    {"name":"resolution","type":"number","default":"per variant","description":"Virtual display width - each variant defaults to its real scaled desktop: 1280×832 (air13), 1440×932 (air15), 1512×982 (pro14), 1728×1117 (pro16) - so desktop breakpoints apply."},
+    {"name":"resolution","type":"number","default":"per variant","description":"Virtual display width - each variant defaults to its real scaled desktop: 1280×832 (air13), 1440×932 (air15), 1512×982 (pro14), 1728×1117 (pro16), 1204×753 (neo13) - so desktop breakpoints apply."},
   ],
   "IPadMockup": [
     {"name":"variant","type":"'ipadpro13' | 'ipadpro11' | 'ipadair13' | 'ipadair11' | 'ipad11'","default":"'ipadpro13'","description":"Which iPad: Pro 13\"/11\" (camera pod, Pencil strip, Face ID), Air 13\"/11\" (single lens, Touch ID top button), or the A16 iPad (single lens, edge Smart Connector)."},
@@ -91,10 +99,10 @@ export const COMPONENT_PROPS: Record<string, PropDoc[]> = {
     {"name":"color","type":"string","default":"per variant","description":"Body color. Takes a retail colorway id from GALAXY_TAB_COLORWAYS (gray, silver) or any CSS color."},
   ],
   "AppleWatchMockup": [
-    {"name":"variant","type":"'series11'","default":"'series11'","description":"Which Apple Watch to render."},
-    {"name":"color","type":"string","default":"'#1c1d21'","description":"Aluminium case. Takes a retail colorway id from APPLE_WATCH_COLORWAYS (jetblack, spacegray, rosegold, silver) or any CSS color."},
-    {"name":"bandColor","type":"string","default":"'#2a2c31'","description":"Solo Loop colorway."},
-    {"name":"resolution","type":"number","default":"208","description":"Virtual display width - 208 is the watch's own point grid, so watchOS-sized layouts apply."},
+    {"name":"variant","type":"'series11' | 'series12' | 'ultra4'","default":"'series11'","description":"Which Apple Watch to render. The Series 12 is the Series 11's case a millimetre wider, with the generation's finishes; the Ultra 4 is the 49 mm titanium case with the crown guard and the Action button."},
+    {"name":"color","type":"string","default":"'#1c1d21'","description":"Case. Takes a retail colorway id from APPLE_WATCH_COLORWAYS[variant] (Series 11 jetblack, spacegray, rosegold, silver; Series 12 darkbronze, lightgold, black, spacegray, radiantgold, natural, pearlwhite, nightblue; Ultra 4 natural, black) or any CSS color."},
+    {"name":"bandColor","type":"string","default":"'#2a2c31'","description":"Band colorway - the Solo Loop on the Series, the Ocean Band on the Ultra."},
+    {"name":"resolution","type":"number","default":"per variant","description":"Virtual display width - each model's own point grid (208 on the Series, 211 on the Ultra), so watchOS-sized layouts apply."},
   ],
   "GalaxyWatchMockup": [
     {"name":"variant","type":"'watch8' | 'watch9' | 'watchultra2'","default":"'watch8'","description":"Which Galaxy Watch to render. The Watch 9 is the Watch 8's case with the generation's internals; the Watch Ultra 2 is the 47 mm titanium squircle."},

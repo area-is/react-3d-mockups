@@ -22,6 +22,7 @@ import {
   CustomBoxMockup,
   type CustomBoxMockupProps,
   IPhoneMockup,
+  IPhoneDuoMockup,
   GalaxyMockup,
   type GalaxyProps,
   type IPhoneProps,
@@ -127,6 +128,14 @@ const _slotsUsage = (
       </IPhoneMockup.Screen>
     </IPhoneMockup>
 
+    {/* the Duo is a book-fold with the iPhone's vocabulary: the fold's pose
+        props, and a screen slot it shares with the Galaxy Z Fold */}
+    <IPhoneDuoMockup openAngle={110} statusBar>
+      <IPhoneDuoMockup.Screen surfaceBackground="#000">
+        <div />
+      </IPhoneDuoMockup.Screen>
+    </IPhoneDuoMockup>
+
     <CustomBoxMockup size={{ width: 250, height: 90, depth: 160 }}>
       <div />
       <CustomBoxMockup.Top surfaceBackground="#111">
@@ -172,6 +181,10 @@ const _storeInfo = mockupInfo('storefront')
 // bus and van joined the registry once their wrap geometry moved into core
 const _busInfo = mockupInfo('bus', { coverage: 'full' })
 const _vanInfo = mockupInfo('van', { coverage: 'panel' })
+// The Duo measures like a fold - pose props, its own variant space.
+const _duoInfo = mockupInfo('iphoneDuo', { openAngle: false, orientation: 'landscape' })
+// @ts-expect-error - a Galaxy Z Fold variant is not an iPhone Duo variant
+mockupInfo('iphoneDuo', { variant: 'fold8' })
 
 // Every region carries all three unit systems.
 type _units = Expect<Equal<RegionInfo['units'], { width: number; height: number }>>

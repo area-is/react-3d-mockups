@@ -85,8 +85,12 @@ const CASES = [
   ['galaxy', 'device=phone&pvariant=s26&ry=24'],
   ['galaxy-landscape', 'device=phone&pvariant=s26&orientation=landscape&ry=24'],
   ['iphone-promax', 'device=iphone&pvariant=promax&ry=24'],
+  // the 18 Pro Max: the 17 Pro Max's chassis under the narrower island
+  ['iphone-18promax', 'device=iphone&pvariant=18promax&ry=24'],
   ['ipad', 'device=tablet&variant=ipadpro13&ry=22'],
   ['laptop', 'device=laptop&lvariant=pro14&ry=18'],
+  // the notchless Neo: square-cornered panel, camera in the bezel
+  ['laptop-neo', 'device=laptop&lvariant=neo13&ry=18'],
   ['fold-open', 'device=fold&ry=22'],
   ['fold-closed', 'device=fold&open=0&ry=22'],
   // the flex poses' split screens must meet seamlessly at the crease - the
@@ -101,7 +105,15 @@ const CASES = [
   ['fold8-flex', 'device=fold&fvariant=fold8&openAngle=110&ry=22'],
   ['fold8ultra-open', 'device=fold&fvariant=fold8ultra&ry=22'],
   ['flip8-open', 'device=flip&flvariant=flip8&ry=22'],
+  // the iPhone Duo: the Fold 8's passport shape under Apple's name - a
+  // hole-free landscape inner panel, the cover with its pill and badge, and
+  // the flex pose with no spine emboss to show
+  ['iphone-duo-open', 'device=iphoneduo&ry=22'],
+  ['iphone-duo-closed', 'device=iphoneduo&open=0&ry=22'],
+  ['iphone-duo-flex', 'device=iphoneduo&openAngle=110&ry=22'],
   ['watch', 'device=watch&ry=18'],
+  // the Ultra 4's flat-sided case, crown guard, Action button and buckled band
+  ['watch-ultra4', 'device=watch&wvariant=ultra4&ry=18'],
   // the Ultra 2's titanium squircle and three-key run (the watch9 shares the
   // watch8 case, which the galaxy-watch harness pose already defends)
   ['watch-ultra2', 'device=watch&wvariant=watchultra2&ry=18'],

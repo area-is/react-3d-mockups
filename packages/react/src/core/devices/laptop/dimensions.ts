@@ -1,7 +1,8 @@
 /**
- * Laptop device dimensions - MacBook Air 13" (M5) and MacBook Pro 14" (M5).
+ * Laptop device dimensions - MacBook Air 13" / 15" (M5), MacBook Pro 14" /
+ * 16" (M5) and the MacBook Neo 13".
  *
- * Both variants share one world scale (~72.4 mm per unit, set so the Air's
+ * Every variant shares one world scale (~72.4 mm per unit, set so the Air's
  * closed footprint is exactly 4.2 x 2.97 units), so they keep their true
  * relative sizes side by side. The Pro 14 numbers were measured from
  * published specifications and product photography (ports, feet, speaker
@@ -41,8 +42,19 @@ export interface LaptopSpec {
     radius: readonly [number, number, number, number]
     offsetY: number
   }
-  /** Camera notch: sits at the top-center of the display, menu-bar deep. */
-  notch: { width: number; height: number; radius: number }
+  /**
+   * Camera notch: sits at the top-center of the display, menu-bar deep. The
+   * notch is the 2021-on Air and Pro design; a laptop without one (the
+   * MacBook Neo) keeps its camera in the bezel above the panel instead - see
+   * `bezelCamera`.
+   */
+  notch?: { width: number; height: number; radius: number }
+  /**
+   * A camera set in the black bezel above the display rather than in a notch:
+   * `offsetY` is how far its centre sits above the display's top edge. Only
+   * the notchless MacBook Neo carries one.
+   */
+  bezelCamera?: { radius: number; offsetY: number }
   /**
    * The Magic Keyboard on the deck, hinge side: `width`/`depth` bound the key
    * grid (14.5 key units across, six rows deep, so they also set the 19 x
@@ -62,6 +74,12 @@ export interface LaptopSpec {
   trackpad: { width: number; depth: number; offsetZ: number }
   /** Default lid angle (degrees between deck and screen; 90 = upright). */
   openAngle: number
+  /**
+   * Keycap finish: the black caps of the Air and Pro by default, or caps
+   * colour-matched to the aluminium (`matched` - the MacBook Neo, whose
+   * legends are then etched dark on light caps).
+   */
+  keycaps?: 'black' | 'matched'
   /** Port openings per side wall. */
   ports: { left: LaptopPort[]; right: LaptopPort[] }
   /** Rubber feet under the base: centers (±x, ±z) and radius. */
@@ -101,7 +119,8 @@ const MACBOOK_AIR_13: LaptopSpec = {
   footprint: { width: 4.2, depth: 2.97, radius: 0.16 },
   base: { thickness: 0.1, bevel: 0.02 },
   lid: { thickness: 0.05, bevel: 0.008 },
-  display: { width: 4.0, height: 2.6, radius: [0.09, 0.09, 0, 0], offsetY: 0.05 },
+  // Apple's bezel drawing: 3.9 mm top corners, a 6.9 mm top bezel.
+  display: { width: 4.0, height: 2.6, radius: [0.054, 0.054, 0, 0], offsetY: 0.09 },
   notch: { width: 0.48, height: 0.095, radius: 0.045 },
   // The same Magic Keyboard module as the Pro (identical 272.8 x 108.6 mm key
   // grid), but set flush in the aluminum deck - the Air has no black tray.
@@ -138,7 +157,8 @@ const MACBOOK_PRO_14: LaptopSpec = {
   // must equal the panel's 3024:1964, or a 1512-wide layout renders 985 tall
   // instead of the hardware's 982. 14.2" at that aspect puts the active area
   // at 302.48 x 196.45 mm, which the height already matched.
-  display: { width: 4.1772, height: 2.713, radius: [0.063, 0.063, 0, 0], offsetY: 0.098 },
+  // Apple's bezel drawing: 3.8 mm top corners.
+  display: { width: 4.1772, height: 2.713, radius: [0.052, 0.052, 0, 0], offsetY: 0.098 },
   notch: { width: 0.508, height: 0.088, radius: 0.018 },
   // Black keyboard tray 278.7 x 114.9 mm centered 36.5 mm behind base center.
   keyboard: { width: 3.85, depth: 1.587, offsetZ: -0.504, tray: true },
@@ -187,7 +207,8 @@ const MACBOOK_AIR_15: LaptopSpec = {
   base: { thickness: 0.103, bevel: 0.02 },
   lid: { thickness: 0.05, bevel: 0.008 },
   // Active area 326.2 x 211.1 mm.
-  display: { width: 4.506, height: 2.916, radius: [0.09, 0.09, 0, 0], offsetY: 0.055 },
+  // Apple's bezel drawing: 3.9 mm top corners, a 6.7 mm top bezel.
+  display: { width: 4.506, height: 2.916, radius: [0.054, 0.054, 0, 0], offsetY: 0.091 },
   notch: { width: 0.48, height: 0.095, radius: 0.045 },
   // Identical Magic Keyboard module, seated the same distance from the hinge.
   keyboard: { width: 3.85, depth: 1.587, offsetZ: -0.756, tray: false },
@@ -219,7 +240,8 @@ const MACBOOK_PRO_16: LaptopSpec = {
   base: { thickness: 0.167, bevel: 0.028 },
   lid: { thickness: 0.054, bevel: 0.008 },
   // Active area 345.7 x 223.5 mm.
-  display: { width: 4.775, height: 3.087, radius: [0.063, 0.063, 0, 0], offsetY: 0.105 },
+  // Apple's bezel drawing: 3.8 mm top corners, a 5.6 mm top bezel.
+  display: { width: 4.775, height: 3.087, radius: [0.052, 0.052, 0, 0], offsetY: 0.093 },
   notch: { width: 0.508, height: 0.088, radius: 0.018 },
   keyboard: { width: 3.85, depth: 1.587, offsetZ: -0.69, tray: true },
   scoop: { width: 0.753, radius: 0.0593, bite: 0.0345 },
@@ -257,11 +279,64 @@ const MACBOOK_PRO_16: LaptopSpec = {
   bottomText: { text: 'MacBook Pro', width: 0.793, height: 0.104, offsetZ: 1.606 },
 }
 
-export const LAPTOP_VARIANTS: Record<'air13' | 'air15' | 'pro14' | 'pro16', LaptopSpec> = {
+/**
+ * MacBook Neo 13" (A18 Pro, 2026) - 297.5 x 206.4 x 12.7 mm closed, 13.0"
+ * 2408x1506 LED-backlit IPS display at 219 ppi. Apple's entry MacBook, and
+ * the first notchless one since 2022: the 1080p FaceTime camera sits in a
+ * visibly deeper black bezel above a square-cornered 16:10 panel, on a body
+ * a hair smaller than the Air 13's and 1.4 mm thicker. It keeps the Magic
+ * Keyboard module (Touch ID optional at retail; modelled with it), set
+ * Air-style straight in the aluminium deck, with two USB-C ports on the left
+ * (USB 3 and USB 2, both charging - there is no MagSafe) and the headphone
+ * jack on the right. Body, panel and port figures are Apple's tech specs;
+ * the deck layout (keyboard seat, trackpad, feet, camera position in the
+ * bezel) is adapted from the Air 13's measured deck and Apple's product
+ * photography. Default scaled resolution 1204x753 (2x).
+ */
+const MACBOOK_NEO_13: LaptopSpec = {
+  footprint: { width: 4.109, depth: 2.851, radius: 0.16 },
+  base: { thickness: 0.115, bevel: 0.02 },
+  lid: { thickness: 0.06, bevel: 0.008 },
+  // 13.0" at 2408:1506 puts the active area at 280.0 x 175.1 mm. Apple's
+  // bezel drawing rounds its top corners 4.0 mm like the Air's and squares
+  // the bottom ones, under a 9.4 mm top bezel - the same as the sides - and
+  // a deeper chin, so the panel sits high.
+  display: { width: 3.867, height: 2.419, radius: [0.055, 0.055, 0, 0], offsetY: 0.086 },
+  // The Ø1.7 mm camera window centred in the top bezel, 4.5 mm above the panel.
+  bezelCamera: { radius: 0.012, offsetY: 0.062 },
+  // Caps colour-matched to the aluminium, per Apple's launch photography.
+  keycaps: 'matched',
+  // The same 272.8 x 108.6 mm Magic Keyboard module as the Air, flush in the
+  // deck, seated the Air's distance from the hinge.
+  keyboard: { width: 3.85, depth: 1.587, offsetZ: -0.54, tray: false },
+  scoop: { width: 0.75, radius: 0.059, bite: 0.032 },
+  // ~117 x 76 mm trackpad, centred between the keyboard and the front edge.
+  trackpad: { width: 1.62, depth: 1.05, offsetZ: 0.84 },
+  openAngle: 110,
+  ports: {
+    // Apple's side photography, scaled by the port openings: two USB-C
+    // pills on the left 23 and 37 mm from the back edge - USB 3, then USB 2
+    // - and on the right the jack 53 mm back with the 27 mm speaker slot
+    // between it and the hinge.
+    left: [
+      { z: -1.108, width: 0.1, height: 0.03 },
+      { z: -0.914, width: 0.1, height: 0.03 },
+    ],
+    right: [
+      { z: -0.693, width: 0.048, height: 0.048, shape: 'round' },
+      { z: -0.956, width: 0.37, height: 0.016 },
+    ],
+  },
+  feet: { x: 1.72, z: 1.1, radius: 0.055 },
+  logo: { width: 0.49, height: 0.6, offsetY: 0.05 },
+}
+
+export const LAPTOP_VARIANTS: Record<'air13' | 'air15' | 'pro14' | 'pro16' | 'neo13', LaptopSpec> = {
   air13: MACBOOK_AIR_13,
   air15: MACBOOK_AIR_15,
   pro14: MACBOOK_PRO_14,
   pro16: MACBOOK_PRO_16,
+  neo13: MACBOOK_NEO_13,
 }
 
 export type LaptopVariant = keyof typeof LAPTOP_VARIANTS
@@ -287,13 +362,15 @@ export const LAPTOP_MM_PER_UNIT = 72.4
 
 /**
  * Default CSS px width of each variant's virtual display: the panel's own
- * point grid at 2x (a 2560x1664 Air 13 renders 1280x832).
+ * point grid at 2x (a 2560x1664 Air 13 renders 1280x832, the Neo's
+ * 2408x1506 renders 1204x753).
  */
 export const LAPTOP_RESOLUTIONS: Record<LaptopVariant, number> = {
   air13: 1280,
   air15: 1440,
   pro14: 1512,
   pro16: 1728,
+  neo13: 1204,
 }
 
 /** Live geometry of the display. Laptops have one pose - always landscape. */

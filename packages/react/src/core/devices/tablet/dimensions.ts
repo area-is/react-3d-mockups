@@ -137,7 +137,8 @@ export interface TabletSpec {
 const IPAD_PRO_13: TabletSpec = {
   body: { width: 3.367, height: 4.4, depth: 0.08, radius: 0.2, bevel: 0.01 },
   glass: { width: 3.31, height: 4.343, radius: 0.18 },
-  display: { width: 3.095, height: 4.128, radius: 0.16 },
+  // Apple's bezel drawing: 5.6 mm display corners.
+  display: { width: 3.095, height: 4.128, radius: 0.0875 },
   resolution: 1032,
   // Apple's drawing: the pod is a 31.44 mm rounded square whose outer edge sits
   // 4.32 mm from the top and side edges, so its center is 20.04 mm in.
@@ -167,7 +168,8 @@ const IPAD_PRO_13: TabletSpec = {
 const IPAD_PRO_11: TabletSpec = {
   body: { width: 2.773, height: 3.902, depth: 0.083, radius: 0.19, bevel: 0.01 },
   glass: { width: 2.716, height: 3.845, radius: 0.17 },
-  display: { width: 2.508, height: 3.639, radius: 0.15 },
+  // Apple's bezel drawing: 5.6 mm display corners.
+  display: { width: 2.508, height: 3.639, radius: 0.0875 },
   resolution: 834,
   // Apple's drawing gives the 11" the SAME camera pod, buttons, Smart Connector
   // and speaker runs as the 13" - only the body around them changes.
@@ -195,7 +197,8 @@ const IPAD_AIR_13: TabletSpec = {
   glass: { width: 3.3, height: 4.327, radius: 0.14 },
   // Width corrected from an exact 4:3: the panel is 2732:2048, very slightly
   // wider, and modelling it as 4:3 rendered 1365 tall instead of 1366.
-  display: { width: 3.078, height: 4.106, radius: 0.12 },
+  // Apple's bezel drawing: 3.4 mm display corners.
+  display: { width: 3.078, height: 4.106, radius: 0.053 },
   resolution: 1024,
   // Apple's drawing: lens center 12.69 mm in from the top and side edges, an
   // Ø11.89 window inside an Ø16.92 body-colored mound, mic 27.62 mm from the top.
@@ -230,7 +233,8 @@ const IPAD_AIR_13: TabletSpec = {
 const IPAD_AIR_11: TabletSpec = {
   body: { width: 2.789, height: 3.869, depth: 0.095, radius: 0.15, bevel: 0.012 },
   glass: { width: 2.732, height: 3.812, radius: 0.13 },
-  display: { width: 2.466, height: 3.548, radius: 0.11 },
+  // Apple's bezel drawing: 3.6 mm display corners.
+  display: { width: 2.466, height: 3.548, radius: 0.056 },
   resolution: 820,
   // Same camera module, buttons and Smart Connector as the 13" Air; only the
   // speaker runs move in with the narrower body (28.22–56.44 mm per Apple).
@@ -269,7 +273,8 @@ const IPAD_11: TabletSpec = {
   glass: { width: 2.748, height: 3.828, radius: 0.21 },
   // Height corrected so the modelled aspect matches the panel's 1640:2360;
   // it rendered 1181 tall against the hardware's 1180.
-  display: { width: 2.464, height: 3.5458, radius: 0.1 },
+  // Apple's bezel drawing: 4.6 mm display corners.
+  display: { width: 2.464, height: 3.5458, radius: 0.072 },
   resolution: 820,
   // Apple's drawing: the same camera module as the Air (Ø11.89 window inside an
   // Ø16.92 mound), sitting 14.90 mm in from both edges, mic 29.62 from the top.
