@@ -19,43 +19,72 @@
   letter-spacing: -0.01em;
 }
 
+/* The positioning box for the Examples menu on a phone, where the menu
+   spans the bar rather than hanging off its button. */
 .ex-bar-inner {
+  position: relative;
   display: flex;
-  /* Never wider than the screen: on anything narrower than the one-row
-     layout below allows for, the links drop to a second row instead. */
-  flex-wrap: wrap;
   align-items: center;
-  gap: 4px 12px;
+  gap: 16px;
   max-width: 1240px;
-  min-height: 38px;
+  min-height: 46px;
   margin: 0 auto;
-  padding: 4px 32px;
+  padding: 0 32px;
 }
 
 .ex-bar a {
   color: var(--text);
-  transition: color 0.15s ease;
+  transition: color 0.15s ease, background 0.15s ease;
 }
 
-.ex-bar a:hover {
-  color: var(--accent-2);
+/* ---- left: the library, then this example ------------------------------ */
+
+.ex-bar-lead {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
 }
 
 .ex-bar-home {
   display: inline-flex;
   align-items: center;
-  gap: 7px;
+  gap: 8px;
   flex: none;
+  font-size: 13.5px;
   font-weight: 650;
+  letter-spacing: -0.02em;
   white-space: nowrap;
 }
 
-.ex-bar-tag {
+.ex-bar-home:hover {
+  color: #fff;
+}
+
+.ex-bar-crumb {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
   flex: none;
-  padding: 2px 8px;
-  border: 1px solid rgba(255, 255, 255, 0.14);
+  white-space: nowrap;
+}
+
+.ex-bar-slash {
+  color: rgba(255, 255, 255, 0.22);
+  font-weight: 300;
+  font-size: 16px;
+}
+
+.ex-bar-current {
+  color: var(--text);
+  font-weight: 550;
+}
+
+.ex-bar-tag {
+  padding: 2px 7px;
   border-radius: 999px;
-  font-size: 12px;
+  background: rgba(255, 255, 255, 0.07);
+  font-size: 11.5px;
   font-weight: 600;
   letter-spacing: -0.005em;
   color: var(--muted);
@@ -63,65 +92,195 @@
 
 .ex-bar-note {
   min-width: 0;
+  padding-left: 12px;
+  border-left: 1px solid rgba(255, 255, 255, 0.1);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
+.ex-bar-note a {
+  text-decoration: underline;
+  text-decoration-color: rgba(255, 255, 255, 0.25);
+  text-underline-offset: 2px;
+}
+
+.ex-bar-note a:hover {
+  color: var(--accent-2);
+}
+
+/* ---- right: docs, the examples, the source, the next one ---------------- */
+
 .ex-bar-links {
   display: flex;
-  gap: 16px;
+  align-items: center;
+  gap: 4px;
   flex: none;
   margin-left: auto;
   white-space: nowrap;
 }
 
-.ex-bar-links a {
+/* The plain links and the menu's button share one look: quiet until hovered,
+   with the hover a soft fill rather than a colour change alone. */
+.ex-bar-link,
+.ex-bar .nav-menu-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 30px;
+  padding: 0 10px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 550;
+  color: var(--muted);
+}
+
+.ex-bar a.ex-bar-link {
+  color: var(--muted);
+}
+
+.ex-bar a.ex-bar-link:hover,
+.ex-bar .nav-menu-btn:hover,
+.ex-bar .nav-menu[data-open='true'] .nav-menu-btn {
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.ex-bar-link:focus-visible,
+.ex-bar .nav-menu-btn:focus-visible,
+.ex-bar-next:focus-visible,
+.ex-bar-home:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* The one filled control: where to go when this page is done. */
+.ex-bar a.ex-bar-next {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 30px;
+  margin-left: 6px;
+  padding: 0 11px 0 12px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.08);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+  font-size: 13px;
   font-weight: 600;
+  color: var(--text);
 }
 
-.ex-bar-narrow {
-  display: none;
+.ex-bar a.ex-bar-next:hover {
+  background: rgba(255, 255, 255, 0.13);
+  color: #fff;
 }
 
-/* The same line at phone width: the sentence goes and the links keep one
-   word each. One row down to 360px; below that the mark goes too. */
+.ex-bar-next svg {
+  transition: transform 0.15s ease;
+}
+
+.ex-bar-next:hover svg {
+  transform: translateX(2px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ex-bar-next:hover svg {
+    transform: none;
+  }
+}
+
+/* ---- the Examples menu, as the site header has it ------------------------ */
+
+.ex-bar .nav-menu-pop {
+  top: 38px;
+  right: -4px;
+  z-index: 70;
+  font-size: 14px;
+  letter-spacing: -0.01em;
+}
+
+.ex-bar .nav-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: none;
+  padding: 6px 8px;
+  border-radius: 7px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #fff;
+}
+
+.ex-bar .nav-menu-item:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+/* This page, in the list of pages: marked, not offered. */
+.ex-bar .nav-menu-item[aria-current='page'] {
+  background: rgba(255, 255, 255, 0.08);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+}
+
+/* The note is the first thing to go, then the crumb and the Docs link: on a
+   phone the bar is the library's name and the three ways out. */
+@media (max-width: 1100px) {
+  .ex-bar-note {
+    display: none;
+  }
+}
+
 @media (max-width: 760px) {
   .ex-bar-inner {
-    column-gap: 9px;
-    padding: 4px 14px;
+    gap: 10px;
+    min-height: 44px;
+    padding: 0 12px 0 14px;
   }
 
-  .ex-bar-note,
+  .ex-bar-crumb,
+  .ex-bar-docs,
   .ex-bar-wide {
     display: none;
   }
 
-  .ex-bar-narrow {
-    display: inline;
+  .ex-bar-links {
+    gap: 2px;
   }
 
-  .ex-bar-links {
-    gap: 13px;
+  .ex-bar-link,
+  .ex-bar .nav-menu-btn {
+    padding: 0 8px;
+  }
+
+  .ex-bar a.ex-bar-next {
+    margin-left: 2px;
+    padding: 0 9px 0 10px;
+  }
+
+  /* One column, the width of the bar, hung from the bar rather than from its
+     button: `.nav-menu` stops being the positioning box, `.ex-bar-inner` is. */
+  .ex-bar .nav-menu {
+    position: static;
+  }
+
+  .ex-bar .nav-menu-pop {
+    top: calc(100% + 4px);
+    left: 10px;
+    right: 10px;
+    width: auto;
+    grid-template-columns: 1fr;
+  }
+
+  .ex-bar .nav-menu-group + .nav-menu-group {
+    padding-left: 0;
+    padding-top: 6px;
+    border-left: 0;
+    border-top: 1px solid var(--border);
   }
 }
 
 @media (max-width: 359px) {
-  .ex-bar-home svg {
+  .ex-bar-name {
     display: none;
-  }
-
-  .ex-bar-inner {
-    column-gap: 7px;
-    padding: 4px 10px;
-  }
-
-  .ex-bar-tag {
-    padding: 2px 6px;
-    letter-spacing: 0.02em;
-  }
-
-  .ex-bar-links {
-    gap: 10px;
   }
 }

@@ -121,6 +121,14 @@ const STAGE_Y = 0.72
 const SIDE_SCALE = 0.5
 /** The picker row, well below the stage. */
 const ROW_Y = -2.2
+/**
+ * How much lower than `ROW_Y` the row itself is drawn. The strip sat a full
+ * unit above the canvas's foot, which put a band of empty stage between the
+ * thumbnails and the Play / Copy code toolbar under them; this closes most of
+ * it. Kept apart from `ROW_Y`, which also sets the rig's drop on a narrow
+ * canvas, so lowering the strip does not move the device on stage.
+ */
+const ROW_LOWER = 0.55
 const ROW_SCALE = 0.17
 const ROW_SPACING = 1.25
 /**
@@ -1030,7 +1038,7 @@ function RowSlot({
     const near = Math.max(0, 1 - Math.abs(d))
     const scale = extent.scale * ROW_SCALE * (1 + 0.3 * near) * (hovered.current ? 1.1 : 1)
     g.position.x = d * ROW_SPACING - extent.cx * scale
-    g.position.y = ROW_Y - extent.cy * scale
+    g.position.y = ROW_Y - ROW_LOWER - extent.cy * scale
     g.scale.setScalar(scale)
     g.rotation.y = (entry.yaw ?? 0) + BASE_RY
     g.updateMatrixWorld(true)
@@ -1206,6 +1214,22 @@ export default function CarouselScene() {
     stop()
     goTo(i)
     announce(i)
+  }
+  /**
+   * Play moves on at once rather than six seconds later: a button that
+   * appears to do nothing for the length of a slide reads as broken, and the
+   * step says what the button is for. The interval restarts from the press,
+   * so the next slide is a full slide away.
+   */
+  const toggleAuto = () => {
+    if (autoOn) {
+      stop()
+      return
+    }
+    setAuto(true)
+    const to = activeRef.current + 1
+    goTo(to)
+    announce(to)
   }
 
   const fit = useCarouselFit(sectionRef)
@@ -1592,7 +1616,7 @@ export default function CarouselScene() {
           <button
             type="button"
             className="carousel-tool"
-            onClick={() => setAuto(!autoOn)}
+            onClick={toggleAuto}
             aria-label={autoOn ? 'Pause autoplay' : 'Play autoplay'}
           >
             {autoOn ? <Pause size={15} strokeWidth={2} aria-hidden /> : <Play size={15} strokeWidth={2} aria-hidden />}

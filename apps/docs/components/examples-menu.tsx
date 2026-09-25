@@ -12,8 +12,12 @@ import { asset } from '@/lib/base-path.mjs'
  * its name. The glimpses are `npm run example-thumbs`, a few KB each, and the
  * menu only renders when it is open, so a visitor who never opens it never
  * fetches them.
+ *
+ * The site header and the bar across the top of every example both carry
+ * it. On an example, `current` names the page the visitor is on, which the
+ * menu marks rather than offering as somewhere to go.
  */
-export function ExamplesMenu() {
+export function ExamplesMenu({ current }: { current?: string } = {}) {
   const [open, setOpen] = useState(false)
   const ref = useRef<HTMLSpanElement>(null)
 
@@ -58,6 +62,7 @@ export function ExamplesMenu() {
                   href={example.href}
                   className="nav-menu-item"
                   role="menuitem"
+                  aria-current={example.slug === current ? 'page' : undefined}
                   onClick={() => setOpen(false)}
                 >
                   <img

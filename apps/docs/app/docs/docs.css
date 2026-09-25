@@ -100,22 +100,23 @@
 }
 
 /* A category's name across both columns, in the voice of Fumadocs' own
-   sidebar separators but a step quieter - these are under "Devices". */
+   sidebar separators but a step quieter - these are under "Devices". Set in
+   its own case: weight and colour mark it as a heading, not capitals. */
 .mockup-grid-heading {
   grid-column: 1 / -1;
-  margin: 8px 0 -2px;
-  font-size: 11px;
-  font-weight: 500;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
+  margin: 20px 0 -2px;
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: -0.005em;
+  line-height: 1.3;
   color: var(--color-fd-muted-foreground);
 }
 
-/* The first has no grid gap above it, only the separator's own margin; this
-   makes up the difference, so every category starts the same 16px below
-   whatever comes before it. */
+/* The first has no tiles above it, only the separator; a category after
+   tiles sits 28px below them (the 8px grid gap plus its margin), which
+   separates it from the category it follows. */
 .mockup-grid-heading:first-child {
-  margin-top: 12px;
+  margin-top: 16px;
 }
 
 .mockup-tile {
