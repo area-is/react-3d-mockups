@@ -436,7 +436,7 @@ function keycapGeometry(width: number, depth: number) {
  * across, its center 0.816 of the way down the cap (3.9 x 0.9 mm, 5.1 mm below
  * the cap's center on a 16 mm cap), standing ~0.2 mm off the face.
  */
-function HomeRowNubs({ keys }: { keys: KeyDef[] }) {
+function HomeRowNubs({ keys, color }: { keys: KeyDef[]; color: string }) {
   const geometry = React.useMemo(() => {
     if (!keys.length) return null
     const width = keys[0]!.w * 0.237
@@ -455,7 +455,7 @@ function HomeRowNubs({ keys }: { keys: KeyDef[] }) {
     <>
       {keys.map((key, i) => (
         <mesh key={i} geometry={geometry} position={[key.x, CAP_TOP_Y, key.z + key.d * 0.316]}>
-          <meshPhysicalMaterial color="#17181d" metalness={0.08} roughness={0.72} envMapIntensity={0.45} />
+          <meshPhysicalMaterial color={color} metalness={0.08} roughness={0.72} envMapIntensity={0.45} />
         </mesh>
       ))}
     </>
@@ -463,7 +463,17 @@ function HomeRowNubs({ keys }: { keys: KeyDef[] }) {
 }
 
 /** Every cap of one footprint, in one draw call. */
-function CapCluster({ width, depth, keys }: { width: number; depth: number; keys: KeyDef[] }) {
+function CapCluster({
+  width,
+  depth,
+  keys,
+  color,
+}: {
+  width: number
+  depth: number
+  keys: KeyDef[]
+  color: string
+}) {
   const meshRef = React.useRef<THREE.InstancedMesh>(null!)
   const geometry = React.useMemo(() => keycapGeometry(width, depth), [width, depth])
   React.useEffect(() => () => geometry.dispose(), [geometry])
@@ -475,7 +485,7 @@ function CapCluster({ width, depth, keys }: { width: number; depth: number; keys
   return (
     <instancedMesh ref={meshRef} args={[undefined, undefined, keys.length]} geometry={geometry}>
       {/* matte keycaps: tame the studio env so the black doesn't wash out */}
-      <meshPhysicalMaterial color="#17181d" metalness={0.08} roughness={0.72} envMapIntensity={0.45} />
+      <meshPhysicalMaterial color={color} metalness={0.08} roughness={0.72} envMapIntensity={0.45} />
     </instancedMesh>
   )
 }
@@ -487,7 +497,17 @@ function CapCluster({ width, depth, keys }: { width: number; depth: number; keys
  * media icons), the raised F / J home-row markers, and the Touch ID sensor on
  * the top-right key.
  */
-function Keys({ keyboard }: { keyboard: { width: number; depth: number; offsetZ: number } }) {
+function Keys({
+  keyboard,
+  capColor = '#17181d',
+  ink = 'rgba(228, 231, 240, 0.85)',
+}: {
+  keyboard: { width: number; depth: number; offsetZ: number }
+  /** Keycap colour - the Air and Pro's black, or the Neo's colour-matched caps. */
+  capColor?: string
+  /** Legend colour: light on black caps, dark on colour-matched ones. */
+  ink?: string
+}) {
   const layout = React.useMemo(() => buildKeyboardLayout(keyboard), [keyboard])
 
   // Caps bucketed by footprint - six widths plus the half-height arrows.
@@ -511,7 +531,7 @@ function Keys({ keyboard }: { keyboard: { width: number; depth: number; offsetZ:
     canvas.width = 2048
     canvas.height = Math.round(keyboard.depth * scale)
     const ctx = canvas.getContext('2d')!
-    const INK = 'rgba(228, 231, 240, 0.85)'
+    const INK = ink
     ctx.fillStyle = INK
     ctx.strokeStyle = INK
     // Apple laser-etches these legends in a light-to-regular weight; 400 keeps
@@ -621,7 +641,7 @@ function Keys({ keyboard }: { keyboard: { width: number; depth: number; offsetZ:
     texture.anisotropy = 8
     texture.colorSpace = THREE.SRGBColorSpace
     return texture
-  }, [layout, keyboard])
+  }, [layout, keyboard, ink])
   React.useEffect(() => () => legendsTexture?.dispose(), [legendsTexture])
 
   // Touch ID's sensor fills two thirds of its cap (measured Ø11 mm).
@@ -630,10 +650,10 @@ function Keys({ keyboard }: { keyboard: { width: number; depth: number; offsetZ:
   return (
     <>
       {clusters.map(([id, cluster]) => (
-        <CapCluster key={id} width={cluster.width} depth={cluster.depth} keys={cluster.keys} />
+        <CapCluster key={id} width={cluster.width} depth={cluster.depth} keys={cluster.keys} color={capColor} />
       ))}
       {/* the raised F / J home-row markers */}
-      <HomeRowNubs keys={layout.keys.filter((k) => k.legend.t === 'txt' && k.legend.nub)} />
+      <HomeRowNubs keys={layout.keys.filter((k) => k.legend.t === 'txt' && k.legend.nub)} color={capColor} />
       {/* printed legends, floating just above the caps */}
       {legendsTexture && (
         <mesh position={[0, 0.0195, 0]} rotation-x={-Math.PI / 2}>
@@ -683,6 +703,15 @@ function LaptopImpl({
   // color. Ids win over same-named CSS colors - pass hex for those.
   const retail = findColorway(LAPTOP_COLORWAYS[variant], colorProp)
   const color = retail?.color ?? colorProp ?? '#e3e4e6'
+  // The Neo's caps are the aluminium's own colour, a shade lighter (Apple's
+  // launch photography), with legends etched dark; the Air's and Pro's are
+  // black with light legends.
+  const matchedCaps = spec.keycaps === 'matched'
+  const capColor = React.useMemo(
+    () => (matchedCaps ? `#${new THREE.Color(color).lerp(new THREE.Color('#ffffff'), 0.14).getHexString()}` : '#17181d'),
+    [matchedCaps, color]
+  )
+  const legendInk = matchedCaps ? 'rgba(46, 48, 56, 0.82)' : 'rgba(228, 231, 240, 0.85)'
   const { footprint, base, lid, display, notch: notchDims, bezelCamera, keyboard, trackpad } = spec
   // Default scaled desktops (native/2): 1280x832 / 1440x932 on the Airs,
   // 1512x982 / 1728x1117 on the Pros, 1204x753 on the Neo - from core, so the
@@ -868,7 +897,7 @@ function LaptopImpl({
           )}
           {/* caps sit nearly flush with the deck (measured: tops +0.3 mm) */}
           <group position={[0, deckY - 0.013, keyboard.offsetZ]}>
-            <Keys keyboard={keyboard} />
+            <Keys keyboard={keyboard} capColor={capColor} ink={legendInk} />
           </group>
 
           {/* trackpad: flush glass with a hairline seam around it. Same finish as

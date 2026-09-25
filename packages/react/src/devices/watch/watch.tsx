@@ -611,6 +611,15 @@ function WatchBody({
             />
             <meshPhysicalMaterial color={color} metalness={0.9} roughness={0.22} clearcoat={0.4} />
           </mesh>
+          {/* the Ultra's International Orange ring inlaid around the cap's face */}
+          {crown.ring && (
+            <mesh rotation-y={Math.PI / 2} position-x={crown.proud + 0.0086}>
+              <ringGeometry
+                args={[(crown.radius - crown.toothDepth - 0.012) * 0.74, (crown.radius - crown.toothDepth - 0.012) * 0.92, 48]}
+              />
+              <meshPhysicalMaterial color={crown.ring} metalness={0.2} roughness={0.5} />
+            </mesh>
+          )}
         </group>
       )}
 

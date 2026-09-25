@@ -14,31 +14,36 @@ breaking change can ship in a minor release, and is always listed under
   same `openAngle` pose vocabulary as `FoldMockup` (open, shut, or any Flex
   angle between), a landscape 7.6" inner panel (890×626 logical) with *no*
   camera hole because the inner FaceTime camera sits under the glass, a 5.4"
-  cover screen (466×678) behind a centred hole, the iPhone 17's two-lens
-  glossy pill and the Apple badge on the camera half's back, Touch ID in the
-  side button, a mirror-polished titanium frame, a bare hinge cover with no
-  wordmark, and iOS's status bar rather than One UI's. It is built on the
-  same spec shape and scene body as the Galaxy Z Fold - `FoldSpec` gained a
-  `brand`, an optional inner punch hole and spine emboss, per-ring finish
-  figures and a back badge - and measures under the new `iphoneDuo` kind.
-  `IPhoneMockup` gains `variant="18pro"` and `variant="18promax"`: the 17
-  Pros' chassis to the tenth of a millimetre under the generation's ~35%
-  narrower Dynamic Island and colour-matched Ceramic Shield back, in Black,
-  Silver, Glacier and Burgundy. `AppleWatchMockup` gains `variant="series12"`
-  (the Series 11's case, the generation's eight aluminium, titanium and
-  ceramic finishes) and `variant="ultra4"` - the 49 mm flat-sided titanium
-  case the Ultra 3 introduced, with its raised crown guard, the orange Action
-  button on the left flank (orange whatever the finish, because on the
-  hardware it is), a flat crystal over the 422×514 panel (211×257 logical)
-  and the buckled Ocean Band; watch keys can now sit on either flank.
-  `LaptopMockup` gains `variant="neo13"`, the MacBook Neo 13": the first
-  notchless MacBook in the catalog - `LaptopSpec.notch` is optional now and a
-  `bezelCamera` puts the 1080p camera in the deeper bezel above a
-  square-cornered 2408×1506 panel (1204×753 logical) - on a body a hair
-  smaller and thicker than the Air 13's, with two USB-C ports and no MagSafe,
-  in Silver, Blush, Citrus and Indigo. Every body and panel figure is Apple's
-  published dimension; the detail geometry each spec carries over from a
-  measured predecessor says so in its comment.
+  cover screen (466×678) with the camera hole in its top-right corner, the
+  horizontal two-lens plateau with its mic and flash and the Apple badge on
+  the camera half's back, the volume keys on that half's top edge, Touch ID
+  in the side button, near-square hinge corners beside round free ones, a
+  mirror-polished titanium frame, a bare hinge cover with no wordmark, and
+  iOS's status bar rather than One UI's. It is built on the same spec shape
+  and scene body as the Galaxy Z Fold - `FoldSpec` gained a `brand`, an
+  optional inner punch hole and spine emboss, per-ring finish figures and
+  positions, a back badge, hinge-side corner radii, a cover display offset,
+  top-edge keys and a plateau-seated flash and mic - and measures under the
+  new `iphoneDuo` kind. `IPhoneMockup` gains `variant="18pro"` and
+  `variant="18promax"`: the 17 Pros' chassis to the tenth of a millimetre
+  under the generation's Dynamic Island, a quarter narrower, and
+  colour-matched Ceramic Shield back, in Black, Silver, Glacier and Burgundy.
+  `AppleWatchMockup` gains `variant="series12"` (the Series 11's case a
+  millimetre wider, the generation's eight aluminium, titanium and ceramic
+  finishes) and `variant="ultra4"` - the 49 mm flat-sided titanium case the
+  Ultra 3 introduced, with its raised crown guard, the orange-ringed crown,
+  the orange Action button on the left flank (orange whatever the finish,
+  because on the hardware it is), a flat crystal over the 422×514 panel
+  (211×257 logical) and the buckled Ocean Band; watch keys can now sit on
+  either flank. `LaptopMockup` gains `variant="neo13"`, the MacBook Neo 13":
+  the first notchless MacBook in the catalog - `LaptopSpec.notch` is optional
+  now and a `bezelCamera` puts the camera in the bezel above the 2408×1506
+  panel (1204×753 logical) - on a body a hair smaller and thicker than the
+  Air 13's, with keycaps colour-matched to the aluminium (`LaptopSpec.keycaps`),
+  two USB-C ports and no MagSafe, in Silver, Blush, Citrus and Indigo. Every
+  body and panel figure is Apple's published dimension, and the detail
+  geometry is measured off Apple's own product-bezel drawings (see
+  `agent-outputs/model-review-2026-09-apple.md`).
 
 - **Render control on every mockup.** `frameloop` (`'demand' | 'always' |
   'never'`), `pauseWhenOffscreen`, `gl` (merged over `CANVAS_GL_DEFAULTS`) and
@@ -98,6 +103,7 @@ breaking change can ship in a minor release, and is always listed under
   `statusBarLayout()`, `statusBarMetrics()` and `resolveStatusBarContent()` are
   exported from `react-3d-mockups/core` for bindings outside React, and
   `<StatusBar>` from the package root for anyone composing one by hand.
+
 
 ### Changed (breaking)
 
@@ -309,6 +315,19 @@ breaking change can ship in a minor release, and is always listed under
   The left half lands at the bottom of the upright landscape content but showed
   the top, so crossing the flat-open threshold mirrored the content across the
   crease.
+
+- **Apple's product bezels as the benchmark for the whole Apple catalog.**
+  Measured against the bezel drawings on Apple Design Resources, the display
+  corners were too round on every iPad (now 5.6 mm on the Pros, 3.4-3.6 on
+  the Airs, 4.6 on the iPad), too tight on the iPhone 17 Pro (10.4 mm, with
+  the Pro Max's 12.6 mm body corners) and too round on the Apple Watch Series
+  11 (8.0 mm, on the 32.4 × 38.6 mm panel Apple's 1196 mm² implies); the
+  MacBook Air 13 and 15 top bezels were 2.6-2.9 mm too deep and their top
+  display corners too round (3.9 mm now, 3.8 on the Pros, with the Pro 16's
+  5.6 mm top bezel); the iPhone 17, Air and 17 Pro Dynamic Islands were
+  0.5-0.6 mm low and the 17 Pro's a millimetre narrow (20.65 mm); and the
+  Studio Display's panel corners are square. The older Apple specs carry the
+  corrected numbers; nothing about their API changed.
 
 ### Added
 

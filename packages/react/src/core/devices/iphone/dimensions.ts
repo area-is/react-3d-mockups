@@ -124,7 +124,8 @@ const IPHONE_17: IPhoneSpec = {
   body: { width: 1.925, height: 4.027, depth: 0.214, radius: 0.34, bevel: 0.02 },
   glass: { width: 1.865, height: 3.967, radius: 0.31 },
   display: { width: 1.8, height: 3.9134, radius: 0.28 },
-  island: { width: 0.56, height: 0.17, offsetY: 0.16 },
+  // Apple's bezel drawing: 20.65 x 5.96 mm, its centre 5.32 mm below the display's top edge.
+  island: { width: 0.556, height: 0.16, offsetY: 0.143 },
   resolution: 402,
   buttons: [
     { edge: 'left', y: 1.127, length: 0.17 },
@@ -180,7 +181,8 @@ const IPHONE_17_AIR: IPhoneSpec = {
   body: { width: 2.011, height: 4.205, depth: 0.152, radius: 0.338, bevel: 0.016 },
   glass: { width: 1.951, height: 4.145, radius: 0.31 },
   display: { width: 1.873, height: 4.066, radius: 0.276 },
-  island: { width: 0.557, height: 0.168, offsetY: 0.183 },
+  // Apple's bezel drawing: 20.65 x 5.96 mm, its centre 6.32 mm below the display's top edge.
+  island: { width: 0.556, height: 0.16, offsetY: 0.17 },
   resolution: 420,
   // Measured: Action 6.3 mm at +45.2, volumes 10.8/10.9 at +30.8/+16.4 (left rail);
   // side key 17.7 mm at +23.1, flush Camera Control 17.4 mm at -26.8 (right rail).
@@ -233,10 +235,13 @@ const IPHONE_17_AIR: IPhoneSpec = {
  * photography.
  */
 const IPHONE_17_PRO: IPhoneSpec = {
-  body: { width: 1.935, height: 4.038, depth: 0.2355, radius: 0.289, bevel: 0.02 },
-  glass: { width: 1.875, height: 3.978, radius: 0.26 },
-  display: { width: 1.8, height: 3.9134, radius: 0.23 },
-  island: { width: 0.528, height: 0.16, offsetY: 0.15 },
+  // Apple's bezel drawing gives the Pro the Pro Max's corners: 13.0 mm on
+  // the body, 10.4 on the display - and a 20.65 x 5.96 mm island centred
+  // 5.33 mm below the display's top edge.
+  body: { width: 1.935, height: 4.038, depth: 0.2355, radius: 0.34, bevel: 0.02 },
+  glass: { width: 1.875, height: 3.978, radius: 0.3 },
+  display: { width: 1.8, height: 3.9134, radius: 0.28 },
+  island: { width: 0.556, height: 0.16, offsetY: 0.1435 },
   resolution: 402,
   // Measured: Action 6.7 mm at +43.0, volumes 10.6 at +29.8/+16.6; side key 16.9 mm
   // at +23.4; flush Camera Control at -29.6.
@@ -325,8 +330,9 @@ const IPHONE_17_PRO: IPhoneSpec = {
 const IPHONE_17_PRO_MAX: IPhoneSpec = {
   body: { width: 2.1, height: 4.398, depth: 0.2355, radius: 0.34, bevel: 0.02 },
   glass: { width: 2.04, height: 4.338, radius: 0.3 },
-  display: { width: 1.962, height: 4.263, radius: 0.274 },
-  island: { width: 0.561, height: 0.163, offsetY: 0.142 },
+  display: { width: 1.962, height: 4.263, radius: 0.279 },
+  // Apple's bezel drawing: 20.60 x 5.91 mm, its centre 5.35 mm below the display's top edge.
+  island: { width: 0.5545, height: 0.159, offsetY: 0.144 },
   resolution: 440,
   // Measured: Action 6.9 mm at +47.4, volumes 11.2 at +33.3/+19.1; side key 17.7 mm
   // at +26.2; flush Camera Control at -30.1. All 2.7 mm thick, 0.45 mm proud.
@@ -391,12 +397,12 @@ const IPHONE_17_PRO_MAX: IPhoneSpec = {
 /**
  * The Dynamic Island the iPhone 18 Pro generation shrank to. Apple moved the
  * infrared camera under the display, and the cutout that is left measures
- * 13.49 mm across against the 17 Pro's 20.76 - the pre-launch measurement of
- * the panel cutout, which the retail units bore out and which Apple's own
- * accessory drawings for this generation have yet to publish. The pill's
- * height and its distance from the top edge are the 17 Pro's.
+ * 15.57 mm across against the 17 Pro's 20.65 - a quarter narrower - on
+ * Apple's own product-bezel drawings for the generation (the pre-launch
+ * 13.49 mm figure was the bare panel cutout, not the rendered pill). The
+ * pill's height and its distance from the top edge are the 17 Pro's.
  */
-const IPHONE_18_ISLAND_WIDTH = 0.363
+const IPHONE_18_ISLAND_WIDTH = 0.419
 
 /**
  * iPhone 18 Pro - the 17 Pro's chassis to the published tenth of a
@@ -404,7 +410,7 @@ const IPHONE_18_ISLAND_WIDTH = 0.363
  * forged plateau and lens trio, the same keys. So every body, camera and edge
  * figure is carried over from the 17 Pro spec, deliberately. What the
  * generation changed is visible from the front and the back: the Dynamic
- * Island is ~35% narrower, and the Ceramic Shield charging window is now
+ * Island is ~25% narrower, and the Ceramic Shield charging window is now
  * colour-matched to the aluminium unibody rather than the lighter two-tone
  * panel - the window is still there (it is what the model draws glossier than
  * the bead-blasted metal around it), it is just the body's own colour.

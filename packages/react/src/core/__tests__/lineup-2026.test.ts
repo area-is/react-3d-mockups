@@ -70,8 +70,9 @@ describe('iPhone 18 Pro and Pro Max', () => {
     expect(a.body).toEqual(b.body)
     expect(a.display).toEqual(b.display)
     expect(a.rearCamera).toEqual(b.rearCamera)
-    // ~35% narrower, the same height and the same seat below the top edge.
-    expect(a.island.width).toBeLessThan(b.island.width * 0.75)
+    // A quarter narrower (Apple's bezels: 15.57 vs 20.65 mm), the same
+    // height and the same seat below the top edge.
+    expect(a.island.width / b.island.width).toBeCloseTo(15.57 / 20.65, 2)
     expect(a.island.height).toBe(b.island.height)
     expect(a.island.offsetY).toBe(b.island.offsetY)
     expect(mockupInfo('iphone', { variant: next }).primary.px).toEqual(
@@ -100,8 +101,13 @@ describe('MacBook Neo 13"', () => {
 })
 
 describe('Apple Watch Series 12 and Ultra 4', () => {
-  it('carries the Series 12 on the Series 11 case', () => {
-    expect(APPLE_WATCH_VARIANTS.series12.body).toEqual(APPLE_WATCH_VARIANTS.series11.body)
+  it('carries the Series 12 on the Series 11 case, a millimetre wider', () => {
+    const { series11, series12 } = APPLE_WATCH_VARIANTS
+    // Apple's Series 12 specs: 46 x 40 x 9.7 mm against the 11's 46 x 39.
+    expect(series12.body.width * WATCH_MM_PER_UNIT).toBeCloseTo(40, 0)
+    expect(series11.body.width * WATCH_MM_PER_UNIT).toBeCloseTo(39, 0)
+    expect(series12.body.height).toBe(series11.body.height)
+    expect(series12.body.depth).toBe(series11.body.depth)
     expect(APPLE_WATCH_VARIANTS.series12.display).toEqual(APPLE_WATCH_VARIANTS.series11.display)
     expect(mockupInfo('appleWatch', { variant: 'series12' }).primary.px).toEqual(
       mockupInfo('appleWatch', { variant: 'series11' }).primary.px
@@ -112,10 +118,19 @@ describe('Apple Watch Series 12 and Ultra 4', () => {
     const ultra = APPLE_WATCH_VARIANTS.ultra4
     expect(ultra.style).toBe('apple')
     expect(ultra.body.height * WATCH_MM_PER_UNIT).toBeCloseTo(49, 0)
-    expect(ultra.body.width * WATCH_MM_PER_UNIT).toBeCloseTo(44, 0)
+    // The published 44 mm spans the crown guard and crown; the case itself
+    // is 41.4 mm on Apple's bezel drawing.
+    const guarded = ultra.body.width + ultra.crownGuard!.proud + (ultra.crown!.proud - ultra.crownGuard!.proud)
+    expect(guarded * WATCH_MM_PER_UNIT).toBeCloseTo(44, 0)
     expect(ultra.body.depth * WATCH_MM_PER_UNIT).toBeCloseTo(12, 0)
     expect(mockupInfo('appleWatch', { variant: 'ultra4' }).primary.px).toEqual({ width: 211, height: 257 })
-    expect(diagonal(mockupInfo('appleWatch', { variant: 'ultra4' }).primary.mm)).toBeCloseTo(1.98, 1)
+    // 422x514 at Apple's 326 ppi is 32.9 x 40.1 mm; with its 9 mm corners
+    // that is the 1245 mm² display area Apple publishes (the Series 11's
+    // 416x496 with 8 mm corners gives its 1196 the same way).
+    const area = ({ width, height, radius }: { width: number; height: number; radius: number }) =>
+      (width * height - (4 - Math.PI) * radius * radius) * WATCH_MM_PER_UNIT ** 2
+    expect(area(ultra.display)).toBeCloseTo(1245, -1)
+    expect(area(APPLE_WATCH_VARIANTS.series11.display)).toBeCloseTo(1196, -1)
   })
 
   it('shields the Ultra crown and puts the orange Action button on the left flank', () => {

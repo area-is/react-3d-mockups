@@ -64,7 +64,16 @@ export interface WatchSpec {
    * outer face protrudes past the case wall, `teeth`/`toothDepth` the
    * machined knurling crevices.
    */
-  crown?: { y: number; radius: number; thickness: number; proud: number; teeth: number; toothDepth: number }
+  /** `ring` paints a ring of that colour on the crown's face (the Ultra's International Orange). */
+  crown?: {
+    y: number
+    radius: number
+    thickness: number
+    proud: number
+    teeth: number
+    toothDepth: number
+    ring?: string
+  }
   /**
    * Keys on the right edge: Apple's flush side button (tiny `proud`, reads as
    * a pill outline in a recess), Galaxy's two raised chamfered keys, the
@@ -205,7 +214,9 @@ const SERIES_11: WatchSpec = {
   style: 'apple',
   body: { width: 2.203, height: 2.6, depth: 0.548, radius: 0.88, bevel: 0.12 },
   glass: { width: 2.02, height: 2.38, radius: 0.72 },
-  display: { width: 1.808, height: 2.158, radius: 0.62 },
+  // 416x496 at Apple's 326 ppi: 32.4 x 38.6 mm, the published 1196 mm², with
+  // 8.0 mm corners on Apple's bezel drawing.
+  display: { width: 1.831, height: 2.181, radius: 0.452 },
   resolution: 208,
   // Crown center ~31% down the right edge; ~7.3 mm knurled barrel, ~2 mm proud.
   crown: { y: 0.48, radius: 0.205, thickness: 0.19, proud: 0.115, teeth: 46, toothDepth: 0.0085 },
@@ -296,15 +307,19 @@ const GALAXY_WATCH_8: WatchSpec = {
 }
 
 /**
- * Apple Watch Series 12, 46 mm. Apple publishes the same case as the Series
- * 11 - 46 x 40 x 9.7 mm in aluminium and titanium, the same 416x496 panel and
- * the same 1196 mm² display area - so the geometry is carried over
- * deliberately, and the generation shows in the colorways. The new ceramic
+ * Apple Watch Series 12, 46 mm. Apple publishes the Series 11's case a
+ * millimetre wider - 46 x 40 x 9.7 mm in aluminium and titanium against the
+ * 11's 46 x 39 - over the same 416x496 panel and the same 1196 mm² display
+ * area, so the geometry is carried over at that width, and the generation
+ * shows in the colorways. The new ceramic
  * case is a millimetre taller and wider and 0.15 mm deeper; that is not
  * modelled as separate geometry.
  */
 const SERIES_12: WatchSpec = {
   ...SERIES_11,
+  // Apple's Series 12 tech specs give the aluminium and titanium 46 mm case
+  // a millimetre more width than the Series 11's 39: 46 x 40 x 9.7 mm.
+  body: { ...SERIES_11.body, width: 2.26 },
 }
 
 /**
@@ -322,20 +337,28 @@ const SERIES_12: WatchSpec = {
  */
 const ULTRA_4: WatchSpec = {
   style: 'apple',
-  body: { width: 2.486, height: 2.768, depth: 0.678, radius: 0.5, bevel: 0.08 },
-  glass: { width: 2.24, height: 2.5, radius: 0.4 },
-  // 1.98" at 422:514 - 31.9 x 38.9 mm.
-  display: { width: 1.802, height: 2.198, radius: 0.4 },
+  // Apple's published 44 mm width takes in the crown guard and crown: the
+  // case itself is 41.4 mm across on Apple's bezel drawing, the guard 1.6 mm
+  // proud of it and the crown 2.3.
+  body: { width: 2.339, height: 2.768, depth: 0.678, radius: 0.5, bevel: 0.08 },
+  // The flat crystal, with the 1.6 mm black border it paints around the panel.
+  glass: { width: 2.04, height: 2.446, radius: 0.6 },
+  // 422x514 at Apple's 326 ppi: 32.9 x 40.1 mm with 9.0 mm corners, the
+  // published 1245 mm², 4.3 mm in from the case edge on every side.
+  display: { width: 1.858, height: 2.263, radius: 0.511 },
   resolution: 211,
-  // The larger Ultra crown, standing clear of the guard by ~2 mm.
-  crown: { y: 0.34, radius: 0.235, thickness: 0.2, proud: 0.26, teeth: 48, toothDepth: 0.009 },
-  // The guard: a raised boss the height of crown and side button together.
-  crownGuard: { y: 0, length: 1.36, proud: 0.14, thickness: 0.46, radius: 0.09 },
+  // The Ø8.4 mm Ultra crown, centred 6.8 mm above the display's middle,
+  // standing 0.7 mm clear of the guard - with the orange ring on its face.
+  crown: { y: 0.38, radius: 0.237, thickness: 0.2, proud: 0.13, teeth: 48, toothDepth: 0.009, ring: '#e8622a' },
+  // The guard: a 27.2 mm raised boss centred on the case, spanning the crown
+  // and the side button, 1.6 mm proud.
+  crownGuard: { y: 0, length: 1.531, proud: 0.09, thickness: 0.46, radius: 0.09 },
   buttons: [
-    // side button, inside the guard, a hair proud of its face
-    { y: -0.36, length: 0.5, width: 0.16, proud: 0.165 },
-    // the Action button: orange whatever the case finish
-    { edge: 'left', y: 0, length: 0.62, width: 0.2, proud: 0.09, color: '#e8622a' },
+    // side button, 9.7 mm, centred 7.2 mm below the middle, 0.4 mm proud of the guard's face
+    { y: -0.407, length: 0.546, width: 0.16, proud: 0.112 },
+    // the Action button: 13.0 mm, centred 4.1 mm below the middle, all but
+    // flush in the case's silhouette - orange whatever the case finish
+    { edge: 'left', y: -0.232, length: 0.735, width: 0.2, proud: 0.03, color: '#e8622a' },
   ],
   // Two speaker slots flanking the Action button on the left flank.
   speaker: [

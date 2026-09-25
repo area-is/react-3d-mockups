@@ -1,6 +1,9 @@
 # Model review: the 2026 Apple additions against Apple's photos and product bezels
 
 **Date:** 2026-09-25 · **Reviewing:** `0fd524c` on `claude/bold-bohr-hjtaw9` (#50) · **Reviewer:** Claude Code
+**Update, same day:** every finding below, the older-model items included, is fixed in the commit
+that follows this review on the branch. See [What was fixed](#what-was-fixed) at the end for the
+after-fix overlays.
 
 > **Bottom line:** the published outer dimensions and panels are right on all six new models. Apple's own
 > bezel artwork measures within 0.3 mm of every body and display size. The problems are in the
@@ -325,6 +328,64 @@ None of these are applied. This document is the review.
    The guard, crown and Action button follow.
 7. **Series 12 display corners** (8) and **Pro corners** (9).
 8. **Colours** (10), then the older iPad and MacBook Air items.
+
+
+## What was fixed
+
+All ten findings and the older-model benchmark items were applied on the branch after this review,
+and the overlays were re-run on the rebuilt package. The magenta outline is Apple's bezel in every
+image; the render underneath is the model after the fix.
+
+![iPhone Duo back after the fix, model vs Apple at the same scale](model-review-2026-09-apple/after-duo-back-compare.png)
+
+- **iPhone Duo** (findings 1–4): the rear module is now a horizontal 55.8 × 21.3 mm plateau with the
+  lenses side by side and the mic and flash on it, the badge is centred on the back, the cover hole
+  is Ø6.0 mm in the top-right corner, the volume keys ride the camera half's top edge, the Touch ID
+  button sits alone in the upper part of the free rail, and the corners follow Apple's: 4.3 mm at the
+  hinge, 12.4 mm at the free edge, 1.3 / 9.6 mm on the cover display and 8.9 mm on the inner one.
+  The cover display also carries Apple's 0.7 mm shift toward the free edge. `FoldSpec` gained
+  `hingeRadius`, a display `offsetX`, a punch-hole `offsetX`, top-edge keys, per-ring `x`, an
+  optional island and a plateau-seated flash and mic to carry all of it.
+
+  ![iPhone Duo cover after the fix](model-review-2026-09-apple/after-duo-cover.png)
+  ![iPhone Duo inner display after the fix](model-review-2026-09-apple/after-duo-inner.png)
+
+- **iPhone 18 Pro and Pro Max** (finding 5): the island is 15.57 mm wide, centred 5.33 mm below the
+  display's top edge.
+
+  ![iPhone 18 Pro island after the fix](model-review-2026-09-apple/after-18pro-island.png)
+
+- **Watch Ultra 4** (finding 6): a 41.4 mm case with the 1.6 mm guard and the crown making up
+  Apple's 44 mm, the display at 32.9 × 40.1 mm with 9.0 mm corners and the published 1245 mm²
+  area, the guard 27.2 mm long, the crown 6.8 mm above the middle, the side button 9.7 mm and the
+  Action button 13.0 mm long at Apple's positions, and the orange ring on the crown's face.
+
+  ![Watch Ultra 4 after the fix](model-review-2026-09-apple/after-ultra4-front.png)
+
+- **MacBook Neo** (finding 7): keycaps colour-matched to the aluminium with dark legends, 4.0 mm
+  top display corners, a 9.4 mm top bezel, the Ø1.7 mm camera 4.5 mm above the panel, the USB-C
+  ports at 23 and 37 mm from the back, the jack at 53 mm, and the 27 mm speaker slot on the right.
+
+  ![MacBook Neo after the fix](model-review-2026-09-apple/after-neo-front.png)
+
+- **Watch Series 12 and Series 11** (finding 8): the display at 32.4 × 38.6 mm with 8.0 mm corners,
+  the published 1196 mm². The Series 12 case is 40 mm wide, as Apple's specs page says.
+
+  ![Watch Series 12 after the fix](model-review-2026-09-apple/after-s12-front.png)
+
+- **iPhone 17 Pro and 18 Pro corners** (finding 9): display corners 10.4 mm and body corners 12.6 mm,
+  the Pro Max's. The 17 Pro's own island is now 20.65 mm wide as well.
+- **Colours** (finding 10): Glacier, Burgundy, Night Sky, Neo Indigo and Citrus, and Ultra Natural
+  re-sampled from the bezel renders.
+- **Older models:** iPad display corners on all five iPads (5.6 / 3.4 / 3.6 / 4.6 mm), the MacBook
+  Air 13 and 15 top bezels (6.9 / 6.7 mm) and top display corners (3.9 mm), the Pro 14 and 16 top
+  corners (3.8 mm) and the Pro 16 top bezel (5.6 mm), the iPhone 17 and Air island centres, and the
+  Studio Display's square panel corners.
+
+**Not changed.** The quadratic corners the library draws on device bodies still read about 15%
+tighter than a circle of the same radius, on every device. That is a renderer trait, not a spec
+number, and is left as is. The Neo port positions come from a perspective photo and carry about
+2 mm of uncertainty.
 
 ## Sources
 

@@ -99,7 +99,7 @@ export const COMPONENT_PROPS: Record<string, PropDoc[]> = {
     {"name":"color","type":"string","default":"per variant","description":"Body color. Takes a retail colorway id from GALAXY_TAB_COLORWAYS (gray, silver) or any CSS color."},
   ],
   "AppleWatchMockup": [
-    {"name":"variant","type":"'series11' | 'series12' | 'ultra4'","default":"'series11'","description":"Which Apple Watch to render. The Series 12 is the Series 11's case with the generation's finishes; the Ultra 4 is the 49 mm titanium case with the crown guard and the Action button."},
+    {"name":"variant","type":"'series11' | 'series12' | 'ultra4'","default":"'series11'","description":"Which Apple Watch to render. The Series 12 is the Series 11's case a millimetre wider, with the generation's finishes; the Ultra 4 is the 49 mm titanium case with the crown guard and the Action button."},
     {"name":"color","type":"string","default":"'#1c1d21'","description":"Case. Takes a retail colorway id from APPLE_WATCH_COLORWAYS[variant] (Series 11 jetblack, spacegray, rosegold, silver; Series 12 darkbronze, lightgold, black, spacegray, radiantgold, natural, pearlwhite, nightblue; Ultra 4 natural, black) or any CSS color."},
     {"name":"bandColor","type":"string","default":"'#2a2c31'","description":"Band colorway - the Solo Loop on the Series, the Ocean Band on the Ultra."},
     {"name":"resolution","type":"number","default":"per variant","description":"Virtual display width - each model's own point grid (208 on the Series, 211 on the Ultra), so watchOS-sized layouts apply."},

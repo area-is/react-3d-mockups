@@ -61,7 +61,7 @@ Beyond the [shared screen props](/docs/screen-content):
 
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
-| `variant` | `'series11' \| 'series12' \| 'ultra4'` | `'series11'` | Which Apple Watch to render. The Series 12 is the Series 11's case with the generation's finishes; the Ultra 4 is the 49 mm titanium case with the crown guard and the Action button. |
+| `variant` | `'series11' \| 'series12' \| 'ultra4'` | `'series11'` | Which Apple Watch to render. The Series 12 is the Series 11's case a millimetre wider, with the generation's finishes; the Ultra 4 is the 49 mm titanium case with the crown guard and the Action button. |
 | `color` | `string` | `'#1c1d21'` | Case. Takes a retail colorway id from `APPLE_WATCH_COLORWAYS[variant]` (Series 11 `jetblack`, `spacegray`, `rosegold`, `silver`; Series 12 `darkbronze`, `lightgold`, `black`, `spacegray`, `radiantgold`, `natural`, `pearlwhite`, `nightblue`; Ultra 4 `natural`, `black`) or any CSS color. |
 | `bandColor` | `string` | `'#2a2c31'` | Band colorway - the Solo Loop on the Series, the Ocean Band on the Ultra. |
 | `resolution` | `number` | per variant | Virtual display width - each model's own point grid (208 on the Series, 211 on the Ultra), so watchOS-sized layouts apply. |
@@ -74,8 +74,9 @@ There is no `orientation` prop, and no `bandOpen`.
 
 The 49 mm grade 5 titanium case the Ultra 3 introduced: flat sides, tighter
 corners, a flat sapphire crystal over the 1.98″ 422×514 panel (211×257
-logical), the crown guard, the orange Action button and the buckled Ocean
-Band. Retail finishes: `natural`, `black`.
+logical), the crown guard with the orange-ringed crown, the orange Action
+button and the buckled Ocean Band. Apple's 44 mm width takes in the guard and
+crown; the case itself is 41.4 mm across, per Apple's bezel drawing. Retail finishes: `natural`, `black`.
 
 <MockupExplorer
   component="AppleWatchMockup"

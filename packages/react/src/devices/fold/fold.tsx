@@ -114,8 +114,26 @@ interface FoldBodyProps extends FoldCommonProps {
 }
 
 /** An extruded rounded-rect slab with a soft edge bevel (a fold half / the open body). */
-function slabGeometry(width: number, height: number, radius: number, depth: number, bevel: number) {
-  const shape = roundedRectShape(width - bevel * 2, height - bevel * 2, radius - bevel)
+function slabGeometry(
+  width: number,
+  height: number,
+  radius: number,
+  depth: number,
+  bevel: number,
+  hingeRadius?: number
+) {
+  // The hinge runs down the left edge: a spec that rounds its hinge corners
+  // differently gets true arcs on all four (the Duo's near-square hinge ends
+  // beside its round free corners); otherwise the shared quadratic corners.
+  const shape =
+    hingeRadius === undefined
+      ? roundedRectShape(width - bevel * 2, height - bevel * 2, radius - bevel)
+      : mixedRoundedRectShape(width - bevel * 2, height - bevel * 2, {
+          tl: hingeRadius - bevel,
+          tr: radius - bevel,
+          br: radius - bevel,
+          bl: hingeRadius - bevel,
+        })
   const core = depth - bevel * 2
   const g = new THREE.ExtrudeGeometry(shape, {
     depth: core,
@@ -238,7 +256,7 @@ function FoldBody({
       // the cover (front) half, the USB-C on the camera (rear) half.
       const b = spec.closed.body
       const { speaker, usb } = spec.bottomEdge.closed
-      const slab = () => slabGeometry(b.width, b.height, b.radius, halfDepth, b.bevel)
+      const slab = () => slabGeometry(b.width, b.height, b.radius, halfDepth, b.bevel, b.hingeRadius)
       return {
         mode: 'closed' as const,
         front: cutGeometry(slab(), [
@@ -315,22 +333,29 @@ function FoldBody({
     [shell]
   )
 
+  // The back plate and the cover-glass ring follow the pose's body outline,
+  // inset - with the folded pose's hinge corners where the spec rounds them
+  // differently (only then do the corners become true arcs).
+  const bodyPlate = React.useCallback(
+    (inset: number, rInset: number) => {
+      const r = Math.max(0.02, body.radius - rInset)
+      const hinge = mode === 'closed' ? spec.closed.body.hingeRadius : undefined
+      if (hinge === undefined)
+        return roundedRectShape(body.width - inset, body.height - inset, r)
+      const rh = Math.max(0.02, hinge - rInset)
+      return mixedRoundedRectShape(body.width - inset, body.height - inset, { tl: rh, tr: r, br: r, bl: rh })
+    },
+    [body, mode, spec.closed.body.hingeRadius]
+  )
+
   const backGeometry = React.useMemo(
-    () =>
-      new THREE.ShapeGeometry(
-        roundedRectShape(body.width - 0.05, body.height - 0.05, Math.max(0.02, body.radius - 0.025)),
-        16
-      ),
-    [body]
+    () => new THREE.ShapeGeometry(bodyPlate(0.05, 0.025), 16),
+    [bodyPlate]
   )
 
   const glassGeometry = React.useMemo(
-    () =>
-      new THREE.ShapeGeometry(
-        roundedRectShape(body.width - 0.03, body.height - 0.03, Math.max(0.02, body.radius - 0.015)),
-        16
-      ),
-    [body]
+    () => new THREE.ShapeGeometry(bodyPlate(0.03, 0.015), 16),
+    [bodyPlate]
   )
 
   // Camera pedestal: the light plateau plate with the dark pill on top of it.
@@ -347,23 +372,36 @@ function FoldBody({
     })
   }
   const plateauGeometry = React.useMemo(() => pillGeometry(cam.plateau), [cam.plateau])
-  const islandGeometry = React.useMemo(() => pillGeometry(cam.island), [cam.island])
+  const islandGeometry = React.useMemo(() => (cam.island ? pillGeometry(cam.island) : null), [cam.island])
+  // The mic grille pill on the plateau's face (the Duo).
+  const micGeometry = React.useMemo(
+    () => (cam.mic ? new THREE.ShapeGeometry(roundedRectShape(cam.mic.width, cam.mic.height, cam.mic.height / 2), 12) : null),
+    [cam.mic]
+  )
 
   // The (off) cover-display glass on the back of the open pose's left half.
+  // Drawn mirrored (it faces backward), so its hinge-side corners are given
+  // on the shape's left and land against the spine.
   const coverGlassGeometry = React.useMemo(() => {
     if (mode === 'closed') return null
     const c = spec.closed
+    const r = c.display.radius + 0.02
+    const rh = (c.display.hingeRadius ?? c.display.radius) + 0.02
     return new THREE.ShapeGeometry(
-      roundedRectShape(c.display.width + 0.03, c.display.height + 0.06, c.display.radius + 0.02),
+      mixedRoundedRectShape(c.display.width + 0.03, c.display.height + 0.06, { tl: rh, tr: r, br: r, bl: rh }),
       16
     )
   }, [mode, spec.closed])
   React.useEffect(() => () => coverGlassGeometry?.dispose(), [coverGlassGeometry])
 
-  // Where the (off) cover screen sits on the back of the open device: centered
-  // on the cover half, i.e. inset from the open body's left edge by half the
-  // folded width - and its punch camera, mirrored from the cover-screen spec.
+  // Where the (off) cover screen sits on the back of the open device: on the
+  // cover half, inset from the open body's left edge by half the folded
+  // width, shifted by the display's own offset - which points at the free
+  // edge, the far left of the open back, so it is negated here along with
+  // the punch camera's offset, mirrored from the cover-screen spec.
   const coverBackX = (spec.open.body.width - spec.closed.body.width) / 2
+  const coverDisplayX = -(spec.closed.display.offsetX ?? 0)
+  const coverPunchX = coverDisplayX - (spec.closed.punchHole.offsetX ?? 0)
   const coverPunchY = spec.closed.display.height / 2 - spec.closed.punchHole.offsetY
   const coverPunchR = spec.closed.punchHole.radius
 
@@ -391,7 +429,8 @@ function FoldBody({
       backGeometry.dispose()
       glassGeometry.dispose()
       plateauGeometry.dispose()
-      islandGeometry.dispose()
+      islandGeometry?.dispose()
+      micGeometry?.dispose()
       spineLogoGeometry?.dispose()
       backLogoGeometry?.dispose()
     }
@@ -400,6 +439,7 @@ function FoldBody({
     glassGeometry,
     plateauGeometry,
     islandGeometry,
+    micGeometry,
     spineLogoGeometry,
     backLogoGeometry,
   ])
@@ -413,7 +453,7 @@ function FoldBody({
   // under the panel, so there is nothing to draw and nothing for the status
   // bar to clear.
   const hole = isOpenFace ? spec.open.punchHole : spec.closed.punchHole
-  const holeX = isOpenFace ? (spec.open.punchHole?.offsetX ?? 0) : 0
+  const holeX = (isOpenFace ? spec.open.punchHole?.offsetX : spec.closed.punchHole.offsetX) ?? 0
   const holeOffsetY = hole?.offsetY ?? 0
   const holeR = hole?.radius ?? 0
 
@@ -451,15 +491,24 @@ function FoldBody({
       </mesh>
       {/* the lens housing matches the body color on the real device - an
           anodized boss, not a black plate (only the lens glass is dark) */}
-      <mesh
-        geometry={islandGeometry}
-        rotation-y={Math.PI}
-        position={[cam.island.x, cam.island.y, backZ - cam.plateau.raise]}
-      >
-        <meshPhysicalMaterial color={color} metalness={0.4} roughness={0.32} clearcoat={0.8} />
-      </mesh>
-      {cam.rings.map(({ y, r, pupil, glint }, i) => (
-        <group key={i} position={[cam.island.x, y, backZ - cam.plateau.raise - cam.island.raise]}>
+      {cam.island && islandGeometry && (
+        <mesh
+          geometry={islandGeometry}
+          rotation-y={Math.PI}
+          position={[cam.island.x, cam.island.y, backZ - cam.plateau.raise]}
+        >
+          <meshPhysicalMaterial color={color} metalness={0.4} roughness={0.32} clearcoat={0.8} />
+        </mesh>
+      )}
+      {cam.rings.map(({ x, y, r, pupil, glint }, i) => (
+        <group
+          key={i}
+          position={[
+            x ?? cam.island?.x ?? cam.plateau.x,
+            y,
+            backZ - cam.plateau.raise - (cam.island?.raise ?? 0),
+          ]}
+        >
           <LensRing
             r={r}
             proud={cam.ringProud ?? 0.028}
@@ -471,8 +520,25 @@ function FoldBody({
           />
         </group>
       ))}
-      {/* the LED flash window, seated on the back beside the plateau */}
-      <group position={[cam.flash.x, cam.flash.y, backZ - 0.002]}>
+      {/* the mic grille pill on the plateau's face (the Duo) */}
+      {cam.mic && micGeometry && (
+        <mesh
+          geometry={micGeometry}
+          rotation-y={Math.PI}
+          position={[cam.mic.x, cam.mic.y, backZ - cam.plateau.raise - 0.0015]}
+        >
+          <meshStandardMaterial color="#3a3c40" metalness={0.5} roughness={0.55} />
+        </mesh>
+      )}
+      {/* the LED flash window, seated on the back beside the plateau - or up
+          on the plateau's face where the spec puts it there */}
+      <group
+        position={[
+          cam.flash.x,
+          cam.flash.y,
+          cam.flash.seat === 'plateau' ? backZ - cam.plateau.raise - 0.0015 : backZ - 0.002,
+        ]}
+      >
         <FlashModule r={cam.flash.r} />
       </group>
     </>
@@ -498,18 +564,41 @@ function FoldBody({
 
   // Side keys on the right rail (closed: they ride the camera slab).
   const sideKeys = (railX: number) =>
-    spec.buttons.map(({ y, length }, i) => (
-      <SideKey
-        key={i}
-        side={1}
-        railX={railX}
-        y={y}
-        length={length}
-        thickness={spec.buttonProfile.thickness}
-        protrusion={spec.buttonProfile.protrusion}
-        color={frameColor}
-      />
-    ))
+    spec.buttons.map((key, i) =>
+      key.edge === 'top' ? null : (
+        <SideKey
+          key={i}
+          side={1}
+          railX={railX}
+          y={key.y}
+          length={key.length}
+          thickness={spec.buttonProfile.thickness}
+          protrusion={spec.buttonProfile.protrusion}
+          color={frameColor}
+        />
+      )
+    )
+
+  // Keys on the camera half's top edge (the Duo's volume keys): the same
+  // pill, turned a quarter to stand on the top rail. `shift` carries the
+  // closed pose's x across onto the camera half in the open pose. A quarter
+  // turn about z maps the key's rail axis onto -x, hence the negated x.
+  const topKeys = (shift: number) =>
+    spec.buttons.map((key, i) =>
+      key.edge !== 'top' ? null : (
+        <group key={i} rotation-z={Math.PI / 2}>
+          <SideKey
+            side={1}
+            railX={body.height / 2}
+            y={-(key.x + shift)}
+            length={key.length}
+            thickness={spec.buttonProfile.thickness}
+            protrusion={spec.buttonProfile.protrusion}
+            color={frameColor}
+          />
+        </group>
+      )
+    )
 
   // Antenna seam inserts on both rails, sized to the slab that carries them.
   const antennaSeams = (depth: number) =>
@@ -592,12 +681,20 @@ function FoldBody({
     />
   )
 
+  // The cover display may round its hinge-side corners differently and sit
+  // off the body's centre line; the inner display is centred and uniform.
+  const closedDisplay = spec.closed.display
+  const screenRadius: number | [number, number, number, number] =
+    isOpenFace || closedDisplay.hingeRadius === undefined
+      ? display.radius
+      : [closedDisplay.hingeRadius, display.radius, display.radius, closedDisplay.hingeRadius]
+  const screenX = isOpenFace ? 0 : (closedDisplay.offsetX ?? 0)
   const screen = (surfaceZ: number) => (
     <DeviceScreen
       width={landscape ? display.height : display.width}
       height={landscape ? display.width : display.height}
-      radius={display.radius}
-      position={[0, 0, surfaceZ]}
+      radius={screenRadius}
+      position={[screenX, 0, surfaceZ]}
       rotation={landscape ? [0, 0, -Math.PI / 2] : [0, 0, 0]}
       {...resolveSurface(screenSlot, {
         surfaceBackground,
@@ -739,10 +836,14 @@ function FoldBody({
               <group position-x={hw / 2}>
                 {coverGlassGeometry && (
                   <group position={[-coverBackX, 0, 0]}>
-                    <mesh geometry={coverGlassGeometry} rotation-y={Math.PI} position-z={-b.depth / 2 - 0.003}>
+                    <mesh
+                      geometry={coverGlassGeometry}
+                      rotation-y={Math.PI}
+                      position={[coverDisplayX, 0, -b.depth / 2 - 0.003]}
+                    >
                       <meshPhysicalMaterial color="#0a0b0f" metalness={0.15} roughness={0.14} clearcoat={1} clearcoatRoughness={0.1} />
                     </mesh>
-                    <mesh rotation-x={Math.PI / 2} position={[0, coverPunchY, -b.depth / 2 - 0.005]}>
+                    <mesh rotation-x={Math.PI / 2} position={[coverPunchX, coverPunchY, -b.depth / 2 - 0.005]}>
                       <cylinderGeometry args={[coverPunchR, coverPunchR, 0.004, 20]} />
                       <meshPhysicalMaterial color="#1a2130" metalness={0.4} roughness={0.2} clearcoat={1} />
                     </mesh>
@@ -781,6 +882,7 @@ function FoldBody({
                 {cameraCluster(-b.depth / 2)}
                 {spec.logo && backLogo(-b.depth / 2, spec.logo.open)}
                 {sideKeys(b.width / 2)}
+                {topKeys(coverBackX)}
                 <UsbC
                   x={spec.bottomEdge.open.usb.x}
                   y={-b.height / 2}
@@ -893,12 +995,12 @@ function FoldBody({
               <mesh
                 geometry={coverGlassGeometry}
                 rotation-y={Math.PI}
-                position-z={-body.depth / 2 - 0.003}
+                position={[coverDisplayX, 0, -body.depth / 2 - 0.003]}
               >
                 <meshPhysicalMaterial color="#0a0b0f" metalness={0.15} roughness={0.14} clearcoat={1} clearcoatRoughness={0.1} />
               </mesh>
-              {/* its punch camera, top center of the cover panel */}
-              <mesh rotation-x={Math.PI / 2} position={[0, coverPunchY, -body.depth / 2 - 0.005]}>
+              {/* its punch camera, where the cover panel's spec puts it */}
+              <mesh rotation-x={Math.PI / 2} position={[coverPunchX, coverPunchY, -body.depth / 2 - 0.005]}>
                 <cylinderGeometry args={[coverPunchR, coverPunchR, 0.004, 20]} />
                 <meshPhysicalMaterial color="#1a2130" metalness={0.4} roughness={0.2} clearcoat={1} />
               </mesh>
@@ -908,6 +1010,7 @@ function FoldBody({
           {cameraCluster(-body.depth / 2)}
           {spec.logo && backLogo(-body.depth / 2, spec.logo.open)}
           {sideKeys(body.width / 2)}
+          {topKeys(coverBackX)}
           {antennaSeams(body.depth)}
 
           {/* bottom edge: the machined cavities' interiors */}
@@ -974,6 +1077,7 @@ function FoldBody({
           {cameraCluster(-halfDepth / 2)}
           {spec.logo && backLogo(-halfDepth / 2, spec.logo.closed)}
           {sideKeys(body.width / 2)}
+          {topKeys(0)}
           {antennaSeams(halfDepth)}
           <UsbC
             x={spec.bottomEdge.closed.usb.x}

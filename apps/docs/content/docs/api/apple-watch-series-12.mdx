@@ -61,7 +61,7 @@ Beyond the [shared screen props](/docs/screen-content):
 
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
-| `variant` | `'series11' \| 'series12' \| 'ultra4'` | `'series11'` | Which Apple Watch to render. The Series 12 is the Series 11's case with the generation's finishes; the Ultra 4 is the 49 mm titanium case with the crown guard and the Action button. |
+| `variant` | `'series11' \| 'series12' \| 'ultra4'` | `'series11'` | Which Apple Watch to render. The Series 12 is the Series 11's case a millimetre wider, with the generation's finishes; the Ultra 4 is the 49 mm titanium case with the crown guard and the Action button. |
 | `color` | `string` | `'#1c1d21'` | Case. Takes a retail colorway id from `APPLE_WATCH_COLORWAYS[variant]` (Series 11 `jetblack`, `spacegray`, `rosegold`, `silver`; Series 12 `darkbronze`, `lightgold`, `black`, `spacegray`, `radiantgold`, `natural`, `pearlwhite`, `nightblue`; Ultra 4 `natural`, `black`) or any CSS color. |
 | `bandColor` | `string` | `'#2a2c31'` | Band colorway - the Solo Loop on the Series, the Ocean Band on the Ultra. |
 | `resolution` | `number` | per variant | Virtual display width - each model's own point grid (208 on the Series, 211 on the Ultra), so watchOS-sized layouts apply. |
@@ -72,9 +72,10 @@ There is no `orientation` prop, and no `bandOpen`.
 
 ### Apple Watch Series 12
 
-The Series 11's case to the published millimetre - the generation is the S11
+The Series 11's case a millimetre wider (Apple publishes 46 × 40 × 9.7 mm
+against the 11's 46 × 39) over the same panel - the generation is the S11
 chip, the sensors and a ceramic case option, none of it visible from outside
-- so the model shares the Series 11's geometry deliberately and the finishes
+- so the model carries the Series 11's geometry at that width and the finishes
 carry the year: aluminium `darkbronze`, `lightgold`, `black`, `spacegray`;
 titanium `radiantgold`, `natural`; ceramic `pearlwhite`, `nightblue`.
 

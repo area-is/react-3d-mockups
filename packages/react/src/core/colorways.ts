@@ -47,15 +47,15 @@ export const GALAXY_COLORWAYS: Record<GalaxyVariant, Colorway[]> = {
 
 /**
  * The 18 Pro generation's four finishes - Black, Silver, the light-blue
- * Glacier and the red-purple Burgundy - eyeballed from Apple's launch imagery
- * pending measured swatches. The rail is the anodized unibody, so it follows
+ * Glacier and the wine-dark Burgundy - sampled from the rails on Apple's
+ * product-bezel renders and the backs in its launch photography. The rail is the anodized unibody, so it follows
  * the body closely on every one.
  */
 const IPHONE_18_PRO_COLORS: Colorway[] = [
   { id: 'black', name: 'Black', color: '#1e1f23', frameColor: '#3a3d43' },
   { id: 'silver', name: 'Silver', color: '#dfe0e2', frameColor: '#c6c8cc' },
-  { id: 'glacier', name: 'Glacier', color: '#c4d8e6', frameColor: '#adc3d2' },
-  { id: 'burgundy', name: 'Burgundy', color: '#6a2b3e', frameColor: '#7c3b4e' },
+  { id: 'glacier', name: 'Glacier', color: '#b7c5d5', frameColor: '#adbacb' },
+  { id: 'burgundy', name: 'Burgundy', color: '#552a32', frameColor: '#5e3238' },
 ]
 
 export const IPHONE_COLORWAYS: Record<IPhoneVariant, Colorway[]> = {
@@ -94,7 +94,7 @@ export const IPHONE_COLORWAYS: Record<IPhoneVariant, Colorway[]> = {
  */
 export const IPHONE_DUO_COLORWAYS: Record<IPhoneDuoVariant, Colorway[]> = {
   duo: [
-    { id: 'nightsky', name: 'Night Sky', color: '#1f2740', frameColor: '#4d5468' },
+    { id: 'nightsky', name: 'Night Sky', color: '#2a323e', frameColor: '#3a4250' },
     { id: 'starwhite', name: 'Star White', color: '#f1f0ec', frameColor: '#d6d5d1' },
   ],
 }
@@ -152,12 +152,12 @@ const MACBOOK_PRO_COLORS: Colorway[] = [
   { id: 'silver', name: 'Silver', color: '#e3e4e6' },
 ]
 
-/** The Neo's four finishes, eyeballed from Apple's launch imagery. */
+/** The Neo's four finishes, sampled from Apple's bezel renders and launch photography. */
 const MACBOOK_NEO_COLORS: Colorway[] = [
   { id: 'silver', name: 'Silver', color: '#e3e4e6' },
   { id: 'blush', name: 'Blush', color: '#e9cfd0' },
-  { id: 'citrus', name: 'Citrus', color: '#e9d98a' },
-  { id: 'indigo', name: 'Indigo', color: '#3b4470' },
+  { id: 'citrus', name: 'Citrus', color: '#dedb92' },
+  { id: 'indigo', name: 'Indigo', color: '#505b73' },
 ]
 
 export const LAPTOP_COLORWAYS: Record<LaptopVariant, Colorway[]> = {
@@ -224,7 +224,7 @@ export const APPLE_WATCH_COLORWAYS: Record<AppleWatchVariant, Colorway[]> = {
   ],
   // The Ultra's two titanium finishes.
   ultra4: [
-    { id: 'natural', name: 'Natural', color: '#c9c8c3' },
+    { id: 'natural', name: 'Natural', color: '#cdc6bd' },
     { id: 'black', name: 'Black', color: '#2b2c2e' },
   ],
 }

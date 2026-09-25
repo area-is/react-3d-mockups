@@ -39,7 +39,8 @@ export const STUDIO_DISPLAY = {
    * The glass itself paints the uniform black bezel around the panel. */
   glass: { width: 5.373, height: 3.104, radius: 0.08 },
   /** Active display area. Content you pass as children maps onto this rect. */
-  display: { width: 5.189, height: 2.919, radius: 0.03 },
+  // The panel's corners are square on Apple's bezel drawing.
+  display: { width: 5.189, height: 2.919, radius: 0 },
   /** Default CSS px width of the virtual display (the 2560x1440 logical grid). */
   resolution: 2560,
   /** Distance from panel center down to the desk plane: 297.3 mm, so the

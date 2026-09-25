@@ -41,14 +41,26 @@ import { foldOpenAngle } from '../../regions'
 interface FoldRearCamera {
   /** Light pedestal plate under the pill (measured: 19.8 x 52.1 mm, 2.7 mm proud). */
   plateau: { x: number; y: number; width: number; height: number; radius: number; raise: number }
-  /** Dark pill seating the lens column (measured: 15.2 x 48.6 mm, +2.2 mm more). */
-  island: { x: number; y: number; width: number; height: number; radius: number; raise: number }
+  /**
+   * Dark pill seating the lens column (measured: 15.2 x 48.6 mm, +2.2 mm
+   * more). Absent where the collars stand straight on the plateau (the
+   * iPhone Duo).
+   */
+  island?: { x: number; y: number; width: number; height: number; radius: number; raise: number }
   /**
    * Lens collars, top to bottom (r 7.9 mm on a 16.7 mm pitch); `pupil` is the
    * front element's fraction of the ring radius, `glint` its coating flare.
+   * `x` defaults to the island's (the plateau's, without one), so a column of
+   * lenses gives only `y`; the Duo's side-by-side pair gives both.
    */
-  rings: { y: number; r: number; pupil?: number; glint?: string }[]
-  flash: { x: number; y: number; r: number }
+  rings: { x?: number; y: number; r: number; pupil?: number; glint?: string }[]
+  /**
+   * The LED flash window: on the flat back beside the plateau by default, or
+   * up on the plateau's face (`seat: 'plateau'`, the iPhone Duo).
+   */
+  flash: { x: number; y: number; r: number; seat?: 'back' | 'plateau' }
+  /** A microphone grille pill on the plateau's face (the iPhone Duo). */
+  mic?: { x: number; y: number; width: number; height: number }
   /**
    * How far the collars stand proud of the island, and where each collar's
    * metal ends and its cover glass begins (as a fraction of the ring radius).
@@ -73,13 +85,35 @@ export interface FoldSpec {
    * device's side profile.
    */
   closed: {
-    body: { width: number; height: number; depth: number; radius: number; bevel: number }
+    /**
+     * `radius` rounds the free-edge corners; `hingeRadius`, when given, the
+     * two corners along the hinge (the iPhone Duo's hinge ends nearly
+     * square while its free corners are the roundest on any iPhone).
+     */
+    body: {
+      width: number
+      height: number
+      depth: number
+      radius: number
+      hingeRadius?: number
+      bevel: number
+    }
     /** Air gap between the folded halves (the crevice along the rails). */
     gap: number
-    /** Cover display (content maps here when closed). */
-    display: { width: number; height: number; radius: number }
-    /** Centered front-camera punch hole on the cover screen. */
-    punchHole: { radius: number; offsetY: number }
+    /**
+     * Cover display (content maps here when closed). `hingeRadius` rounds its
+     * hinge-side corners when they differ from `radius`; `offsetX` shifts it
+     * off the body's centre line toward the free edge (Apple's bezel drawing
+     * leaves the Duo a wider border along the hinge than along the free
+     * edge).
+     */
+    display: { width: number; height: number; radius: number; hingeRadius?: number; offsetX?: number }
+    /**
+     * Front-camera punch hole on the cover screen; `offsetX` is its signed
+     * distance from the display's centre line (positive toward the free
+     * edge), centred when absent.
+     */
+    punchHole: { radius: number; offsetX?: number; offsetY: number }
     /** Default CSS px width of the portrait cover display. */
     resolution: number
   }
@@ -107,8 +141,14 @@ export interface FoldSpec {
     closed: FoldRearCamera
     open: FoldRearCamera
   }
-  /** Side keys on the right edge (same y in both poses): volume, then power. */
-  buttons: { y: number; length: number }[]
+  /**
+   * Keys. On the free (right) rail, `y` places a key along the rail, the
+   * same in both poses. A key on the top edge (`edge: 'top'` - the iPhone
+   * Duo's volume keys ride the camera half's top edge) is placed by `x` in
+   * the CLOSED pose's own coordinates; the open pose carries it across onto
+   * the camera half.
+   */
+  buttons: ({ edge?: 'right'; y: number; length: number } | { edge: 'top'; x: number; length: number })[]
   buttonProfile: { protrusion: number; thickness: number }
   /**
    * The hinge: open, a recessed spine channel down the center of the back;
@@ -370,56 +410,68 @@ export const FOLD_DEFAULT_VARIANT: FoldVariant = 'fold7'
 const IPHONE_DUO: FoldSpec = {
   brand: 'apple',
   closed: {
-    body: { width: 2.294, height: 3.213, depth: 0.308, radius: 0.3, bevel: 0.02 },
+    // Apple's bezel drawing: the free-edge corners are 12.4 mm, the hinge
+    // ends 4.3 mm - the hinge cover's squared ends.
+    body: { width: 2.294, height: 3.213, depth: 0.308, radius: 0.338, hingeRadius: 0.12, bevel: 0.02 },
     gap: 0.012,
-    // 77.7 x 113.0 mm cover panel (5.4", 1398x2034), centred.
-    display: { width: 2.119, height: 3.083, radius: 0.26 },
-    punchHole: { radius: 0.053, offsetY: 0.13 },
+    // 77.7 x 113.0 mm cover panel (5.4", 1398x2034). Its free-edge corners
+    // are 9.6 mm, its hinge-side corners 1.3 mm, and it sits 0.7 mm off
+    // centre toward the free edge (3.9 mm of border along the hinge, 2.5 at
+    // the free edge).
+    display: { width: 2.119, height: 3.083, radius: 0.262, hingeRadius: 0.035, offsetX: 0.02 },
+    // The Ø6.0 mm hole in the panel's top-right corner: 7.9 mm below the
+    // display's top edge, 30.7 mm right of its centre line.
+    punchHole: { radius: 0.0815, offsetX: 0.838, offsetY: 0.215 },
     resolution: 466,
   },
   open: {
-    body: { width: 4.49, height: 3.213, depth: 0.142, radius: 0.3, bevel: 0.012 },
-    // 157.9 x 111.1 mm inner panel (7.6", 2670x1878, landscape).
-    display: { width: 4.307, height: 3.03, radius: 0.06 },
+    body: { width: 4.49, height: 3.213, depth: 0.142, radius: 0.338, bevel: 0.012 },
+    // 157.9 x 111.1 mm inner panel (7.6", 2670x1878, landscape) with 8.9 mm
+    // corners, per the bezel drawing.
+    display: { width: 4.307, height: 3.03, radius: 0.243 },
     resolution: 890,
   },
   rearCamera: {
-    // Folded: the iPhone 17's pill at the 17's own margins - 13.65 mm in from
-    // the free edge, 22.5 mm down from the top - on the camera half's back:
-    // 24.88 x 42.28 mm base, two Ø16 lenses 17.72 mm apart on its axis, the
-    // Ø6.28 flash out on the flat back on the lens pair's centre line. The
-    // island is the pill's own lens seat in the same colour, standing the
-    // 17's 1.67 mm collars off the glass with its thin, glossy rims.
+    // Apple's Outer Open bezel drawing, on the camera half's back: a
+    // horizontal 55.8 x 21.3 mm stadium plateau across the top, 4.8 mm in
+    // from the free edge and 4.4 mm down from the top edge, with the two
+    // Ø16.2 lens collars side by side on its centre line (15.1 and 32.8 mm
+    // in from the free edge, on the 17's 17.7 mm pitch) and the mic grille
+    // and Ø3.7 flash stacked at its inner end. No separate island: the
+    // collars stand straight on the plateau.
     closed: {
-      plateau: { x: 0.775, y: 0.993, width: 0.679, height: 1.153, radius: 0.3395, raise: 0.048 },
-      island: { x: 0.775, y: 0.993, width: 0.6, height: 1.074, radius: 0.3, raise: 0.02 },
-      // Top to bottom: 48 MP main, 48 MP ultra-wide.
+      plateau: { x: 0.255, y: 1.196, width: 1.522, height: 0.581, radius: 0.29, raise: 0.065 },
+      // Free edge inward: 48 MP Fusion main, 48 MP ultra-wide.
       rings: [
-        { y: 1.235, r: 0.218, pupil: 0.5, glint: '#3f4f7a' },
-        { y: 0.751, r: 0.218, pupil: 0.46, glint: '#4b4270' },
+        { x: 0.735, y: 1.196, r: 0.221, pupil: 0.5, glint: '#3f4f7a' },
+        { x: 0.252, y: 1.196, r: 0.221, pupil: 0.46, glint: '#4b4270' },
       ],
-      flash: { x: 0.317, y: 0.993, r: 0.086 },
+      mic: { x: -0.206, y: 1.309, width: 0.087, height: 0.038 },
+      flash: { x: -0.206, y: 1.069, r: 0.05, seat: 'plateau' },
       ringProud: 0.045,
       ringCollar: 0.86,
     },
     // Unfolded: the same module riding the camera half (right of the spine).
     open: {
-      plateau: { x: 1.873, y: 0.993, width: 0.679, height: 1.153, radius: 0.3395, raise: 0.048 },
-      island: { x: 1.873, y: 0.993, width: 0.6, height: 1.074, radius: 0.3, raise: 0.02 },
+      plateau: { x: 1.353, y: 1.196, width: 1.522, height: 0.581, radius: 0.29, raise: 0.065 },
       rings: [
-        { y: 1.235, r: 0.218, pupil: 0.5, glint: '#3f4f7a' },
-        { y: 0.751, r: 0.218, pupil: 0.46, glint: '#4b4270' },
+        { x: 1.833, y: 1.196, r: 0.221, pupil: 0.5, glint: '#3f4f7a' },
+        { x: 1.35, y: 1.196, r: 0.221, pupil: 0.46, glint: '#4b4270' },
       ],
-      flash: { x: 1.415, y: 0.993, r: 0.086 },
+      mic: { x: 0.892, y: 1.309, width: 0.087, height: 0.038 },
+      flash: { x: 0.892, y: 1.069, r: 0.05, seat: 'plateau' },
       ringProud: 0.045,
       ringCollar: 0.86,
     },
   },
-  // Volume up, volume down, then the Touch ID side button, on the free rail.
+  // The Touch ID side button alone on the free rail, 18.6 mm long and
+  // centred 15.9 mm above the middle; the two 10.8 mm volume keys on the
+  // camera half's top edge, 1.8 and 15.3 mm right of the folded body's
+  // centre line (bezel drawing).
   buttons: [
-    { y: 0.74, length: 0.29 },
-    { y: 0.36, length: 0.29 },
-    { y: -0.3, length: 0.5 },
+    { y: 0.434, length: 0.507 },
+    { edge: 'top', x: 0.05, length: 0.295 },
+    { edge: 'top', x: 0.416, length: 0.295 },
   ],
   buttonProfile: { protrusion: 0.011, thickness: 0.06 },
   // The bare titanium hinge cover: no emboss.
@@ -436,8 +488,9 @@ const IPHONE_DUO: FoldSpec = {
     },
   },
   antennaLines: [0.9],
-  // The 17's 15.75 x 19.34 mm badge, centred on the camera half below the pill.
-  logo: { width: 0.43, height: 0.528, closed: { x: 0, y: -0.5 }, open: { x: 1.098, y: -0.5 } },
+  // The 16.3 x 20.0 mm badge, centred on the camera half's back, its centre
+  // 0.8 mm below the middle.
+  logo: { width: 0.445, height: 0.546, closed: { x: 0, y: -0.022 }, open: { x: 1.098, y: -0.022 } },
 }
 
 /** The iPhone Duo family - one model today. */
