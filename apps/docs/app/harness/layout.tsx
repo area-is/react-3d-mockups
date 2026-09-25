@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
-import { fraunces, inter, jetbrainsMono, notoSansKR } from '@/lib/fonts'
+import { fraunces, inter, jetbrainsMono } from '@/lib/fonts'
+import { notoSansKR } from '@/lib/fonts-ko'
 import '../globals.css'
 
 export const metadata: Metadata = {

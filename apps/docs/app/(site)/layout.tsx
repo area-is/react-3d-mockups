@@ -3,7 +3,8 @@ import Link from 'next/link'
 import { Logo } from '@/components/logo'
 import { SiteNav } from '@/components/site-nav'
 import { SITE_EXAMPLES } from '@/components/site-examples'
-import { fraunces, inter, jetbrainsMono, notoSansKR } from '@/lib/fonts'
+import { fraunces, inter, jetbrainsMono } from '@/lib/fonts'
+import { notoSansKR } from '@/lib/fonts-ko'
 import {
   AUTHOR,
   CHANGELOG_URL,

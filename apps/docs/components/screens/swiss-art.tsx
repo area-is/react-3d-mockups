@@ -45,8 +45,8 @@ export const PAPER = '#efede6'
 export const INK = '#141414'
 export const SIGNAL = '#e1341e'
 
-/** Inter, with Noto Sans KR behind it for the Hangul Inter does not have (see `lib/fonts.ts`). */
-export const FONT = 'var(--font-inter), var(--font-noto-sans-kr), Inter, system-ui, -apple-system, "Segoe UI", sans-serif'
+/** Inter, the face every piece of artwork is set in (see `lib/fonts.ts`). */
+export const FONT = 'var(--font-inter), Inter, system-ui, -apple-system, "Segoe UI", sans-serif'
 
 export interface Tone {
   ground: string

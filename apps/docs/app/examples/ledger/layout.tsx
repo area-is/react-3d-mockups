@@ -1,4 +1,4 @@
-import { fraunces, inter, jetbrainsMono, notoSansKR } from '@/lib/fonts'
+import { fraunces, inter, jetbrainsMono } from '@/lib/fonts'
 import { ExampleBar } from '../_shared/example-bar'
 import { EXAMPLE_VIEWPORT } from '../_shared/metadata'
 import '../../globals.css'
@@ -11,7 +11,7 @@ export const viewport = EXAMPLE_VIEWPORT
 // only the shared stylesheet and fonts, like the other examples.
 export default function LedgerExampleLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${inter.variable} ${jetbrainsMono.variable} ${fraunces.variable} ${notoSansKR.variable}`}>
+    <html lang="en" className={`${inter.variable} ${jetbrainsMono.variable} ${fraunces.variable}`}>
       <body>
         <ExampleBar slug="ledger" />
         {children}

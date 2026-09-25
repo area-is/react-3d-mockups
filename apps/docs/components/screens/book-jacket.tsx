@@ -2,7 +2,7 @@
 
 import type { CSSProperties, ReactNode } from 'react'
 import { epicentre } from 'tabbied/patterns'
-import { FONT, INK, Pattern, Sheet, luminance, type Tone } from './swiss-art'
+import { INK, Pattern, Sheet, luminance, type Tone } from './swiss-art'
 import { Ean13, Ean5 } from './label-art'
 import { asset } from '@/lib/base-path.mjs'
 
@@ -72,6 +72,14 @@ function jacketTone(cloth: string): Tone {
 /* ------------------------------------------------------------------ */
 
 const TITLE = ['Spring', 'Comes', 'Late']
+/**
+ * Inter for the Latin, with Noto Sans KR behind it for the Hangul Inter does
+ * not have (see `lib/fonts-ko.ts`). The jacket is the only artwork that sets
+ * Korean, so it is the only one that names the Korean face; the shared `FONT`
+ * is Inter alone.
+ */
+const FONT_KO = 'var(--font-inter), var(--font-noto-sans-kr), Inter, system-ui, -apple-system, "Segoe UI", sans-serif'
+
 const TITLE_KO = '봄은 늦게 온다'
 const AUTHOR = 'Kim Soon-ja'
 const AUTHOR_KO = '김순자'
@@ -178,7 +186,7 @@ function Portrait() {
 export function JacketCover({ cloth }: { cloth: string }) {
   const t = jacketTone(cloth)
   return (
-    <Sheet tone={t} style={{ flexDirection: 'column', padding: '7cqw', position: 'relative' }}>
+    <Sheet tone={t} style={{ fontFamily: FONT_KO, flexDirection: 'column', padding: '7cqw', position: 'relative' }}>
       <Portrait />
 
       {/* the type block sits over the photograph, so it is its own layer */}
@@ -255,7 +263,7 @@ export function JacketCover({ cloth }: { cloth: string }) {
 export function JacketSpine({ cloth }: { cloth: string }) {
   const t = jacketTone(cloth)
   return (
-    <Sheet tone={t} style={{ alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+    <Sheet tone={t} style={{ fontFamily: FONT_KO, alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
       <div
         style={{
           transform: 'rotate(90deg)',
@@ -328,7 +336,7 @@ function IsbnBlock() {
         flex: 'none',
         background: '#ffffff',
         color: INK,
-        fontFamily: FONT,
+        fontFamily: FONT_KO,
         padding: '1.4cqw 1.6cqw 1.3cqw',
         display: 'flex',
         flexDirection: 'column',
@@ -368,7 +376,7 @@ function IsbnBlock() {
 export function JacketBack({ cloth }: { cloth: string }) {
   const t = jacketTone(cloth)
   return (
-    <Sheet tone={t} style={{ flexDirection: 'column', padding: '6.5cqw 7cqw 7cqw', gap: '3cqw' }}>
+    <Sheet tone={t} style={{ fontFamily: FONT_KO, flexDirection: 'column', padding: '6.5cqw 7cqw 7cqw', gap: '3cqw' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: '3cqw', flex: 'none' }}>
         <Micro style={{ color: t.accent }}>Memoir · 344 pages</Micro>
         <Micro style={{ fontSize: '2.6cqw', opacity: 0.55 }}>{AUTHOR_KO} 지음</Micro>
