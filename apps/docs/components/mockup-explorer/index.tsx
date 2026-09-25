@@ -990,7 +990,7 @@ function MockupExplorerImpl({
     const label = labelOverride ?? REGION_LABEL(region)
     if (chroma) return <ChromaSurface label={label} />
     const art = artFor(region)
-    if (art) return carouselArtNode(art, stock)
+    if (art) return carouselArtNode(art, stock, { region, coverage: spec.coverage ? p.coverage : undefined })
     return spec.print ? <SurfaceArt label={label} material={spec.stock ? stock : undefined} /> : <LiveCounter />
   }
   /**

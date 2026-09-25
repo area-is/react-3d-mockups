@@ -417,3 +417,28 @@ export function CartonRoof({ material }: { material: string }) {
     </Sheet>
   )
 }
+
+/**
+ * The back roof panel: no cap here, so it carries what the front roof has
+ * no room for - the opening instruction, the recycling line and the dairy's
+ * name, small and in the green, the way the side panels set it.
+ */
+export function CartonRoofBack({ material }: { material: string }) {
+  const { ink, quiet } = press(material)
+  return (
+    <Sheet
+      tone={materialTone(material)}
+      style={{ color: ink, flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'space-between', padding: '4cqw 5cqw 4.4cqw', gap: '4cqw' }}
+    >
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '1.6cqw' }}>
+        <Wordmark size="4.4cqw" style={{ color: GREEN }} />
+        <p style={body('3cqw', { color: quiet })}>
+          Twist the cap to open.
+          <br />
+          Keep refrigerated below 5 °C.
+        </p>
+      </div>
+      <RecycleMark color={ink} size="9cqw" label={<span style={body('2.6cqw', { color: quiet })}>Rinse, cap on,<br />recycle</span>} />
+    </Sheet>
+  )
+}
