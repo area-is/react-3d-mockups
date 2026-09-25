@@ -1474,18 +1474,6 @@ export default function CarouselScene() {
             ))}
           </span>
           <span className="carousel-finish-name">{colorway.name}</span>
-          {code ? (
-            <button
-              type="button"
-              className="carousel-code"
-              onClick={copyCode}
-              title="Copy the JSX for this mockup"
-              aria-label={copied ? 'Code copied' : `Copy the code for this ${nameOf(entry)}`}
-            >
-              {copied ? <Check size={14} strokeWidth={2} aria-hidden /> : <CodeXml size={14} strokeWidth={2} aria-hidden />}
-              <span>{copied ? 'Copied' : 'Code'}</span>
-            </button>
-          ) : null}
         </div>
       </div>
 
@@ -1594,15 +1582,39 @@ export default function CarouselScene() {
       </div>
 
       <div className="carousel-foot">
-        <button
-          type="button"
-          className="carousel-play"
-          onClick={() => setAuto(!autoOn)}
-          aria-label={autoOn ? 'Pause autoplay' : 'Play autoplay'}
-        >
-          {autoOn ? <Pause size={13} strokeWidth={2.2} aria-hidden /> : <Play size={13} strokeWidth={2.2} aria-hidden />}
-          <span>{autoOn ? 'Pause' : 'Play'}</span>
-        </button>
+        {/* The stage's two tools, together under it: autoplay's toggle and
+            the model's code. They used to sit apart - the code pill at the
+            end of the swatch row, which it is not one of, and the toggle
+            beside a hint that fades, which left it stranded off-centre - and
+            both in bordered mono capitals, a second voice on a page set in
+            Inter. One capsule, centred on the stage they act on. */}
+        <div className="carousel-tools" role="group" aria-label="Carousel controls">
+          <button
+            type="button"
+            className="carousel-tool"
+            onClick={() => setAuto(!autoOn)}
+            aria-label={autoOn ? 'Pause autoplay' : 'Play autoplay'}
+          >
+            {autoOn ? <Pause size={15} strokeWidth={2} aria-hidden /> : <Play size={15} strokeWidth={2} aria-hidden />}
+            <span>{autoOn ? 'Pause' : 'Play'}</span>
+          </button>
+          {code ? (
+            <>
+              <span className="carousel-tools-rule" aria-hidden />
+              <button
+                type="button"
+                className="carousel-tool"
+                data-done={copied}
+                onClick={copyCode}
+                title="Copy the JSX for this mockup"
+                aria-label={copied ? 'Code copied' : `Copy the code for this ${nameOf(entry)}`}
+              >
+                {copied ? <Check size={15} strokeWidth={2.2} aria-hidden /> : <CodeXml size={15} strokeWidth={2} aria-hidden />}
+                <span>{copied ? 'Copied' : 'Copy code'}</span>
+              </button>
+            </>
+          ) : null}
+        </div>
         {/* The one hint - there used to be a "Drag to rotate" badge on the
             stage saying half of it again. In with the first frame, out at
             the first drag, and not back for a visitor who has dragged. */}

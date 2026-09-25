@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import { ArrowRight, LayoutGrid } from 'lucide-react'
 import { highlight } from 'fumadocs-core/highlight'
 import { HeroCarousel } from '@/components/hero-carousel'
 import { DEVICES, OBJECTS } from '@/lib/mockup-catalog.mjs'
@@ -203,8 +204,10 @@ export default function HomePage() {
         <div className="hero-cta">
           <Link className="btn btn-primary" href="/docs/quick-start">
             Get started
+            <ArrowRight className="btn-icon btn-icon-trail" size={16} strokeWidth={2.25} aria-hidden />
           </Link>
           <Link className="btn btn-secondary" href="/docs/gallery">
+            <LayoutGrid className="btn-icon" size={16} strokeWidth={2} aria-hidden />
             Browse all {MODEL_COUNT} models
           </Link>
         </div>

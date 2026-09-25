@@ -498,6 +498,41 @@ code {
 .btn-primary {
   background: var(--grad);
   color: var(--accent-ink);
+  transition: transform 0.12s ease, filter 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* A lift rather than a colour change: the fill is already the loudest thing
+   on the page, so hover brightens it a step and lets a soft glow of the same
+   green gather under it. */
+.btn-primary:hover {
+  filter: brightness(1.07) saturate(1.05);
+  box-shadow: 0 8px 26px -10px rgba(49, 211, 34, 0.7);
+}
+
+.btn-primary:focus-visible,
+.btn-secondary:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+.btn-icon {
+  flex: none;
+}
+
+/* The trailing arrow leans toward where the button goes. */
+.btn-icon-trail {
+  margin-right: -3px;
+  transition: transform 0.2s ease;
+}
+
+.btn:hover .btn-icon-trail {
+  transform: translateX(2px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btn:hover .btn-icon-trail {
+    transform: none;
+  }
 }
 
 .btn-secondary {
@@ -508,6 +543,16 @@ code {
 
 .btn-secondary:hover {
   border-color: rgba(255, 255, 255, 0.34);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.btn-secondary .btn-icon {
+  color: var(--muted);
+  transition: color 0.15s ease;
+}
+
+.btn-secondary:hover .btn-icon {
+  color: var(--text);
 }
 
 .text-link {
@@ -989,10 +1034,8 @@ code {
  * who has dragged once does not see it again (see CarouselScene).
  */
 .carousel-hint {
-  font-family: var(--font-mono);
-  font-size: 14px;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
+  font-size: 13px;
+  letter-spacing: -0.005em;
   color: var(--text-low);
   margin: 0;
   text-align: center;
@@ -1022,45 +1065,62 @@ code {
 }
 
 /*
- * Autoplay's pause/play toggle. Set in the hint's voice and next to it, so it
- * reads as part of the carousel's controls rather than as page chrome, and
- * compact enough that the row stays one line on a phone.
+ * The stage's toolbar: autoplay's toggle and the copy-code button in one
+ * capsule, centred under the stage they act on. Set in Inter and in sentence
+ * case like the readout above the stage - the bordered mono capitals these
+ * used to wear were a second voice on the page. The capsule is a faint fill
+ * rather than an outline, and each button lights its own half on hover.
  */
-.carousel-play,
-.carousel-code {
+.carousel-tools {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
   flex: none;
-  padding: 5px 11px;
+  padding: 3px;
   border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.16);
-  background: none;
-  color: var(--muted);
-  font-family: var(--font-mono);
-  font-size: 12px;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  cursor: pointer;
-  transition: border-color 0.15s ease, color 0.15s ease;
+  background: rgba(255, 255, 255, 0.045);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.07);
 }
 
-.carousel-play:hover,
-.carousel-code:hover {
-  border-color: rgba(255, 255, 255, 0.36);
+.carousel-tool {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  height: 32px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 999px;
+  background: none;
+  color: var(--muted);
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 550;
+  letter-spacing: -0.005em;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.carousel-tool:hover {
+  background: rgba(255, 255, 255, 0.07);
   color: var(--text);
 }
 
-.carousel-play:focus-visible,
-.carousel-code:focus-visible {
+.carousel-tool:focus-visible {
   outline: 2px solid var(--accent);
-  outline-offset: 2px;
+  outline-offset: 1px;
 }
 
-/* The copy-code pill sits at the end of the finishes row, a step apart from
-   the swatches it is not one of. */
-.carousel-code {
-  margin-left: 4px;
+/* "Copied" answers in the accent for the moment it shows. */
+.carousel-tool[data-done='true'] {
+  color: var(--accent-2);
+}
+
+.carousel-tools-rule {
+  width: 1px;
+  height: 16px;
+  margin: 0 2px;
+  background: rgba(255, 255, 255, 0.1);
+  flex: none;
 }
 
 /*
@@ -1127,22 +1187,22 @@ code {
   background: linear-gradient(180deg, var(--bg) 62%, transparent);
 }
 
-/* What is left below the stage: autoplay's toggle, the gesture hint and the
-   off-screen jumps. One row, and a fixed height, so the page under it never
-   moves: not when the scene loads, not when the hint fades. */
+/* What is left below the stage: the toolbar, the gesture hint under it and
+   the off-screen jumps. A fixed height, so the page under it never moves: not
+   when the scene loads, not when the hint fades. */
 .carousel-foot {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: 14px;
-  min-height: 32px;
-  padding: 7px 14px 0;
+  justify-content: flex-start;
+  gap: 10px;
+  min-height: 68px;
+  padding: 8px 14px 0;
 }
 
 @media (max-width: 620px) {
   .carousel-hint {
-    font-size: 12px;
-    letter-spacing: 0.08em;
+    font-size: 12.5px;
   }
 }
 
@@ -1161,16 +1221,23 @@ code {
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  border: 1px solid rgba(255, 255, 255, 0.16);
+  border: 0;
   background: none;
-  color: var(--text);
+  color: var(--muted);
   cursor: pointer;
   flex: none;
-  transition: border-color 0.15s ease;
+  transition: background 0.15s ease, color 0.15s ease;
 }
 
+/* No ring at rest - the chevron is the button - and a soft disc on hover. */
 .carousel-arrow:hover {
-  border-color: rgba(255, 255, 255, 0.36);
+  background: rgba(255, 255, 255, 0.07);
+  color: var(--text);
+}
+
+.carousel-arrow:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
 }
 
 /*
@@ -1333,15 +1400,6 @@ code {
   .carousel-finish-name {
     min-width: 0;
     flex: 0 1 auto;
-  }
-
-  /* Icon only: the pill's label is also its accessible name. */
-  .carousel-code span {
-    display: none;
-  }
-
-  .carousel-code {
-    padding: 5px 8px;
   }
 }
 
@@ -1790,7 +1848,7 @@ code {
 /*
  * WCAG 2.2.2: moving content that runs longer than five seconds needs a way to
  * stop it. The carousel has three: the pause/play toggle under the stage
- * (`.carousel-play`), a permanent stop at the first arrow, swatch or drag, and
+ * (`.carousel-tool` in `.carousel-tools`), a permanent stop at the first arrow, swatch or drag, and
  * `prefers-reduced-motion`, which keeps autoplay from starting at all. (An
  * earlier version dropped the toggle by request and leaned on the other two;
  * the 2026-09 audit asked for it back, since a visitor who wants the motion
