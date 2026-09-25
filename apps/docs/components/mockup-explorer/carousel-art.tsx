@@ -280,8 +280,10 @@ const ART: Readonly<Record<string, (finish: string, at: ArtPlacement) => ReactNo
   MailerBottom: (finish) => <MailerBottom material={finish} />,
 
   // The bus is bought as a colour: the wrap's ground is the paint.
-  SunpeelSide: (finish, at) => <SunpeelSide ground={finish} doors={at.region === 'curbSide'} panel={at.coverage === 'panel'} />,
-  SunpeelRear: (finish, at) => <SunpeelRear ground={finish} panel={at.coverage === 'panel'} />,
+  SunpeelSide: (finish, at) => (
+    <SunpeelSide ground={finish} doors={at.region === 'curbSide'} panel={at.coverage === 'panel'} clearGlass={at.coverage === 'full'} />
+  ),
+  SunpeelRear: (finish, at) => <SunpeelRear ground={finish} panel={at.coverage === 'panel'} clearGlass={at.coverage === 'full'} />,
   SunpeelRoute: () => <SunpeelRoute />,
 
   KilnCover: () => <KilnCover />,

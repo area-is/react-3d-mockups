@@ -114,9 +114,14 @@ function Lockup({ flavour, size }: { flavour: Flavour; size: number }) {
  * One flank of the bus (1920 x 455 at the wrap's resolution). `doors` is the
  * curb side: tail at the left, a door leaf at 43-52 % and another from 88 %.
  * `panel` is the king-size ad instead of the full wrap - see `SunpeelBoard`.
+ *
+ * `clearGlass` is a full wrap cut away from the windows (`coverage="full"`)
+ * rather than run over them as perforated film: the window band takes 28-72 %
+ * of the height, so the name moves up into the clear band above it, and the
+ * fruit runs on behind the glass the way a wrap's picture does.
  */
-export function SunpeelSide({ ground, doors, panel }: { ground?: string; doors?: boolean; panel?: boolean }) {
-  if (panel) return <SunpeelBoard ground={ground} nose={doors ? 'right' : 'left'} />
+export function SunpeelSide({ ground, doors, panel, clearGlass }: { ground?: string; doors?: boolean; panel?: boolean; clearGlass?: boolean }) {
+  if (panel) return <SunpeelBoard ground={ground} doors={doors} />
   const flavour = flavourOf(ground)
   // Tail zone: the street side's last half, the curb side's first 42 %.
   const fruitLeft = doors ? 1 : 54
@@ -127,17 +132,34 @@ export function SunpeelSide({ ground, doors, panel }: { ground?: string; doors?:
       <Fruit flavour={flavour} style={{ left: `${fruitLeft}cqw`, bottom: '10cqh', width: '41cqw' }} />
       {/* a rule along the skirt, broken only by the wheel arches the clip cuts */}
       <div aria-hidden style={{ position: 'absolute', left: 0, right: 0, bottom: 0, height: '6cqh', background: flavour.ink }} />
-      {/* Centred on the band above the wheel arches (their tops are at 73 %
-          of the height), so no line of it runs into a cut-out. */}
-      <div style={{ position: 'absolute', left: `${textLeft}cqw`, top: 0, bottom: '28cqh', display: 'flex', alignItems: 'center' }}>
-        <Lockup flavour={flavour} size={doors ? 7.2 : 8.6} />
-      </div>
+      {clearGlass ? (
+        <div style={{ position: 'absolute', left: `${doors ? 46 : 9}cqw`, top: '4cqh', height: '21cqh', display: 'flex', alignItems: 'center', gap: '1.4cqw' }}>
+          <span style={{ ...WORDMARK, fontSize: '19cqh' }}>sunpeel</span>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.4cqh' }}>
+            <span style={{ fontSize: '7cqh', fontWeight: 800, letterSpacing: '-0.035em', lineHeight: 1, whiteSpace: 'nowrap' }}>{flavour.name}</span>
+            <span style={{ fontSize: '4.2cqh', fontWeight: 600, letterSpacing: '-0.01em', lineHeight: 1.2, whiteSpace: 'nowrap', opacity: 0.8 }}>
+              Sparkling fruit water · Squeezed, never sweetened
+            </span>
+          </div>
+        </div>
+      ) : (
+        // Centred on the band above the wheel arches (their tops are at 73 %
+        // of the height), so no line of it runs into a cut-out.
+        <div style={{ position: 'absolute', left: `${textLeft}cqw`, top: 0, bottom: '28cqh', display: 'flex', alignItems: 'center' }}>
+          <Lockup flavour={flavour} size={doors ? 7.2 : 8.6} />
+        </div>
+      )}
     </Wrap>
   )
 }
 
-/** The tail (396 x 348): the sun, the fruit and the name, stacked between the lamps. `panel` is the 21" x 70" tail ad instead. */
-export function SunpeelRear({ ground, panel }: { ground?: string; panel?: boolean }) {
+/**
+ * The tail (396 x 348): the sun, the fruit and the name, stacked between the
+ * lamps. `panel` is the 21" x 70" tail ad instead; `clearGlass` keeps the
+ * picture below the rear window (3-41 % of the height) that a full wrap cut
+ * away from the glass leaves open.
+ */
+export function SunpeelRear({ ground, panel, clearGlass }: { ground?: string; panel?: boolean; clearGlass?: boolean }) {
   const flavour = flavourOf(ground)
   if (panel) {
     return (
@@ -153,11 +175,22 @@ export function SunpeelRear({ ground, panel }: { ground?: string; panel?: boolea
   }
   return (
     <Wrap flavour={flavour}>
-      <Sun flavour={flavour} style={{ left: '22cqw', top: '4cqh', width: '56cqw' }} />
-      <Fruit flavour={flavour} style={{ left: '12cqw', top: '14cqh', width: '76cqw' }} />
-      <div style={{ position: 'absolute', left: 0, right: 0, bottom: '12cqh', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '3cqw' }}>
-        <span style={{ ...WORDMARK, fontSize: '19cqw' }}>sunpeel</span>
-        <span style={{ fontSize: '6.4cqw', fontWeight: 800, letterSpacing: '-0.03em' }}>{flavour.name}</span>
+      <Sun flavour={flavour} style={clearGlass ? { left: '32cqw', top: '33cqh', width: '36cqw' } : { left: '22cqw', top: '4cqh', width: '56cqw' }} />
+      <Fruit flavour={flavour} style={clearGlass ? { left: '29cqw', top: '38cqh', width: '42cqw' } : { left: '12cqw', top: '14cqh', width: '76cqw' }} />
+      <div
+        style={{
+          position: 'absolute',
+          left: 0,
+          right: 0,
+          bottom: clearGlass ? '7cqh' : '12cqh',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          gap: clearGlass ? '2cqw' : '3cqw',
+        }}
+      >
+        <span style={{ ...WORDMARK, fontSize: clearGlass ? '14cqw' : '19cqw' }}>sunpeel</span>
+        <span style={{ fontSize: clearGlass ? '5cqw' : '6.4cqw', fontWeight: 800, letterSpacing: '-0.03em' }}>{flavour.name}</span>
       </div>
     </Wrap>
   )
@@ -165,39 +198,46 @@ export function SunpeelRear({ ground, panel }: { ground?: string; panel?: boolea
 
 /**
  * The king-size side panel (30" x 144", 4.8:1), for a bus on `coverage="panel"`:
- * the same three things as the wrap - sun, fruit, name - in a strip. The name
- * leads from the `nose` end, so the curb side (whose panel runs tail to nose)
- * and the street side (nose to tail) both read front to back.
+ * the same three things as the wrap - sun, fruit, name - in a strip, the name
+ * leading from the nose end.
+ *
+ * The street side's panel runs nose to tail and is clear all the way, so it
+ * takes a line of copy at the tail end too. The curb side's (`doors`) runs
+ * tail to nose, and the rear door leaf stands in front of it from 15 to 48 %
+ * of its length, so there everything keeps to the front half and the tail
+ * end is left as plain ground.
  */
-export function SunpeelBoard({ ground, nose = 'left' }: { ground?: string; nose?: 'left' | 'right' }) {
+export function SunpeelBoard({ ground, doors }: { ground?: string; doors?: boolean }) {
   const flavour = flavourOf(ground)
-  const at = (cqw: number): CSSProperties => (nose === 'left' ? { left: `${cqw}cqw` } : { right: `${cqw}cqw` })
+  const at = (cqw: number): CSSProperties => (doors ? { right: `${cqw}cqw` } : { left: `${cqw}cqw` })
   return (
     <Wrap flavour={flavour}>
-      <Sun flavour={flavour} style={{ ...at(31), top: '-12cqh', width: '22cqw' }} />
-      <Fruit flavour={flavour} style={{ ...at(28), top: '6cqh', width: '28cqw' }} />
+      <Sun flavour={flavour} style={{ ...at(doors ? 29 : 31), top: '-12cqh', width: doors ? '18cqw' : '22cqw' }} />
+      <Fruit flavour={flavour} style={{ ...at(doors ? 26 : 28), top: doors ? '10cqh' : '6cqh', width: doors ? '23cqw' : '28cqw' }} />
       <div style={{ position: 'absolute', ...at(4), top: 0, bottom: 0, display: 'flex', alignItems: 'center' }}>
         <Lockup flavour={flavour} size={5.4} />
       </div>
-      <div
-        style={{
-          position: 'absolute',
-          ...(nose === 'left' ? { right: '4cqw' } : { left: '4cqw' }),
-          top: 0,
-          bottom: 0,
-          display: 'flex',
-          alignItems: 'center',
-          fontSize: '4.2cqw',
-          fontWeight: 800,
-          letterSpacing: '-0.045em',
-          lineHeight: 0.95,
-          textAlign: nose === 'left' ? 'right' : 'left',
-        }}
-      >
-        Ice cold.
-        <br />
-        Zero sugar.
-      </div>
+      {!doors && (
+        <div
+          style={{
+            position: 'absolute',
+            right: '4cqw',
+            top: 0,
+            bottom: 0,
+            display: 'flex',
+            alignItems: 'center',
+            fontSize: '4.2cqw',
+            fontWeight: 800,
+            letterSpacing: '-0.045em',
+            lineHeight: 0.95,
+            textAlign: 'right',
+          }}
+        >
+          Ice cold.
+          <br />
+          Zero sugar.
+        </div>
+      )}
     </Wrap>
   )
 }
