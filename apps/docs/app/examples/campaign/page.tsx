@@ -128,7 +128,7 @@ export default function CampaignExamplePage() {
               <span className="cp-wordmark-place">{FESTIVAL.place}</span>
             </div>
             <h3>The wordmark</h3>
-            <p>Inter at its heaviest, tight, upper case. It holds at eight feet on the bulletin and at eight millimetres on the pass.</p>
+            <p>Inter at its heaviest, set tight. It holds at eight feet on the bulletin and at eight millimetres on the pass.</p>
           </article>
         </div>
       </section>

@@ -54,7 +54,6 @@
 .at-brand {
   font-size: 30px;
   font-weight: 600;
-  text-transform: uppercase;
   letter-spacing: -0.03em;
 }
 
@@ -95,10 +94,9 @@
 
 .at-eyebrow {
   margin: 0 0 14px;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
+  letter-spacing: -0.005em;
   color: var(--at-red);
 }
 
@@ -131,10 +129,9 @@
 }
 
 .at-control-label {
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
+  letter-spacing: -0.005em;
   color: var(--at-muted);
 }
 

@@ -70,8 +70,8 @@ export function Stream() {
             ))}
           </div>
           <p className="st-picker-note">
-            Every poster is a <TabbiedLink /> pattern in the title&rsquo;s own palette, so the catalogue has no image
-            files at all. The TV&rsquo;s hero is live: it recomposes every few seconds.
+            Every poster is a <TabbiedLink /> pattern in the title&rsquo;s own palette with the show&rsquo;s one object
+            standing in front of it. The TV&rsquo;s hero is live: the pattern behind it recomposes every few seconds.
           </p>
         </div>
       </section>

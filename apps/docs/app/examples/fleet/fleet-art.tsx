@@ -2,7 +2,8 @@
 
 import type { CSSProperties } from 'react'
 import { chase } from 'tabbied/patterns'
-import { Pattern } from '@/components/screens/swiss-art'
+import { Pattern, luminance } from '@/components/screens/swiss-art'
+import { asset } from '@/lib/base-path.mjs'
 import { Face } from '../_shared/face'
 import { COMPANY, PARCEL, type Livery } from './fleet-data'
 
@@ -13,11 +14,14 @@ import { COMPANY, PARCEL, type Livery } from './fleet-data'
  * field of marks at the front of the body, the name as large as the panel
  * allows, and one arrow. The field is `chase` from Tabbied - blocks of
  * lines in the livery's two inks - seeded, because a fleet is painted once.
- * Every measurement is in container units: the same component wraps the
- * trailer's 15 m side, the van's, and the top of a shipping box.
+ * In front of the field stands the cargo: a pallet of parcels taped in the
+ * brand's navy and orange, a generated cut-out on a transparent ground
+ * (`/art/fleet-parcels.webp`), so it sits on any livery. Every measurement
+ * is in container units: the same component wraps the trailer's 15 m side,
+ * the van's, and the top of a shipping box.
  */
 
-const HEAVY: CSSProperties = { fontWeight: 800, letterSpacing: '-0.05em', lineHeight: 0.86, textTransform: 'uppercase' }
+const HEAVY: CSSProperties = { fontWeight: 800, letterSpacing: '-0.05em', lineHeight: 0.86 }
 
 /** The mark: an arrow, the length of its box. */
 export function Arrow({ color, style }: { color: string; style?: CSSProperties }) {
@@ -35,6 +39,47 @@ function Field({ livery, seed, grid = '4x6' }: { livery: Livery; seed: string; g
       <Pattern pattern={chase} seed={seed} palette={[livery.body, livery.ink, livery.accent]} grid={grid} />
     </div>
   )
+}
+
+/** The pallet (619 x 640), standing on the foot of whatever box it is in. */
+const PARCELS = { src: '/art/fleet-parcels.webp', aspect: 619 / 640 }
+
+/**
+ * The cargo in front of the field, standing on the panel's foot. It sizes
+ * itself to the field's own box - that box is the query container - so it
+ * fits the tall rear doors and the short, wide side panels alike.
+ */
+function Cargo() {
+  return (
+    <div style={{ position: 'absolute', inset: 0, containerType: 'size' }}>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={asset(PARCELS.src)}
+        alt=""
+        draggable={false}
+        decoding="async"
+        style={{
+          position: 'absolute',
+          left: '50%',
+          bottom: '3cqh',
+          height: 'min(90cqh, 94cqw)',
+          width: 'auto',
+          aspectRatio: PARCELS.aspect,
+          transform: 'translateX(-50%)',
+          filter: 'drop-shadow(0 1cqh 1.6cqh rgba(0, 0, 0, 0.45))',
+        }}
+      />
+    </div>
+  )
+}
+
+/**
+ * The darker of the livery's two colours: what the app sets its cards and
+ * its button in, with white type. On the Signal livery that is the ink; on
+ * Night, where the ink is the pale one, it is the body.
+ */
+function deep(livery: Livery): string {
+  return luminance(livery.ink) < luminance(livery.body) ? livery.ink : livery.body
 }
 
 /* ------------------------------------------------------------------ */
@@ -62,6 +107,7 @@ export function Side({ livery, seed, mirror, cab = 0 }: { livery: Livery; seed: 
     <Face background={livery.body} color={livery.ink} style={{ display: 'flex', flexDirection: mirror ? 'row-reverse' : 'row' }}>
       <div style={{ position: 'relative', width: `${field}cqw`, flex: 'none', overflow: 'hidden' }}>
         <Field livery={livery} seed={seed} />
+        <Cargo />
       </div>
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '6cqh 3cqw', gap: '6cqh', minWidth: 0 }}>
         <span style={{ ...HEAVY, fontSize: `min(54cqh, ${nameMax}cqw)`, whiteSpace: 'nowrap' }}>{COMPANY.name}</span>
@@ -97,6 +143,7 @@ export function Rear({ livery, seed }: { livery: Livery; seed: string }) {
     <Face background={livery.body} color={livery.ink} style={{ display: 'flex', flexDirection: 'column', padding: '6cqw', gap: '5cqw' }}>
       <div style={{ position: 'relative', flex: 1, minHeight: 0, overflow: 'hidden' }}>
         <Field livery={livery} seed={seed} grid="2x3" />
+        <Cargo />
       </div>
       <span style={{ ...HEAVY, fontSize: '15cqw' }}>{COMPANY.name}</span>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', gap: '3cqw' }}>
@@ -147,9 +194,11 @@ export function BoxTop({ livery }: { livery: Livery }) {
 /** A long side of the box (513 x 171). */
 export function BoxSide({ livery }: { livery: Livery }) {
   return (
-    <Face background={livery.body} color={livery.ink} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 5cqw' }}>
-      <span style={{ ...HEAVY, fontSize: '40cqh' }}>{COMPANY.name}</span>
-      <span style={{ fontSize: '15cqh', fontWeight: 700, color: livery.accent, whiteSpace: 'nowrap' }}>{COMPANY.tag}</span>
+    <Face background={livery.body} color={livery.ink} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '4cqw', padding: '0 5cqw' }}>
+      {/* Both sized by the width as well as the height: the side is 3:1, and
+          the name and the line together are wider than that at full height. */}
+      <span style={{ ...HEAVY, fontSize: 'min(40cqh, 10.5cqw)', whiteSpace: 'nowrap' }}>{COMPANY.name}</span>
+      <span style={{ fontSize: 'min(15cqh, 3.6cqw)', fontWeight: 700, color: livery.accent, whiteSpace: 'nowrap' }}>{COMPANY.tag}</span>
     </Face>
   )
 }
@@ -168,24 +217,53 @@ export function BoxEnd({ livery }: { livery: Livery }) {
 /*  The app                                                            */
 /* ------------------------------------------------------------------ */
 
+/** The route diorama (800 x 511). */
+const ROUTE = { src: '/art/fleet-route.webp', aspect: 800 / 511 }
+
+/** `from` mixed toward `to` by `t`, as a hex colour. */
+function mix(from: string, to: string, t: number): string {
+  const ch = (hex: string) => [1, 3, 5].map((i) => Number.parseInt(hex.slice(i, i + 2), 16))
+  const a = ch(from)
+  const b = ch(to)
+  return `#${a.map((v, i) => Math.round(v + (b[i]! - v) * t).toString(16).padStart(2, '0')).join('')}`
+}
+
 /** Track a parcel, on a Galaxy (360 x 780). */
 export function TrackApp({ livery }: { livery: Livery }) {
   const INK = '#14213d'
   const PAPER = '#f4f5f7'
   const MUTED = '#6b7280'
   const doneCount = PARCEL.steps.filter((s) => s.done).length
+  const card = deep(livery)
   return (
     <Face background={PAPER} color={INK} style={{ display: 'flex', flexDirection: 'column', paddingTop: 'calc(var(--mockup-safe-area-top, 0px) + 8px)', letterSpacing: '-0.012em' }}>
       <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', padding: '8px 20px 10px' }}>
         <span style={{ ...HEAVY, fontSize: 20 }}>{COMPANY.name}</span>
         <span style={{ fontSize: 12.5, fontWeight: 600, color: MUTED }}>Track</span>
       </header>
-      <div style={{ position: 'relative', margin: '0 16px', height: 150, borderRadius: 18, overflow: 'hidden', background: livery.ink }}>
-        <div style={{ position: 'absolute', inset: 0 }}>
-          <Pattern pattern={chase} seed="northline-app" palette={[livery.ink, livery.accent, '#ffffff']} grid="4x6" />
-        </div>
-        <div style={{ position: 'absolute', inset: 0, background: `linear-gradient(to right, ${livery.ink} 45%, transparent 90%)` }} />
-        <div style={{ position: 'absolute', left: 18, bottom: 16, color: '#fff' }}>
+      {/* The route card: where the parcel is going, over a little model of
+          the street it is going to - a generated diorama with the van on
+          its way and the drop pin at the end (`/art/fleet-route.webp`). */}
+      <div
+        style={{
+          position: 'relative',
+          margin: '0 16px',
+          height: 176,
+          borderRadius: 18,
+          overflow: 'hidden',
+          background: `radial-gradient(120% 110% at 88% 100%, ${mix(card, '#ffffff', 0.14)} 0%, ${card} 62%)`,
+          flex: 'none',
+        }}
+      >
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={asset(ROUTE.src)}
+          alt=""
+          draggable={false}
+          decoding="async"
+          style={{ position: 'absolute', right: -34, bottom: -20, height: 146, width: 'auto', aspectRatio: ROUTE.aspect, filter: 'drop-shadow(0 8px 14px rgba(0, 0, 0, 0.35))' }}
+        />
+        <div style={{ position: 'absolute', left: 18, top: 16, color: '#fff' }}>
           <div style={{ fontSize: 11.5, fontWeight: 700, color: livery.accent }}>Arriving</div>
           <div style={{ fontSize: 24, fontWeight: 800, letterSpacing: '-0.04em', lineHeight: 1, marginTop: 4 }}>{PARCEL.eta}</div>
           <div style={{ fontSize: 12, fontWeight: 600, opacity: 0.8, marginTop: 5 }}>
@@ -214,7 +292,7 @@ export function TrackApp({ livery }: { livery: Livery }) {
           </div>
         ))}
       </div>
-      <div style={{ margin: '0 16px 26px', padding: '14px 18px', borderRadius: 999, background: livery.ink, color: '#fff', textAlign: 'center', fontSize: 14, fontWeight: 700 }}>
+      <div style={{ margin: '0 16px 26px', padding: '14px 18px', borderRadius: 999, background: card, color: '#fff', textAlign: 'center', fontSize: 14, fontWeight: 700 }}>
         Leave it with a neighbour
       </div>
     </Face>

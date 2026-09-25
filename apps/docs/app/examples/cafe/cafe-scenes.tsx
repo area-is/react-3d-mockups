@@ -29,10 +29,10 @@ export function StorefrontScene({ open, paint }: { open: boolean; paint: string 
         <Fascia paint={paint} />
       </StorefrontMockup.Fascia>
       <StorefrontMockup.FrontLeft>
-        <WindowPoster title="Oat latte" sub={'€4,20\nours, made to steam'} seed="ninefold-left" paint={paint} />
+        <WindowPoster title="Oat latte" sub={'€4,20\nours, made to steam'} seed="ninefold-left" paint={paint} art="flatwhite" />
       </StorefrontMockup.FrontLeft>
       <StorefrontMockup.FrontRight>
-        <WindowPoster title="Bread daily" sub={'sourdough at 7:30\nbuns at 8, 11 and 3'} seed="ninefold-right" paint={paint} />
+        <WindowPoster title="Bread daily" sub={'sourdough at 7:30\nbuns at 8, 11 and 3'} seed="ninefold-right" paint={paint} art="bun" />
       </StorefrontMockup.FrontRight>
       {/* The door is painted in the glass tint rather than left transparent.
           A surface is DOM under the canvas, so transparent pixels fall

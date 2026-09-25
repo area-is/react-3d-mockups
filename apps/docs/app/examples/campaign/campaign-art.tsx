@@ -15,7 +15,7 @@ import { ACID, BAG, BONE, FESTIVAL, NIGHT, PALETTE, RUNNING_ORDER } from './camp
  * radiating from a point and spinning slightly off it, which is what a beam
  * of light through an aperture does - with `flux`, rings spreading from a
  * drop, as the secondary. The inks are four bright colours on the night.
- * The wordmark is Inter at its heaviest, set tight and upper case.
+ * The wordmark is Inter at its heaviest, set tight.
  *
  * What differs from surface to surface is only the seed and the grid. A
  * printed piece pins its seed, so the 6-sheet in the shelter is the same
@@ -136,10 +136,10 @@ export function Performer({ height, right = '-6cqw', bottom = '-2cqh', style }: 
   )
 }
 
-/** The wordmark: one word, the heaviest weight, tight, upper case. */
+/** The wordmark: one word, the heaviest weight, tight. */
 export function Wordmark({ size, color = BONE, style }: { size: string; color?: string; style?: CSSProperties }) {
   return (
-    <div style={{ fontSize: size, fontWeight: 800, letterSpacing: '-0.05em', lineHeight: 0.86, textTransform: 'uppercase', color, ...style }}>
+    <div style={{ fontSize: size, fontWeight: 800, letterSpacing: '-0.05em', lineHeight: 0.86, color, ...style }}>
       {FESTIVAL.name}
     </div>
   )
@@ -411,8 +411,7 @@ export function Pass() {
           boxSizing: 'border-box',
           fontSize: '4.2cqw',
           fontWeight: 800,
-          letterSpacing: '0.02em',
-          textTransform: 'uppercase',
+          letterSpacing: '-0.02em',
         }}
       >
         <span>All areas</span>
@@ -426,7 +425,7 @@ export function Pass() {
           <span style={{ fontSize: '3.9cqw', fontWeight: 600, letterSpacing: '-0.01em', lineHeight: 1.2, opacity: 0.85 }}>Stage manager · Dock stage</span>
           <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '4.5cqw', fontFamily: MONO, fontSize: '3cqw', fontWeight: 600, opacity: 0.7 }}>
             <span>AP26 · 0417</span>
-            <span>24 – 26 JUL</span>
+            <span>24–26 Jul</span>
           </div>
         </div>
       </div>

@@ -4,6 +4,7 @@ import type { CSSProperties, ReactNode } from 'react'
 import { annulus, damier } from 'tabbied/patterns'
 import { Pattern } from '@/components/screens/swiss-art'
 import { SERIF } from '@/components/screens/label-art'
+import { asset } from '@/lib/base-path.mjs'
 import { Face } from '../_shared/face'
 import { BAKES, DRINKS, SHOP, price, type MenuItem } from './cafe-data'
 
@@ -16,6 +17,10 @@ import { BAKES, DRINKS, SHOP, price, type MenuItem } from './cafe-data'
  * thicken row by row, which on a coffee shop reads as cups seen from above
  * - printed in oat and green. The pattern is seeded everywhere: a shopfront
  * and a milk carton do not redraw themselves.
+ *
+ * The two front display bays also carry the thing they are selling, a flat
+ * white and a cardamom bun - generated cut-outs on a transparent ground
+ * (`/art/cafe-*.webp`) standing in front of the rings.
  *
  * Measurements are in container units, so the same poster fits the
  * storefront's 480 px display bay and the carton's 420 px wall.
@@ -36,18 +41,51 @@ const WORDMARK: CSSProperties = { fontFamily: SERIF, fontWeight: 600, letterSpac
 export function Fascia({ paint, sub = SHOP.kind }: { paint: string; sub?: string }) {
   return (
     <Face background={paint} color={CREAM} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 4cqw' }}>
-      <span style={{ ...WORDMARK, fontSize: '62cqh', textTransform: 'uppercase', letterSpacing: '0.02em' }}>{SHOP.name}</span>
-      <span style={{ fontSize: '28cqh', fontWeight: 600, letterSpacing: '0.16em', textTransform: 'uppercase', opacity: 0.85 }}>{sub}</span>
+      <span style={{ ...WORDMARK, fontSize: '66cqh' }}>{SHOP.name}</span>
+      <span style={{ fontSize: '32cqh', fontWeight: 600, letterSpacing: '-0.01em', opacity: 0.85 }}>{sub}</span>
     </Face>
   )
 }
 
-/** A window poster: a ring print, a line of type. On every pane but the door. */
-export function WindowPoster({ title, sub, seed, paint }: { title: string; sub: string; seed: string; paint: string }) {
+/** What a poster can show in front of its rings: the cut-out and its width over height. */
+const POSTER_ART = {
+  flatwhite: { src: '/art/cafe-flatwhite.webp', aspect: 640 / 539 },
+  bun: { src: '/art/cafe-bun.webp', aspect: 640 / 566 },
+} as const
+
+/**
+ * A window poster: a ring print, a line of type. On every pane but the door.
+ * `art` puts the thing on sale in front of the rings, on a pool of cream so
+ * the print quietens where it stands.
+ */
+export function WindowPoster({ title, sub, seed, paint, art }: { title: string; sub: string; seed: string; paint: string; art?: keyof typeof POSTER_ART }) {
+  const picture = art ? POSTER_ART[art] : null
   return (
     <Face background={CREAM} color={INK} style={{ display: 'flex', flexDirection: 'column', padding: '6cqw', gap: '4cqw' }}>
       <div style={{ flex: 1, minHeight: 0, position: 'relative' }}>
         <Pattern pattern={annulus} seed={seed} palette={[CREAM, paint, OAT, INK]} grid="4x6" />
+        {picture ? (
+          <div style={{ position: 'absolute', inset: 0, containerType: 'size' }}>
+            <div aria-hidden style={{ position: 'absolute', inset: '4cqh 12cqw', background: `radial-gradient(closest-side, ${CREAM} 62%, transparent)` }} />
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={asset(picture.src)}
+              alt=""
+              draggable={false}
+              decoding="async"
+              style={{
+                position: 'absolute',
+                left: '50%',
+                top: '50%',
+                height: 'min(84cqh, 66cqw)',
+                width: 'auto',
+                aspectRatio: picture.aspect,
+                transform: 'translate(-50%, -50%)',
+                filter: 'drop-shadow(0 2cqh 2.4cqh rgba(36, 32, 26, 0.35))',
+              }}
+            />
+          </div>
+        ) : null}
       </div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: '3cqw' }}>
         <span style={{ ...WORDMARK, fontSize: '9cqw' }}>{title}</span>
@@ -86,8 +124,8 @@ export function Door({ open, paint }: { open: boolean; paint: string }) {
           transition: 'background 0.4s ease',
         }}
       >
-        <span style={{ fontSize: '4.2cqw', fontWeight: 600, letterSpacing: '0.18em', textTransform: 'uppercase', opacity: 0.8 }}>{open ? "We're" : "Sorry, we're"}</span>
-        <span style={{ ...WORDMARK, fontSize: '19cqw', textTransform: 'uppercase', letterSpacing: '0.02em' }}>{open ? 'Open' : 'Closed'}</span>
+        <span style={{ fontSize: '5cqw', fontWeight: 600, letterSpacing: '-0.01em', opacity: 0.8 }}>{open ? "We're" : "Sorry, we're"}</span>
+        <span style={{ ...WORDMARK, fontSize: '21cqw' }}>{open ? 'Open' : 'Closed'}</span>
         <span style={{ fontSize: '4.2cqw', fontWeight: 600, lineHeight: 1.35, opacity: 0.8 }}>{open ? 'Come in, the bread is warm' : 'Back tomorrow at 7'}</span>
       </div>
       <div style={{ marginTop: 'auto', textAlign: 'center', fontSize: '4cqw', fontWeight: 600, lineHeight: 1.5, color: CREAM, textShadow: '0 0 2cqw rgba(0,0,0,0.5)', whiteSpace: 'pre-line' }}>
@@ -122,8 +160,8 @@ export function BoardFront() {
   return (
     <Face background="transparent" color={CREAM} style={{ display: 'flex', flexDirection: 'column', padding: '9cqw 8cqw', gap: '6cqw' }}>
       <div style={{ textAlign: 'center' }}>
-        <span style={{ ...WORDMARK, fontSize: '13cqw', textTransform: 'uppercase', letterSpacing: '0.04em' }}>{SHOP.name}</span>
-        <div style={{ fontSize: '3.6cqw', fontWeight: 600, letterSpacing: '0.16em', textTransform: 'uppercase', opacity: 0.75, marginTop: '1.5cqw' }}>Today</div>
+        <span style={{ ...WORDMARK, fontSize: '14cqw' }}>{SHOP.name}</span>
+        <div style={{ fontSize: '4.4cqw', fontWeight: 600, letterSpacing: '-0.01em', opacity: 0.75, marginTop: '1.5cqw' }}>Today</div>
       </div>
       <ChalkList title="Coffee" items={DRINKS} />
       <ChalkList title="From the oven" items={BAKES} />
@@ -141,7 +179,7 @@ export function BoardBack() {
       <span style={{ fontSize: '4cqw', fontWeight: 600, lineHeight: 1.5, opacity: 0.8 }}>Buns at 8, 11 and 3.
         <br />
         When it is gone, it is gone.</span>
-      <span style={{ marginTop: '6cqw', ...WORDMARK, fontSize: '7cqw', textTransform: 'uppercase', letterSpacing: '0.04em' }}>{SHOP.name}</span>
+      <span style={{ marginTop: '6cqw', ...WORDMARK, fontSize: '8cqw' }}>{SHOP.name}</span>
     </Face>
   )
 }
@@ -244,7 +282,7 @@ export function CardBack({ paint }: { paint: string }) {
         <Pattern pattern={damier} seed="ninefold-card" palette={[paint, CREAM, OAT]} grid="4x6" />
       </div>
       <div style={{ position: 'relative', marginTop: 'auto', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
-        <span style={{ ...WORDMARK, fontSize: '11cqw', textTransform: 'uppercase', letterSpacing: '0.03em' }}>{SHOP.name}</span>
+        <span style={{ ...WORDMARK, fontSize: '12cqw' }}>{SHOP.name}</span>
         <span style={{ fontSize: '2.8cqw', fontWeight: 600, lineHeight: 1.5, textAlign: 'right', whiteSpace: 'pre-line' }}>{SHOP.hours.replace(/ · /g, '\n')}</span>
       </div>
     </Face>

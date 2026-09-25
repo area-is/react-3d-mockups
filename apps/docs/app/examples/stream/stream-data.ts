@@ -3,9 +3,12 @@ import type { PatternDefinition } from 'tabbied'
 
 /**
  * Prism's catalogue. Every title's key art is a Tabbied pattern in its own
- * palette, seeded by the title, so a show looks the same on the TV, the
- * Fold, the Flip and the iPad - and the same tomorrow. The one thing the
- * page changes is which title is featured, and every screen follows.
+ * palette, seeded by the title, with the show's one object standing in
+ * front of it - a diving helmet, a pocket watch, a lighthouse - as a
+ * generated cut-out on a transparent ground (`/art/stream-*.webp`). So a
+ * show looks the same on the TV, the Fold, the Flip and the iPad, and the
+ * same tomorrow. The one thing the page changes is which title is featured,
+ * and every screen follows.
  */
 
 export interface Show {
@@ -18,6 +21,8 @@ export interface Show {
   /** Ground first, then the inks. */
   palette: string[]
   grid: string
+  /** The object in front of the pattern: a cut-out, and its width over height. */
+  art: { src: string; aspect: number }
   /** Where the viewer is, for the continue-watching row. 0-1. */
   progress?: number
   episodes?: string[]
@@ -26,6 +31,7 @@ export interface Show {
 export const SHOWS: Show[] = [
   {
     id: 'undertow',
+    art: { src: '/art/stream-undertow.webp', aspect: 501 / 640 },
     title: 'Undertow',
     kind: 'Series',
     meta: 'S2 · 8 episodes · Thriller',
@@ -38,6 +44,7 @@ export const SHOWS: Show[] = [
   },
   {
     id: 'the-long-now',
+    art: { src: '/art/stream-long-now.webp', aspect: 581 / 640 },
     title: 'The Long Now',
     kind: 'Film',
     meta: '2h 04m · Drama',
@@ -49,6 +56,7 @@ export const SHOWS: Show[] = [
   },
   {
     id: 'cassiopeia-falls',
+    art: { src: '/art/stream-cassiopeia.webp', aspect: 521 / 640 },
     title: 'Cassiopeia Falls',
     kind: 'Series',
     meta: 'S1 · 6 episodes · Sci-fi',
@@ -61,6 +69,7 @@ export const SHOWS: Show[] = [
   },
   {
     id: 'paper-tigers',
+    art: { src: '/art/stream-paper-tigers.webp', aspect: 630 / 640 },
     title: 'Paper Tigers',
     kind: 'Series',
     meta: 'S3 · 10 episodes · Comedy',
@@ -71,6 +80,7 @@ export const SHOWS: Show[] = [
   },
   {
     id: 'salt-and-iron',
+    art: { src: '/art/stream-salt-iron.webp', aspect: 640 / 585 },
     title: 'Salt & Iron',
     kind: 'Film',
     meta: '1h 52m · Western',
@@ -81,6 +91,7 @@ export const SHOWS: Show[] = [
   },
   {
     id: 'the-quiet-floor',
+    art: { src: '/art/stream-quiet-floor.webp', aspect: 640 / 571 },
     title: 'The Quiet Floor',
     kind: 'Series',
     meta: 'S1 · 8 episodes · Mystery',
@@ -91,6 +102,7 @@ export const SHOWS: Show[] = [
   },
   {
     id: 'halcyon',
+    art: { src: '/art/stream-halcyon.webp', aspect: 640 / 615 },
     title: 'Halcyon',
     kind: 'Film',
     meta: '1h 38m · Romance',
@@ -101,6 +113,7 @@ export const SHOWS: Show[] = [
   },
   {
     id: 'orbital',
+    art: { src: '/art/stream-orbital.webp', aspect: 573 / 640 },
     title: 'Orbital',
     kind: 'Series',
     meta: 'Docuseries · 5 episodes',
