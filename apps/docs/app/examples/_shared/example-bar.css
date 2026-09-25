@@ -243,6 +243,18 @@
     display: none;
   }
 
+  /* The mark alone: on a phone the name ran into the Examples button (with a
+     wider system font it had no room at all). Hidden from the eye only, so
+     the home link keeps its accessible name - the mark is decorative. */
+  .ex-bar-name {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
   .ex-bar-links {
     gap: 2px;
   }
@@ -276,11 +288,5 @@
     padding-top: 6px;
     border-left: 0;
     border-top: 1px solid var(--border);
-  }
-}
-
-@media (max-width: 359px) {
-  .ex-bar-name {
-    display: none;
   }
 }
