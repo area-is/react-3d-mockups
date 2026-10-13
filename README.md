@@ -15,9 +15,9 @@
 </p>
 
 <p align="center">
-  <a href="https://area.is/react-3d-mockups/promo/react-3d-mockups.mp4"><img src="assets/promo-poster.jpg" alt="Play the 38-second react-3d-mockups film" width="820" /></a>
+  <a href="https://area.is/react-3d-mockups/media/react-3d-mockups.mp4"><img src="assets/promo-poster.jpg" alt="Play the 38-second react-3d-mockups film" width="820" /></a>
   <br />
-  <sub><a href="https://area.is/react-3d-mockups/promo/react-3d-mockups.mp4"><b>▶ Watch the 38-second film</b></a> - every frame of it rendered with react-3d-mockups and <a href="examples/remotion">Remotion</a></sub>
+  <sub><a href="https://area.is/react-3d-mockups/media/react-3d-mockups.mp4"><b>▶ Watch the 38-second film</b></a> - every frame of it rendered with react-3d-mockups and <a href="examples/remotion">Remotion</a></sub>
 </p>
 
 GPU-accelerated **3D device mockups for React** - drop any content onto the screen of a

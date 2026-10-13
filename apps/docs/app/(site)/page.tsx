@@ -189,16 +189,16 @@ function QuickStart() {
   )
 }
 
-/** The film's files, under `public/` (see `Film`). */
-const FILM = { src: '/promo/react-3d-mockups.mp4', poster: '/promo/react-3d-mockups-poster.webp' }
+/** The film, from R2 (`app/media/[name]/route.ts`), and its poster, a static asset. */
+const FILM = { src: '/media/react-3d-mockups.mp4', poster: '/promo/react-3d-mockups-poster.webp' }
 
 /**
  * The library's film: 38 seconds of the catalogue and the features, every
  * frame of it a react-3d-mockups component rendered to video with Remotion
- * (`examples/remotion`, `PromoFilm`). A plain `<video>`: the file is a
- * static asset of this site, served by Cloudflare with byte ranges, so it
- * starts playing before it has downloaded and seeks without a player
- * library. `preload="none"` keeps its ten-odd megabytes off the page until
+ * (`examples/remotion`, `PromoFilm`). A plain `<video>`: the file is served
+ * from R2 with byte ranges, so it starts playing before it has downloaded
+ * and seeks without a player library, Safari included. `preload="none"`
+ * keeps its ten-odd megabytes off the page until
  * someone presses play; the poster and the box's aspect ratio hold its
  * place, so nothing shifts when it does.
  */

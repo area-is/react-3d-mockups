@@ -82,5 +82,12 @@
 
   "observability": {
     "enabled": true
-  }
+  },
+
+  /*
+   * Media too big for static assets to serve well - the promo film. Static
+   * assets ignore `Range`, which Safari needs to play a video; R2 honours it.
+   * `app/media/[name]/route.ts` serves this bucket at `/media/<name>`.
+   */
+  "r2_buckets": [{ "binding": "MEDIA", "bucket_name": "react-3d-mockups-media" }]
 }

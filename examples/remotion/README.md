@@ -60,13 +60,17 @@ card at 0:34 to ring out. `scripts/generate-audio.py promo` asks for a new one
 from the same sheet.
 
 The copy the docs home page plays (and the README links to) is a web encode
-of `out/promo.mp4`, served by the docs site's Worker with byte ranges, so it
-plays as it downloads and seeks:
+of `out/promo.mp4` in the `react-3d-mockups-media` R2 bucket, which the docs
+Worker serves with byte ranges at `/media/react-3d-mockups.mp4`, so it plays
+as it downloads and seeks (Safari will not play a video without them, and
+the site's static assets do not do ranges). To publish a new cut:
 
 ```bash
 ffmpeg -i out/promo.mp4 -c:v libx264 -preset slow -crf 21 -profile:v high -level 4.1 \
   -pix_fmt yuv420p -maxrate 8M -bufsize 16M -c:a aac -b:a 160k -movflags +faststart \
-  ../../apps/docs/public/promo/react-3d-mockups.mp4
+  out/react-3d-mockups.mp4
+npx wrangler r2 object put react-3d-mockups-media/react-3d-mockups.mp4 --remote \
+  --file out/react-3d-mockups.mp4 --content-type video/mp4 --cache-control "public, max-age=86400"
 ```
 
 | Shot | Bars | What it shows |
