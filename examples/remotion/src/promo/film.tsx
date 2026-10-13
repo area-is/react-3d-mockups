@@ -7,6 +7,8 @@ import type { TransitionPresentation } from '@remotion/transitions'
 import { EndCard, TitleCard } from './cards'
 import { DocsFonts } from './docs-fonts'
 import { FontGate } from '../campaigns/kit'
+import { Soundtrack, type SoundSheet } from '../campaigns/sound'
+import SOUND from './sound.json'
 import { PROMO_FONTS } from './brand'
 import { ComposeShot } from './shots/compose'
 import { LiveDomShot } from './shots/live-dom'
@@ -78,6 +80,8 @@ export function PromoFilm() {
             return parts
           })}
         </TransitionSeries>
+        {/* The music bed (\`sound.json\`), playing from the first frame: its bars are the film's. */}
+        <Soundtrack sheet={SOUND as SoundSheet} starts={PROMO_STARTS} />
       </FontGate>
     </DocsFonts>
   )

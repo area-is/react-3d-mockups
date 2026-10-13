@@ -48,10 +48,16 @@ npm run render:promo               # out/promo.mp4
 ## The promo film
 
 `PromoFilm` (`src/promo`) is the library's own film: 38 s at 1920×1080, with
-no voice and, for now, no music. It is cut to a 120 BPM grid. A beat is 15
-frames and a bar 60, every shot runs a whole number of bars, and every
-transition starts on a bar line, so music made for it can land its downbeats
-on the cuts.
+no voice, over an instrumental music bed. It is cut to a 120 BPM grid. A beat
+is 15 frames and a bar 60, every shot runs a whole number of bars, and every
+transition starts on a bar line, so the music lands its downbeats on the cuts.
+
+The music (`public/audio/promo/music.mp3`) is ElevenLabs Music v2.5 from the
+prompt in `src/promo/sound.json`, which the film's `Soundtrack` plays from the
+first frame. Its beats fall on the film's grid: a riser under the title, the
+beat coming in on the first cut at 0:02, and the groove stopping on the end
+card at 0:34 to ring out. `scripts/generate-audio.py promo` asks for a new one
+from the same sheet.
 
 | Shot | Bars | What it shows |
 | --- | --- | --- |

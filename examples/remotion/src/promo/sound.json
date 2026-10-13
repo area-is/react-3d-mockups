@@ -1,0 +1,11 @@
+{
+  "film": "promo",
+  "music": {
+    "prompt": "Bright, confident tech product-launch track: modern electronic pop at exactly 120 BPM in 4/4, instrumental. It opens with a crisp synth stab and a short rising sweep, then at 0:02 a light, bouncy groove of plucked synths, finger snaps and soft sidechained pads. At 0:06 the full beat drops hard: punchy kick, tight claps, driving synth bass and sparkling arpeggios, with small fills every two seconds and fresh lifts at 0:14 and 0:22 to keep the momentum high. A short build from 0:30 leads into one big final hit at 0:34 that resolves on a warm major chord and rings out cleanly to silence by 0:38. Crisp, polished, uncluttered production.",
+    "seconds": 38,
+    "volume": 0.85,
+    "duck": 1
+  },
+  "lines": [],
+  "sfx": []
+}
