@@ -12,7 +12,7 @@ declare const require: {
 }
 
 // Only the pictures the film's artwork prints, so the bundle does not carry the whole folder.
-const art = require.context('../../../../apps/docs/public/art', false, /^\.\/(news-|halden-|sunpeel-|halmoni|jazz-trio|milk-farm|cereal-|parfait|marigold|island|harbour|market).*\.webp$/)
+const art = require.context('../../../../apps/docs/public/art', false, /^\.\/(news-|halden-|sunpeel-|halmoni|jazz-trio|milk-farm|cereal-|parfait|marigold|island|harbour|market|stream-).*\.webp$/)
 
 export const BASE_PATH = ''
 

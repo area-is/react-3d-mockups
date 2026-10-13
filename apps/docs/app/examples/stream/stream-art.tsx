@@ -142,7 +142,11 @@ const Play = ({ size, color = INK }: { size: number; color?: string }) => (
 /*  TV: home (1920 x 1080)                                             */
 /* ------------------------------------------------------------------ */
 
-export function TVHome({ featured }: { featured: string }) {
+/**
+ * The TV's home. Its hero ground is `live` - pass `live={false}` to hold it
+ * on one seed, as a video render must (the film in `examples/remotion` does).
+ */
+export function TVHome({ featured, live = true }: { featured: string; live?: boolean }) {
   const show = findShow(featured)
   const continuing = SHOWS.filter((s) => s.progress !== undefined)
   const rail = ['Home', 'Search', 'Series', 'Films', 'Kids', 'My list']
@@ -160,7 +164,7 @@ export function TVHome({ featured }: { featured: string }) {
       <main style={{ position: 'relative', display: 'flex', flexDirection: 'column', minWidth: 0 }}>
         {/* the hero: the featured title's art, bleeding under the rail */}
         <div style={{ position: 'absolute', left: -150, right: 0, top: 0, height: 640 }}>
-          <Tile show={show} live grid={show.grid} labeled={false} art="right" style={{ position: 'absolute', inset: 0, borderRadius: 0 }} />
+          <Tile show={show} live={live} grid={show.grid} labeled={false} art="right" style={{ position: 'absolute', inset: 0, borderRadius: 0 }} />
           <div style={{ position: 'absolute', inset: 0, background: `linear-gradient(to right, ${INK} 0%, rgba(8,9,15,0.85) 22%, rgba(8,9,15,0.2) 60%, rgba(8,9,15,0) 100%), linear-gradient(to top, ${INK} 0%, rgba(8,9,15,0) 45%)` }} />
         </div>
         <div style={{ position: 'relative', padding: '150px 60px 0 40px', maxWidth: 760, display: 'flex', flexDirection: 'column', gap: 18 }}>

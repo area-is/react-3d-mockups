@@ -27,7 +27,9 @@ import {
 import { bauhaus, chase, damier, dipole, epicentre, gyre, halftone, moire, radiance, sunray } from 'tabbied/patterns'
 import { SwissDial, SwissSplit, SwissStack } from '@/components/screens/swiss-art'
 import { Newspaper, WatchFace } from '@/components/screens/device-apps'
-import { BillboardAdArt, TVShowArt } from '@/components/screens/print-art'
+import { BillboardAdArt } from '@/components/screens/print-art'
+import { TVHome } from '@/app/examples/stream/stream-art'
+import { DEFAULT_FEATURED, SHOWS } from '@/app/examples/stream/stream-data'
 import { SUNPEEL_FLAVOURS, SunpeelRear, SunpeelSide } from '@/components/screens/bus-wrap'
 import { CartonBack, CartonFacts, CartonFront, CartonRoof, CartonStory } from '@/components/screens/carton-art'
 import { BagBack, BagFront, CerealBack, CerealFacts, CerealFront, CerealStory, CerealTop } from '@/components/screens/package-art'
@@ -46,7 +48,8 @@ import { Lineup } from '../lineup'
  * The catalogue, a family a beat-pair: eight of the library's families, each
  * a row of its models together in one canvas at their true sizes against
  * each other, wearing the artwork the home page carousel gives them - the
- * Swiss posters on the screens, Ridgeway Mills' cereal, the Harlow Valley
+ * Swiss posters on the screens, Prism's home on the TV (from the streaming
+ * sample), Ridgeway Mills' cereal, the Harlow Valley
  * carton, Marigold & Moss's bag, the Sunpeel bus wrap. The rows are laid out
  * from each model's measured bounds (`Lineup`), so nothing touches.
  *
@@ -213,7 +216,9 @@ const CATEGORIES: Category[] = [
   },
   {
     name: 'Displays',
-    patterns: 1,
+    // The display's poster, and Prism's TV home: its hero, the shows in
+    // progress and the week's eight, a pattern each.
+    patterns: 1 + 1 + SHOWS.filter((show) => show.progress !== undefined).length + SHOWS.length,
     models: [
       {
         name: 'Studio Display',
@@ -228,8 +233,8 @@ const CATEGORIES: Category[] = [
         name: 'TV set',
         yaw: -0.32,
         render: (rotation) => (
-          <TVSet variant="pedestal" rotation={rotation} scale={size('tv')}>
-            <TVShowArt />
+          <TVSet variant="pedestal" color="#15171b" rotation={rotation} scale={size('tv')}>
+            <TVHome featured={DEFAULT_FEATURED} live={false} />
           </TVSet>
         ),
       },

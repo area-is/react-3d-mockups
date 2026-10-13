@@ -12,13 +12,11 @@ import { CodeCard, t } from '../code'
  * built from geometry as it mounts, so its hinge and its finish are props -
  * it opens from shut onto The Meridian (the cover display carries the
  * paper's phone layout until the inner screen takes over), then turns to
- * show its back while the colour steps through the retail colourways on the
- * beat.
+ * show its back, in one colourway throughout: Mint, light enough to read
+ * against the dark ground.
  */
 
-const COLOURS = FOLD_COLORWAYS.fold7
-/** Beats the colour changes on. */
-const SWAPS = [60, 75, 90, 105]
+const COLOUR = FOLD_COLORWAYS.fold7.find((c) => c.id === 'mint')!
 
 export function ProceduralShot() {
   const frame = useCurrentFrame()
@@ -27,8 +25,7 @@ export function ProceduralShot() {
   const stage = useStage(true)
   // From 1 degree, not 0: below half a degree the Fold swaps to its separate shut model.
   const openAngle = Math.round(tween(frame, 4, 40, 1, 150, easeInOut))
-  const swaps = SWAPS.filter((at) => frame >= at).length
-  const colour = COLOURS[swaps % COLOURS.length]!
+  const colour = COLOUR
   const turn = tween(frame, 44, 118, 0, 1, easeInOut)
   const rotation: Vec3 = [0.08, -0.32 + turn * 3.1, 0]
   return (
