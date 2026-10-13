@@ -1533,6 +1533,47 @@ code {
 }
 
 /* ------------------------------------------------------------------ */
+/*  The film                                                           */
+/* ------------------------------------------------------------------ */
+
+/*
+ * The film under the quick start: a heading and a line beside each other
+ * from a tablet up, the player full width under them. The player's box is
+ * 16:9 before anything loads, so the page holds still when the poster and
+ * the video arrive.
+ */
+.film {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: clamp(40px, 6.3vw, 65px) clamp(14px, 3.6vw, 43px) 0;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.film-copy h2 {
+  margin: 0 0 9px;
+}
+
+.film-copy p {
+  color: var(--muted);
+  font-size: 14px;
+  max-width: 62ch;
+  margin: 0;
+  text-wrap: pretty;
+}
+
+.film-video {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 9;
+  border-radius: 11px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: #08090c;
+}
+
+/* ------------------------------------------------------------------ */
 /*  Quick start                                                        */
 /* ------------------------------------------------------------------ */
 

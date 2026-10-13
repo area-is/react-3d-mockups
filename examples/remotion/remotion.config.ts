@@ -11,12 +11,29 @@ import { Config } from '@remotion/cli/config'
  */
 const single = (name: string) => path.resolve(process.cwd(), 'node_modules', name)
 
+/*
+ * The promo film (`src/promo`) shows the docs site's own artwork - the home
+ * carousel's screens and prints, the sample sites' apps - imported from
+ * `apps/docs` rather than copied. Those files import each other through the
+ * site's `@/` alias, and their pictures through `@/lib/base-path.mjs`, which
+ * here is a shim that hands back webpack's URL for the file (see
+ * `src/promo/docs-asset.ts`). Their `tabbied` is pinned to this project's
+ * copy: two copies would each register `<css-doodle>`.
+ */
+const docs = path.resolve(process.cwd(), '../../apps/docs')
+const tabbied = (file: string) => path.resolve(process.cwd(), 'node_modules/tabbied/dist', file)
+
 Config.overrideWebpackConfig((config) => ({
   ...config,
   resolve: {
     ...config.resolve,
     alias: {
       ...(config.resolve?.alias as Record<string, string> | undefined),
+      '@/lib/base-path.mjs$': path.resolve(process.cwd(), 'src/promo/docs-asset.ts'),
+      '@': docs,
+      tabbied$: tabbied('core/index.js'),
+      'tabbied/react$': tabbied('react/index.js'),
+      'tabbied/patterns$': tabbied('patterns.generated.js'),
       react: single('react'),
       'react-dom': single('react-dom'),
       three: single('three'),

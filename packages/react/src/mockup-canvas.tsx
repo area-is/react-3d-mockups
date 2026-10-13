@@ -215,6 +215,15 @@ const STUDIO = STUDIO_LIGHTFORMERS.map((lf, i) => (
 /** How far outside the viewport a canvas starts drawing again. */
 const PAUSE_MARGIN = '120px'
 
+/**
+ * Pixel ratio when none is given. The floor of 1.5 supersamples 1x screens:
+ * the specular streaks on thin bevels are narrower than a pixel, so MSAA
+ * (which only smooths polygon edges) leaves them stair-stepped.
+ */
+const DEFAULT_DPR: [number, number] = [1.5, 2]
+/** Pixel ratio for a capture (`delayCapture` set) when none is given. */
+const CAPTURE_DPR = 2
+
 // Typed locally: this is browser code and does not take node's types.
 declare const process: { env: { NODE_ENV?: string } }
 
@@ -301,7 +310,14 @@ export interface MockupCanvasProps {
   background?: string
   /** Override the default camera (position [0, 0.5, 7.4], fov 40). */
   camera?: CanvasProps['camera']
-  /** Device-pixel-ratio range; clamped for consistent GPU load on hi-dpi screens. */
+  /**
+   * Device-pixel-ratio range the canvas renders at. Defaults to `[1.5, 2]`:
+   * at least 1.5x, so on a 1x screen the canvas is drawn larger and scaled
+   * down, which smooths the thin highlights along bevels and edges that
+   * multisampling alone leaves stair-stepped; at most 2x, to keep the GPU load
+   * on hi-dpi screens in check. With `delayCapture` set (an export) it
+   * defaults to `2`, for the cleanest frames.
+   */
   dpr?: CanvasProps['dpr']
   /**
    * When the canvas draws a frame.
@@ -399,7 +415,7 @@ export function MockupCanvas({
   shadowY = DEFAULT_SHADOW_Y,
   background,
   camera,
-  dpr = [1, 2],
+  dpr,
   frameloop = 'demand',
   pauseWhenOffscreen = true,
   time,
@@ -637,7 +653,7 @@ export function MockupCanvas({
       // mockup, horizontal drags (and mouse) orbit the device. With zoom on,
       // the canvas owns the pinch instead (touch-action none).
       style={{ touchAction: canvasTouchAction(zoom), background, ...style }}
-      dpr={dpr}
+      dpr={dpr ?? (capturing ? CAPTURE_DPR : DEFAULT_DPR)}
       camera={cameraOptions}
       gl={glProps}
       onCreated={handleCreated}

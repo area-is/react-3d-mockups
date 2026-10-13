@@ -53,7 +53,7 @@ import {
   type MockupInfo,
 } from 'react-3d-mockups'
 import { carouselArtNode } from '@/components/mockup-explorer/carousel-art'
-import { BillboardAdArt, BusAdArt, TVShowArt } from '@/components/screens/print-art'
+import { BillboardAdArt, BusAdArt } from '@/components/screens/print-art'
 import { SwissSite } from '@/components/screens/device-apps'
 import { SwissRaster } from '@/components/screens/swiss-art'
 
@@ -213,7 +213,7 @@ function regionProbe(Mockup: object, measuredAt: Record<string, unknown> = {}): 
  *                                                  (default gradient; `context` reports
  *                                                  whether React context reaches the glass)
  *   art         artwork for `screen=art`: any piece the carousel stages
- *               (SwissSite, CartonFront, …) or BusAdArt | BillboardAdArt | TVShowArt;
+ *               (SwissSite, CartonFront, …) or BusAdArt | BillboardAdArt;
  *               printed pieces take `color` as their stock
  *   device      …also `composed`: a laptop and a phone in ONE canvas, the
  *               home page's "Composable by design" picture
@@ -227,7 +227,6 @@ function regionProbe(Mockup: object, measuredAt: Record<string, unknown> = {}): 
 const PRINT_ART: Record<string, () => React.ReactNode> = {
   BusAdArt: () => <BusAdArt />,
   BillboardAdArt: () => <BillboardAdArt />,
-  TVShowArt: () => <TVShowArt />,
 }
 
 function artNode(name: string, finish: string | undefined): React.ReactNode {

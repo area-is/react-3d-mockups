@@ -26,17 +26,15 @@ export type { ScreenRadius }
  * in the lower half of the band, with the canvas itself at the midpoint, so
  * their DOM always composites UNDER the canvas.
  *
- * The range is enormous because the portal spreads it LINEARLY over the camera's
- * whole near..far span, and screens have to sort against each other by that
- * z-index alone - the DOM is what you actually see through the hole the depth
- * mask cuts, so two overlapping screens stack by z-index, not by the depth
- * buffer. A greeting card's cover and its inside face are ~25 mm apart in a
- * 1000-unit frustum; on drei's default band (16.7 million wide, but a
- * different split) both rounded to the same integer and the inside face
- * painted straight over the cover. A million steps
- * resolves a few thousandths of a unit, which is finer than any two surfaces
- * on one object. `isolateScreenStack` below keeps the big numbers from ever
- * reaching the page.
+ * Screens have to sort against each other by z-index alone - the DOM is what
+ * you actually see through the hole the depth mask cuts, so two overlapping
+ * screens stack by z-index, not by the depth buffer. The portal ranks every
+ * screen of the scene by their planes once a frame (`stackSurfaces`) and
+ * hands them 1, 2, 3...; the band only has to stay clear of the canvas above
+ * them. It was once spread linearly over the camera's near..far span, by
+ * centre distance, which a large surface behind a small one defeats.
+ * `isolateScreenStack` below keeps the canvas's big number from ever reaching
+ * the page.
  */
 const SCREEN_Z_RANGE: [number, number] = [2_000_000, 0]
 

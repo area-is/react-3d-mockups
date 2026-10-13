@@ -14,6 +14,12 @@
   <img src="assets/hero.png" alt="A 3D iPhone mockup with a live music-player UI on its screen, flanked by two more devices" width="820" />
 </p>
 
+<p align="center">
+  <a href="https://area.is/react-3d-mockups/media/react-3d-mockups.mp4"><img src="assets/promo-poster.jpg" alt="Play the 38-second react-3d-mockups film" width="820" /></a>
+  <br />
+  <sub><a href="https://area.is/react-3d-mockups/media/react-3d-mockups.mp4"><b>▶ Watch the 38-second film</b></a> - every frame of it rendered with react-3d-mockups and <a href="examples/remotion">Remotion</a></sub>
+</p>
+
 GPU-accelerated **3D device mockups for React** - drop any content onto the screen of a
 3D phone and it renders live: real DOM on the glass, vector crisp at any angle, videos
 playing, iframes loading. The mockups are decorative - you rotate and zoom them, and the

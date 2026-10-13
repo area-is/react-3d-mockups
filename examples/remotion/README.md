@@ -2,7 +2,8 @@
 
 A [Remotion](https://www.remotion.dev) project that renders react-3d-mockups
 to video: a reel over animated [Tabbied](https://tabbied.com) pattern
-backgrounds, and three campaign films that use no patterns at all.
+backgrounds, three campaign films that use no patterns at all, and the
+library's own promo film.
 
 - **`MockupReel`**: a ~30 s reel at 1920×1080. It opens on a title card,
   then gives single mockups a shot each - an iPhone 18 Pro Max turning
@@ -27,6 +28,9 @@ backgrounds, and three campaign films that use no patterns at all.
 - **`GroveFilm`, `KiteFilm`, `LumenFilm`**: three ~25 s films, each a
   campaign for a fictional brand carried across the objects and devices it
   would really appear on. See [The campaign films](#the-campaign-films).
+- **`PromoFilm`**: a 38 s film for the library itself, in the docs site's
+  look and with its artwork: the models from the home page carousel, family
+  by family, four features and the twelve sample sites. See [The promo film](#the-promo-film).
 
 It is not an npm workspace: it installs the package from `../../packages/react`
 the way an app would, so build the package first.
@@ -38,7 +42,79 @@ npm install
 npm run studio                     # preview in Remotion Studio
 npm run render                     # out/mockup-reel.mp4
 npm run render:grove               # out/grove.mp4 (also render:kite, render:lumen)
+npm run render:promo               # out/promo.mp4
 ```
+
+## The promo film
+
+`PromoFilm` (`src/promo`) is the library's own film: 38 s at 1920×1080, with
+no voice, over an instrumental music bed. It is cut to a 120 BPM grid. A beat
+is 15 frames and a bar 60, every shot runs a whole number of bars, and every
+transition starts on a bar line, so the music lands its downbeats on the cuts.
+
+The music (`public/audio/promo/music.mp3`) is ElevenLabs Music v2.5 from the
+prompt in `src/promo/sound.json`, which the film's `Soundtrack` plays from the
+first frame. Its beats fall on the film's grid: a riser under the title, the
+beat coming in on the first cut at 0:02, and the groove stopping on the end
+card at 0:34 to ring out. `scripts/generate-audio.py promo` asks for a new one
+from the same sheet.
+
+The copy the docs home page plays (and the README links to) is a web encode
+of `out/promo.mp4` in the `react-3d-mockups-media` R2 bucket, which the docs
+Worker serves with byte ranges at `/media/react-3d-mockups.mp4`, so it plays
+as it downloads and seeks (Safari will not play a video without them, and
+the site's static assets do not do ranges). To publish a new cut:
+
+```bash
+ffmpeg -i out/promo.mp4 -c:v libx264 -preset slow -crf 21 -profile:v high -level 4.1 \
+  -pix_fmt yuv420p -maxrate 8M -bufsize 16M -c:a aac -b:a 160k -movflags +faststart \
+  out/react-3d-mockups.mp4
+npx wrangler r2 object put react-3d-mockups-media/react-3d-mockups.mp4 --remote \
+  --file out/react-3d-mockups.mp4 --content-type video/mp4 --cache-control "public, max-age=86400"
+```
+
+| Shot | Bars | What it shows |
+| --- | --- | --- |
+| 0:00 title | 1 | The stacked-screens mark builds panel by panel on the half-beat; "Live 3D mockups for React." |
+| 0:02 one component | 2 | "Your component in 3D.": the quick-start snippet types itself out beside an Icy Blue Galaxy S26, screen to the camera, under a cool key light |
+| 0:06 the catalogue | 4 | 58 models, a family every two beats, each a row of its models in one canvas at their true relative sizes: phones, foldables, laptops and tablets, wearables, displays, print (the Korean memoir with the Alhambra record), packaging (Harlow Valley milk, Ridgeway Mills cereal, Marigold & Moss, the Northline mailer) and out of home (the HALDEN billboard, the Sunpeel bus) |
+| 0:14 live DOM | 2 | "Real DOM, not a texture.": the Ledger sample's laptop, phone and watch on one React state, a purchase landing on every beat |
+| 0:18 procedural | 2 | "No 3D files. Just props.": a Z Fold7 opening onto The Meridian, then stepping through its colourways, its props shown live |
+| 0:22 composable | 2 | "Compose whole scenes.": five objects at true size join one `<MockupCanvas>` on the half-beat, line up and regroup, their positions in the code |
+| 0:26 video | 2 | "Render it to video.": a player with a live turntable over a timeline whose counter is this film's own, and a track of the three campaign films |
+| 0:30 sample sites | 2 | The twelve sample sites as a wall of browser windows, each scrolling past its 3D scene |
+| 0:34 end card | 2 | The mark, `npm install react-3d-mockups`, the docs address |
+
+- **The docs site's own artwork.** The carousel's screens and prints, the
+  Ledger app and the Northline mailer are imported from `apps/docs`, not
+  copied. `remotion.config.ts` points the site's `@/` alias at it (and
+  `tsconfig.json` does the same for types). The site's `asset()` helper is
+  swapped for a shim that hands back webpack's URL for each picture
+  (`src/promo/docs-asset.ts`), and `src/promo/docs-fonts.tsx` loads the
+  site's own font files under the variables its next/font setup defines. The
+  docs' `tabbied` is pinned to this project's copy: two copies would each
+  register `<css-doodle>`.
+- **Patterns hold one seed a shot.** On the site the device screens reseed
+  their patterns on the wall clock, which a render cannot share, and a reseed
+  morphs the cells through CSS transitions on the browser's clock. The film
+  builds the same posters from `SwissStack`, `SwissDial` and `SwissSplit` with
+  a pinned seed, and skips the one screen that only comes live (the studio
+  site on the carousel's laptop). `useDoodlesDrawn` holds a shot's first
+  frame until every pattern on the page has drawn: Tabbied paints
+  asynchronously, and its `onReady` is not reachable through the art.
+- **Rows are laid out from measured bounds.** Each catalogue family is one
+  canvas with a `Lineup` (`src/promo/lineup.tsx`): it measures every model
+  the first frame it exists, stands it on the floor, spaces it from its
+  neighbour by its bounds and fits the row to the frame, holding the frame
+  until it has. Models are scaled to one unit, so they keep their sizes
+  against each other, and spaced by their bounds, so none can touch. The
+  composed scene's two layouts are set by hand instead (its positions are
+  the point of the shot); render it with `REMOTION_OVERLAP_PROBE=1` and any
+  two objects that meet are logged.
+- **The sample sites are screenshots** (`public/promo/sites`), each site's
+  first two screens with its 3D scenes drawn. Retake them with
+  `scripts/shoot-sites.mjs` against a running docs site. The track in the
+  video shot is stills from the three campaign films (`public/promo/films`).
 
 ## The campaign films
 

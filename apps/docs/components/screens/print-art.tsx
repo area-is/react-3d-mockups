@@ -146,36 +146,6 @@ export function BusAdArt() {
   )
 }
 
-/** TV streaming-app hero. */
-export function TVShowArt() {
-  return (
-    <div
-      style={{
-        width: '100%',
-        height: '100%',
-        boxSizing: 'border-box',
-        background: 'linear-gradient(200deg, #1c2b45 0%, #0a0f1a 70%)',
-        color: '#eef2f8',
-        display: 'flex',
-        flexDirection: 'column',
-        padding: 60,
-        overflow: 'hidden',
-      }}
-    >
-      <div style={{ fontSize: 26, letterSpacing: 6, color: '#5ad0a6', fontWeight: 700 }}>NORTHWIND ORIGINAL</div>
-      <div style={{ fontSize: 110, fontWeight: 800, letterSpacing: -3, lineHeight: 0.98, marginTop: 24 }}>
-        THE RIDGE
-      </div>
-      <div style={{ fontSize: 30, color: '#9db0cd', marginTop: 18 }}>New season · Fridays</div>
-      <div style={{ display: 'flex', gap: 24, marginTop: 'auto' }}>
-        {['#25467a', '#2a8f68', '#8a3547', '#66513a', '#31552e'].map((c) => (
-          <div key={c} style={{ width: 300, height: 170, borderRadius: 14, background: `linear-gradient(160deg, ${c}, #10151f)` }} />
-        ))}
-      </div>
-    </div>
-  )
-}
-
 /** Chalkboard menu for the A-frame: Inter, regular casing, tightened - the way a café that owns a stencil letters a board. */
 export function ChalkMenuArt() {
   return (

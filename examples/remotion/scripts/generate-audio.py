@@ -3,7 +3,8 @@
 Generate a campaign film's sound with ElevenLabs: the narration, the sound
 effects and the music bed its cue sheet names.
 
-Each film has a cue sheet, `src/campaigns/<film>/sound.json`. The film reads
+Each film has a cue sheet, `src/campaigns/<film>/sound.json` (the library's
+own promo film keeps its sheet in `src/promo/sound.json`). The film reads
 it to place every file on its shots (`src/campaigns/sound.tsx`), playing
 whatever is in `public/audio/<film>/` and nothing that is not, so it renders
 silent until the files exist. This script fills that folder:
@@ -220,7 +221,10 @@ def main():
         rest = rest[:at] + rest[at + 2 :]
     flags = {a for a in rest if a.startswith('--')}
     only = [a for a in rest if not a.startswith('--')]
-    sheet = json.loads((ROOT / 'src' / 'campaigns' / film / 'sound.json').read_text())
+    sheet_path = ROOT / 'src' / 'campaigns' / film / 'sound.json'
+    if not sheet_path.exists():
+        sheet_path = ROOT / 'src' / film / 'sound.json'
+    sheet = json.loads(sheet_path.read_text())
     out_dir = ROOT / 'public' / 'audio' / film
     entries = list(plan(sheet))
     unknown = set(only) - {e[0] for e in entries}

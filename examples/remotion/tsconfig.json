@@ -20,6 +20,9 @@
     // one. Fiber 9.7 hid this by accident: its `Canvas` return type pulled in
     // `react/jsx-runtime`, which TypeScript then merged into this project's.
     "paths": {
+      // The docs site's artwork, which the promo film imports (see remotion.config.ts).
+      "@/lib/base-path.mjs": ["./src/promo/docs-asset.ts"],
+      "@/*": ["../../apps/docs/*"],
       "react": ["./node_modules/@types/react"],
       "react/*": ["./node_modules/@types/react/*"],
       "@react-three/fiber": ["./node_modules/@react-three/fiber"]
