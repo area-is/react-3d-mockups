@@ -56,7 +56,7 @@ export function OneComponentShot() {
         }}
       />
       <div style={{ position: 'absolute', left: 900 * u, top: 20 * u, width: 980 * u, height: 1040 * u }}>
-        <GalaxyMockup {...stage} variant="s26" color="icyblue" statusBar={{ color: '#141414' }} rotation={rotation}>
+        <GalaxyMockup {...stage} variant="s26" color="icyblue" statusBar={{ color: '#efede6' }} rotation={rotation}>
           <SwissStack pattern={gyre} seed="promo-rotation" tone="midnight" grid="6x9" index="01" kicker="Rotation" title={'Slow\nturns'} meta="Neue Grafik · Zürich" />
         </GalaxyMockup>
       </div>

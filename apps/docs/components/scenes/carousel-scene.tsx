@@ -364,7 +364,8 @@ const NORTHLINE = LIVERIES[0]!
 const DEVICES: Entry[] = [
   {
     id: 'galaxy-s26',
-    statusBarInk: '#141414',
+    // Light ink: the Rotation poster is navy to the top edge.
+    statusBarInk: '#efede6',
     res: pxRes('galaxy', { variant: 's26' }),
     colorways: GALAXY_COLORWAYS.s26,
     content: () => <SwissRotation />,
