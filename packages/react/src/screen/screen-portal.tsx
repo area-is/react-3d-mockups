@@ -24,6 +24,7 @@ import * as ReactDOM from 'react-dom/client'
 import { DoubleSide, OrthographicCamera, PerspectiveCamera, Vector3 } from 'three'
 import type * as THREE from 'three'
 import { useFrame, useThree } from '@react-three/fiber'
+import { stackSurfaces, surfaceCorners } from '../core/screen/stacking'
 
 const v1 = /* @__PURE__ */ new Vector3()
 const v2 = /* @__PURE__ */ new Vector3()
@@ -35,13 +36,67 @@ function isBehindCamera(object: THREE.Object3D, camera: THREE.Camera): boolean {
   return objectPos.sub(cameraPos).angleTo(camera.getWorldDirection(v3)) > Math.PI / 2
 }
 
-/** drei's z-index: the anchor's camera distance spread linearly over `range`. */
-function objectZIndex(object: THREE.Object3D, camera: THREE.Camera, range: [number, number]): number | undefined {
-  if (!(camera instanceof PerspectiveCamera || camera instanceof OrthographicCamera)) return undefined
-  const dist = v1.setFromMatrixPosition(object.matrixWorld).distanceTo(v2.setFromMatrixPosition(camera.matrixWorld))
-  const A = (range[1] - range[0]) / (camera.far - camera.near)
-  const B = range[1] - A * camera.far
-  return Math.round(A * dist + B)
+/**
+ * The screens of one scene, stacked together.
+ *
+ * Every screen's DOM sits under the canvas and shows through the hole its
+ * depth mask clears, and what shows through a hole is whichever screen's DOM
+ * is on top there - so where two screens overlap on the page, the nearer one
+ * has to have the higher z-index. Each portal used to set its own from its
+ * anchor's camera distance (drei's way), which puts a large surface over a
+ * small one in front of it whenever the large one's centre is the nearer:
+ * a record sleeve standing behind a milk carton showed through the carton.
+ * Now every portal of a scene registers here, and once a frame the first of
+ * them to run stacks them all by their planes (see `stackSurfaces`).
+ */
+interface Layer {
+  anchor: React.RefObject<THREE.Group | null>
+  geometry: React.RefObject<THREE.BufferGeometry>
+  element: HTMLElement
+}
+
+interface Stack {
+  layers: Set<Layer>
+  /** The renderer frame the stack was last sorted for. */
+  frame: number
+}
+
+const stacks = new WeakMap<THREE.Object3D, Stack>()
+
+function joinStack(scene: THREE.Object3D, layer: Layer): () => void {
+  let stack = stacks.get(scene)
+  if (!stack) {
+    stack = { layers: new Set(), frame: -1 }
+    stacks.set(scene, stack)
+  }
+  stack.layers.add(layer)
+  stack.frame = -1
+  return () => {
+    stack.layers.delete(layer)
+    stack.frame = -1
+  }
+}
+
+/** Gives every screen of `scene` its z-index for this frame, below `ceiling` (where the canvas sits). */
+function restack(scene: THREE.Object3D, camera: THREE.Camera, frame: number, ceiling: number): void {
+  const stack = stacks.get(scene)
+  if (!stack || stack.frame === frame) return
+  stack.frame = frame
+  if (!(camera instanceof PerspectiveCamera || camera instanceof OrthographicCamera)) return
+  const layers: Layer[] = []
+  const surfaces = []
+  for (const layer of stack.layers) {
+    const anchor = layer.anchor.current
+    if (!anchor) continue
+    anchor.updateWorldMatrix(true, false)
+    layers.push(layer)
+    surfaces.push({ corners: surfaceCorners(layer.geometry.current, anchor.matrixWorld) })
+  }
+  stackSurfaces(surfaces, camera).forEach((index, rank) => {
+    const zIndex = `${Math.min(ceiling - 1, rank + 1)}`
+    const element = layers[index]!.element
+    if (element.style.zIndex !== zIndex) element.style.zIndex = zIndex
+  })
 }
 
 const epsilon = (value: number) => (Math.abs(value) < 1e-10 ? 0 : value)
@@ -108,6 +163,8 @@ export function ScreenPortal({
   const group = React.useRef<THREE.Group>(null)
   const mounted = React.useRef<Mounted | null>(null)
   const visible = React.useRef(true)
+  const geometryRef = React.useRef(geometry)
+  geometryRef.current = geometry
 
   // Depth blending: the canvas composites OVER the screens, at the band's midpoint.
   React.useLayoutEffect(() => {
@@ -134,7 +191,9 @@ export function ScreenPortal({
     visible.current = true
     scene.updateMatrixWorld()
     target.appendChild(element)
+    const leaveStack = joinStack(scene, { anchor: group, geometry: geometryRef, element })
     return () => {
+      leaveStack()
       element.remove()
       if (mounted.current === mount) mounted.current = null
       // Not here: this cleanup runs inside React's commit, where unmounting a
@@ -168,7 +227,7 @@ export function ScreenPortal({
     )
   })
 
-  useFrame(() => {
+  useFrame((state) => {
     const anchor = group.current
     const mount = mounted.current
     if (!anchor || !mount) return
@@ -181,8 +240,7 @@ export function ScreenPortal({
       visible.current = shown
       element.style.display = shown ? 'block' : 'none'
     }
-    const halfRange = Math.floor(zIndexRange[0] / 2)
-    element.style.zIndex = `${objectZIndex(anchor, camera, [halfRange - 1, 0])}`
+    restack(scene, camera, state.gl.info.render.frame, Math.floor(zIndexRange[0] / 2))
 
     const widthHalf = size.width / 2
     const heightHalf = size.height / 2
