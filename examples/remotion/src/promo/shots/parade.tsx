@@ -233,7 +233,8 @@ const MODELS: Model[] = [
     patterns: 0,
     yaw: 0.42,
     render: (stage, rotation) => (
-      <ShoppingBagMockup {...stage} color={OLIVE} rotation={rotation}>
+      // The handles stand above the bag's framing, so it is set a little smaller to keep them in the picture.
+      <ShoppingBagMockup {...stage} color={OLIVE} rotation={rotation} scale={0.8}>
         <BagFront material={OLIVE} />
         <ShoppingBagMockup.Back>
           <BagBack material={OLIVE} />
