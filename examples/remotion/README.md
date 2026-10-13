@@ -59,6 +59,16 @@ beat coming in on the first cut at 0:02, and the groove stopping on the end
 card at 0:34 to ring out. `scripts/generate-audio.py promo` asks for a new one
 from the same sheet.
 
+The copy the docs home page plays (and the README links to) is a web encode
+of `out/promo.mp4`, served by the docs site's Worker with byte ranges, so it
+plays as it downloads and seeks:
+
+```bash
+ffmpeg -i out/promo.mp4 -c:v libx264 -preset slow -crf 21 -profile:v high -level 4.1 \
+  -pix_fmt yuv420p -maxrate 8M -bufsize 16M -c:a aac -b:a 160k -movflags +faststart \
+  ../../apps/docs/public/promo/react-3d-mockups.mp4
+```
+
 | Shot | Bars | What it shows |
 | --- | --- | --- |
 | 0:00 title | 1 | The stacked-screens mark builds panel by panel on the half-beat; "Live 3D mockups for React." |

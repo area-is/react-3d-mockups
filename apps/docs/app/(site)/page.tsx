@@ -189,6 +189,49 @@ function QuickStart() {
   )
 }
 
+/** The film's files, under `public/` (see `Film`). */
+const FILM = { src: '/promo/react-3d-mockups.mp4', poster: '/promo/react-3d-mockups-poster.webp' }
+
+/**
+ * The library's film: 38 seconds of the catalogue and the features, every
+ * frame of it a react-3d-mockups component rendered to video with Remotion
+ * (`examples/remotion`, `PromoFilm`). A plain `<video>`: the file is a
+ * static asset of this site, served by Cloudflare with byte ranges, so it
+ * starts playing before it has downloaded and seeks without a player
+ * library. `preload="none"` keeps its ten-odd megabytes off the page until
+ * someone presses play; the poster and the box's aspect ratio hold its
+ * place, so nothing shifts when it does.
+ */
+function Film() {
+  return (
+    <section className="film" aria-labelledby="film-title">
+      <div className="film-copy">
+        <h2 id="film-title">See it in 38 seconds</h2>
+        <p>
+          Every device and object in the film is a react-3d-mockups component, rendered to video
+          with Remotion. Its{' '}
+          <a className="accent-link" href={`${GITHUB_URL}/tree/main/examples/remotion`}>
+            source is in the repository
+          </a>
+          .
+        </p>
+      </div>
+      <video
+        className="film-video"
+        controls
+        playsInline
+        preload="none"
+        width={1920}
+        height={1080}
+        poster={asset(FILM.poster)}
+        aria-label="The react-3d-mockups film: the catalogue of 3D models and the library's features"
+      >
+        <source src={asset(FILM.src)} type="video/mp4" />
+      </video>
+    </section>
+  )
+}
+
 export default function HomePage() {
   return (
     <>
@@ -216,6 +259,8 @@ export default function HomePage() {
       <HeroCarousel />
 
       <QuickStart />
+
+      <Film />
 
       <section className="features" aria-label="What the library does">
         {FEATURES.map((feature, i) => (
