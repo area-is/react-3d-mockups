@@ -928,7 +928,8 @@ const MOTTLE = `url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/
 function OnBoard({ material, art, children }: { material: string; art?: ReactNode; children: ReactNode }) {
   const dark = materialTone(material).text !== INK
   return (
-    <div style={{ position: 'relative', width: '100%', height: '100%', background: material, overflow: 'hidden', isolation: 'isolate' }}>
+    // A size container of its own, so the art's `cqw` measures against the face wherever it is mounted.
+    <div style={{ position: 'relative', width: '100%', height: '100%', background: material, overflow: 'hidden', isolation: 'isolate', containerType: 'size' }}>
       {art && <div style={{ position: 'absolute', inset: 0, opacity: 0.96, filter: 'saturate(0.94)' }}>{art}</div>}
       <div
         style={{
@@ -994,7 +995,8 @@ const BLOOM = asset('/art/marigold-bloom.webp')
 function Flowers({ src, style }: { src: string; style: CSSProperties }) {
   return (
     // eslint-disable-next-line @next/next/no-img-element
-    <img src={src} alt="" draggable={false} style={{ position: 'absolute', display: 'block', height: 'auto', pointerEvents: 'none', ...style }} />
+    // `maxWidth: none`: the garland is meant to be wider than the bag, and a page's reset would cap it at the face.
+    <img src={src} alt="" draggable={false} style={{ position: 'absolute', display: 'block', height: 'auto', maxWidth: 'none', pointerEvents: 'none', ...style }} />
   )
 }
 
