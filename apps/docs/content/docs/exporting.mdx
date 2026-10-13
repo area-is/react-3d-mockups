@@ -137,7 +137,9 @@ export function Turntable() {
   wherever a render tab starts - came out with no device, or with a hole
   where the screen belongs, on different frames from one render to the next.
   While it is set the canvas never pauses, so there is no
-  `pauseWhenOffscreen` to turn off.
+  `pauseWhenOffscreen` to turn off, and it renders at a pixel ratio of 2
+  unless you pass `dpr`: a 1x render is supersampled, which keeps thin
+  highlights along bevels and edges from stair-stepping.
 - **`time={frame / fps}`** puts `autoRotate` and `float` on the video's
   clock. Without it they run on the browser's, and Remotion renders frames
   out of order across several tabs, so each tab would land on a different
