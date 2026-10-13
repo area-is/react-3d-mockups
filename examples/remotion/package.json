@@ -1,7 +1,7 @@
 {
   "name": "react-3d-mockups-remotion-example",
   "private": true,
-  "description": "Remotion videos built from react-3d-mockups scenes: a reel over Tabbied pattern backgrounds, and three campaign films printed with GPT Image 2.5 cut-outs. Not a workspace: it installs the package the way an app would.",
+  "description": "Remotion videos built from react-3d-mockups scenes: a reel over Tabbied pattern backgrounds, three campaign films printed with GPT Image 2.5 cut-outs, and the library's own promo film. Not a workspace: it installs the package the way an app would.",
   "type": "module",
   "scripts": {
     "studio": "remotion studio",
@@ -9,6 +9,7 @@
     "render:grove": "remotion render GroveFilm out/grove.mp4 --concurrency=1",
     "render:kite": "remotion render KiteFilm out/kite.mp4 --concurrency=1",
     "render:lumen": "remotion render LumenFilm out/lumen.mp4 --concurrency=1",
+    "render:promo": "remotion render PromoFilm out/promo.mp4 --concurrency=1",
     "art": "python3 scripts/generate-art.py",
     "still": "remotion still",
     "typecheck": "tsc --noEmit",
