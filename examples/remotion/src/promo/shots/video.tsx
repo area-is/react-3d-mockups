@@ -31,10 +31,10 @@ export function VideoShot({ start, total }: { start: number; total: number }) {
   const u = width / 1920
   const stage = useStage(true)
   const filmFrame = start + frame
-  const rotation: Vec3 = [0.05, -0.45 + Math.sin(frame / 38) * 0.55, 0]
-  const pick = Math.floor(frame / 30) % 3
+  const rotation: Vec3 = [0.05, -0.45 + Math.sin(frame / 22) * 0.55, 0]
+  const pick = Math.floor(frame / 15) % 3
   const playhead = frame / durationInFrames
-  const enter = tween(frame, 0, 18, 0, 1, easeOut)
+  const enter = tween(frame, 0, 12, 0, 1, easeOut)
   const secs = (n: number) => `${String(Math.floor(n / fps / 60)).padStart(2, '0')}:${String(Math.floor(n / fps) % 60).padStart(2, '0')}.${String(n % fps).padStart(2, '0')}`
   return (
     <Ground glow={0.1}>
@@ -99,10 +99,10 @@ export function VideoShot({ start, total }: { start: number; total: number }) {
         {/* playhead */}
         <div style={{ position: 'absolute', top: 46 * u, bottom: 0, left: `${3 + playhead * 94}%`, width: 2 * u, background: BRAND.green, boxShadow: `0 0 ${12 * u}px ${BRAND.green}` }} />
       </div>
-      <Feature kicker="Video with Remotion" title="Render it to video." sub="Each frame waits until the mockup has drawn it, so every MP4 comes out frame-perfect. This film is one." width={600} style={{ left: 110 * u, top: 130 * u }} />
+      <Feature kicker="Video with Remotion" title="Render it to video." sub="Every frame waits for the mockup to draw. This film is one." width={600} style={{ left: 110 * u, top: 130 * u }} />
       <CodeCard
-        start={24}
-        speed={3}
+        start={12}
+        speed={6}
         width={600}
         size={22}
         caret={false}

@@ -28,9 +28,9 @@ library's own promo film.
 - **`GroveFilm`, `KiteFilm`, `LumenFilm`**: three ~25 s films, each a
   campaign for a fictional brand carried across the objects and devices it
   would really appear on. See [The campaign films](#the-campaign-films).
-- **`PromoFilm`**: a 66 s film for the library itself, in the docs site's
-  look and with its artwork: the models from the home page carousel, four
-  features and the twelve sample sites. See [The promo film](#the-promo-film).
+- **`PromoFilm`**: a 38 s film for the library itself, in the docs site's
+  look and with its artwork: the models from the home page carousel, family
+  by family, four features and the twelve sample sites. See [The promo film](#the-promo-film).
 
 It is not an npm workspace: it installs the package from `../../packages/react`
 the way an app would, so build the package first.
@@ -47,7 +47,7 @@ npm run render:promo               # out/promo.mp4
 
 ## The promo film
 
-`PromoFilm` (`src/promo`) is the library's own film: 66 s at 1920×1080, with
+`PromoFilm` (`src/promo`) is the library's own film: 38 s at 1920×1080, with
 no voice and, for now, no music. It is cut to a 120 BPM grid. A beat is 15
 frames and a bar 60, every shot runs a whole number of bars, and every
 transition starts on a bar line, so music made for it can land its downbeats
@@ -55,15 +55,15 @@ on the cuts.
 
 | Shot | Bars | What it shows |
 | --- | --- | --- |
-| 0:00 title | 2 | The stacked-screens mark builds panel by panel on the beat; "Live 3D mockups for React." |
-| 0:04 one component | 3 | "Your component in 3D.": the quick-start snippet types itself out, and a Galaxy S26 turns round as `<YourApp />` lands in it |
-| 0:10 the catalogue | 6 | 58 models: twelve of the home carousel's models, two beats each, in its artwork (Swiss posters on the screens, the HALDEN billboard, the Sunpeel bus, the Korean memoir, the Alhambra record, Harlow Valley milk, Ridgeway Mills cereal, Marigold & Moss) |
-| 0:22 live DOM | 4 | "Real DOM, not a texture.": the Ledger sample's laptop, phone and watch on one React state, a purchase landing on the beat |
-| 0:30 procedural | 4 | "No 3D files. Just props.": a Z Fold7 opening onto The Meridian, then stepping through its colourways, its props shown live |
-| 0:38 composable | 4 | "Compose whole scenes.": five objects at true size join one `<MockupCanvas>` a beat apart, line up and regroup, their positions in the code |
-| 0:46 video | 4 | "Render it to video.": a player with a live turntable over a timeline whose counter is this film's own, and a track of the three campaign films |
-| 0:54 sample sites | 4 | The twelve sample sites as a wall of browser windows, each scrolling past its 3D scene |
-| 1:02 end card | 2 | The mark, `npm install react-3d-mockups`, the docs address |
+| 0:00 title | 1 | The stacked-screens mark builds panel by panel on the half-beat; "Live 3D mockups for React." |
+| 0:02 one component | 2 | "Your component in 3D.": the quick-start snippet types itself out beside an Icy Blue Galaxy S26, screen to the camera, under a cool key light |
+| 0:06 the catalogue | 4 | 58 models, a family every two beats, each a row of its models in one canvas at their true relative sizes: phones, foldables, laptops and tablets, wearables, displays, print (the Korean memoir with the Alhambra record), packaging (Harlow Valley milk, Ridgeway Mills cereal, Marigold & Moss, the Northline mailer) and out of home (the HALDEN billboard, the Sunpeel bus) |
+| 0:14 live DOM | 2 | "Real DOM, not a texture.": the Ledger sample's laptop, phone and watch on one React state, a purchase landing on every beat |
+| 0:18 procedural | 2 | "No 3D files. Just props.": a Z Fold7 opening onto The Meridian, then stepping through its colourways, its props shown live |
+| 0:22 composable | 2 | "Compose whole scenes.": five objects at true size join one `<MockupCanvas>` on the half-beat, line up and regroup, their positions in the code |
+| 0:26 video | 2 | "Render it to video.": a player with a live turntable over a timeline whose counter is this film's own, and a track of the three campaign films |
+| 0:30 sample sites | 2 | The twelve sample sites as a wall of browser windows, each scrolling past its 3D scene |
+| 0:34 end card | 2 | The mark, `npm install react-3d-mockups`, the docs address |
 
 - **The docs site's own artwork.** The carousel's screens and prints, the
   Ledger app and the Northline mailer are imported from `apps/docs`, not
@@ -82,6 +82,15 @@ on the cuts.
   site on the carousel's laptop). `useDoodlesDrawn` holds a shot's first
   frame until every pattern on the page has drawn: Tabbied paints
   asynchronously, and its `onReady` is not reachable through the art.
+- **Rows are laid out from measured bounds.** Each catalogue family is one
+  canvas with a `Lineup` (`src/promo/lineup.tsx`): it measures every model
+  the first frame it exists, stands it on the floor, spaces it from its
+  neighbour by its bounds and fits the row to the frame, holding the frame
+  until it has. Models are scaled to one unit, so they keep their sizes
+  against each other, and spaced by their bounds, so none can touch. The
+  composed scene's two layouts are set by hand instead (its positions are
+  the point of the shot); render it with `REMOTION_OVERLAP_PROBE=1` and any
+  two objects that meet are logged.
 - **The sample sites are screenshots** (`public/promo/sites`), each site's
   first two screens with its 3D scenes drawn. Retake them with
   `scripts/shoot-sites.mjs` against a running docs site. The track in the

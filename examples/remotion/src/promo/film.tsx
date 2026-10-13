@@ -11,7 +11,7 @@ import { PROMO_FONTS } from './brand'
 import { ComposeShot } from './shots/compose'
 import { LiveDomShot } from './shots/live-dom'
 import { OneComponentShot } from './shots/one-component'
-import { ParadeShot, PARADE_LENGTH } from './shots/parade'
+import { CatalogueShot, CATALOGUE_LENGTH } from './shots/catalogue'
 import { ProceduralShot } from './shots/procedural'
 import { SitesShot } from './shots/sites'
 import { VideoShot } from './shots/video'
@@ -24,11 +24,14 @@ import { VideoShot } from './shots/video'
  * downbeats on the cuts. Each transition starts on a bar line: a shot runs
  * its bars plus the transition's length, and the next one starts as the
  * transition does.
+ *
+ * Nineteen bars, 38 seconds: a bar for the title, four for the catalogue (a
+ * family every two beats), two for each feature and two for the end card.
  */
 
 export const BEAT = 15
 export const BAR = 60
-const T = 10
+const T = 8
 
 interface Shot {
   id: string
@@ -40,14 +43,14 @@ interface Shot {
 }
 
 const SHOTS: Shot[] = [
-  { id: 'title', bars: 2, render: () => <TitleCard />, into: fade() as never },
-  { id: 'one-component', bars: 3, render: () => <OneComponentShot />, into: slide({ direction: 'from-right' }) as never },
-  { id: 'parade', bars: PARADE_LENGTH / BAR, render: () => <ParadeShot />, into: wipe({ direction: 'from-left' }) as never },
-  { id: 'live-dom', bars: 4, render: () => <LiveDomShot />, into: slide({ direction: 'from-bottom' }) as never },
-  { id: 'procedural', bars: 4, render: () => <ProceduralShot />, into: wipe({ direction: 'from-right' }) as never },
-  { id: 'compose', bars: 4, render: () => <ComposeShot />, into: slide({ direction: 'from-right' }) as never },
-  { id: 'video', bars: 4, render: (start) => <VideoShot start={start} total={PROMO_DURATION} />, into: fade() as never },
-  { id: 'sites', bars: 4, render: () => <SitesShot />, into: fade() as never },
+  { id: 'title', bars: 1, render: () => <TitleCard />, into: fade() as never },
+  { id: 'one-component', bars: 2, render: () => <OneComponentShot />, into: slide({ direction: 'from-right' }) as never },
+  { id: 'catalogue', bars: CATALOGUE_LENGTH / BAR, render: () => <CatalogueShot />, into: wipe({ direction: 'from-left' }) as never },
+  { id: 'live-dom', bars: 2, render: () => <LiveDomShot />, into: slide({ direction: 'from-bottom' }) as never },
+  { id: 'procedural', bars: 2, render: () => <ProceduralShot />, into: wipe({ direction: 'from-right' }) as never },
+  { id: 'compose', bars: 2, render: () => <ComposeShot />, into: slide({ direction: 'from-right' }) as never },
+  { id: 'video', bars: 2, render: (start) => <VideoShot start={start} total={PROMO_DURATION} />, into: fade() as never },
+  { id: 'sites', bars: 2, render: () => <SitesShot />, into: fade() as never },
   { id: 'end', bars: 2, render: () => <EndCard /> },
 ]
 

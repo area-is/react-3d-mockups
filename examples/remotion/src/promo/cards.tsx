@@ -33,7 +33,7 @@ export function Rise({ text, start, step = 3, style }: { text: string; start: nu
   return (
     <span style={{ display: 'inline-block', ...style }}>
       {words.map((word, i) => {
-        const t = tween(frame, start + i * step, start + i * step + 16, 0, 1, easeOut)
+        const t = tween(frame, start + i * step, start + i * step + 12, 0, 1, easeOut)
         return (
           <span key={i} style={{ display: 'inline-block', overflow: 'hidden', verticalAlign: 'bottom', paddingBottom: '0.12em', marginBottom: '-0.12em' }}>
             <span style={{ display: 'inline-block', transform: `translateY(${(1 - t) * 110}%)`, opacity: t, marginRight: i < words.length - 1 ? '0.26em' : 0 }}>{word}</span>
@@ -49,7 +49,7 @@ export function Kicker({ children, start, color = BRAND.green, style }: { childr
   const frame = useCurrentFrame()
   const { width } = useVideoConfig()
   const u = width / 1920
-  const t = tween(frame, start, start + 14, 0, 1, easeOut)
+  const t = tween(frame, start, start + 10, 0, 1, easeOut)
   return (
     <div style={{ fontFamily: MONO, fontSize: 22 * u, letterSpacing: '0.02em', color, opacity: t, transform: `translateY(${(1 - t) * 12 * u}px)`, ...style }}>{children}</div>
   )
@@ -64,13 +64,13 @@ export function TitleCard() {
   const frame = useCurrentFrame()
   const { width } = useVideoConfig()
   const u = width / 1920
-  // Each panel drops onto the one below it, a beat apart (15 frames at 120 BPM).
-  const drop = (i: number) => tween(frame, 6 + i * 15, 6 + i * 15 + 14, 1, 0, easeOut)
+  // Each panel drops onto the one below it, half a beat apart (7.5 frames at 120 BPM).
+  const drop = (i: number) => tween(frame, 1 + i * 7.5, 1 + i * 7.5 + 10, 1, 0, easeOut)
   const lift = [0, 1, 2].map((i) => drop(i) * 70)
-  const show = [0, 1, 2].map((i) => tween(frame, 6 + i * 15, 6 + i * 15 + 6, 0, 1))
-  const name = tween(frame, 50, 68, 0, 1, easeOut)
-  const line = tween(frame, 66, 84, 0, 1, easeOut)
-  const out = tween(frame, 104, 120, 0, 1, easeInOut)
+  const show = [0, 1, 2].map((i) => tween(frame, 1 + i * 7.5, 1 + i * 7.5 + 4, 0, 1))
+  const name = tween(frame, 18, 30, 0, 1, easeOut)
+  const line = tween(frame, 26, 38, 0, 1, easeOut)
+  const out = tween(frame, 52, 68, 0, 1, easeInOut)
   return (
     <Ground glow={0.16 + 0.08 * name}>
       <AbsoluteFill style={{ alignItems: 'center', justifyContent: 'center', opacity: 1 - out, transform: `scale(${1 + out * 0.06})` }}>
@@ -96,9 +96,9 @@ export function EndCard() {
   const frame = useCurrentFrame()
   const { width } = useVideoConfig()
   const u = width / 1920
-  const mark = tween(frame, 4, 24, 0, 1, easeOut)
-  const install = tween(frame, 22, 40, 0, 1, easeOut)
-  const url = tween(frame, 34, 52, 0, 1, easeOut)
+  const mark = tween(frame, 2, 16, 0, 1, easeOut)
+  const install = tween(frame, 12, 26, 0, 1, easeOut)
+  const url = tween(frame, 20, 34, 0, 1, easeOut)
   // The cursor blinks on the beat.
   const blink = Math.floor(frame / 15) % 2 === 0 ? 1 : 0
   return (
@@ -160,13 +160,13 @@ export function Feature({
   const frame = useCurrentFrame()
   const { width: videoWidth } = useVideoConfig()
   const u = videoWidth / 1920
-  const subIn = tween(frame, start + 14, start + 30, 0, 1, easeOut)
+  const subIn = tween(frame, start + 10, start + 22, 0, 1, easeOut)
   const leave = out === undefined ? 0 : tween(frame, out, out + 10, 0, 1, easeInOut)
   return (
     <div style={{ position: 'absolute', width: width * u, opacity: 1 - leave, transform: `translateY(${-leave * 16 * u}px)`, ...style }}>
       <Kicker start={start}>{kicker}</Kicker>
       <div style={{ marginTop: 18 * u, fontFamily: SANS, fontWeight: 700, fontSize: 84 * u, lineHeight: 1.02, letterSpacing: '-0.04em', color: BRAND.text }}>
-        <Rise text={title} start={start + 4} />
+        <Rise text={title} start={start + 3} step={2} />
       </div>
       {sub ? (
         <div style={{ marginTop: 24 * u, fontFamily: SANS, fontWeight: 500, fontSize: 30 * u, lineHeight: 1.4, color: BRAND.muted, opacity: subIn, transform: `translateY(${(1 - subIn) * 12 * u}px)` }}>

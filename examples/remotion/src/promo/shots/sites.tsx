@@ -94,8 +94,8 @@ export function SitesShot() {
             const column = i % COLUMNS
             const row = Math.floor(i / COLUMNS)
             // Columns rise in on the beat, one after another.
-            const enter = tween(frame, 4 + column * 15 + row * 4, 22 + column * 15 + row * 4, 0, 1, easeOut)
-            const scroll = tween(frame, 40 + i * 6, durationInFrames - 10, 0, 1, easeInOut)
+            const enter = tween(frame, column * 7 + row * 3, 12 + column * 7 + row * 3, 0, 1, easeOut)
+            const scroll = tween(frame, 20 + i * 3, durationInFrames, 0, 1, easeInOut)
             return (
               <div key={site.slug} style={{ opacity: enter, transform: `translateY(${(1 - enter) * 80 * u}px)` }}>
                 <Window {...site} scroll={scroll} />
@@ -105,7 +105,7 @@ export function SitesShot() {
         </div>
       </div>
       <div style={{ position: 'absolute', inset: 0, background: `linear-gradient(90deg, ${BRAND.bg} 0%, ${BRAND.bg} 34%, rgba(8,9,12,0.0) 52%)` }} />
-      <Feature kicker="Sample sites" title="Twelve sites, built with it." sub="Finance, streaming, games, print, packaging and a festival. Every one is in the repo." width={600} style={{ left: 110 * u, top: 300 * u }} />
+      <Feature kicker="Sample sites" title="Twelve sites, built with it." sub="Finance, games, print, packaging and more. All in the repo." width={600} style={{ left: 110 * u, top: 300 * u }} />
     </Ground>
   )
 }

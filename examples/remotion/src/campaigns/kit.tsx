@@ -197,8 +197,11 @@ export function OverlapProbe({ names, frame }: { names: string[]; frame: number 
   React.useEffect(() => {
     if (enabled) console.warn(`[overlap] probing ${key}`)
   }, [enabled, key])
+  // Once per video frame: a frame can take several redraws to settle, and the test walks every vertex.
+  const checked = React.useRef<number | null>(null)
   useFrame(() => {
-    if (!enabled) return
+    if (!enabled || checked.current === frame) return
+    checked.current = frame
     scene.updateMatrixWorld(true)
     const objects = names.map((name) => scene.getObjectByName(name)).filter((o): o is THREE.Object3D => !!o)
     if (objects.length !== names.length) console.warn(`[overlap] frame ${frame}: missing ${names.filter((n) => !scene.getObjectByName(n)).join(', ')}`)

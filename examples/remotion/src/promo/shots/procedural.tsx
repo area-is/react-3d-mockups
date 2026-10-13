@@ -18,7 +18,7 @@ import { CodeCard, t } from '../code'
 
 const COLOURS = FOLD_COLORWAYS.fold7
 /** Beats the colour changes on. */
-const SWAPS = [120, 150, 180, 210]
+const SWAPS = [60, 75, 90, 105]
 
 export function ProceduralShot() {
   const frame = useCurrentFrame()
@@ -26,10 +26,10 @@ export function ProceduralShot() {
   const u = width / 1920
   const stage = useStage(true)
   // From 1 degree, not 0: below half a degree the Fold swaps to its separate shut model.
-  const openAngle = Math.round(tween(frame, 18, 84, 1, 150, easeInOut))
+  const openAngle = Math.round(tween(frame, 4, 40, 1, 150, easeInOut))
   const swaps = SWAPS.filter((at) => frame >= at).length
   const colour = COLOURS[swaps % COLOURS.length]!
-  const turn = tween(frame, 96, 200, 0, 1, easeInOut)
+  const turn = tween(frame, 44, 118, 0, 1, easeInOut)
   const rotation: Vec3 = [0.08, -0.32 + turn * 3.1, 0]
   return (
     <Ground glow={0.12}>
@@ -41,13 +41,13 @@ export function ProceduralShot() {
       <Feature
         kicker="Procedural objects"
         title="No 3D files. Just props."
-        sub="Every phone, laptop, carton and billboard is built from geometry at runtime."
+        sub="Every model is built from geometry at runtime."
         width={640}
         style={{ left: 110 * u, top: 130 * u }}
       />
       <CodeCard
-        start={30}
-        speed={3}
+        start={12}
+        speed={6}
         width={640}
         size={26}
         caret={false}

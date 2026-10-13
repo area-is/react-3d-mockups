@@ -17,7 +17,7 @@ import { useDoodlesDrawn } from '../doodles'
  */
 
 /** Frames a purchase is added on: beats into the shot. */
-const ADDS = [52, 82, 112, 142]
+const ADDS = [24, 39, 54, 69, 84, 99]
 
 function ledgerAt(frame: number): { state: LedgerState; last: (typeof QUICK_ADDS)[number] | null; since: number } {
   let list: Tx[] = SEED_TRANSACTIONS
@@ -41,12 +41,12 @@ export function LiveDomShot() {
   useDoodlesDrawn('Ledger', 1)
   const { state, last, since } = React.useMemo(() => ledgerAt(frame), [frame])
   // A slow push towards the laptop's glass, so the type is seen to stay sharp.
-  const push = tween(frame, 0, 240, 0, 1, easeInOut)
+  const push = tween(frame, 0, 130, 0, 1, easeInOut)
   const camera = { position: [0.2 + push * 0.3, 0.55 - push * 0.1, 11 - push * 1.2] as Vec3, fov: 38 }
   const laptop = floated(floatAt(frame, fps, 0.5, 0), [0, -0.5, -0.4], [0, -0.16, 0])
   const phone = floated(floatAt(frame, fps, 0.8, 1.7), [2.5, -0.95, 1.55], [0, -0.34, 0])
   const watch = floated(floatAt(frame, fps, 0.7, 3.1), [-2.45, -0.8, 1.35], [0, 0.42, 0])
-  const pop = since === Infinity ? 0 : tween(since, 0, 8, 0, 1, easeOut) * (1 - tween(since, 22, 30, 0, 1))
+  const pop = since === Infinity ? 0 : tween(since, 0, 5, 0, 1, easeOut) * (1 - tween(since, 9, 15, 0, 1))
   return (
     <Ground glow={0.1}>
       <div style={{ position: 'absolute', left: 640 * u, top: 0, width: 1280 * u, height: 1080 * u }}>
@@ -62,7 +62,7 @@ export function LiveDomShot() {
           </AppleWatch>
         </MockupCanvas>
       </div>
-      <Feature kicker="Any content on the surface" title="Real DOM, not a texture." sub="Components, video and iframes stay live. Here one React state drives three screens." width={620} style={{ left: 110 * u, top: 150 * u }} />
+      <Feature kicker="Any content on the surface" title="Real DOM, not a texture." sub="Components, video and iframes stay live. One state, three screens." width={620} style={{ left: 110 * u, top: 150 * u }} />
       <div
         style={{
           position: 'absolute',
@@ -75,7 +75,7 @@ export function LiveDomShot() {
           fontFamily: MONO,
           fontSize: 24 * u,
           color: BRAND.text,
-          opacity: tween(frame, 40, 52, 0, 1),
+          opacity: tween(frame, 14, 22, 0, 1),
           transform: `scale(${1 + pop * 0.04})`,
           transformOrigin: 'left center',
         }}
