@@ -2,7 +2,7 @@
 
 import type { CSSProperties, ReactNode } from 'react'
 import { FONT, INK, Micro, PAPER, Sheet, materialTone } from './swiss-art'
-import { JetPrint, NutritionFacts, Photo, Pill, Plate, RecycleMark, RoundSeal, SERIF, UpcA } from './label-art'
+import { JetPrint, NutritionFacts, Photo, Pill, RecycleMark, RoundSeal, SERIF, UpcA } from './label-art'
 import { asset } from '@/lib/base-path.mjs'
 
 /**
@@ -16,16 +16,16 @@ import { asset } from '@/lib/base-path.mjs'
  *   corrugate: the name set black and tight across the lid, the roast date
  *   jetted on, the handling pictograms along the foot and down the ends, the
  *   tape crossing the middle the way tape does;
- * - the shopping bag is a florist's carrier done the way an expensive shop
- *   does one: a botanical plate, the name set heavy and tight, one quiet
- *   line, the address at the foot, one ink, and nothing else.
+ * - the shopping bag is a florist's carrier: a garland of marigolds painted
+ *   in gouache spilling off the foot of the front, the name set large in a
+ *   soft serif above it, and one bloom on the back.
  *
  * All of them print straight onto the material (`materialTone`), so the
  * carousel's finish swatches change the board under the print: white board,
  * kraft, a black box with white ink. The brand colours are solid inks and
- * stay put; the type flips to white ink on a dark board. The bag's engraving
- * (`/art/marigold.webp`) is an alpha-only plate printed through `Plate`, so
- * it flips with the type.
+ * stay put; the type flips to white ink on a dark board. The bag's flowers
+ * (`/art/marigold-garland.webp`, `/art/marigold-bloom.webp`) are printed in
+ * process colour, so they stay the same on every stock.
  *
  * Measurements are in `cqw` against each face's own width, so a side panel
  * a third as wide as the front sets its type a third the size - which is
@@ -889,13 +889,13 @@ export function MailerBottom({ material }: { material: string }) {
 /* ------------------------------------------------------------------ */
 
 /**
- * The florist prints in one ink. On a dark board that ink is white - not the
- * library's cream "paper" ink - because the bag the shop actually hands over
- * is black with white print; on a light board it is the near-black.
+ * The florist's inks. The type is one ink - a deep moss on a light board,
+ * white on a dark one, because the bag the shop actually hands over is black
+ * with white print - and the ampersand is the one touch of marigold.
  */
-function shop(material: string): { ink: string } {
+function shop(material: string): { ink: string; marigold: string } {
   const t = materialTone(material)
-  return { ink: t.text === INK ? INK : '#ffffff' }
+  return t.text === INK ? { ink: '#26331e', marigold: '#cf5f0c' } : { ink: '#ffffff', marigold: '#f59a2c' }
 }
 
 /**
@@ -906,33 +906,36 @@ function shop(material: string): { ink: string } {
 const MOTTLE = `url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='m'><feTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='2' seed='3' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  -0.6 0 0 0 1.15'/></filter><rect width='240' height='240' filter='url(%23m)'/></svg>")`
 
 /**
- * Ink on the bag's board, the way it prints. Drawn straight over the board,
- * the face read as a sticker: a block of flat ink at full strength, sharp on
- * a perfectly even brown. A one-ink carrier is a print on fibre, so:
+ * The bag's print on its board, the way it prints. Drawn straight over the
+ * board, the face read as a sticker: flat ink at full strength, sharp on a
+ * perfectly even brown. A carrier is a print on fibre, so:
  *
- * - the ink multiplies into the board instead of covering it - the near-black
- *   comes out a deep warm brown-black on kraft, and the plate's fine lines
- *   soften into the stock - except white ink on a dark board, which sits on
- *   top as white ink does, a little translucent;
+ * - the type's ink multiplies into the board instead of covering it - the
+ *   moss comes out a deep warm green-black on kraft - except white ink on a
+ *   dark board, which sits on top as white ink does, a little translucent;
  * - it is mottled (`MOTTLE`) and its edges a hair soft, because fibre takes
  *   ink unevenly and lets it spread;
- * - the paper is laid over everything, ink included: fibre grain, the
- *   turned-over hem along the mouth, and the soft fall-off of a bag that is
- *   not perfectly flat.
+ * - the flowers (`art`) are process colour over a white underbase, so they
+ *   keep their colour on kraft and charcoal alike, a touch short of full
+ *   strength the way a print on board is;
+ * - the paper is laid over everything, ink and flowers included: fibre
+ *   grain, the turned-over hem along the mouth, and the soft fall-off of a
+ *   bag that is not perfectly flat.
  *
  * The board is painted here too, under the ink, so the blend has the stock
  * to multiply into whatever the surface's own background is.
  */
-function OnBoard({ material, children }: { material: string; children: ReactNode }) {
+function OnBoard({ material, art, children }: { material: string; art?: ReactNode; children: ReactNode }) {
   const dark = materialTone(material).text !== INK
   return (
     <div style={{ position: 'relative', width: '100%', height: '100%', background: material, overflow: 'hidden', isolation: 'isolate' }}>
+      {art && <div style={{ position: 'absolute', inset: 0, opacity: 0.96, filter: 'saturate(0.94)' }}>{art}</div>}
       <div
         style={{
           position: 'absolute',
           inset: 0,
           mixBlendMode: dark ? 'normal' : 'multiply',
-          opacity: dark ? 0.88 : 0.86,
+          opacity: dark ? 0.9 : 0.88,
           WebkitMaskImage: MOTTLE,
           maskImage: MOTTLE,
           WebkitMaskSize: '240px 240px',
@@ -982,18 +985,29 @@ function OnBoard({ material, children }: { material: string; children: ReactNode
   )
 }
 
-/** The florist's mark: a marigold, an engraving printed in the one ink (see `Plate`). */
-const MARIGOLD = asset('/art/marigold.webp')
+/** A garland of marigolds and their leaves, gouache on a clear ground: 1280 x 714 in the file. */
+const GARLAND = asset('/art/marigold-garland.webp')
+/** One marigold in full face with two leaves behind it: 840 x 816 in the file. */
+const BLOOM = asset('/art/marigold-bloom.webp')
+
+/** A flower painting placed on the board (see `OnBoard`'s `art`). */
+function Flowers({ src, style }: { src: string; style: CSSProperties }) {
+  return (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img src={src} alt="" draggable={false} style={{ position: 'absolute', display: 'block', height: 'auto', pointerEvents: 'none', ...style }} />
+  )
+}
 
 /**
- * The name: Inter, heavy and tightened, in regular casing, in the one ink.
- * An expensive carrier's restraint is in what is left off the bag, not in
- * letterspaced capitals or a second colour.
+ * The name: Fraunces, large and soft, on two lines, with the ampersand in
+ * italic and in marigold - the one place the type takes the flowers' colour.
  */
-function Wordmark({ size }: { size: string }) {
+function Wordmark({ size, marigold }: { size: string; marigold: string }) {
   return (
-    <div style={{ fontFamily: FONT, fontSize: size, fontWeight: 700, letterSpacing: '-0.035em', lineHeight: 1, whiteSpace: 'nowrap' }}>
-      Marigold &amp; Moss
+    <div style={{ fontFamily: SERIF, fontSize: size, fontWeight: 500, letterSpacing: '-0.035em', lineHeight: 0.92, whiteSpace: 'nowrap' }}>
+      Marigold
+      <br />
+      <span style={{ fontStyle: 'italic', fontWeight: 400, color: marigold }}>&amp;</span> Moss
     </div>
   )
 }
@@ -1001,73 +1015,49 @@ function Wordmark({ size }: { size: string }) {
 /** A line of the bag's small type: regular casing, tightened, quiet. */
 function Line({ children, style }: { children: ReactNode; style?: CSSProperties }) {
   return (
-    <span style={{ fontFamily: FONT, fontSize: '2.2cqw', fontWeight: 500, letterSpacing: '-0.01em', lineHeight: 1.45, whiteSpace: 'nowrap', ...style }}>
+    <span style={{ fontFamily: FONT, fontSize: '2.4cqw', fontWeight: 500, letterSpacing: '-0.01em', lineHeight: 1.45, whiteSpace: 'nowrap', ...style }}>
       {children}
     </span>
   )
 }
 
 /**
- * The front, and the discipline of a luxury carrier: the plate, the name
- * under it, one quiet line, and the address at the foot - and between them
- * the board, which is most of the bag. The block sits a little below the
- * sheet's centre: the handles and the mouth pull the eye to the top, so a
- * carrier's optical centre is lower than its geometric one, and a block on
- * the geometric centre reads as riding high.
+ * The front: the name in the top half, and under it the garland, wider than
+ * the bag, running off both sides and the foot as if the bag were too full
+ * to hold it - the flowers the shop sells, on the thing it sends them home in.
  */
 export function BagFront({ material }: { material: string }) {
-  const { ink } = shop(material)
+  const { ink, marigold } = shop(material)
   const t = materialTone(material)
   return (
-    <OnBoard material={material}>
-      <Sheet tone={t} style={{ flexDirection: 'column', alignItems: 'center', padding: '8cqw 10cqw 7cqw', color: ink, textAlign: 'center' }}>
-        <div style={{ flex: 1.3 }} />
-        {/* 800 x 1302 in the file */}
-        <Plate src={MARIGOLD} ink={ink} style={{ width: '36cqw', height: '58.6cqw' }} />
-        <div style={{ marginTop: '6cqw' }}>
-          <Wordmark size="7cqw" />
+    <OnBoard material={material} art={<Flowers src={GARLAND} style={{ left: '-15cqw', width: '130cqw', bottom: '-9cqw' }} />}>
+      <Sheet tone={t} style={{ flexDirection: 'column', alignItems: 'center', padding: '15cqw 8cqw 0', color: ink, textAlign: 'center' }}>
+        <Line style={{ opacity: 0.8 }}>Fleuriste · Est. 2016</Line>
+        <div style={{ marginTop: '4.5cqw' }}>
+          <Wordmark size="15.5cqw" marigold={marigold} />
         </div>
-        <div style={{ width: '6cqw', height: '0.28cqw', background: ink, opacity: 0.7, marginTop: '3.6cqw', flex: 'none' }} />
-        <Line style={{ marginTop: '3cqw', opacity: 0.8 }}>Fleuriste · Est. 2016</Line>
-        <div style={{ flex: 1, minHeight: '6cqw' }} />
-        <Line style={{ fontSize: '2cqw', opacity: 0.7 }}>34 Elm Street · Northampton, Massachusetts</Line>
+        <span style={{ marginTop: '4.5cqw', fontFamily: SERIF, fontStyle: 'italic', fontSize: '3.8cqw', lineHeight: 1.3, opacity: 0.9, whiteSpace: 'nowrap' }}>
+          Grown slow, cut this morning.
+        </span>
       </Sheet>
     </OnBoard>
   )
 }
 
 /**
- * The back: the shop's seal - the plate inside a ring of small type - with
- * the name under it and the one line the shop allows itself. A seal is what
- * the expensive bags carry on the reverse when they carry anything at all.
- * The legend is the one line of capitals on the bag, because a seal's rim
- * is where the real ones print them; it is short enough to leave a gap at
- * the join whatever the viewer's rasteriser does to Inter's widths.
+ * The back: one bloom, large and a little off the top of centre, the name
+ * small under it and the address at the foot - the quiet side of the bag.
  */
 export function BagBack({ material }: { material: string }) {
-  const { ink } = shop(material)
+  const { ink, marigold } = shop(material)
   const t = materialTone(material)
   return (
-    <OnBoard material={material}>
-      <Sheet tone={t} style={{ flexDirection: 'column', alignItems: 'center', padding: '8cqw 10cqw 7cqw', color: ink, textAlign: 'center' }}>
-        <div style={{ flex: 1.3 }} />
-        <RoundSeal
-          size="34cqw"
-          legend="MARIGOLD & MOSS · FLEURISTE · "
-          color={ink}
-          ring={false}
-          center={<Plate src={MARIGOLD} ink={ink} style={{ width: '100%', height: '100%' }} />}
-        />
-        <div style={{ marginTop: '6cqw' }}>
-          <Wordmark size="5cqw" />
-        </div>
-        <Line style={{ marginTop: '4cqw', fontSize: '2.8cqw', opacity: 0.85 }}>
-          Grown slow. Cut this morning.
-          <br />
-          Wrapped by hand.
-        </Line>
-        <div style={{ flex: 1, minHeight: '6cqw' }} />
-        <Line style={{ fontSize: '2cqw', opacity: 0.7 }}>Flowers · Plants · Workshops · marigoldandmoss.com</Line>
+    <OnBoard material={material} art={<Flowers src={BLOOM} style={{ left: '17cqw', width: '66cqw', top: '22cqw' }} />}>
+      <Sheet tone={t} style={{ flexDirection: 'column', alignItems: 'center', padding: '0 8cqw 9cqw', color: ink, textAlign: 'center' }}>
+        <div style={{ flex: 1 }} />
+        <Wordmark size="7.5cqw" marigold={marigold} />
+        <Line style={{ marginTop: '4cqw', opacity: 0.85 }}>Flowers · Plants · Workshops</Line>
+        <Line style={{ marginTop: '0.6cqw', fontSize: '2.1cqw', opacity: 0.7 }}>34 Elm Street, Northampton · marigoldandmoss.com</Line>
       </Sheet>
     </OnBoard>
   )
