@@ -7,6 +7,8 @@ breaking change can ship in a minor release, and is always listed under
 
 ## Unreleased
 
+## 0.2.0 - 2026-10-14
+
 ### Added
 
 - **Experimental: screens that take input (`experimentalScreenInput`).** On
