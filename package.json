@@ -1,7 +1,7 @@
 {
   "name": "react-3d-mockups-monorepo",
   "private": true,
-  "description": "Monorepo for react-3d-mockups: interactive, GPU-accelerated 3D device mockups for React. The published package plus its docs site.",
+  "description": "Monorepo for react-3d-mockups, 3D device mockups for React built on three.js: the published package and its docs site.",
   "workspaces": [
     "packages/*",
     "apps/*"

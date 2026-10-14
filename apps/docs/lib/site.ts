@@ -22,7 +22,7 @@ export const SITE_URL = (
 /** The home page's title and description, also the site-wide fallbacks. */
 export const SITE_TITLE = 'React 3D Mockups: 3D device mockups for React'
 export const SITE_DESCRIPTION =
-  'GPU-accelerated 3D device mockups for React, built on three.js. Drop any content onto the screen of a 3D device and it renders live - real DOM, not a texture.'
+  '3D device mockups for React, built on three.js. What you put on a screen - a component, a video, an iframe - is live DOM, and keeps running.'
 
 /**
  * The repository and the package, for every outbound link the site makes.

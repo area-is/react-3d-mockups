@@ -425,8 +425,8 @@ export interface MockupCanvasProps {
 }
 
 /**
- * A ready-made react-three-fiber stage for device mockups: GPU-accelerated
- * WebGL canvas, studio lighting, soft shadows and orbit controls. Compose it
+ * A ready-made react-three-fiber stage for device mockups: a WebGL canvas,
+ * studio lighting, soft shadows and orbit controls. Compose it
  * with any device model, e.g. `<MockupCanvas><Galaxy>…</Galaxy></MockupCanvas>`.
  *
  * The stage itself - camera pose, orbit feel, light rig, shadow softness -

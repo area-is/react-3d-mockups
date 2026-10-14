@@ -69,7 +69,7 @@ const STRUCTURED_DATA = {
  */
 const FEATURES = [
   {
-    title: 'Real GPU rendering',
+    title: 'Rendering',
     image: {
       src: '/features/rendering.webp',
       width: 485,
@@ -85,7 +85,7 @@ const FEATURES = [
     ),
   },
   {
-    title: 'Any content on the surface',
+    title: 'Live screen content',
     image: {
       src: '/features/surface.webp',
       width: 1040,
@@ -116,7 +116,7 @@ const FEATURES = [
     ),
   },
   {
-    title: 'Composable by design',
+    title: 'Composable',
     image: {
       src: '/features/composable.webp',
       width: 1040,
@@ -208,7 +208,7 @@ function Film() {
   return (
     <section className="film" aria-labelledby="film-title">
       <div className="film-copy">
-        <h2 id="film-title">See it in 38 seconds</h2>
+        <h2 id="film-title">A 38-second film</h2>
         <p>
           Every device and object in the film is a react-3d-mockups component, rendered to video
           with Remotion. Its{' '}
@@ -238,8 +238,8 @@ export default function HomePage() {
           line added here pushes it further below the fold. The install
           command is the first thing under the carousel instead. */}
       <section className="hero">
-        <p className="eyebrow">GPU-accelerated mockups for React</p>
-        <h1>Your Component in 3D</h1>
+        <p className="eyebrow">An open-source React library</p>
+        <h1>3D device mockups for React</h1>
         <div className="hero-cta">
           <Link className="btn btn-primary" href="/docs/quick-start">
             Get started
