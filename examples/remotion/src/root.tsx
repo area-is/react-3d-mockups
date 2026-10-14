@@ -9,6 +9,7 @@ import { GroveFilm, GROVE_DURATION } from './campaigns/grove/film'
 import { KiteFilm, KITE_DURATION } from './campaigns/kite/film'
 import { LumenFilm, LUMEN_DURATION } from './campaigns/lumen/film'
 import { PromoFilm, PROMO_DURATION } from './promo/film'
+import { FoldClip, FOLD_LENGTH, PhonesClip, PHONES_LENGTH, TrioClip, TRIO_LENGTH, TurnClip, TURN_LENGTH } from './clips/clips'
 
 export function Root() {
   return (
@@ -18,6 +19,10 @@ export function Root() {
       <Composition id="KiteFilm" component={KiteFilm} durationInFrames={KITE_DURATION} fps={30} width={1920} height={1080} />
       <Composition id="LumenFilm" component={LumenFilm} durationInFrames={LUMEN_DURATION} fps={30} width={1920} height={1080} />
       <Composition id="PromoFilm" component={PromoFilm} durationInFrames={PROMO_DURATION} fps={30} width={1920} height={1080} />
+      <Composition id="TurnClip" component={TurnClip} durationInFrames={TURN_LENGTH} fps={30} width={1080} height={1080} />
+      <Composition id="FoldClip" component={FoldClip} durationInFrames={FOLD_LENGTH} fps={30} width={1080} height={1080} />
+      <Composition id="TrioClip" component={TrioClip} durationInFrames={TRIO_LENGTH} fps={30} width={1920} height={1080} />
+      <Composition id="PhonesClip" component={PhonesClip} durationInFrames={PHONES_LENGTH} fps={30} width={1920} height={1080} />
       <Composition
         id="Bench"
         component={Bench}
