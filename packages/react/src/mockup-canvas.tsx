@@ -452,9 +452,7 @@ export function MockupCanvas({
   onCreated,
   label = '3D mockup',
   screenAccessibility = 'hidden',
-  // PREVIEW ONLY: on by default so every mockup on this branch's docs
-  // preview takes input. Revert to `false` before this merges.
-  experimentalScreenInput = true,
+  experimentalScreenInput = false,
   screenDrag = true,
   className,
   style,
