@@ -15,8 +15,6 @@
  *   where a drag selects text or moves a thumb;
  * - inside anything marked `data-mockup-no-rotate`, for content with drags
  *   of its own (a drawing pad, a carousel);
- * - one whose `pointerdown` the content prevented (`preventDefault()`), as
- *   drag code commonly does to stop text selection;
  * - one the content captures (`setPointerCapture`), which is how most custom
  *   drag code claims a pointer - for touch and pen, only on an element other
  *   than the one pressed, which the browser captures to by itself;
@@ -90,8 +88,6 @@ export function createScreenDragHandoff(
   const onPointerDown = (event: PointerEvent) => {
     if (cancelGesture || !enabled() || !event.isPrimary) return
     if (event.pointerType === 'mouse' && event.button !== 0) return
-    // Bindings call this after the content's own handlers have run.
-    if (event.defaultPrevented) return
     const origin = event.target instanceof Element ? event.target : null
     if (origin?.closest(NO_HANDOFF)) return
     const canvas = getCanvas()

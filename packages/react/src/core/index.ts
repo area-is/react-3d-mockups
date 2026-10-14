@@ -115,8 +115,6 @@ export {
   screenSurfaceStyle,
 } from './screen/surface'
 export { type BackfaceCuller, createBackfaceCuller } from './screen/backface'
-export { traceTransparent } from './screen/clip-trace'
-export { NO_HANDOFF, SCREEN_DRAG_THRESHOLD_PX, createScreenDragHandoff, type ScreenDragHandoff } from './screen/drag-handoff'
 export {
   type StatusBarPlatform,
   type StatusBarFormFactor,

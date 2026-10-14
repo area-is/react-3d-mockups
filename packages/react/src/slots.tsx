@@ -66,6 +66,18 @@ export interface SurfaceProps {
 
 /** Props of a slot element: its content plus per-surface overrides. */
 export interface SlotProps extends SurfaceProps {
+  /**
+   * EXPERIMENTAL, with `experimentalScreenInput`: whether a drag that starts
+   * on this region turns the model. Overrides the mockup's `screenDrag` for
+   * this region alone - `false` for a screen whose content has drags all
+   * over it (a map, a drawing canvas, a board), so every drag on it is the
+   * content's. The hardware and the background still turn the model.
+   *
+   * A slot-only setting: on a bare device it would have to be threaded
+   * through every model's defaults, so the device-wide one is the stage's
+   * (`screenDrag` on `MockupCanvas` or a one-liner mockup).
+   */
+  screenDrag?: boolean
   children?: React.ReactNode
 }
 
@@ -261,6 +273,8 @@ export interface ResolvedSurface {
   screenStyle?: React.CSSProperties
   /** Which region this surface is, surfaced to content via `useSurface()`. */
   region?: string
+  /** The slot's own `screenDrag`, if it set one; the stage's applies otherwise. */
+  screenDrag?: boolean
 }
 
 /**
@@ -283,5 +297,6 @@ export function resolveSurface(
     // Spread straight onto <DeviceScreen region=…>, so every surface reports
     // itself without any call site having to name it twice.
     region: slot?.region,
+    screenDrag: slot?.screenDrag,
   }
 }

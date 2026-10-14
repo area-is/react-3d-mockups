@@ -400,10 +400,9 @@ export interface MockupCanvasProps {
    * traced from the pixels the canvas leaves transparent for it.
    *
    * A tap or click on a screen is the content's; a press that turns into a
-   * drag still turns the model, unless the content claims it: form controls,
-   * anything marked `data-mockup-no-rotate`, a `pointerdown` the content
-   * prevented, or a pointer the content captured (`setPointerCapture`). On
-   * touch, vertical swipes scroll as they do on the rest of the mockup.
+   * drag still turns the model, unless the content claims it (see
+   * `screenDrag`). On touch, vertical swipes scroll as they do on the rest of
+   * the mockup.
    *
    * Costs: a synchronous canvas readback per screen per drawn frame. Screens
    * also join the accessibility tree, as `screenAccessibility` `'visible'`
@@ -411,6 +410,16 @@ export interface MockupCanvasProps {
    * a pointer too.
    */
   experimentalScreenInput?: boolean
+  /**
+   * EXPERIMENTAL, with `experimentalScreenInput`: whether a drag that starts
+   * on a screen turns the model. Default `true`: a press that travels 10 px
+   * is handed to the orbit controls, unless the content claims it (a form
+   * control, anything marked `data-mockup-no-rotate`, or a pointer the
+   * content captures with `setPointerCapture`). `false` leaves every drag on
+   * every screen to the content; the hardware and the background still turn
+   * the model. A slot's own `screenDrag` overrides this for its region.
+   */
+  screenDrag?: boolean
   className?: string
   style?: React.CSSProperties
 }
@@ -446,6 +455,7 @@ export function MockupCanvas({
   // PREVIEW ONLY: on by default so every mockup on this branch's docs
   // preview takes input. Revert to `false` before this merges.
   experimentalScreenInput = true,
+  screenDrag = true,
   className,
   style,
 }: MockupCanvasProps) {
@@ -653,8 +663,14 @@ export function MockupCanvas({
     [gl]
   )
   const stage = React.useMemo<StageSettings>(
-    () => ({ screenAccessibility, delayCapture: capture, screenInput: experimentalScreenInput, screenDrag: controls }),
-    [screenAccessibility, capture, experimentalScreenInput, controls]
+    () => ({
+      screenAccessibility,
+      delayCapture: capture,
+      screenInput: experimentalScreenInput,
+      orbitControls: controls,
+      screenDrag,
+    }),
+    [screenAccessibility, capture, experimentalScreenInput, controls, screenDrag]
   )
 
   // The canvas's own container is a stacking context (see isolateCanvasStack

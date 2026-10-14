@@ -25,15 +25,18 @@ import { DoubleSide, OrthographicCamera, PerspectiveCamera, Vector3 } from 'thre
 import type * as THREE from 'three'
 import { addAfterEffect, useFrame, useThree } from '@react-three/fiber'
 import { stackSurfaces, surfaceCorners } from '../core/screen/stacking'
-import { traceTransparent } from '../core/screen/clip-trace'
-import { createScreenDragHandoff } from '../core/screen/drag-handoff'
+import type { ScreenDragHandoff } from '../core/screen/drag-handoff'
+
+type ScreenInputModule = typeof import('./screen-input')
 
 /**
- * EXPERIMENTAL: running totals for `experimentalScreenInput`, so a test page
- * can show what the per-frame readback and tracing cost on the machine it
- * runs on. Reset it by assigning zeros.
+ * EXPERIMENTAL: the clip tracer and the drag handoff, fetched the first time a
+ * screen takes input and shared by every screen after it. Nothing that leaves
+ * input off pays for them - an app's bundler splits a dynamic import into its
+ * own chunk.
  */
-export const experimental_screenInputStats = { frames: 0, readMs: 0, traceMs: 0, pixels: 0, vertices: 0 }
+let screenInputModule: Promise<ScreenInputModule> | null = null
+const loadScreenInput = () => (screenInputModule ??= import('./screen-input'))
 
 const v1 = /* @__PURE__ */ new Vector3()
 const v2 = /* @__PURE__ */ new Vector3()
@@ -187,6 +190,7 @@ export function ScreenPortal({
   const camera = useThree((state) => state.camera)
   const scene = useThree((state) => state.scene)
   const size = useThree((state) => state.size)
+  const invalidate = useThree((state) => state.invalidate)
   const group = React.useRef<THREE.Group>(null)
   const mounted = React.useRef<Mounted | null>(null)
   const visible = React.useRef(true)
@@ -230,13 +234,18 @@ export function ScreenPortal({
     // A press or a wheel on the screen is the content's, not the canvas's
     // event system's - until a press turns into a drag, which the handoff
     // gives to the orbit controls.
-    const handoff = input
-      ? createScreenDragHandoff(
+    let handoff: ScreenDragHandoff | null = null
+    let unmounted = false
+    if (input) {
+      void loadScreenInput().then(({ createScreenDragHandoff }) => {
+        if (unmounted) return
+        handoff = createScreenDragHandoff(
           element,
           () => handoffRef.current.gl.domElement,
           () => handoffRef.current.dragToRotate
         )
-      : null
+      })
+    }
     const press = (event: PointerEvent) => {
       event.stopPropagation()
       handoff?.onPointerDown(event)
@@ -247,6 +256,7 @@ export function ScreenPortal({
       element.addEventListener('wheel', keep)
     }
     return () => {
+      unmounted = true
       handoff?.dispose()
       element.removeEventListener('pointerdown', press)
       element.removeEventListener('wheel', keep)
@@ -292,71 +302,36 @@ export function ScreenPortal({
   const drew = React.useRef(false)
   React.useEffect(() => {
     if (!input) return
-    const corner = new Vector3()
-    let buffer = new Uint8Array(0)
-    return addAfterEffect(() => {
+    // Until the clipper has loaded the screen stays fully clipped; the frame
+    // after it lands traces it.
+    let clip: ReturnType<ScreenInputModule['createScreenClipper']> | null = null
+    let unmounted = false
+    void loadScreenInput().then((module) => {
+      if (unmounted) return
+      clip = module.createScreenClipper()
+      invalidate()
+    })
+    const stop = addAfterEffect(() => {
       if (!drew.current) return
       drew.current = false
       const anchor = group.current
       const mount = mounted.current
-      const geometry = geometryRef.current
-      if (!anchor || !mount || !visible.current) return
-      const canvas = gl.domElement
-      const dpr = canvas.width / size.width
-      if (!geometry.boundingBox) geometry.computeBoundingBox()
-      const box = geometry.boundingBox!
-      // The screen's projected bounds in device pixels, top-down, with a
-      // margin for antialiasing. Outside them the DOM draws nothing anyway.
-      let minX = Infinity
-      let minY = Infinity
-      let maxX = -Infinity
-      let maxY = -Infinity
-      for (const [x, y] of [
-        [box.min.x, box.min.y],
-        [box.max.x, box.min.y],
-        [box.max.x, box.max.y],
-        [box.min.x, box.max.y],
-      ] as const) {
-        corner.set(x, y, 0).applyMatrix4(anchor.matrixWorld).project(camera)
-        const px = (corner.x * 0.5 + 0.5) * canvas.width
-        const py = (0.5 - corner.y * 0.5) * canvas.height
-        minX = Math.min(minX, px)
-        maxX = Math.max(maxX, px)
-        minY = Math.min(minY, py)
-        maxY = Math.max(maxY, py)
-      }
-      const x0 = Math.max(0, Math.floor(minX) - 2)
-      const y0 = Math.max(0, Math.floor(minY) - 2)
-      const x1 = Math.min(canvas.width, Math.ceil(maxX) + 2)
-      const y1 = Math.min(canvas.height, Math.ceil(maxY) + 2)
-      const w = x1 - x0
-      const h = y1 - y0
-      if (w <= 0 || h <= 0) {
-        mount.element.style.clipPath = 'inset(50%)'
-        return
-      }
-      if (buffer.length < w * h * 4) buffer = new Uint8Array(w * h * 4)
-      const context = gl.getContext()
-      const t0 = performance.now()
-      // Rows come back bottom-up.
-      context.readPixels(x0, canvas.height - y1, w, h, context.RGBA, context.UNSIGNED_BYTE, buffer)
-      const t1 = performance.now()
-      const { path, vertices } = traceTransparent(
-        (x, y) => buffer[((h - 1 - y) * w + x) * 4 + 3]! < 128,
-        w,
-        h,
-        (x) => +((x0 + x) / dpr).toFixed(2),
-        (y) => +((y0 + y) / dpr).toFixed(2)
-      )
-      const stats = experimental_screenInputStats
-      stats.frames++
-      stats.readMs += t1 - t0
-      stats.traceMs += performance.now() - t1
-      stats.pixels += w * h
-      stats.vertices += vertices
-      mount.element.style.clipPath = path ? `path(evenodd, "${path}")` : 'inset(50%)'
+      if (!clip || !anchor || !mount || !visible.current) return
+      clip({
+        canvas: gl.domElement,
+        context: gl.getContext(),
+        cssWidth: size.width,
+        camera,
+        anchor,
+        geometry: geometryRef.current,
+        element: mount.element,
+      })
     })
-  }, [input, gl, camera, size])
+    return () => {
+      unmounted = true
+      stop()
+    }
+  }, [input, gl, camera, size, invalidate])
 
   useFrame((state) => {
     const anchor = group.current

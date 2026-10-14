@@ -52,6 +52,7 @@ const CANVAS_KEYS: ReadonlySet<string> = new Set([
   'label',
   'screenAccessibility',
   'experimentalScreenInput',
+  'screenDrag',
   'className',
   'style',
 ] satisfies (keyof CanvasOnlyProps)[])
@@ -98,6 +99,7 @@ type MockupStageProps = Pick<
   | 'label'
   | 'screenAccessibility'
   | 'experimentalScreenInput'
+  | 'screenDrag'
   | 'className'
   | 'style'
 >

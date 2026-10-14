@@ -20,7 +20,9 @@ import { asset } from '@/lib/base-path.mjs'
  * the custom drag strip (they move, the model does not), drag anywhere else on the screen, the
  * hardware or the background (the model turns, and the cell you started on
  * does not count a click), and click where the base covers the display
- * (nothing should happen).
+ * (nothing should happen). The `screenDrag` switches leave every drag on the
+ * screen to the content, set on the mockup or on its one Screen slot; the
+ * hardware and the background still turn the model.
  */
 
 type Scene = 'phone' | 'laptop-under' | 'laptop-wedge' | 'laptop-front' | 'laptop-iframe' | 'overlap' | 'fold'
@@ -114,37 +116,55 @@ function TestScreen({ name, rows = 8, cols = 4 }: { name: string; rows?: number;
   )
 }
 
-function SceneView({ scene, input }: { scene: Scene; input: boolean }) {
-  const stage = { controls: true, float: false, experimentalScreenInput: input } as const
+/**
+ * Who a drag on the screen belongs to: the model (the default), the content
+ * on every screen (`screenDrag={false}` on the mockup), or the content on the
+ * one slot (`<X.Screen screenDrag={false}>`).
+ */
+type Drag = 'model' | 'mockup' | 'slot'
+
+function SceneView({ scene, input, drag }: { scene: Scene; input: boolean; drag: Drag }) {
+  const stage = { controls: true, float: false, experimentalScreenInput: input, screenDrag: drag !== 'mockup' } as const
+  const slotDrag = drag === 'slot' ? false : undefined
   switch (scene) {
     case 'laptop-under':
       return (
         <LaptopMockup {...stage} variant="pro14" openAngle={105} rotation={[-0.42, -0.4, 0]} camera={{ position: [0, 0, 7.5], fov: 36 }}>
-          <TestScreen name="laptop" rows={6} cols={8} />
+          <LaptopMockup.Screen screenDrag={slotDrag}>
+            <TestScreen name="laptop" rows={6} cols={8} />
+          </LaptopMockup.Screen>
         </LaptopMockup>
       )
     case 'laptop-wedge':
       return (
         <LaptopMockup {...stage} variant="pro14" openAngle={38} rotation={[-0.3, -0.25, 0]} camera={{ position: [0, 0, 7.5], fov: 36 }}>
-          <TestScreen name="laptop" rows={6} cols={8} />
+          <LaptopMockup.Screen screenDrag={slotDrag}>
+            <TestScreen name="laptop" rows={6} cols={8} />
+          </LaptopMockup.Screen>
         </LaptopMockup>
       )
     case 'laptop-front':
       return (
         <LaptopMockup {...stage} variant="pro14" openAngle={110} rotation={[0.2, -0.35, 0]}>
-          <TestScreen name="laptop" rows={6} cols={8} />
+          <LaptopMockup.Screen screenDrag={slotDrag}>
+            <TestScreen name="laptop" rows={6} cols={8} />
+          </LaptopMockup.Screen>
         </LaptopMockup>
       )
     case 'laptop-iframe':
       return (
         <LaptopMockup {...stage} variant="pro14" openAngle={110} rotation={[0.15, -0.3, 0]}>
-          <iframe src={asset('/embedded')} title="An embedded page" style={{ width: '100%', height: '100%', border: 0 }} />
+          <LaptopMockup.Screen screenDrag={slotDrag}>
+            <iframe src={asset('/embedded')} title="An embedded page" style={{ width: '100%', height: '100%', border: 0 }} />
+          </LaptopMockup.Screen>
         </LaptopMockup>
       )
     case 'phone':
       return (
         <IPhoneMockup {...stage} variant="pro" color="silver" rotation={[0.08, -0.35, 0]}>
-          <TestScreen name="phone" />
+          <IPhoneMockup.Screen screenDrag={slotDrag}>
+            <TestScreen name="phone" />
+          </IPhoneMockup.Screen>
         </IPhoneMockup>
       )
     case 'overlap':
@@ -161,7 +181,9 @@ function SceneView({ scene, input }: { scene: Scene; input: boolean }) {
     case 'fold':
       return (
         <FoldMockup {...stage} variant="fold7" openAngle={115} rotation={[0.12, -0.95, 0]}>
-          <TestScreen name="fold" rows={8} cols={6} />
+          <FoldMockup.Screen screenDrag={slotDrag}>
+            <TestScreen name="fold" rows={8} cols={6} />
+          </FoldMockup.Screen>
         </FoldMockup>
       )
   }
@@ -197,6 +219,7 @@ const button = (on: boolean): React.CSSProperties => ({
 export default function ScreenInputBench() {
   const [scene, setScene] = React.useState<Scene>('laptop-under')
   const [input, setInput] = React.useState(true)
+  const [drag, setDrag] = React.useState<Drag>('model')
   const [log, setLog] = React.useState<string[]>([])
   const cost = useCost()
   const push = React.useCallback((entry: string) => setLog((l) => [`${new Date().toLocaleTimeString()}  ${entry}`, ...l].slice(0, 8)), [])
@@ -207,14 +230,17 @@ export default function ScreenInputBench() {
     const s = params.get('scene')
     if (SCENES.some((x) => x.id === s)) setScene(s as Scene)
     if (params.get('mode') === 'blend') setInput(false)
+    const d = params.get('drag')
+    if (d === 'mockup' || d === 'slot') setDrag(d)
   }, [])
   React.useEffect(() => {
     const url = new URL(window.location.href)
     url.searchParams.set('scene', scene)
     url.searchParams.set('mode', input ? 'clip' : 'blend')
+    url.searchParams.set('drag', drag)
     window.history.replaceState(null, '', url)
     Object.assign(experimental_screenInputStats, { frames: 0, readMs: 0, traceMs: 0, pixels: 0, vertices: 0 })
-  }, [scene, input])
+  }, [scene, input, drag])
 
   return (
     <ClickLog.Provider value={push}>
@@ -233,9 +259,21 @@ export default function ScreenInputBench() {
               {s.label}
             </button>
           ))}
+          <span style={{ width: 12 }} />
+          {(
+            [
+              ['model', 'screen drags turn the model'],
+              ['mockup', 'screenDrag off: mockup'],
+              ['slot', 'screenDrag off: slot'],
+            ] as const
+          ).map(([id, label]) => (
+            <button key={id} type="button" style={button(drag === id)} onClick={() => setDrag(id)}>
+              {label}
+            </button>
+          ))}
         </div>
         <div style={{ height: '68vh', minHeight: 420 }}>
-          <SceneView key={`${scene}-${input}`} scene={scene} input={input} />
+          <SceneView key={`${scene}-${input}-${drag}`} scene={scene} input={input} drag={drag} />
         </div>
         <div style={{ padding: '10px 16px', display: 'grid', gap: 6, font: '13px ui-monospace, monospace' }}>
           <div>{input ? cost : 'blend mode: nothing is traced, and the screen takes no input'}</div>
