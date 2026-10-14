@@ -4,13 +4,13 @@
   <img src="https://raw.githubusercontent.com/area-is/react-3d-mockups/main/assets/hero.png" alt="A 3D iPhone mockup with a live music-player UI on its screen, flanked by two more devices" width="720" />
 </p>
 
-**Live React components on procedural 3D devices - no GLB files.**
 [Docs, live demos and a gallery of all 58 models →](https://area.is/react-3d-mockups/docs/gallery)
 
-GPU-accelerated **3D device mockups for React**. Put any content on the screen of a 3D
-device - real DOM, projected onto WebGL glass, so it stays live: text is vector crisp at
-any angle, videos play, iframes load, React state and effects keep running. Mockups are
-decorative: you rotate and zoom them, and the hardware masks the screen pixel for pixel
+**3D device mockups for React**, generated from code, with no 3D files to host. What you
+put on a device's screen is regular DOM, positioned on the glass with CSS 3D
+transforms, so it keeps running: React state and effects, video, iframes. The browser draws the text, so it
+stays sharp at any angle. By default the screens are display-only: you rotate and zoom
+the model, and hardware in front of a screen hides it pixel for pixel
 ([why](#screens-are-display-only)).
 
 > **In active development.** The API may change over the next few weeks. Breaking changes
@@ -42,9 +42,9 @@ decorative: you rotate and zoom them, and the hardware masks the screen pixel fo
   of it the CSG engine, shared by every device), 144 KB for the whole library, peers
   excluded.
 - **True-to-device screens** - each virtual display matches the real device's logical
-  resolution in portrait *and* landscape (table below), so your layouts and breakpoints
-  behave exactly like on the hardware.
-- **Real GPU rendering, only when needed** - three.js + react-three-fiber,
+  resolution in portrait *and* landscape (table below), so your breakpoints match the
+  device's.
+- **Draws only when needed** - three.js + react-three-fiber,
   physically-based materials, studio lighting, soft shadows, clamped DPR. A mockup draws
   a frame only when something moves (a drag, `autoRotate`, `float`, a prop change), and
   not at all while it is scrolled off screen or its tab is hidden.

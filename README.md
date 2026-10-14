@@ -20,10 +20,11 @@
   <sub><a href="https://area.is/react-3d-mockups/media/react-3d-mockups.mp4"><b>▶ Watch the 38-second film</b></a> - every frame of it rendered with react-3d-mockups and <a href="examples/remotion">Remotion</a></sub>
 </p>
 
-GPU-accelerated **3D device mockups for React** - drop any content onto the screen of a
-3D phone and it renders live: real DOM on the glass, vector crisp at any angle, videos
-playing, iframes loading. The mockups are decorative - you rotate and zoom them, and the
-hardware masks the screen pixel for pixel.
+**3D device mockups for React.** What you put on a device's screen is regular DOM,
+positioned on the glass with CSS 3D transforms, so it keeps running: React state and
+effects, video, iframes. The browser draws the text, so it stays sharp at any angle. By default the
+screens don't take input: dragging rotates the model, and hardware in front of a
+screen hides it pixel for pixel.
 
 > **In active development.** The API may change over the next few weeks. Breaking changes
 > are listed in the [changelog](CHANGELOG.md) with what to change; pin an exact version
@@ -31,14 +32,14 @@ hardware masks the screen pixel for pixel.
 
 Built on [three.js](https://threejs.org) and
 [react-three-fiber](https://github.com/pmndrs/react-three-fiber). Every model is
-generated procedurally at runtime - **no 3D asset files to load or host**. The device
-lineup is 33 strong: the Galaxy S26 line, two foldable generations (Z Fold 7 and
+generated from code at runtime, so there are no 3D asset files to load or host. The
+devices: the Galaxy S26 line, two foldable generations (Z Fold 7 and
 Z Flip 7, the wide Z Fold 8, the Z Fold 8 Ultra and Z Flip 8) and Apple's
 foldable iPhone Duo, the iPhone 17 family and the iPhone 18 Pros, MacBook Air,
 Pro and Neo, the iPad and Galaxy Tab families, three Apple Watches (Series 11,
 Series 12 and the titanium Ultra 4) and three Galaxy Watches (8, 9 and the
-titanium Ultra 2) on full wristbands, and a 27" desktop display. Beyond devices,
-the same live-surface API covers everyday objects - books, magazines,
+titanium Ultra 2) on full wristbands, and a 27" desktop display. The objects
+use the same API for their printable surfaces: books, magazines,
 brochures, business cards, ID badges, credit cards (EMV chip, embossed number
 and name), packaging (product box, mailer box, gable-top milk carton,
 shopping bag),

@@ -6,10 +6,12 @@ keywords: [screen, content, iframe, video, react context, provider, display only
 
 Anything the browser can render can live on a device screen. The screen is a
 real DOM layer composited in 3D by CSS transforms, not a texture, so text stays
-vector crisp at every angle - React components keep their state and effects,
-`<video>` keeps playing, and an `<iframe>` keeps loading. Screens are
-decorative: they render live but do not take pointer input - see
-[Why screens are display-only](#why-screens-are-display-only).
+sharp at every angle - React components keep their state and effects,
+`<video>` keeps playing, and an `<iframe>` keeps loading. By default screens
+are decorative: they render live but do not take pointer input - see
+[Why screens are display-only](#why-screens-are-display-only), and
+[Experimental: screens that take input](#experimental-screens-that-take-input)
+for the opt-in that lets them.
 
 ```tsx
 // React components: state and effects keep running on the glass
@@ -37,7 +39,7 @@ material, and how large the file needs to be.
 Your content renders into a viewport that defaults to the device's logical
 resolution, for example 360×780 CSS px on the Galaxy S26 and 1032×1376 on the
 13" iPad Pro. Media queries, breakpoints, and `vh`/`vw` units inside the screen
-behave exactly like on the real device. Pass `resolution` (the CSS pixel width
+match the real device's. Pass `resolution` (the CSS pixel width
 of the display) to override it; height always follows the panel's aspect ratio,
 so the graphic stays true to the panel.
 
@@ -173,28 +175,100 @@ every print surface always report `0`.
 
 ## Why screens are display-only
 
-A mockup is a picture of a device, not a device. Content on the glass renders
-live - state, effects, video, iframes - but pointer events never reach it:
-clicks, scrolling and typing all belong to the mockup's orbit controls, so a
-drag anywhere (body, background, or screen) rotates the model.
+By default, content on the glass renders live - state, effects, video,
+iframes - but pointer events never reach it: clicks, scrolling and typing all
+belong to the mockup's orbit controls, so a drag anywhere (body, background,
+or screen) rotates the model.
 
-That is a deliberate architectural choice, and it is what buys the mockup its
-looks. A screen is real DOM composited into a WebGL scene, and where that DOM
-sits in the stacking order decides how hardware can hide it. react-3d-mockups
-always stacks it *under* the canvas and masks it with the depth buffer, so
-anything in front of the screen covers it exactly, pixel for pixel: a laptop's
-keyboard hides the screen's reflection, a phone's proud camera ring stands over
-a wrap, a bus's mirrors draw over the livery.
+That comes from where the screen's DOM sits. A screen is real DOM composited
+into a WebGL scene, and by default react-3d-mockups stacks it *under* the
+canvas and masks it with the depth buffer, so anything in front of the screen
+covers it exactly, pixel for pixel: a laptop's keyboard hides the screen's
+reflection, a phone's proud camera ring stands over a wrap, a bus's mirrors
+draw over the livery. Under the canvas, though, a pointer lands on the canvas
+and never on the content.
 
-The alternative - lifting the DOM above the canvas so pointers can reach it -
-means nothing in the scene can visually cover it any more. Hiding becomes
-all-or-nothing, guessed from sample rays, and it goes wrong in both directions:
-content shows through hardware that should hide it (you can see a laptop's
-screen through its own keyboard), and a screen that is mostly visible can blank
-out entirely. Mockups exist to look right, so that trade is not offered.
+Early versions lifted the DOM above the canvas when a screen had to take
+input, and hid it behind hardware by casting a few rays. Rays can only show or
+hide a whole screen, so it went wrong in both directions: content showed
+through hardware that should hide it (a laptop's screen through its own
+keyboard), and a screen that was mostly visible could blank out entirely. That
+mode was removed. The experimental one below takes input without the trade.
 
-If you need a genuinely usable embedded app, render it in the page next to the
-mockup rather than on it.
+## Experimental: screens that take input
+
+`experimentalScreenInput` lets pointers reach the screens. Clicks, hover,
+wheel and touch scrolling, focus and typing work on the content as they do on
+the page, iframes included.
+
+```tsx
+<LaptopMockup experimentalScreenInput>
+  <YourApp />
+</LaptopMockup>
+```
+
+Each screen's DOM moves above the canvas and is clipped every frame to the
+part of it no hardware covers. The clip comes from the canvas itself: the
+screen's depth mask still renders, and it leaves the canvas transparent
+exactly where the screen is the nearest surface. So the clip follows the same
+per-pixel test as the default, and a laptop seen from below still hides the
+bottom of its display behind its base.
+
+It is experimental: the name and the behavior may change in any release. What
+it costs:
+
+- **A readback every frame.** After each frame the canvas draws, every screen
+  reads the canvas's pixels under it back from the GPU, which makes the CPU
+  wait for the frame to finish.
+- **About 2 KB gzip, on demand.** The clipping and dragging code loads the
+  first time a screen takes input; a mockup with it off never downloads it.
+- **Screens join the accessibility tree**, as `screenAccessibility="visible"`
+  puts them: content that takes input has to be reachable without a pointer
+  too.
+
+### Who gets a drag
+
+A tap or a click on a screen is always the content's. A drag is decided in
+this order:
+
+1. With `screenDrag={false}`, every drag on the screens is the content's. Set
+   it on the mockup for all its screens, or on one slot
+   (`<LaptopMockup.Screen screenDrag={false}>`) for one screen.
+2. A drag that starts on a form control (a text field, a slider, a select,
+   editable text), inside anything marked `data-mockup-no-rotate`, or one the
+   content claims with `setPointerCapture` stays the content's.
+3. Otherwise, once the pointer has moved 10 px, the drag turns the model, and
+   the content gets no click for it.
+4. On touch, a mostly vertical swipe scrolls instead, as it does on the rest
+   of the mockup.
+
+Drags on the hardware and on the background always turn the model, and with
+`controls={false}` there is nothing to turn, so the content keeps every drag.
+
+```tsx
+<LaptopMockup experimentalScreenInput>
+  <LaptopMockup.Screen>
+    <Dashboard>
+      {/* A chart you scrub by dragging: it keeps its drags, the rest turns the model. */}
+      <div data-mockup-no-rotate>
+        <ScrubbableChart />
+      </div>
+    </Dashboard>
+  </LaptopMockup.Screen>
+</LaptopMockup>
+```
+
+```tsx
+{/* A map: drags all over it, so none of them turn the model. */}
+<IPadMockup experimentalScreenInput screenDrag={false}>
+  <MapApp />
+</IPadMockup>
+```
+
+Drag code that only listens for `mousemove` on `document`, without capturing
+the pointer, cannot be detected from outside, and loses its drag to the model
+after 10 px. Mark it `data-mockup-no-rotate`, or turn `screenDrag` off for that
+screen.
 
 ## React context on the screen
 

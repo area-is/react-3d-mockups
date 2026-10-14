@@ -698,6 +698,7 @@ function FoldBody({
   const punchHoleOverlay = hole && (
     <div
       aria-hidden
+      data-mockup-cutout=""
       style={{
         position: 'absolute',
         ...(landscape

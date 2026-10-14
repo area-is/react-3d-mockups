@@ -201,3 +201,6 @@ export type {
   CreditCardEmboss,
   CreditCardFinish,
 } from './core'
+
+// EXPERIMENTAL: per-frame cost of `experimentalScreenInput`, for test pages.
+export { experimental_screenInputStats } from './screen/screen-input-stats'

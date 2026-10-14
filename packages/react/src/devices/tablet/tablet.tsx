@@ -561,6 +561,7 @@ function TabletBody({
             {notch ? (
               <div
                 aria-hidden
+                data-mockup-cutout=""
                 style={{
                   position: 'absolute',
                   // the Tab Ultra notch lives on the landscape-top edge - the

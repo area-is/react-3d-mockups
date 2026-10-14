@@ -233,6 +233,8 @@ export interface DeviceScreenProps {
    * bar and only a layout knows which it is.
    */
   safeAreaTop?: number
+  /** EXPERIMENTAL: the slot's own `screenDrag`, from `resolveSurface`. */
+  screenDrag?: boolean
   children?: React.ReactNode
 }
 
@@ -283,6 +285,7 @@ function BridgedScreen({
   overlay,
   safeAreaTop = 0,
   surface: reported,
+  screenDrag,
   children,
 }: DeviceScreenProps) {
   const gl = useThree((state) => state.gl)
@@ -302,7 +305,10 @@ function BridgedScreen({
   const [waitedForEvents, setWaitedForEvents] = React.useState(false)
   const waitFrames = React.useRef(0)
   const portalTarget = connected || (waitedForEvents ? (gl.domElement.parentElement as HTMLElement | null) : null)
-  const { screenAccessibility, delayCapture } = React.useContext(StageContext)
+  const stage = React.useContext(StageContext)
+  const { screenAccessibility, delayCapture, screenInput = false } = stage
+  // A slot's own setting wins over the stage's; with no controls there is nothing to hand to.
+  const dragToRotate = (stage.orbitControls ?? false) && (screenDrag ?? stage.screenDrag ?? true)
   /*
    * The portal renders its children into a SEPARATE React root, and a new
    * root starts with no context at all - so a theme, an i18n provider, a
@@ -520,14 +526,15 @@ function BridgedScreen({
   const surface = (
     <div
       ref={rasterScale === 1 ? setContent : undefined}
-      aria-hidden={screenAccessibility === 'visible' ? undefined : true}
-      inert={screenAccessibility === 'visible' ? undefined : true}
+      aria-hidden={screenInput || screenAccessibility === 'visible' ? undefined : true}
+      inert={screenInput || screenAccessibility === 'visible' ? undefined : true}
       style={{
         ...screenSurfaceStyle({ width, height, radius, resolution, background }),
         // The inset the system UI costs the content, for CSS to pick up. Set
         // before `screenStyle` so a device can still override it.
         ...({ '--mockup-safe-area-top': `${safeAreaTop}px` } as React.CSSProperties),
         ...screenStyle,
+        ...(screenInput ? { pointerEvents: 'auto' as const } : null),
         ...(rasterScale === 1
           ? null
           : {
@@ -573,7 +580,9 @@ function BridgedScreen({
           // Keep the inner transform div from hit-testing. It spans the screen
           // rect and would otherwise sit in front of user content that
           // legitimately wants to paint over the mockup.
-          pointerEvents="none"
+          pointerEvents={screenInput ? 'auto' : 'none'}
+          input={screenInput}
+          dragToRotate={dragToRotate}
         >
         <style href={SCREEN_LAYER_STYLE_HREF} precedence="default">
           {SCREEN_LAYER_CSS}
@@ -596,7 +605,7 @@ function BridgedScreen({
                 width: resolution * rasterScale,
                 height: cssHeight * rasterScale,
                 overflow: 'hidden',
-                pointerEvents: 'none',
+                pointerEvents: screenInput ? 'auto' : 'none',
                 backfaceVisibility: 'hidden',
                 WebkitBackfaceVisibility: 'hidden',
               }}

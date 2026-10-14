@@ -16,10 +16,19 @@
  * Peers are what the app already installs once (react, three, fiber, drei).
  * The runtime dependencies (the CSG engine, its-fine) are counted, because an
  * app bundles them on our behalf.
+ *
+ * Bundled with code splitting, as an app's bundler does, and counting only
+ * what the import loads up front: the entry and every chunk it imports
+ * statically. A dynamic `import()` the library makes for an opt-in feature
+ * (today the experimental screen input) becomes a chunk the app fetches only
+ * when the feature is used, so it is reported beside the total rather than in
+ * it. Without splitting, esbuild inlines dynamic imports, and the table would
+ * charge every app for code most never load.
  */
 import { build } from 'esbuild'
-import { readFileSync, writeFileSync } from 'node:fs'
-import { dirname, join } from 'node:path'
+import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import { tmpdir } from 'node:os'
+import { dirname, join, relative } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { gzipSync } from 'node:zlib'
 
@@ -70,12 +79,24 @@ const ENTRIES = [
   ['CustomBoxMockup', 'any-size box'],
 ]
 
+// Splitting needs a real entry file (esbuild will not split stdin) and an
+// output directory, though nothing is written to it.
+const scratch = mkdtempSync(join(tmpdir(), 'measure-size-'))
+process.on('exit', () => rmSync(scratch, { recursive: true, force: true }))
+
+/** Sizes of what `contents` loads up front, and of the chunks it only loads on demand. */
 async function measure(contents) {
+  const entry = join(scratch, 'entry.js')
+  writeFileSync(entry, contents.replaceAll("'./dist/", `'${join(root, 'dist')}/`))
   const result = await build({
-    stdin: { contents, resolveDir: root, loader: 'js' },
+    entryPoints: [entry],
+    absWorkingDir: scratch,
+    outdir: join(scratch, 'out'),
     bundle: true,
+    splitting: true,
     minify: true,
     write: false,
+    metafile: true,
     format: 'esm',
     target: 'es2022',
     platform: 'browser',
@@ -84,8 +105,22 @@ async function measure(contents) {
     // ignores it in a bundle, which is exactly what an app bundler does too.
     logLevel: 'error',
   })
-  const bytes = result.outputFiles[0].contents
-  return { min: bytes.length / 1024, gzip: gzipSync(bytes).length / 1024 }
+  const files = new Map(result.outputFiles.map((file) => [relative(scratch, file.path), file.contents]))
+  const outputs = result.metafile.outputs
+  const start = Object.keys(outputs).find((path) => outputs[path].entryPoint)
+  // Walk the static imports from the entry: that is what loads with it.
+  const upfront = new Set()
+  const walk = (path) => {
+    if (upfront.has(path)) return
+    upfront.add(path)
+    for (const imported of outputs[path].imports) if (!imported.external && imported.kind === 'import-statement') walk(imported.path)
+  }
+  walk(start)
+  const bytes = Buffer.concat([...upfront].map((path) => files.get(path)))
+  const lazy = Object.keys(outputs)
+    .filter((path) => !upfront.has(path) && path.endsWith('.js'))
+    .reduce((sum, path) => sum + gzipSync(files.get(path)).length / 1024, 0)
+  return { min: bytes.length / 1024, gzip: gzipSync(bytes).length / 1024, lazy }
 }
 
 const kb = (n) => `${n.toFixed(1)} KB`
@@ -97,8 +132,9 @@ const whole = await measure(`export * from './dist/index.js'`)
 
 const mode = process.argv[2]
 if (!mode) {
-  for (const r of rows) console.log(`${r.component}: ${kb(r.min)} min / ${kb(r.gzip)} gzip`)
-  console.log(`everything: ${kb(whole.min)} min / ${kb(whole.gzip)} gzip`)
+  const lazy = (r) => (r.lazy > 0 ? ` (+ ${kb(r.lazy)} gzip on demand)` : '')
+  for (const r of rows) console.log(`${r.component}: ${kb(r.min)} min / ${kb(r.gzip)} gzip${lazy(r)}`)
+  console.log(`everything: ${kb(whole.min)} min / ${kb(whole.gzip)} gzip${lazy(whole)}`)
   process.exit(0)
 }
 

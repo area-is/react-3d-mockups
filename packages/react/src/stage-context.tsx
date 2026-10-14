@@ -21,6 +21,12 @@ export interface StageSettings {
   screenAccessibility: ScreenAccessibility
   /** The canvas's `delayCapture`, which each screen holds while its content lands. */
   delayCapture?: DelayCapture
+  /** EXPERIMENTAL: screens take pointer input (`experimentalScreenInput`). */
+  screenInput?: boolean
+  /** Whether the canvas has orbit controls: without them there is nothing to hand a drag to. */
+  orbitControls?: boolean
+  /** EXPERIMENTAL: whether a drag that starts on a screen taking input turns the model (`screenDrag`). */
+  screenDrag?: boolean
 }
 
 /**

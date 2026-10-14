@@ -54,7 +54,14 @@ type _noPanelsProp = Expect<Not<Has<'panels', React.ComponentProps<typeof Brochu
 // ---- surface vocabulary is unified ---------------------------------------------------
 type _surfaceBackground = Expect<Has<'surfaceBackground', AFrameSignProps>>
 // one vocabulary: a slot and its mockup spell the same setting the same way
-type _slotMatchesDefaults = Expect<Equal<Omit<SlotProps, 'children'>, SurfaceProps>>
+// (`screenDrag` is the one slot-only setting: EXPERIMENTAL, see SlotProps)
+type _slotMatchesDefaults = Expect<Equal<Omit<SlotProps, 'children' | 'screenDrag'>, SurfaceProps>>
+// drag-to-rotate on a screen taking input: the stage's, overridden per slot,
+// never on a bare device, where it would be a silent no-op
+type _slotScreenDrag = Expect<Has<'screenDrag', SlotProps>>
+type _mockupScreenDrag = Expect<Has<'screenDrag', AFrameSignMockupProps>>
+type _canvasScreenDrag = Expect<Has<'screenDrag', MockupCanvasProps>>
+type _noDeviceScreenDrag = Expect<Not<Has<'screenDrag', GalaxyProps>>>
 type _slotShape = Expect<Equal<keyof SurfaceProps, 'surfaceBackground' | 'resolution' | 'surfaceStyle'>>
 type _slotChildren = Expect<Has<'children', SlotProps>>
 

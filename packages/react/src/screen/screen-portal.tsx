@@ -23,8 +23,20 @@ import * as React from 'react'
 import * as ReactDOM from 'react-dom/client'
 import { DoubleSide, OrthographicCamera, PerspectiveCamera, Vector3 } from 'three'
 import type * as THREE from 'three'
-import { useFrame, useThree } from '@react-three/fiber'
+import { addAfterEffect, useFrame, useThree } from '@react-three/fiber'
 import { stackSurfaces, surfaceCorners } from '../core/screen/stacking'
+import type { ScreenDragHandoff } from '../core/screen/drag-handoff'
+
+type ScreenInputModule = typeof import('./screen-input')
+
+/**
+ * EXPERIMENTAL: the clip tracer and the drag handoff, fetched the first time a
+ * screen takes input and shared by every screen after it. Nothing that leaves
+ * input off pays for them - an app's bundler splits a dynamic import into its
+ * own chunk.
+ */
+let screenInputModule: Promise<ScreenInputModule> | null = null
+const loadScreenInput = () => (screenInputModule ??= import('./screen-input'))
 
 const v1 = /* @__PURE__ */ new Vector3()
 const v2 = /* @__PURE__ */ new Vector3()
@@ -53,6 +65,8 @@ interface Layer {
   anchor: React.RefObject<THREE.Group | null>
   geometry: React.RefObject<THREE.BufferGeometry>
   element: HTMLElement
+  /** Stacked above the canvas (`input`) rather than under it. */
+  above: boolean
 }
 
 interface Stack {
@@ -93,7 +107,8 @@ function restack(scene: THREE.Object3D, camera: THREE.Camera, frame: number, cei
     surfaces.push({ corners: surfaceCorners(layer.geometry.current, anchor.matrixWorld) })
   }
   stackSurfaces(surfaces, camera).forEach((index, rank) => {
-    const zIndex = `${Math.min(ceiling - 1, rank + 1)}`
+    const above = layers[index]!.above
+    const zIndex = `${above ? ceiling + 1 + rank : Math.min(ceiling - 1, rank + 1)}`
     const element = layers[index]!.element
     if (element.style.zIndex !== zIndex) element.style.zIndex = zIndex
   })
@@ -144,6 +159,19 @@ export interface ScreenPortalProps {
   wrapperClass?: string
   /** `pointer-events` of the element holding the content. */
   pointerEvents?: React.CSSProperties['pointerEvents']
+  /**
+   * EXPERIMENTAL (`experimentalScreenInput`): stack the DOM ABOVE the canvas,
+   * where pointers reach it, and clip it every frame to the pixels the canvas
+   * left transparent for it - the part of the screen no hardware covers.
+   */
+  input?: boolean
+  /**
+   * With `input`: a press that turns into a drag is handed to the canvas's
+   * orbit controls, so dragging on the glass still turns the model while taps
+   * stay the content's (see `createScreenDragHandoff`). Off when the canvas
+   * has no controls to hand to.
+   */
+  dragToRotate?: boolean
   children?: React.ReactNode
 }
 
@@ -154,17 +182,23 @@ export function ScreenPortal({
   zIndexRange,
   wrapperClass,
   pointerEvents = 'auto',
+  input = false,
+  dragToRotate = false,
   children,
 }: ScreenPortalProps) {
   const gl = useThree((state) => state.gl)
   const camera = useThree((state) => state.camera)
   const scene = useThree((state) => state.scene)
   const size = useThree((state) => state.size)
+  const invalidate = useThree((state) => state.invalidate)
   const group = React.useRef<THREE.Group>(null)
   const mounted = React.useRef<Mounted | null>(null)
   const visible = React.useRef(true)
   const geometryRef = React.useRef(geometry)
   geometryRef.current = geometry
+  // Read per gesture, so toggling controls does not remount the screen.
+  const handoffRef = React.useRef({ gl, dragToRotate })
+  handoffRef.current = { gl, dragToRotate }
 
   // Depth blending: the canvas composites OVER the screens, at the band's midpoint.
   React.useLayoutEffect(() => {
@@ -177,6 +211,11 @@ export function ScreenPortal({
     const element = document.createElement('div')
     element.style.cssText = 'position:absolute;top:0;left:0;pointer-events:none;overflow:hidden;'
     if (wrapperClass) element.className = wrapperClass
+    // Above the canvas, nothing may show until the first frame has been traced.
+    if (input) {
+      element.style.clipPath = 'inset(50%)'
+      element.dataset.screenInput = ''
+    }
     const mount: Mounted = {
       element,
       root: ReactDOM.createRoot(element),
@@ -191,8 +230,36 @@ export function ScreenPortal({
     visible.current = true
     scene.updateMatrixWorld()
     target.appendChild(element)
-    const leaveStack = joinStack(scene, { anchor: group, geometry: geometryRef, element })
+    const leaveStack = joinStack(scene, { anchor: group, geometry: geometryRef, element, above: input })
+    // A press or a wheel on the screen is the content's, not the canvas's
+    // event system's - until a press turns into a drag, which the handoff
+    // gives to the orbit controls.
+    let handoff: ScreenDragHandoff | null = null
+    let unmounted = false
+    if (input) {
+      void loadScreenInput().then(({ createScreenDragHandoff }) => {
+        if (unmounted) return
+        handoff = createScreenDragHandoff(
+          element,
+          () => handoffRef.current.gl.domElement,
+          () => handoffRef.current.dragToRotate
+        )
+      })
+    }
+    const press = (event: PointerEvent) => {
+      event.stopPropagation()
+      handoff?.onPointerDown(event)
+    }
+    const keep = (event: Event) => event.stopPropagation()
+    if (input) {
+      element.addEventListener('pointerdown', press)
+      element.addEventListener('wheel', keep)
+    }
     return () => {
+      unmounted = true
+      handoff?.dispose()
+      element.removeEventListener('pointerdown', press)
+      element.removeEventListener('wheel', keep)
       leaveStack()
       element.remove()
       if (mounted.current === mount) mounted.current = null
@@ -201,7 +268,7 @@ export function ScreenPortal({
       // detached, so the root has nothing live left to touch.
       queueMicrotask(() => mount.root.unmount())
     }
-  }, [target, wrapperClass, scene])
+  }, [target, wrapperClass, scene, input])
 
   // Every commit re-renders the content into the screen's root, so whatever
   // the parent passes down - and every context bridged with it - stays live.
@@ -227,9 +294,49 @@ export function ScreenPortal({
     )
   })
 
+  // EXPERIMENTAL (`input`): once the frame has rendered, read the canvas's
+  // alpha under this screen and clip the DOM to the transparent part of it.
+  // It runs after every root has drawn and before the browser composites, so
+  // the drawing buffer still holds this frame; `drew` keeps it to frames this
+  // canvas actually drew, since an undrawn buffer reads back empty.
+  const drew = React.useRef(false)
+  React.useEffect(() => {
+    if (!input) return
+    // Until the clipper has loaded the screen stays fully clipped; the frame
+    // after it lands traces it.
+    let clip: ReturnType<ScreenInputModule['createScreenClipper']> | null = null
+    let unmounted = false
+    void loadScreenInput().then((module) => {
+      if (unmounted) return
+      clip = module.createScreenClipper()
+      invalidate()
+    })
+    const stop = addAfterEffect(() => {
+      if (!drew.current) return
+      drew.current = false
+      const anchor = group.current
+      const mount = mounted.current
+      if (!clip || !anchor || !mount || !visible.current) return
+      clip({
+        canvas: gl.domElement,
+        context: gl.getContext(),
+        cssWidth: size.width,
+        camera,
+        anchor,
+        geometry: geometryRef.current,
+        element: mount.element,
+      })
+    })
+    return () => {
+      unmounted = true
+      stop()
+    }
+  }, [input, gl, camera, size, invalidate])
+
   useFrame((state) => {
     const anchor = group.current
     const mount = mounted.current
+    drew.current = true
     if (!anchor || !mount) return
     const { element, outer, inner } = mount
     camera.updateMatrixWorld()

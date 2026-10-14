@@ -455,6 +455,7 @@ function GalaxyImpl({
             {renderStatusBar(statusBar, statusBarPlacement)}
             <div
               aria-hidden
+              data-mockup-cutout=""
               style={{
                 position: 'absolute',
                 // the hole sits at the panel's physical top - the left edge in landscape

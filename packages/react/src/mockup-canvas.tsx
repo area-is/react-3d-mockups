@@ -392,13 +392,41 @@ export interface MockupCanvasProps {
    * nowhere else on the page.
    */
   screenAccessibility?: ScreenAccessibility
+  /**
+   * EXPERIMENTAL - may change or go away in any release. Let pointers reach
+   * the screens: clicks, hover, scrolling, typing and focus all work on the
+   * content, as they would on the page. Each screen's DOM stacks above the
+   * canvas and is clipped every frame to the part of it no hardware covers,
+   * traced from the pixels the canvas leaves transparent for it.
+   *
+   * A tap or click on a screen is the content's; a press that turns into a
+   * drag still turns the model, unless the content claims it (see
+   * `screenDrag`). On touch, vertical swipes scroll as they do on the rest of
+   * the mockup.
+   *
+   * Costs: a synchronous canvas readback per screen per drawn frame. Screens
+   * also join the accessibility tree, as `screenAccessibility` `'visible'`
+   * would put them, since content that takes input must be reachable without
+   * a pointer too.
+   */
+  experimentalScreenInput?: boolean
+  /**
+   * EXPERIMENTAL, with `experimentalScreenInput`: whether a drag that starts
+   * on a screen turns the model. Default `true`: a press that travels 10 px
+   * is handed to the orbit controls, unless the content claims it (a form
+   * control, anything marked `data-mockup-no-rotate`, or a pointer the
+   * content captures with `setPointerCapture`). `false` leaves every drag on
+   * every screen to the content; the hardware and the background still turn
+   * the model. A slot's own `screenDrag` overrides this for its region.
+   */
+  screenDrag?: boolean
   className?: string
   style?: React.CSSProperties
 }
 
 /**
- * A ready-made react-three-fiber stage for device mockups: GPU-accelerated
- * WebGL canvas, studio lighting, soft shadows and orbit controls. Compose it
+ * A ready-made react-three-fiber stage for device mockups: a WebGL canvas,
+ * studio lighting, soft shadows and orbit controls. Compose it
  * with any device model, e.g. `<MockupCanvas><Galaxy>…</Galaxy></MockupCanvas>`.
  *
  * The stage itself - camera pose, orbit feel, light rig, shadow softness -
@@ -424,6 +452,8 @@ export function MockupCanvas({
   onCreated,
   label = '3D mockup',
   screenAccessibility = 'hidden',
+  experimentalScreenInput = false,
+  screenDrag = true,
   className,
   style,
 }: MockupCanvasProps) {
@@ -631,8 +661,14 @@ export function MockupCanvas({
     [gl]
   )
   const stage = React.useMemo<StageSettings>(
-    () => ({ screenAccessibility, delayCapture: capture }),
-    [screenAccessibility, capture]
+    () => ({
+      screenAccessibility,
+      delayCapture: capture,
+      screenInput: experimentalScreenInput,
+      orbitControls: controls,
+      screenDrag,
+    }),
+    [screenAccessibility, capture, experimentalScreenInput, controls, screenDrag]
   )
 
   // The canvas's own container is a stacking context (see isolateCanvasStack
