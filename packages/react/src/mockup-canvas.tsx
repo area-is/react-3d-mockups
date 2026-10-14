@@ -399,11 +399,16 @@ export interface MockupCanvasProps {
    * canvas and is clipped every frame to the part of it no hardware covers,
    * traced from the pixels the canvas leaves transparent for it.
    *
-   * Costs: a synchronous canvas readback per screen per drawn frame, and a
-   * press that starts on a screen goes to the content instead of rotating the
-   * model. Screens also join the accessibility tree, as `screenAccessibility`
-   * `'visible'` would put them, since content that takes input must be
-   * reachable without a pointer too.
+   * A tap or click on a screen is the content's; a press that turns into a
+   * drag still turns the model, unless the content claims it: form controls,
+   * anything marked `data-mockup-no-rotate`, a `pointerdown` the content
+   * prevented, or a pointer the content captured (`setPointerCapture`). On
+   * touch, vertical swipes scroll as they do on the rest of the mockup.
+   *
+   * Costs: a synchronous canvas readback per screen per drawn frame. Screens
+   * also join the accessibility tree, as `screenAccessibility` `'visible'`
+   * would put them, since content that takes input must be reachable without
+   * a pointer too.
    */
   experimentalScreenInput?: boolean
   className?: string
@@ -648,8 +653,8 @@ export function MockupCanvas({
     [gl]
   )
   const stage = React.useMemo<StageSettings>(
-    () => ({ screenAccessibility, delayCapture: capture, screenInput: experimentalScreenInput }),
-    [screenAccessibility, capture, experimentalScreenInput]
+    () => ({ screenAccessibility, delayCapture: capture, screenInput: experimentalScreenInput, screenDrag: controls }),
+    [screenAccessibility, capture, experimentalScreenInput, controls]
   )
 
   // The canvas's own container is a stacking context (see isolateCanvasStack

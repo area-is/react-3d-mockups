@@ -23,6 +23,8 @@ export interface StageSettings {
   delayCapture?: DelayCapture
   /** EXPERIMENTAL: screens take pointer input (`experimentalScreenInput`). */
   screenInput?: boolean
+  /** Whether the canvas has orbit controls, so a drag on a screen taking input can turn the model. */
+  screenDrag?: boolean
 }
 
 /**

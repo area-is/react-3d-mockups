@@ -26,6 +26,7 @@ import type * as THREE from 'three'
 import { addAfterEffect, useFrame, useThree } from '@react-three/fiber'
 import { stackSurfaces, surfaceCorners } from '../core/screen/stacking'
 import { traceTransparent } from '../core/screen/clip-trace'
+import { createScreenDragHandoff } from '../core/screen/drag-handoff'
 
 /**
  * EXPERIMENTAL: running totals for `experimentalScreenInput`, so a test page
@@ -161,6 +162,13 @@ export interface ScreenPortalProps {
    * left transparent for it - the part of the screen no hardware covers.
    */
   input?: boolean
+  /**
+   * With `input`: a press that turns into a drag is handed to the canvas's
+   * orbit controls, so dragging on the glass still turns the model while taps
+   * stay the content's (see `createScreenDragHandoff`). Off when the canvas
+   * has no controls to hand to.
+   */
+  dragToRotate?: boolean
   children?: React.ReactNode
 }
 
@@ -172,6 +180,7 @@ export function ScreenPortal({
   wrapperClass,
   pointerEvents = 'auto',
   input = false,
+  dragToRotate = false,
   children,
 }: ScreenPortalProps) {
   const gl = useThree((state) => state.gl)
@@ -183,6 +192,9 @@ export function ScreenPortal({
   const visible = React.useRef(true)
   const geometryRef = React.useRef(geometry)
   geometryRef.current = geometry
+  // Read per gesture, so toggling controls does not remount the screen.
+  const handoffRef = React.useRef({ gl, dragToRotate })
+  handoffRef.current = { gl, dragToRotate }
 
   // Depth blending: the canvas composites OVER the screens, at the band's midpoint.
   React.useLayoutEffect(() => {
@@ -215,14 +227,28 @@ export function ScreenPortal({
     scene.updateMatrixWorld()
     target.appendChild(element)
     const leaveStack = joinStack(scene, { anchor: group, geometry: geometryRef, element, above: input })
-    // A press or a wheel on the screen is the content's, not the orbit controls'.
+    // A press or a wheel on the screen is the content's, not the canvas's
+    // event system's - until a press turns into a drag, which the handoff
+    // gives to the orbit controls.
+    const handoff = input
+      ? createScreenDragHandoff(
+          element,
+          () => handoffRef.current.gl.domElement,
+          () => handoffRef.current.dragToRotate
+        )
+      : null
+    const press = (event: PointerEvent) => {
+      event.stopPropagation()
+      handoff?.onPointerDown(event)
+    }
     const keep = (event: Event) => event.stopPropagation()
     if (input) {
-      element.addEventListener('pointerdown', keep)
+      element.addEventListener('pointerdown', press)
       element.addEventListener('wheel', keep)
     }
     return () => {
-      element.removeEventListener('pointerdown', keep)
+      handoff?.dispose()
+      element.removeEventListener('pointerdown', press)
       element.removeEventListener('wheel', keep)
       leaveStack()
       element.remove()

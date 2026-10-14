@@ -302,7 +302,7 @@ function BridgedScreen({
   const [waitedForEvents, setWaitedForEvents] = React.useState(false)
   const waitFrames = React.useRef(0)
   const portalTarget = connected || (waitedForEvents ? (gl.domElement.parentElement as HTMLElement | null) : null)
-  const { screenAccessibility, delayCapture, screenInput = false } = React.useContext(StageContext)
+  const { screenAccessibility, delayCapture, screenInput = false, screenDrag = false } = React.useContext(StageContext)
   /*
    * The portal renders its children into a SEPARATE React root, and a new
    * root starts with no context at all - so a theme, an i18n provider, a
@@ -576,6 +576,7 @@ function BridgedScreen({
           // legitimately wants to paint over the mockup.
           pointerEvents={screenInput ? 'auto' : 'none'}
           input={screenInput}
+          dragToRotate={screenDrag}
         >
         <style href={SCREEN_LAYER_STYLE_HREF} precedence="default">
           {SCREEN_LAYER_CSS}

@@ -16,9 +16,11 @@ import { asset } from '@/lib/base-path.mjs'
  * of a nearly shut lid, the base stands in front of part of the display.
  *
  * Things to try: click a cell (it counts), hover (it turns white), scroll
- * the grid with the wheel or a finger, type in the field, drag on the
- * hardware or the background (the model turns), and click where the base
- * covers the display (nothing should happen).
+ * the grid with the wheel or a finger, type in the field, drag the slider or
+ * the custom drag strip (they move, the model does not), drag anywhere else on the screen, the
+ * hardware or the background (the model turns, and the cell you started on
+ * does not count a click), and click where the base covers the display
+ * (nothing should happen).
  */
 
 type Scene = 'phone' | 'laptop-under' | 'laptop-wedge' | 'laptop-front' | 'laptop-iframe' | 'overlap' | 'fold'
@@ -45,6 +47,13 @@ function TestScreen({ name, rows = 8, cols = 4 }: { name: string; rows?: number;
   const [hits, setHits] = React.useState<Record<number, number>>({})
   const [hover, setHover] = React.useState(-1)
   const [text, setText] = React.useState('')
+  const [level, setLevel] = React.useState(50)
+  const [knob, setKnob] = React.useState(0.5)
+  const track = React.useRef<HTMLDivElement>(null)
+  const dragKnob = (e: React.PointerEvent) => {
+    const r = track.current!.getBoundingClientRect()
+    setKnob(Math.min(1, Math.max(0, (e.clientX - r.left) / r.width)))
+  }
   return (
     <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', background: '#10131a', color: '#fff', font: '600 22px system-ui, sans-serif' }}>
       <div style={{ flex: 1, overflow: 'auto', display: 'grid', gridTemplateColumns: `repeat(${cols}, 1fr)`, gridAutoRows: `calc((100% - 4px) / ${rows})`, gap: 4, padding: 4 }}>
@@ -77,6 +86,23 @@ function TestScreen({ name, rows = 8, cols = 4 }: { name: string; rows?: number;
           </div>
         ))}
       </div>
+      {/* A drag of the content's own, the way most custom drag code claims one: setPointerCapture. */}
+      <div
+        ref={track}
+        onPointerDown={(e) => {
+          e.currentTarget.setPointerCapture(e.pointerId)
+          dragKnob(e)
+        }}
+        onPointerMove={(e) => e.currentTarget.hasPointerCapture(e.pointerId) && dragKnob(e)}
+        style={{ position: 'relative', margin: '4px 4px 0', height: 40, borderRadius: 10, background: '#222838', touchAction: 'none', font: '500 16px system-ui, sans-serif', display: 'grid', placeItems: 'center' }}
+      >
+        custom drag {Math.round(knob * 100)}
+        <div style={{ position: 'absolute', top: 4, bottom: 4, width: 32, left: `calc(${knob * 100}% - ${knob * 32}px)`, borderRadius: 8, background: '#c8f05a' }} />
+      </div>
+      <label style={{ margin: '4px 4px 0', display: 'flex', alignItems: 'center', gap: 12, font: '500 18px system-ui, sans-serif' }}>
+        Slider {level}
+        <input type="range" min={0} max={100} value={level} onChange={(e) => setLevel(Number(e.target.value))} style={{ flex: 1, height: 36 }} />
+      </label>
       <input
         value={text}
         onChange={(e) => setText(e.target.value)}

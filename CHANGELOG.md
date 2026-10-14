@@ -17,10 +17,11 @@ breaking change can ship in a minor release, and is always listed under
   hardware covers, traced from the pixels the canvas leaves transparent for
   it, so a laptop's base still hides the bottom of its display from below.
   Screens last took input by raycasting, which could only show or hide a
-  whole screen; this clips per pixel instead. It costs a synchronous canvas
-  readback per screen per drawn frame. A press that starts on a screen goes
-  to the content rather than turning the model, and the screens join the
-  accessibility tree. The name says it: it may change or go away in any
+  whole screen; this clips per pixel instead. A tap is the content's and a
+  drag still turns the model, unless the content claims the drag (form
+  controls, `data-mockup-no-rotate`, a prevented `pointerdown`, or a pointer
+  it captures). It costs a synchronous canvas readback per screen per drawn
+  frame, and the screens join the accessibility tree. The name says it: it may change or go away in any
   release. Try it at `/harness/screen-input` on the docs site.
 - **`CreditCardMockup` and `CreditCard`: a payment card with real embossing.**
   An ISO/IEC 7810 ID-1 card (85.60×53.98×0.76 mm, 3.18 mm corners) with
