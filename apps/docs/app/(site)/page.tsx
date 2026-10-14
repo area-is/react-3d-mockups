@@ -17,6 +17,7 @@ import {
   pageMetadata,
 } from '@/lib/site'
 import { CopyButton } from './_components/copy-button'
+import { FilmPlayer } from './_components/film-player'
 import { InstallTabs } from './_components/install-tabs'
 
 // Absolute, not '/': joined onto `metadataBase` a bare slash comes out as
@@ -195,7 +196,8 @@ const FILM = { src: '/media/react-3d-mockups.mp4', poster: '/promo/react-3d-mock
 /**
  * The library's film: 38 seconds of the catalogue and the features, every
  * frame of it a react-3d-mockups component rendered to video with Remotion
- * (`examples/remotion`, `PromoFilm`). A plain `<video>`: the file is served
+ * (`examples/remotion`, `PromoFilm`). A plain `<video>` (see `FilmPlayer`
+ * for the cover that starts it): the file is served
  * from R2 with byte ranges, so it starts playing before it has downloaded
  * and seeks without a player library, Safari included. `preload="none"`
  * keeps its ten-odd megabytes off the page until
@@ -216,18 +218,12 @@ function Film() {
           .
         </p>
       </div>
-      <video
-        className="film-video"
-        controls
-        playsInline
-        preload="none"
-        width={1920}
-        height={1080}
+      <FilmPlayer
+        src={asset(FILM.src)}
         poster={asset(FILM.poster)}
-        aria-label="The react-3d-mockups film: the catalogue of 3D models and the library's features"
-      >
-        <source src={asset(FILM.src)} type="video/mp4" />
-      </video>
+        duration="0:38"
+        label="The react-3d-mockups film: the catalogue of 3D models and the library's features"
+      />
     </section>
   )
 }
