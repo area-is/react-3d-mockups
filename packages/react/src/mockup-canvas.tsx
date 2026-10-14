@@ -392,6 +392,20 @@ export interface MockupCanvasProps {
    * nowhere else on the page.
    */
   screenAccessibility?: ScreenAccessibility
+  /**
+   * EXPERIMENTAL - may change or go away in any release. Let pointers reach
+   * the screens: clicks, hover, scrolling, typing and focus all work on the
+   * content, as they would on the page. Each screen's DOM stacks above the
+   * canvas and is clipped every frame to the part of it no hardware covers,
+   * traced from the pixels the canvas leaves transparent for it.
+   *
+   * Costs: a synchronous canvas readback per screen per drawn frame, and a
+   * press that starts on a screen goes to the content instead of rotating the
+   * model. Screens also join the accessibility tree, as `screenAccessibility`
+   * `'visible'` would put them, since content that takes input must be
+   * reachable without a pointer too.
+   */
+  experimentalScreenInput?: boolean
   className?: string
   style?: React.CSSProperties
 }
@@ -424,6 +438,7 @@ export function MockupCanvas({
   onCreated,
   label = '3D mockup',
   screenAccessibility = 'hidden',
+  experimentalScreenInput = false,
   className,
   style,
 }: MockupCanvasProps) {
@@ -631,8 +646,8 @@ export function MockupCanvas({
     [gl]
   )
   const stage = React.useMemo<StageSettings>(
-    () => ({ screenAccessibility, delayCapture: capture }),
-    [screenAccessibility, capture]
+    () => ({ screenAccessibility, delayCapture: capture, screenInput: experimentalScreenInput }),
+    [screenAccessibility, capture, experimentalScreenInput]
   )
 
   // The canvas's own container is a stacking context (see isolateCanvasStack

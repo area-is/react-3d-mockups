@@ -302,7 +302,7 @@ function BridgedScreen({
   const [waitedForEvents, setWaitedForEvents] = React.useState(false)
   const waitFrames = React.useRef(0)
   const portalTarget = connected || (waitedForEvents ? (gl.domElement.parentElement as HTMLElement | null) : null)
-  const { screenAccessibility, delayCapture } = React.useContext(StageContext)
+  const { screenAccessibility, delayCapture, screenInput = false } = React.useContext(StageContext)
   /*
    * The portal renders its children into a SEPARATE React root, and a new
    * root starts with no context at all - so a theme, an i18n provider, a
@@ -520,14 +520,15 @@ function BridgedScreen({
   const surface = (
     <div
       ref={rasterScale === 1 ? setContent : undefined}
-      aria-hidden={screenAccessibility === 'visible' ? undefined : true}
-      inert={screenAccessibility === 'visible' ? undefined : true}
+      aria-hidden={screenInput || screenAccessibility === 'visible' ? undefined : true}
+      inert={screenInput || screenAccessibility === 'visible' ? undefined : true}
       style={{
         ...screenSurfaceStyle({ width, height, radius, resolution, background }),
         // The inset the system UI costs the content, for CSS to pick up. Set
         // before `screenStyle` so a device can still override it.
         ...({ '--mockup-safe-area-top': `${safeAreaTop}px` } as React.CSSProperties),
         ...screenStyle,
+        ...(screenInput ? { pointerEvents: 'auto' as const } : null),
         ...(rasterScale === 1
           ? null
           : {
@@ -573,7 +574,8 @@ function BridgedScreen({
           // Keep the inner transform div from hit-testing. It spans the screen
           // rect and would otherwise sit in front of user content that
           // legitimately wants to paint over the mockup.
-          pointerEvents="none"
+          pointerEvents={screenInput ? 'auto' : 'none'}
+          input={screenInput}
         >
         <style href={SCREEN_LAYER_STYLE_HREF} precedence="default">
           {SCREEN_LAYER_CSS}
@@ -596,7 +598,7 @@ function BridgedScreen({
                 width: resolution * rasterScale,
                 height: cssHeight * rasterScale,
                 overflow: 'hidden',
-                pointerEvents: 'none',
+                pointerEvents: screenInput ? 'auto' : 'none',
                 backfaceVisibility: 'hidden',
                 WebkitBackfaceVisibility: 'hidden',
               }}

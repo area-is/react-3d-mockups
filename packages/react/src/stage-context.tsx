@@ -21,6 +21,8 @@ export interface StageSettings {
   screenAccessibility: ScreenAccessibility
   /** The canvas's `delayCapture`, which each screen holds while its content lands. */
   delayCapture?: DelayCapture
+  /** EXPERIMENTAL: screens take pointer input (`experimentalScreenInput`). */
+  screenInput?: boolean
 }
 
 /**

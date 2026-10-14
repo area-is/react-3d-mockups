@@ -115,6 +115,7 @@ export {
   screenSurfaceStyle,
 } from './screen/surface'
 export { type BackfaceCuller, createBackfaceCuller } from './screen/backface'
+export { traceTransparent } from './screen/clip-trace'
 export {
   type StatusBarPlatform,
   type StatusBarFormFactor,
