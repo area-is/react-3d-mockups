@@ -534,6 +534,7 @@ function IPhoneImpl({
             {renderStatusBar(statusBar, statusBarPlacement)}
             <div
               aria-hidden
+              data-mockup-cutout=""
               style={{
                 position: 'absolute',
                 // the island hugs the panel's physical top - the left edge in landscape

@@ -508,6 +508,7 @@ function FlipImpl({
   const punchHoleOverlay = (
     <div
       aria-hidden
+      data-mockup-cutout=""
       style={{
         position: 'absolute',
         ...(landscape
@@ -586,6 +587,7 @@ function FlipImpl({
             {cam.rings.map(({ x, y, r }, i) => (
               <div
                 key={i}
+                data-mockup-cutout=""
                 style={coverAt(-x, y, r * 2, r * 2, {
                   borderRadius: '50%',
                   background: 'radial-gradient(circle at 38% 38%, #262f42 0%, #0a0c12 55%, #000 100%)',
@@ -594,6 +596,7 @@ function FlipImpl({
               />
             ))}
             <div
+              data-mockup-cutout=""
               style={coverAt(-cam.flash.x, cam.flash.y, cam.flash.r * 2, cam.flash.r * 2, {
                 borderRadius: '50%',
                 background: 'radial-gradient(circle at 45% 40%, #fdf7e4 0%, #d9d2bd 70%, #b7b19e 100%)',

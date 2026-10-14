@@ -1184,6 +1184,7 @@ function LaptopImpl({
               notchDims && (
               <div
                 aria-hidden
+                data-mockup-cutout=""
                 style={{
                   position: 'absolute',
                   top: 0,

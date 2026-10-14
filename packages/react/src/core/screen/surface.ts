@@ -31,7 +31,14 @@ export const SCREEN_LAYER_CLASS = 'react-3d-mockups-screen-layer'
  * canvas (see `screenSurfaceStyle`), so the canvas owns every gesture and its
  * own `canvasTouchAction` is the only touch policy in play.
  */
-export const SCREEN_LAYER_CSS = `.${SCREEN_LAYER_CLASS}{will-change:transform}`
+export const SCREEN_LAYER_CSS =
+  `.${SCREEN_LAYER_CLASS}{will-change:transform}` +
+  // EXPERIMENTAL (`experimentalScreenInput`): a camera cutout drawn over the
+  // content is hardware, so on a screen that takes input it catches the
+  // pointer instead of passing it to the content underneath. Devices mark
+  // theirs `data-mockup-cutout`; shading overlays (gloss, creases) are not
+  // marked and stay click-through.
+  `.${SCREEN_LAYER_CLASS}[data-screen-input] [data-mockup-cutout]{pointer-events:auto!important}`
 
 /** CSS px per world unit for a virtual display `resolution` CSS px wide. */
 export function screenPxPerUnit(resolution: number, width: number): number {

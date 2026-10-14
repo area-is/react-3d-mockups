@@ -196,7 +196,10 @@ export function ScreenPortal({
     element.style.cssText = 'position:absolute;top:0;left:0;pointer-events:none;overflow:hidden;'
     if (wrapperClass) element.className = wrapperClass
     // Above the canvas, nothing may show until the first frame has been traced.
-    if (input) element.style.clipPath = 'inset(50%)'
+    if (input) {
+      element.style.clipPath = 'inset(50%)'
+      element.dataset.screenInput = ''
+    }
     const mount: Mounted = {
       element,
       root: ReactDOM.createRoot(element),
