@@ -3,6 +3,7 @@
 import dynamic from 'next/dynamic'
 import type { MockupExplorerProps } from './mockup-explorer'
 import type { ImageExample } from './image-demo'
+import type { InputExample } from './input-demo'
 
 /**
  * Client-side entry point for the one MDX component that pulls in the 3D
@@ -44,4 +45,14 @@ const ImageDemoInner = dynamic(() => import('./image-demo').then((m) => m.ImageD
 /** The Images guide's live examples - the same chunking as the explorer, for the same reason. */
 export function ImageDemo(props: { example: ImageExample; height?: number }) {
   return <ImageDemoInner {...props} />
+}
+
+const InputDemoInner = dynamic(() => import('./input-demo').then((m) => m.InputDemo), {
+  ssr: false,
+  loading: () => <Placeholder height={460} />,
+})
+
+/** The Screen content page's examples of screens that take input - chunked like the others. */
+export function InputDemo(props: { example: InputExample; height?: number }) {
+  return <InputDemoInner {...props} />
 }

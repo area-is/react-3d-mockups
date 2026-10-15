@@ -7,7 +7,7 @@ import { DeviceDisclaimer } from './device-disclaimer'
 import { ModelGallery } from './model-gallery'
 // Through a `next/dynamic` shell: every docs page gets this map, and a static
 // import here shipped the whole 3D stack to prose-only pages.
-import { ImageDemo, MockupExplorer } from './lazy-mdx-demos'
+import { ImageDemo, InputDemo, MockupExplorer } from './lazy-mdx-demos'
 
 // The cast bridges a structural mismatch between fumadocs-ui's component map
 // and @types/mdx under our @types/react version; the shapes agree at runtime.
@@ -22,6 +22,7 @@ export function getMDXComponents(components?: MDXComponents): MDXComponents {
     ModelGallery,
     MockupExplorer,
     ImageDemo,
+    InputDemo,
     ...components,
   } as unknown as MDXComponents
 }
