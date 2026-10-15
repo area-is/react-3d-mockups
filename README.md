@@ -11,7 +11,7 @@
 </p>
 
 <p align="center">
-  <img src="assets/hero.png" alt="A 3D iPhone mockup with a live music-player UI on its screen, flanked by two more devices" width="820" />
+  <img src="assets/hero.png" alt="A laptop, a phone and a watch mockup, each screen showing the same budgeting app" width="820" />
 </p>
 
 <p align="center">
@@ -89,6 +89,8 @@ Every device and object has its own page with a live prop explorer.
 | --- | --- | --- |
 | [`packages/react`](packages/react) | `react-3d-mockups` | The published npm package - the whole library |
 | [`apps/docs`](apps/docs) | - | Next.js docs & live demos site |
+| [`examples/remotion`](examples/remotion) | - | Remotion project that renders mockups to video: the promo film, three campaign films and short looping clips. Not a workspace: it installs the package the way an app would |
+| [`infra/apex`](infra/apex) | - | The stand-in Worker for the `area.is` apex (see [DEPLOYMENT.md](apps/docs/DEPLOYMENT.md)) |
 
 Inside the package, `src/core` holds the specs, geometry math and screen/stage
 behavior, depends on `three` and never imports React; the rest of `src` is the
@@ -110,6 +112,7 @@ npm run typecheck  # typechecks both workspaces
 npm run test       # core unit tests (no DOM, no WebGL)
 npm run devices:check  # the sizes and counts the docs quote, against the library
 npm run size:check     # what importing each mockup costs, against the documented table
+npm run docs:examples  # every tsx/ts block in the READMEs and docs, compiled against the package
 npm run visual     # visual regression vs baselines (needs `npm run dev` running)
 npm run bench      # performance behaviour vs budgets (needs a running site)
 ```
@@ -121,7 +124,9 @@ less than they look.
 
 - **The package** is published to npm from CI, through npm Trusted Publishing,
   whenever a version bump is merged to `main`; the tag and GitHub Release follow
-  automatically. The steps are in [CONTRIBUTING.md](CONTRIBUTING.md#releasing).
+  automatically. To cut one, run **Prepare a release** from the Actions tab (or
+  `npm run release -- minor` locally) and merge the PR it opens. The details are
+  in [CONTRIBUTING.md](CONTRIBUTING.md#releasing).
 - **The docs site** runs on Cloudflare Workers (OpenNext), deployed by Workers
   Builds on push, and is served at a path on the apex. Everything about building,
   deploying and routing it - including the stand-in Worker for the `area.is` apex -
