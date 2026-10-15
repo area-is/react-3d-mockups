@@ -65,7 +65,8 @@ The `<div>` above stands in for your own content: any React component, an
   effects, and media playback all keep running, and text stays sharp at
   every angle. Screens are decorative - the DOM sits under the canvas so
   hardware covers it pixel for pixel, and every gesture belongs to the orbit
-  controls. See [Screen content](/docs/screen-content).
+  controls. See [Screen content](/docs/screen-content), which also covers the
+  experimental `experimentalScreenInput` for screens that take input.
 - **Studio lighting and soft shadows**, generated on the GPU with no HDR file
   downloads.
 - **A transparent canvas** by default, so your page background shows through.
@@ -74,10 +75,17 @@ The `<div>` above stands in for your own content: any React component, an
 
 ## What you do not get
 
-A working device. The screen shows your content live, but it is display-only:
-clicks, taps, scrolling and typing never reach it, because every gesture
-belongs to the orbit controls. If people need to use the app, render it on the
-page beside the mockup.
+A working device, by default. The screen shows your content live, but it is
+display-only: clicks, taps, scrolling and typing never reach it, because every
+gesture belongs to the orbit controls. If people need to use the app, render it
+on the page beside the mockup, or turn on the experimental
+[`experimentalScreenInput`](/docs/screen-content#experimental-screens-that-take-input):
+
+```tsx
+<GalaxyMockup experimentalScreenInput>
+  <YourApp />
+</GalaxyMockup>
+```
 
 ## Customize
 

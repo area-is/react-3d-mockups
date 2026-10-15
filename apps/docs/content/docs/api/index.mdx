@@ -68,6 +68,10 @@ it: `frameloop` · `pauseWhenOffscreen` · `dpr` · `time` · `delayCapture` ·
 [Rendering](/docs/api/mockup-canvas#rendering) and
 [Accessibility](/docs/accessibility).
 
+Two more are experimental, for screens that take input:
+`experimentalScreenInput` · `screenDrag`. See
+[Screen content](/docs/screen-content#experimental-screens-that-take-input).
+
 `MockupCanvas` has two more, `freeRotation` and `shadowY`, that a mockup does
 not advertise: a mockup's framing already derives the shadow's ground line
 from the object's spec, and the orbit clamp is chosen to look right. Compose
@@ -80,7 +84,8 @@ book's front cover. Objects with more printable surfaces expose each extra
 region as a compound slot on the component (`<AFrameSignMockup.Back>`,
 `<BookMockup.Spine>`); each mockup's page lists its slots in a Regions
 section. Every slot takes per-surface overrides - `surfaceBackground`,
-`resolution`, `surfaceStyle` - over the mockup-level defaults.
+`resolution`, `surfaceStyle` - over the mockup-level defaults, and, for
+screens that take input, `screenDrag`.
 
 ## Shared screen props
 

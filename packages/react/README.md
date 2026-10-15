@@ -10,8 +10,9 @@
 put on a device's screen is regular DOM, positioned on the glass with CSS 3D
 transforms, so it keeps running: React state and effects, video, iframes. The browser draws the text, so it
 stays sharp at any angle. By default the screens are display-only: you rotate and zoom
-the model, and hardware in front of a screen hides it pixel for pixel
-([why](#screens-are-display-only)).
+the model, and hardware in front of a screen hides it pixel for pixel. An experimental
+prop, `experimentalScreenInput`, lets the screens take clicks, scrolling and typing
+([Screens and input](#screens-and-input)).
 
 > **In active development.** The API may change over the next few weeks. Breaking changes
 > are listed in the [changelog](https://github.com/area-is/react-3d-mockups/blob/main/CHANGELOG.md) with what to change;
@@ -135,7 +136,8 @@ type `AFrameSignMockup.` and your editor lists exactly the regions the object ha
 
 A slot takes the same three surface settings a mockup does - `surfaceBackground`,
 `resolution`, `surfaceStyle` - and overrides the mockup's for that one region. One
-vocabulary, whichever element you hang it off. Every surface has a name, so content
+vocabulary, whichever element you hang it off. (A slot also takes `screenDrag`, for
+[screens that take input](#screens-and-input).) Every surface has a name, so content
 lands where the name says no matter what order you write the slots in:
 
 ```tsx
@@ -184,6 +186,8 @@ straight through to the model's group (`<IPhoneMockup rotation={[0, 0.25, 0]}>`)
 | `onCreated` | `(state) => void` | - | r3f's `onCreated`, e.g. to read `gl.info` |
 | `label` | `string` | per model | Accessible name; the canvas is exposed as `role="img"` ("3D mockup of an iPhone") |
 | `screenAccessibility` | `'hidden' \| 'visible'` | `'hidden'` | Screens are decorative, so by default they are `aria-hidden` and `inert`; `'visible'` exposes their content |
+| `experimentalScreenInput` | `boolean` | `false` | Experimental: the screens take pointer and keyboard input. See [Screens and input](#screens-and-input) |
+| `screenDrag` | `boolean` | `true` | With `experimentalScreenInput`: whether a drag that starts on a screen rotates the model. A slot's own `screenDrag` overrides it for that screen |
 | `className` | `string` | - | Class on the wrapper element |
 | `style` | `CSSProperties` | - | Style on the wrapper element, which fills its parent by default |
 
@@ -259,29 +263,46 @@ camera, the tight rear 2× Thunderbolt 5 + 2× USB-C slot cluster, the captive p
 cord's circular recess framed by the stand's cable hole and, faithfully, no power
 button.
 
-## Screens are display-only
+## Screens and input
 
-Content on the glass renders live, but pointer events never reach it: clicks,
-scrolling and typing all belong to the orbit controls, so a drag anywhere -
-body, background, or screen - rotates the model.
+By default, content on the glass renders live but takes no input: clicks,
+scrolling and typing go to the orbit controls, and a drag anywhere - body,
+background, or screen - rotates the model. A screen's DOM is stacked *under* the
+canvas and masked by the depth buffer, so anything in front of the screen covers
+it exactly: a laptop's keyboard hides the screen's reflection, a camera ring
+stands over a wrap, a bus's mirrors draw over the livery. A pointer over the
+screen lands on the canvas, not on the content.
 
-That is deliberate, and it is what buys the mockup its looks. A screen is real
-DOM composited into a WebGL scene, and where that DOM sits in the stacking
-order decides how hardware can hide it. react-3d-mockups always stacks it *under*
-the canvas and masks it with the depth buffer, so anything in front of the
-screen covers it exactly, pixel for pixel: a laptop's keyboard hides the
-screen's reflection, a proud camera ring stands over a wrap, a bus's mirrors
-draw over the livery.
+### Experimental: `experimentalScreenInput`
 
-Lifting the DOM above the canvas is the only way to make it clickable, and it
-costs exactly that masking - nothing in the scene can visually cover DOM that
-sits on top of it. Hiding degrades to an all-or-nothing guess from sample rays,
-which is wrong in both directions: content shows through hardware that should
-hide it, and a mostly-visible screen can blank out entirely. Mockups exist to
-look right, so that trade is not offered.
+```tsx
+<LaptopMockup experimentalScreenInput>
+  <YourApp />
+</LaptopMockup>
+```
 
-If you need a genuinely usable embedded app, render it in the page next to the
-mockup rather than on it.
+With it on, each screen's DOM is stacked above the canvas and clipped every frame
+to the part of it that no hardware covers, read from the canvas's own pixels.
+Clicks, hover, scrolling, focus and typing reach the content, iframes included,
+and hardware in front of a screen still covers it.
+
+A tap or click on a screen goes to the content. A drag that starts on a screen
+rotates the model once it has moved 10 px, unless:
+
+- `screenDrag={false}` is set on the mockup, or on that screen's slot
+  (`<LaptopMockup.Screen screenDrag={false}>`);
+- it starts on a form control (text field, slider, select, editable text) or
+  inside an element marked `data-mockup-no-rotate`;
+- the content captures the pointer with `setPointerCapture`.
+
+On touch, a mostly vertical swipe scrolls instead. Drags on the hardware and the
+background always rotate the model.
+
+What it costs: after every frame the canvas draws, each screen reads its pixels
+back from the canvas; the clipping and drag code (about 2 KB gzip) loads the first
+time a screen takes input; and the screens join the accessibility tree while it is
+on. The prop's name and behavior may change in a later release. The docs cover it
+in more detail: [Screen content](https://area.is/react-3d-mockups/docs/screen-content#experimental-screens-that-take-input).
 
 The screen renders in its own React root, and React context from above the mockup -
 a theme, i18n, your router, a query client - is bridged into it, so screen content

@@ -37,6 +37,8 @@ export const SHARED_PROPS: PropDoc[] = [
     {"name":"onCreated","type":"(state) => void","default":"-","description":"react-three-fiber's onCreated, called once with the canvas state (gl, scene, camera, ...) - for example to read gl.info."},
     {"name":"label","type":"string","default":"per model","description":"Accessible name of the canvas, which has role=\"img\". Mockups default to a description of the model (\"3D mockup of a Galaxy S phone\"); MockupCanvas on its own to \"3D mockup\". See Accessibility."},
     {"name":"screenAccessibility","type":"'hidden' | 'visible'","default":"'hidden'","description":"Whether screen content is exposed to assistive technology. 'hidden' marks every screen aria-hidden and inert, so decorative screen content stays out of the accessibility tree and the tab order; 'visible' exposes it."},
+    {"name":"experimentalScreenInput","type":"boolean","default":"false","description":"Experimental. The screens take pointer and keyboard input: each screen's DOM is stacked above the canvas and clipped every frame to the part no hardware covers. Screens join the accessibility tree while it is on. See Screen content."},
+    {"name":"screenDrag","type":"boolean","default":"true","description":"With experimentalScreenInput: whether a drag that starts on a screen rotates the model (after 10 px, unless the content claims the drag). false leaves every drag on the screens to the content. A slot's own screenDrag overrides it for that screen. See Who gets a drag."},
     {"name":"className","type":"-","default":"-","description":"Forwarded to the canvas wrapper."},
     {"name":"style","type":"-","default":"-","description":"Forwarded to the canvas wrapper."},
   ]

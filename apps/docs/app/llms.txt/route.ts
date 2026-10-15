@@ -18,7 +18,7 @@ const HEADER = `# react-3d-mockups
 
 > 3D device and object mockups for React, rendered with three.js and react-three-fiber. Your content - React components, images, video, iframes - renders as live DOM on the screen or printable surface of a procedurally generated model: ${DEVICES.length} devices (phones, foldables, tablets, laptops, watches, a monitor) and ${OBJECTS.length} objects (print, packaging, out-of-home, vehicles, a TV, custom-size panels and boxes).
 
-Install with \`npm install react-3d-mockups three @react-three/fiber @react-three/drei\` (React 19). Screens are display-only: content renders live, but pointer input goes to the orbit controls, never to the screen. WebGL only exists in the browser, so SSR frameworks load mockups client side. The full text of every page below is at ${absoluteUrl('/llms-full.txt')}.`
+Install with \`npm install react-3d-mockups three @react-three/fiber @react-three/drei\` (React 19). By default screens are display-only: content renders live, but pointer input goes to the orbit controls, never to the screen. The experimental \`experimentalScreenInput\` prop lets screens take input, clipped to the part no hardware covers. WebGL only exists in the browser, so SSR frameworks load mockups client side. The full text of every page below is at ${absoluteUrl('/llms-full.txt')}.`
 
 function item(url: string) {
   const page = source.getPages().find((p) => p.url === url)
