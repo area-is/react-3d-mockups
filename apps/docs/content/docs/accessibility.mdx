@@ -38,7 +38,20 @@ expose it with `screenAccessibility="visible"`:
 ```
 
 Keep links and buttons off a screen you expose: they would be announced, but a
-pointer can never reach them - [screens are display-only](/docs/screen-content#why-screens-are-display-only).
+pointer can never reach them - [screens are display-only](/docs/screen-content#why-screens-are-display-only)
+unless they take input.
+
+## Screens that take input
+
+With the experimental
+[`experimentalScreenInput`](/docs/screen-content#experimental-screens-that-take-input),
+the screens join the accessibility tree whatever `screenAccessibility` says:
+content that takes a click has to be reachable without a pointer too. Screen
+layers are no longer `aria-hidden` or `inert`, so their headings are part of
+your page's outline, screen readers read them, and the Tab key moves into them.
+Treat the screen's content the way you would the same component placed on the
+page: real headings and labels, and controls that work from the keyboard. The
+canvas keeps its own tab stop and arrow-key orbit.
 
 ## Keyboard
 

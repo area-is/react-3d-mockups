@@ -24,7 +24,9 @@
 positioned on the glass with CSS 3D transforms, so it keeps running: React state and
 effects, video, iframes. The browser draws the text, so it stays sharp at any angle. By default the
 screens don't take input: dragging rotates the model, and hardware in front of a
-screen hides it pixel for pixel.
+screen hides it pixel for pixel. An experimental prop, `experimentalScreenInput`,
+lets them take clicks, scrolling and typing while hardware still covers them
+([how it works](https://area.is/react-3d-mockups/docs/screen-content#experimental-screens-that-take-input)).
 
 > **In active development.** The API may change over the next few weeks. Breaking changes
 > are listed in the [changelog](CHANGELOG.md) with what to change; pin an exact version

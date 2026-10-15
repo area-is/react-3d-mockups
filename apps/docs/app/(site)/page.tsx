@@ -239,7 +239,7 @@ export default function HomePage() {
           command is the first thing under the carousel instead. */}
       <section className="hero">
         <p className="eyebrow">An open-source React library</p>
-        <h1>3D device mockups for React</h1>
+        <h1>3D mockups for React</h1>
         <div className="hero-cta">
           <Link className="btn btn-primary" href="/docs/quick-start">
             Get started

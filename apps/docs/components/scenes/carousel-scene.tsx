@@ -51,7 +51,7 @@ import {
   type Colorway,
   type MockupKind,
 } from 'react-3d-mockups'
-import { DEFAULT_CAMERA_FOV, ORBIT } from 'react-3d-mockups/core'
+import { DEFAULT_CAMERA_FOV, ORBIT, tumbleAutoRotateStep } from 'react-3d-mockups/core'
 import { BillboardAdArt, ChalkHoursArt, ChalkMenuArt } from '../screens/print-art'
 import { SUNPEEL_FLAVOURS, SunpeelRear, SunpeelSide } from '../screens/bus-wrap'
 import { CartonBack, CartonFacts, CartonFront, CartonRoof, CartonStory } from '../screens/carton-art'
@@ -181,6 +181,14 @@ const CAROUSEL_OPEN_ANGLE = 150
 
 /** Resting pose - a slight turn reads as three-dimensional at a glance. */
 const BASE_RY = -0.3
+
+/**
+ * How fast the model on stage turns while autoplay runs, as the library's
+ * `autoRotate` speed: 2 is two turns a minute, about 72 degrees over one
+ * six-second slide - enough to read as turning, not so much that the screen
+ * spends the slide facing away.
+ */
+const STAGE_SPIN_SPEED = 2
 /**
  * Vertical limit, matched to the stage's polar clamp: the library's controls
  * orbit the camera between `ORBIT.minPolarAngle` and its mirror, which from a
@@ -958,16 +966,26 @@ function StageSlot({
   index,
   anim,
   tumble,
+  spin,
   color,
 }: {
   entry: Entry
   index: number
   anim: RefObject<number>
   tumble: RefObject<Tumble>
+  /** Whether the model on stage turns on its own: autoplay is running. */
+  spin: RefObject<boolean>
   color: string
 }) {
   const group = useRef<Group>(null)
   const hovered = useRef(false)
+  /*
+   * This slot's own turn, not the shared tumble's: the tumble resets on every
+   * slide change, which would snap the outgoing model back mid-flight. Kept
+   * per slot and weighted by `near` like the tumble, the turn eases out as
+   * the model slides off stage, and starts from nothing on its next visit.
+   */
+  const turn = useRef(0)
 
   /*
    * Priority -1, then an explicit matrix flush.
@@ -979,7 +997,7 @@ function StageSlot({
    * itself from where the device used to be, and the DOM visibly trails the
    * body while a slide is in flight.
    */
-  useFrame((state) => {
+  useFrame((state, delta) => {
     const g = group.current
     if (!g) return
     const extent = extentOf(entry, g)
@@ -988,12 +1006,16 @@ function StageSlot({
     // distinguishes the device on stage from the ones flanking it.
     const t = Math.min(Math.abs(d), 1)
     const near = 1 - t
+    // Only the model on stage turns; a frame after a hidden tab is clamped so
+    // it cannot jump.
+    if (spin.current && t < 0.5) turn.current += tumbleAutoRotateStep(Math.min(delta, 0.1), STAGE_SPIN_SPEED)
+    else if (t >= 1) turn.current = 0
     const scale = extent.scale * (1 - (1 - SIDE_SCALE) * t) * (hovered.current && t > 0.5 ? 1.05 : 1)
     g.position.x = d * SPACING - extent.cx * scale
     g.position.y = STAGE_Y - extent.cy * scale + Math.sin(state.clock.elapsedTime * 1.1) * 0.05 * near
     g.position.z = -1.4 * t
     g.scale.setScalar(scale)
-    g.rotation.y = (entry.yaw ?? 0) + BASE_RY + (tumble.current.yaw - BASE_RY) * near
+    g.rotation.y = (entry.yaw ?? 0) + BASE_RY + (tumble.current.yaw - BASE_RY + turn.current) * near
     g.rotation.x = ((entry.tilt ?? 0) + tumble.current.pitch) * near
     g.updateMatrixWorld(true)
   }, -1)
@@ -1218,6 +1240,13 @@ export default function CarouselScene() {
   const stageRef = useRef<HTMLDivElement>(null)
   const onScreen = useOnScreen(stageRef)
   const playing = autoOn && ready && onScreen
+  // Read every frame by the staged slots: the model on stage turns while
+  // autoplay runs, and stops with it - on Pause, at the first interaction,
+  // off screen, and under a reduced-motion preference.
+  const spinning = useRef(false)
+  useEffect(() => {
+    spinning.current = playing
+  }, [playing])
 
   useEffect(() => {
     if (!playing) return
@@ -1586,6 +1615,7 @@ export default function CarouselScene() {
                     index={i}
                     anim={anim}
                     tumble={tumble}
+                    spin={spinning}
                     color={colorOf(dev)}
                   />
                 ) : null
