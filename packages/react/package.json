@@ -1,6 +1,6 @@
 {
   "name": "react-3d-mockups",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "3D device and object mockups for React, built on three.js. What you put on a screen is live DOM: components, video and iframes keep running.",
   "keywords": [
     "react",
