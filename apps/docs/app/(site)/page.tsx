@@ -96,7 +96,8 @@ const FEATURES = [
       <>
         Pass React components, video or an <code>&lt;iframe&gt;</code> as children: it stays
         live DOM, CSS3D-transformed onto the glass, with state and playback running.
-        Screens are display-only - a drag orbits the device.
+        Screens are display-only by default - a drag orbits the device. The experimental{' '}
+        <code>experimentalScreenInput</code> prop lets them take clicks, scrolling and typing.
       </>
     ),
   },

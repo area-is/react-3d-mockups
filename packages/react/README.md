@@ -1,7 +1,7 @@
 # react-3d-mockups
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/area-is/react-3d-mockups/main/assets/hero.png" alt="A 3D iPhone mockup with a live music-player UI on its screen, flanked by two more devices" width="720" />
+  <img src="https://raw.githubusercontent.com/area-is/react-3d-mockups/main/assets/hero.png" alt="A laptop, a phone and a watch mockup, each screen showing the same budgeting app" width="720" />
 </p>
 
 [Docs, live demos and a gallery of all 58 models →](https://area.is/react-3d-mockups/docs/gallery)
@@ -39,9 +39,10 @@ prop, `experimentalScreenInput`, lets the screens take clicks, scrolling and typ
   every face it has: a box on all six panels, a bus on both flanks, its tail and its
   LED destination sign.
 - **Small imports** - each mockup is its own module, so an app ships only what it
-  imports: about 14–21 KB gzipped for an object, about 60 KB for a device (two thirds
-  of it the CSG engine, shared by every device), 144 KB for the whole library, peers
-  excluded.
+  imports: about 15–23 KB gzipped for an object, about 60 KB for a device (two thirds
+  of it the CSG engine, shared by every device), 146 KB for the whole library, peers
+  excluded. The experimental screen input adds about 2 KB, loaded only when a screen
+  takes input.
 - **True-to-device screens** - each virtual display matches the real device's logical
   resolution in portrait *and* landscape (table below), so your breakpoints match the
   device's.
@@ -375,6 +376,22 @@ primary.px // { width: 440, height: 956 }
 
 None of it needs a browser, so it works in a Server Component, a build script or
 Node. See [Measuring a mockup](https://area.is/react-3d-mockups/docs/api/mockup-info).
+
+Every device variant belongs to a product line in `DEVICE_LINEUP`, and
+`deviceLifecycle(kind, variant)` says where it stands: `current` (the newest in its
+line), `superseded` (a newer model is in the catalog; still fully supported) or
+`deprecated` (scheduled for removal, with the release that removes it):
+
+```ts
+import { deviceLifecycle } from 'react-3d-mockups/core'
+
+deviceLifecycle('iphone', 'pro')
+// { name: 'iPhone 17 Pro', line: 'iPhone Pro', status: 'superseded',
+//   successors: [{ variant: '18pro', name: 'iPhone 18 Pro' }], … }
+```
+
+See [Older devices](https://area.is/react-3d-mockups/docs/roadmap#older-devices) for how models are
+retired.
 
 ## Architecture
 

@@ -1128,6 +1128,53 @@ code {
   color: var(--accent-2);
 }
 
+/*
+ * Autoplay's dwell bar: a 2px line along the foot of the Pause button, inset
+ * from its rounded ends, that drains left over one slide while autoplay is on.
+ * It is the timer, not a picture of one - its animationend moves the carousel
+ * on - so it pauses whenever autoplay waits (off screen, a hidden tab, before
+ * the first frame), and the reduced-motion rule at the end of this file must
+ * not shorten it.
+ */
+.carousel-tool {
+  position: relative;
+}
+
+.carousel-dwell {
+  position: absolute;
+  left: 14px;
+  right: 14px;
+  bottom: 4px;
+  height: 2px;
+  border-radius: 1px;
+  background: rgba(255, 255, 255, 0.1);
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.carousel-dwell-fill {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--accent);
+  transform-origin: left center;
+  animation: carousel-dwell var(--dwell, 6s) linear forwards;
+  animation-play-state: paused;
+}
+
+.carousel-dwell-fill[data-running='true'] {
+  animation-play-state: running;
+}
+
+@keyframes carousel-dwell {
+  from {
+    transform: scaleX(1);
+  }
+  to {
+    transform: scaleX(0);
+  }
+}
+
 .carousel-tools-rule {
   width: 1px;
   height: 16px;
@@ -1953,6 +2000,13 @@ code {
     transition-duration: 0.001ms !important;
     scroll-behavior: auto !important;
   }
+
+  /* Except the carousel's dwell bar, which is a timer: shortened, it would end
+     at once and run autoplay through every slide in a blink. It only shows at
+     all for a visitor who pressed Play. */
+  .carousel-dwell-fill {
+    animation-duration: var(--dwell, 6s) !important;
+  }
 }
 
 /* ------------------------------------------------------------------ */
@@ -1979,10 +2033,16 @@ code {
 
 /*
  * WCAG 2.2.2: moving content that runs longer than five seconds needs a way to
- * stop it. The carousel has three: the pause/play toggle under the stage
+ * stop it. Autoplay has three: the pause/play toggle under the stage
  * (`.carousel-tool` in `.carousel-tools`), a permanent stop at the first arrow, swatch or drag, and
  * `prefers-reduced-motion`, which keeps autoplay from starting at all. (An
  * earlier version dropped the toggle by request and leaned on the other two;
  * the 2026-09 audit asked for it back, since a visitor who wants the motion
  * gone should not have to change a system setting or touch the carousel.)
+ *
+ * The model on stage also turns slowly on its own, and that turn is NOT tied
+ * to the toggle - Pause stops the carousel moving on, not the model turning,
+ * by request. Only `prefers-reduced-motion` stops it (and a drag holds it
+ * while the visitor has the model in hand), so the toggle alone no longer
+ * stops all motion on the stage.
  */

@@ -183,12 +183,14 @@ const CAROUSEL_OPEN_ANGLE = 150
 const BASE_RY = -0.3
 
 /**
- * How fast the model on stage turns while autoplay runs, as the library's
- * `autoRotate` speed: 2 is two turns a minute, about 72 degrees over one
- * six-second slide - enough to read as turning, not so much that the screen
- * spends the slide facing away.
+ * How fast the model on stage turns, as the library's `autoRotate` speed: 2
+ * is two turns a minute, about 72 degrees over one slide - enough to read as
+ * turning, not so much that the screen spends the slide facing away.
  */
 const STAGE_SPIN_SPEED = 2
+
+/** How long autoplay holds each slide: the dwell bar's length, in milliseconds. */
+const DWELL_MS = 6000
 /**
  * Vertical limit, matched to the stage's polar clamp: the library's controls
  * orbit the camera between `ORBIT.minPolarAngle` and its mirror, which from a
@@ -973,7 +975,11 @@ function StageSlot({
   index: number
   anim: RefObject<number>
   tumble: RefObject<Tumble>
-  /** Whether the model on stage turns on its own: autoplay is running. */
+  /**
+   * Whether the model on stage turns on its own: always, except under a
+   * reduced-motion preference and while the visitor is turning it by hand.
+   * Autoplay has no say - it only decides when the carousel moves on.
+   */
   spin: RefObject<boolean>
   color: string
 }) {
@@ -1240,19 +1246,26 @@ export default function CarouselScene() {
   const stageRef = useRef<HTMLDivElement>(null)
   const onScreen = useOnScreen(stageRef)
   const playing = autoOn && ready && onScreen
-  // Read every frame by the staged slots: the model on stage turns while
-  // autoplay runs, and stops with it - on Pause, at the first interaction,
-  // off screen, and under a reduced-motion preference.
+  // Read every frame by the staged slots. The model on stage turns whether
+  // or not autoplay runs - Play and Pause only decide whether the carousel
+  // moves on - except under a reduced-motion preference, and while the
+  // visitor is turning it by hand (see the pointer handlers).
   const spinning = useRef(false)
+  const motionOk = useRef(false)
   useEffect(() => {
-    spinning.current = playing
-  }, [playing])
+    motionOk.current = !reducedMotion
+    spinning.current = !reducedMotion
+  }, [reducedMotion])
 
-  useEffect(() => {
-    if (!playing) return
-    const t = setInterval(() => step(1), 6000)
-    return () => clearInterval(t)
-  }, [playing, step])
+  /*
+   * No interval: the dwell bar under the Play button is the timer. It is a
+   * CSS animation that runs while `playing` and pauses otherwise (off screen,
+   * a hidden tab, before the first frame), so what the visitor sees left on
+   * the bar is exactly what is left of the slide, and its end moves the
+   * carousel on. `dwell` restarts it from full when Play is pressed.
+   */
+  const [dwell, setDwell] = useState(0)
+  const onDwellEnd = () => step(1)
 
   const announce = useCallback((i: number) => {
     const to = ((i % N) + N) % N
@@ -1265,10 +1278,10 @@ export default function CarouselScene() {
     announce(i)
   }
   /**
-   * Play moves on at once rather than six seconds later: a button that
-   * appears to do nothing for the length of a slide reads as broken, and the
-   * step says what the button is for. The interval restarts from the press,
-   * so the next slide is a full slide away.
+   * Play starts a full slide's wait rather than jumping on: the dwell bar
+   * appears under the button and starts shrinking, which says what the button
+   * did (a button that seemed to do nothing for six seconds used to read as
+   * broken, so Play stepped at once).
    */
   const toggleAuto = () => {
     if (autoOn) {
@@ -1276,9 +1289,7 @@ export default function CarouselScene() {
       return
     }
     setAuto(true)
-    const to = activeRef.current + 1
-    goTo(to)
-    announce(to)
+    setDwell((n) => n + 1)
   }
 
   const fit = useCarouselFit(sectionRef)
@@ -1369,6 +1380,9 @@ export default function CarouselScene() {
       at: e.timeStamp,
     }
     if (sectionRef.current) sectionRef.current.dataset.dragging = 'true'
+    // The visitor has the model in hand: it holds still for them, and turns on
+    // from wherever they leave it.
+    if (zone === 'device') spinning.current = false
     // Touch has no hover, so this is the first chance to say which gesture the
     // finger is on: without it the edge under a tap never lights up.
     setZone(e.clientX, e.clientY)
@@ -1420,6 +1434,7 @@ export default function CarouselScene() {
   const onPointerUp = (e: ReactPointerEvent<HTMLDivElement>) => {
     const d = drag.current
     drag.current = null
+    spinning.current = motionOk.current
     if (sectionRef.current) sectionRef.current.dataset.dragging = 'false'
     if (!d) return
     if (!d.moved) {
@@ -1581,6 +1596,7 @@ export default function CarouselScene() {
           onPointerUp={onPointerUp}
           onPointerCancel={() => {
             drag.current = null
+            spinning.current = motionOk.current
             if (sectionRef.current) sectionRef.current.dataset.dragging = 'false'
           }}
           onPointerLeave={() => {
@@ -1671,6 +1687,19 @@ export default function CarouselScene() {
           >
             {autoOn ? <Pause size={15} strokeWidth={2} aria-hidden /> : <Play size={15} strokeWidth={2} aria-hidden />}
             <span>{autoOn ? 'Pause' : 'Play'}</span>
+            {/* What is left of this slide while autoplay is on; its end moves
+                the carousel on. Keyed on the slide, so each one starts full. */}
+            {autoOn ? (
+              <span className="carousel-dwell" aria-hidden>
+                <span
+                  key={`${active}-${dwell}`}
+                  className="carousel-dwell-fill"
+                  data-running={playing}
+                  style={{ '--dwell': `${DWELL_MS}ms` } as CSSProperties}
+                  onAnimationEnd={onDwellEnd}
+                />
+              </span>
+            ) : null}
           </button>
           {code ? (
             <>

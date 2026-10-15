@@ -214,8 +214,74 @@ exactly where the screen is the nearest surface. So the clip follows the same
 per-pixel test as the default, and a laptop seen from below still hides the
 bottom of its display behind its base.
 
-It is experimental: the name and the behavior may change in any release. What
-it costs:
+### Examples
+
+A form: type in the field, pick a plan, tick the box and submit. Drag from
+anywhere else on the screen, or from the laptop itself, to turn it.
+
+<InputDemo example="form" />
+
+```tsx
+import { useState } from 'react'
+
+function SignUpForm() {
+  const [name, setName] = useState('')
+  const [sent, setSent] = useState(false)
+  return (
+    <form onSubmit={(e) => { e.preventDefault(); setSent(true) }}>
+      <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Name" />
+      <button type="submit">Sign up</button>
+      {sent ? <p>{name} signed up.</p> : null}
+    </form>
+  )
+}
+
+<LaptopMockup experimentalScreenInput>
+  <SignUpForm />
+</LaptopMockup>
+```
+
+A feed: scroll it with the wheel or a finger, and tap a heart to like a post.
+A horizontal drag turns the phone; on touch, a vertical swipe scrolls the feed.
+
+<InputDemo example="feed" />
+
+```tsx
+<IPhoneMockup experimentalScreenInput statusBar>
+  {/* Any element that scrolls on the page scrolls on the screen. */}
+  <div style={{ height: '100%', overflowY: 'auto' }}>
+    <Feed />
+  </div>
+</IPhoneMockup>
+```
+
+A sketch pad, where every drag on the screen draws. `screenDrag={false}`
+leaves all of the screen's drags to the content; turn the iPad by its bezel or
+the background around it.
+
+<InputDemo example="sketch" />
+
+```tsx
+<IPadMockup experimentalScreenInput screenDrag={false}>
+  <SketchPad />
+</IPadMockup>
+```
+
+A page in an `<iframe>`: the button inside it counts its presses, in a
+document of its own.
+
+<InputDemo example="iframe" />
+
+```tsx
+<LaptopMockup experimentalScreenInput>
+  <iframe src="/embedded" title="An embedded page" style={{ width: '100%', height: '100%', border: 0 }} />
+</LaptopMockup>
+```
+
+### What it costs
+
+It is experimental: the name and the behavior may change in any release, and
+it is not free:
 
 - **A readback every frame.** After each frame the canvas draws, every screen
   reads the canvas's pixels under it back from the GPU, which makes the CPU
