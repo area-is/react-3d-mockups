@@ -109,6 +109,7 @@ export {
   screenCssHeight,
   screenCornerRadiusCss,
   screenDistanceFactor,
+  screenDepthScale,
   screenRasterScale,
   type ScreenSurfaceStyleOptions,
   type ScreenSurfaceStyle,
