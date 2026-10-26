@@ -7,6 +7,21 @@ breaking change can ship in a minor release, and is always listed under
 
 ## Unreleased
 
+### Fixed
+
+- **Screens off their glass in Safari and on iPhone.** A live screen could
+  be drawn tens of pixels away from the display it belongs on in WebKit
+  (every iOS browser and desktop Safari). The
+  Galaxy Watch explorer on a 430 px wide iPhone put the watch face about
+  30 px above its glass. The HTML bridge maps camera space in world units,
+  so a screen sat a few pixels in front of a perspective eye hundreds of
+  pixels away, and WebKit's sub-pixel rounding of an odd or fractional
+  canvas size (WebKit bug 263454) was multiplied some 70 times on the way
+  to the page. The bridge now scales camera space so each screen sits on
+  the perspective plane (`screenDepthScale`, new in `react-3d-mockups/core`
+  for other bindings), which leaves the projection unchanged and the
+  rounding at its own size.
+
 ## 0.2.0 - 2026-10-14
 
 ### Added

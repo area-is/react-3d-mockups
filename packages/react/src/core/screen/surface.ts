@@ -122,6 +122,37 @@ export function screenDistanceFactor(width: number, resolution: number): number 
   return (400 * width) / resolution
 }
 
+/**
+ * The uniform scale the HTML bridge applies to camera space under a CSS
+ * `perspective`, so the screen sits ON the perspective plane instead of a
+ * hair in front of the eye.
+ *
+ * The bridge (drei's `<Html transform>`, three's CSS3DRenderer) maps camera
+ * space onto the page as `perspective(p) translateZ(p) matrix3d(view)`, with
+ * the view matrix in WORLD units. A watch 7.7 units from the camera then
+ * sits 7.7 px from a perspective eye 543 px away, where w = 7.7 / 543 and
+ * every sub-pixel the browser rounds - the perspective origin, the layer's
+ * own origin, the box it snaps to - is multiplied 70 times on the way to the
+ * screen. WebKit rounds them differently from each other whenever the
+ * canvas is an odd or fractional number of pixels (WebKit bug 263454): on a
+ * 430 px wide iPhone, a 396x395.59 px canvas threw the Galaxy Watch's face
+ * about 30 px off its glass.
+ *
+ * A perspective projection is unchanged by scaling camera space uniformly
+ * (x / -z is the same for sx / -sz), so scaling it by `perspective / depth`
+ * moves nothing on the page and puts a screen `depth` units in front of the
+ * camera at w = 1 - where a rounding error stays the size it was.
+ *
+ * `depth` is the screen's distance in front of the camera along its view
+ * axis, in world units; anything not in front of it gets 1, since it is not
+ * shown.
+ */
+export function screenDepthScale(perspective: number, depth: number): number {
+  if (!(perspective > 0) || !(depth > 0)) return 1
+  const scale = perspective / depth
+  return Number.isFinite(scale) ? scale : 1
+}
+
 export interface ScreenSurfaceStyleOptions {
   /** Active display size in world units. */
   width: number

@@ -59,6 +59,9 @@ What that puts in the core today:
   work, minus the framework portal itself:
   - `screenSurfaceStyle`, `screenCssHeight`, `screenCornerRadiusCss`,
     `screenDistanceFactor` - the CSS-pixel math mapping a world-unit display onto DOM;
+  - `screenDepthScale` - the uniform scale of camera space that puts a screen on
+    the CSS perspective plane, so the browser's sub-pixel rounding is not
+    multiplied on the way to the page (WebKit's threw screens off their glass);
   - `SCREEN_LAYER_CLASS` / `SCREEN_LAYER_CSS` - the compositor-layer promotion the
     bridge element needs;
   - `createBackfaceCuller` - hides the DOM plane when it faces away from the camera.
@@ -123,6 +126,7 @@ is built on:
 2. **Screen** - a `DeviceScreen` equivalent over the renderer's HTML bridge
    (`ScreenPortal` in React, a port of drei's `<Html transform>`): wrapper class
    `SCREEN_LAYER_CLASS`, inject `SCREEN_LAYER_CSS`, scale by `screenDistanceFactor`,
+   scale the bridge's camera space by `screenDepthScale` under its perspective,
    style the content div with `screenSurfaceStyle`, put the bridge in the renderer's
    depth-blending mode with the screen silhouette as its occluder geometry, and run
    `createBackfaceCuller` once per frame. The canvas keeps `pointer-events: auto`

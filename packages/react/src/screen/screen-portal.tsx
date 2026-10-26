@@ -6,7 +6,9 @@
  *
  * Adapted from `<Html transform occlude="blending">` in @react-three/drei
  * (MIT License, Copyright (c) 2020 react-spring), trimmed to the one way the
- * screens use it. The CSS matrix maths below is drei's, unchanged.
+ * screens use it. The CSS matrix maths below is drei's, but for one uniform
+ * scale of camera space that keeps WebKit's rounding from throwing the
+ * screen off its glass (see `screenDepthScale`).
  *
  * It is ours rather than drei's for one reason: React root lifetime. drei
  * creates the wrapper element once per component and unmounts the root
@@ -25,6 +27,7 @@ import { DoubleSide, OrthographicCamera, PerspectiveCamera, Vector3 } from 'thre
 import type * as THREE from 'three'
 import { addAfterEffect, useFrame, useThree } from '@react-three/fiber'
 import { stackSurfaces, surfaceCorners } from '../core/screen/stacking'
+import { screenDepthScale } from '../core/screen/surface'
 import type { ScreenDragHandoff } from '../core/screen/drag-handoff'
 
 type ScreenInputModule = typeof import('./screen-input')
@@ -353,9 +356,13 @@ export function ScreenPortal({
     const heightHalf = size.height / 2
     const fov = camera.projectionMatrix.elements[5]! * heightHalf
     const ortho = camera as THREE.OrthographicCamera
+    // Camera space scaled to put the screen on the perspective plane, where
+    // the browser's rounding is not multiplied (see `screenDepthScale`).
+    const depth = -v1.setFromMatrixPosition(anchor.matrixWorld).applyMatrix4(camera.matrixWorldInverse).z
+    const s = screenDepthScale(fov, depth)
     const cameraTransform = ortho.isOrthographicCamera
       ? `scale(${fov})translate(${epsilon(-(ortho.right + ortho.left) / 2)}px,${epsilon((ortho.top + ortho.bottom) / 2)}px)`
-      : `translateZ(${fov}px)`
+      : `translateZ(${fov}px)scale3d(${s},${s},${s})`
     element.style.width = `${size.width}px`
     element.style.height = `${size.height}px`
     element.style.perspective = ortho.isOrthographicCamera ? '' : `${fov}px`
