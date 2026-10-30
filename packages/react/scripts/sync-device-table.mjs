@@ -55,6 +55,7 @@ const ROWS = {
   ipadair11: ['ipad', { variant: 'ipadair11' }],
   ipad11: ['ipad', { variant: 'ipad11' }],
   tabs11: ['galaxyTab', { variant: 'tabs11' }],
+  tabs12plus: ['galaxyTab', { variant: 'tabs12plus' }],
   tabs11ultra: ['galaxyTab', { variant: 'tabs11ultra' }],
   tabs12ultra: ['galaxyTab', { variant: 'tabs12ultra' }],
   series11: ['appleWatch', { variant: 'series11' }],

@@ -124,6 +124,9 @@ export const DEVICES = [
   device('galaxy-tab-s11', 'Galaxy Tab S11', 'GalaxyTabMockup', 'tabs11', 'device=tablet&variant=tabs11&color=gray&ry=-22', 'Tablets', [
     'galaxy tab', 'samsung tablet', 'android tablet', 'tablet', 'tabs11',
   ]),
+  device('galaxy-tab-s12-plus', 'Galaxy Tab S12+', 'GalaxyTabMockup', 'tabs12plus', 'device=tablet&variant=tabs12plus&color=silver&ry=-22', 'Tablets', [
+    'tab s12+', 'tab s12 plus', 'galaxy tab plus', 'samsung tablet', 'android tablet', 'tablet', 'tabs12plus',
+  ]),
   device('galaxy-tab-s11-ultra', 'Galaxy Tab S11 Ultra', 'GalaxyTabMockup', 'tabs11ultra', 'device=tablet&variant=tabs11ultra&color=silver&ry=-22', 'Tablets', [
     'tab ultra', 'samsung tablet', 'android tablet', 'tablet', 'tabs11ultra',
   ]),

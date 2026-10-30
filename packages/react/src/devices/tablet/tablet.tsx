@@ -633,7 +633,8 @@ export const IPad = Object.assign(IPadImpl, tabletSlots)
 export interface GalaxyTabProps extends TabletCommonProps {
   /**
    * Which Galaxy Tab to render, at true relative sizes: `tabs11` (Tab S11,
-   * 11" - the default), `tabs11ultra` (Tab S11 Ultra, 14.6", with the
+   * 11" - the default), `tabs12plus` (Tab S12+, 12.6", the S11's single
+   * ring and bezel camera), `tabs11ultra` (Tab S11 Ultra, 14.6", with the
    * display notch and dual camera rings) or `tabs12ultra` (Tab S12 Ultra -
    * the S11 Ultra's body, new internals).
    */

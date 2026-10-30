@@ -228,6 +228,7 @@ const DEVICES: Record<string, ExplorerSpec> = {
     label: 'Galaxy Tab S11',
     variants: [
       { id: 'tabs11', label: 'Galaxy Tab S11' },
+      { id: 'tabs12plus', label: 'Galaxy Tab S12+' },
       { id: 'tabs11ultra', label: 'Galaxy Tab S11 Ultra' },
       { id: 'tabs12ultra', label: 'Galaxy Tab S12 Ultra' },
     ],

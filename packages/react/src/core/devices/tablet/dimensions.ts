@@ -73,9 +73,10 @@ export interface TabletSpec {
    * layout diagram).
    */
   sideButtons: { y: number; length: number }[]
-  /** Which short edge carries the USB-C port in portrait. The Galaxy Tabs'
-   * port sits on the edge adjacent to the camera corner - the portrait TOP
-   * edge (it centers on the landscape-left edge); iPads use the bottom. */
+  /** Which short edge carries the USB-C port in portrait. The Tab S11 specs
+   * put it on the edge adjacent to the camera corner - the portrait TOP edge
+   * (it centers on the landscape-left edge); the Tab S12+ and the iPads use
+   * the bottom. */
   usbEdge?: 'top' | 'bottom'
   /**
    * Stylus attachment strip on the portrait right edge (the landscape-top
@@ -335,6 +336,75 @@ const TAB_S11: TabletSpec = {
 }
 
 /**
+ * Galaxy Tab S12+ (12.6", Sep 2026 - a size of its own; there was no Tab
+ * S11+): 289.5 x 187.8 x 5.3 mm, 12.6" 2800x1752 (16:10) AMOLED. The panel
+ * is derived from the published diagonal and grid (271.3 x 169.8 mm), which
+ * leaves a uniform ~9.0 mm bezel and NO notch: Samsung's front render and
+ * the launch hands-ons show the 12 MP front camera as a dot centered in the
+ * landscape-top bezel, ~4 mm in from the edge - the Tab S11's arrangement,
+ * not the Ultra's. Single 13 MP rear ring + flash; keys on the landscape-top
+ * edge at the camera end; three keyboard pogo dots; quad speaker slots;
+ * USB-C on the short edge AWAY from the camera. Logical resolution 876x1400
+ * dp (xhdpi estimate, the panel at half scale, as on the other Tabs).
+ *
+ * Measured off Samsung's orthographic front render (6.27 px/mm; its body
+ * outline is 1.5416:1 against the published 1.5415) and GSMArena's
+ * orthographic back and edge renders (2.45 px/mm on the back, 3.77 on the
+ * edges). GSMArena's matching Tab S11 renders reproduce the S11 spec's
+ * ring, flash and wordmark positions to within 0.7 mm, which is what
+ * calibrates them.
+ */
+const TAB_S12_PLUS: TabletSpec = {
+  // Front render: 9.8 mm body corners (two corners fitted, 9.76 / 9.82).
+  body: { width: 2.9344, height: 4.5234, depth: 0.0828, radius: 0.153, bevel: 0.01 },
+  // Front render: a 0.96 mm ring of frame shows around the glass on all sides.
+  glass: { width: 2.9044, height: 4.4934, radius: 0.138 },
+  // 12.6" at 2800:1752 is 169.76 x 271.31 mm (the render reads 170.4 x 272.0).
+  // 3.0 mm display corners, derived from Samsung's two diagonals - 32.04 cm
+  // full rectangle, 31.78 cm with the corners rounded (the render reads 3.6).
+  display: { width: 2.6525, height: 4.2392, radius: 0.047 },
+  resolution: 876,
+  rearCamera: {
+    style: 'rings',
+    // Ring center 16.3 mm from the landscape-top edge and 16.2 mm from the
+    // camera end. Chamfer to chamfer it reads 14.8 mm against the S11's 14.2
+    // on the same renders, so it is the S11's modelled 13.3 mm ring scaled by
+    // that ratio. Flash on the ring's row, 29.6 mm from the camera end.
+    rings: [{ x: 2.9344 / 2 - 0.2547, y: 4.5234 / 2 - 0.2531, r: 0.108 }],
+    flash: { x: 2.9344 / 2 - 0.2547, y: 4.5234 / 2 - 0.4625 },
+  },
+  // Front render: the S11's keys at the S11's distances from the camera-end
+  // corner, to 0.2 mm - a 20.2 mm volume rocker at 46.4-66.6 mm, then a
+  // 13.6 mm power key at 76.5-90.1 mm.
+  sideButtons: [
+    { y: 4.5234 / 2 - 0.886, length: 0.316 },
+    { y: 4.5234 / 2 - 1.303, length: 0.209 },
+  ],
+  // GSMArena's edge renders put the USB-C on the edge seen from BELOW (its
+  // strip has the ring's silhouette under it; the mic-hole edge, seen from
+  // above, has it over it), i.e. the end away from the camera. Samsung's
+  // IP68 render shows the port on that short edge, and HiTechCentury's review
+  // puts it on the right of a tablet held with its keys top-left. The S11
+  // spec keeps it at the camera end; its GSMArena renders read the same way
+  // as these, which is worth a second look there.
+  usbEdge: 'bottom',
+  // Not drawn on the Galaxy Tabs (the pen clings to a clean edge); recorded
+  // for completeness. Mapped off a hands-on photo through the display's
+  // homography (checked against the front camera, which it puts 0.25 mm off
+  // the center line): the pen rests 132.5-278.3 mm from the camera end.
+  stylus: { length: 2.278, offsetY: -0.948 },
+  // GSMArena back render: three Ø2.5 dots 4.5 mm apart, centered, 10.9 mm in
+  // from the landscape-bottom edge (the S11's render reads the same).
+  pogo: { surface: 'back', x: -2.9344 / 2 + 0.1703, y: 0, axis: 'y', spacing: 0.0703 },
+  // 29.1 mm wordmark centered 77.5 mm toward the landscape-top edge and
+  // 114.0 mm toward the far end, at the S11 spec's aspect.
+  logo: { mark: 'samsung', x: 1.211, y: -1.781, width: 0.455, height: 0.071, rotate: true },
+  // GSMArena edge renders: two 19.5 mm slots per short edge, centered
+  // ±61.9 mm from its middle.
+  speakers: { style: 'slots', xs: [-0.967, 0.967], length: 0.305, width: 0.02 },
+}
+
+/**
  * Galaxy Tab S11 Ultra (14.6") - 326.3 x 208.5 x 5.1 mm, 14.6" 2960x1848
  * (16:10) AMOLED, uniform ~5.9 mm bezel with a small U-shaped notch
  * (~12.4 mm, single 12 MP front camera) on the landscape-top edge (the
@@ -398,9 +468,10 @@ export const IPAD_VARIANTS: Record<
   ipad11: IPAD_11,
 }
 
-/** The Galaxy Tab S11 family, and the S12 Ultra on the S11 Ultra's chassis. */
-export const GALAXY_TAB_VARIANTS: Record<'tabs11' | 'tabs11ultra' | 'tabs12ultra', TabletSpec> = {
+/** The Galaxy Tab S11 and S12 families: the S12 Ultra is on the S11 Ultra's chassis. */
+export const GALAXY_TAB_VARIANTS: Record<'tabs11' | 'tabs12plus' | 'tabs11ultra' | 'tabs12ultra', TabletSpec> = {
   tabs11: TAB_S11,
+  tabs12plus: TAB_S12_PLUS,
   tabs11ultra: TAB_S11_ULTRA,
   tabs12ultra: TAB_S12_ULTRA,
 }

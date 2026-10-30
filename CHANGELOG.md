@@ -18,6 +18,16 @@ breaking change can ship in a minor release, and is always listed under
   It is now the current model of the Galaxy Tab S Ultra line, so the S11
   Ultra folds under "older models" in the docs; the family default stays
   `tabs11`.
+- **Galaxy Tab S12+ (`<GalaxyTab variant="tabs12plus">`).** Samsung's 12.6″
+  tablet from September 2026, a size the catalog has not had before (there
+  was no Tab S11+), so it starts its own `Galaxy Tab S+` line and supersedes
+  nothing. Published 289.5 × 187.8 × 5.3 mm body and 2800 × 1752 panel on
+  the family's half-scale dp grid, 876 × 1400 (1400 × 876 in landscape). It
+  has the S11's layout at a larger size: a uniform ~9 mm bezel with the front
+  camera in it rather than a notch, one rear ring and flash, and the S11's
+  keys at the camera end. The USB-C is on the opposite short edge. Gray and
+  Silver. The rest of the detail is measured off Samsung's and GSMArena's
+  orthographic renders. The family's default stays `tabs11`.
 
 ### Fixed
 

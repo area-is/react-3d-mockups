@@ -100,11 +100,11 @@ export const COMPONENT_PROPS: Record<string, PropDoc[]> = {
     {"name":"resolution","type":"number","default":"per variant","description":"Defaults to the variant's logical grid: 1032×1376 (ipadpro13), 834×1210 (ipadpro11), 1024×1366 (ipadair13), 820×1180 (ipadair11, ipad11)."},
   ],
   "GalaxyTabMockup": [
-    {"name":"variant","type":"'tabs11' | 'tabs11ultra' | 'tabs12ultra'","default":"'tabs11'","description":"Tab S11 (single camera ring), Tab S11 Ultra (dual rings, 14.6\" panel with the U-shaped notch) or Tab S12 Ultra (the S11 Ultra's body with the generation's internals)."},
+    {"name":"variant","type":"'tabs11' | 'tabs12plus' | 'tabs11ultra' | 'tabs12ultra'","default":"'tabs11'","description":"Tab S11 (single camera ring), Tab S12+ (single ring, 12.6\" panel with the camera in the bezel), Tab S11 Ultra (dual rings, 14.6\" panel with the U-shaped notch) or Tab S12 Ultra (the S11 Ultra's body with the generation's internals)."},
     {"name":"orientation","type":"'portrait' | 'landscape'","default":"'portrait'","description":"Landscape lays the tablet on its side and swaps the virtual display with upright content."},
     {"name":"statusBar","type":"boolean | StatusBarOption","default":"false","description":"Draw the system status bar across the top of the screen. true gives the platform's defaults - One UI's tablet bar, with the clock at the leading inset and the meters at the trailing one; an object sets the clock, the meters and the ink ({{ time: '14:05', battery: 0.42, batteryPercent: true, color: '#1c1c1e' }}). It is placed from this device's own camera cutout and logical grid, so it lines up with the hardware on every variant. See Status bar."},
     {"name":"color","type":"string","default":"'#2b292c'","description":"Body color. Takes a colorway id from GALAXY_TAB_COLORWAYS[variant] (see Colorways) or any CSS color."},
-    {"name":"resolution","type":"number","default":"per variant","description":"Defaults to the variant's logical grid: 800×1280 (tabs11), 924×1480 (tabs11ultra, tabs12ultra)."},
+    {"name":"resolution","type":"number","default":"per variant","description":"Defaults to the variant's logical grid: 800×1280 (tabs11), 876×1400 (tabs12plus), 924×1480 (tabs11ultra, tabs12ultra)."},
   ],
   "AppleWatchMockup": [
     {"name":"variant","type":"'series11' | 'series12' | 'ultra4'","default":"'series11'","description":"Which Apple Watch to render. The Series 12 is the Series 11's case a millimetre wider, with the generation's finishes; the Ultra 4 is the 49 mm titanium case with the crown guard and the Action button."},

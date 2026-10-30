@@ -200,6 +200,9 @@ const GALAXY_TAB_COLORS: Colorway[] = [
 
 export const GALAXY_TAB_COLORWAYS: Record<GalaxyTabVariant, Colorway[]> = {
   tabs11: GALAXY_TAB_COLORS,
+  // The same Gray and Silver: Samsung's S12+ renders sample #d5d6da on the
+  // Silver back against the S11's #d3d4d8.
+  tabs12plus: GALAXY_TAB_COLORS,
   tabs11ultra: GALAXY_TAB_COLORS,
   // The S12 Ultra ships in the same Gray and Silver. Launch and review
   // photography shows no visibly different shade, so the pair is shared.
