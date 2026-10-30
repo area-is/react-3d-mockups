@@ -127,6 +127,9 @@ export const DEVICES = [
   device('galaxy-tab-s11-ultra', 'Galaxy Tab S11 Ultra', 'GalaxyTabMockup', 'tabs11ultra', 'device=tablet&variant=tabs11ultra&color=silver&ry=-22', 'Tablets', [
     'tab ultra', 'samsung tablet', 'android tablet', 'tablet', 'tabs11ultra',
   ]),
+  device('galaxy-tab-s12-ultra', 'Galaxy Tab S12 Ultra', 'GalaxyTabMockup', 'tabs12ultra', 'device=tablet&variant=tabs12ultra&color=gray&ry=-22', 'Tablets', [
+    'samsung tablet', 'android tablet', 'tablet', 'tabs12ultra',
+  ]),
   device('apple-watch-series-11', 'Apple Watch Series 11', 'AppleWatchMockup', 'series11', 'device=watch&wvariant=series11&color=jetblack&ry=-18', 'Wearables', [
     'apple watch', 'watch', 'smartwatch', 'wearable', 'watchos', 'series 11',
   ]),

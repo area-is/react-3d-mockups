@@ -112,6 +112,7 @@ export const DEVICE_LINEUP: { readonly [K in DeviceKind]: Readonly<Record<Device
   galaxyTab: {
     tabs11: { name: 'Galaxy Tab S11', line: 'Galaxy Tab S', announced: '2025-09' },
     tabs11ultra: { name: 'Galaxy Tab S11 Ultra', line: 'Galaxy Tab S Ultra', announced: '2025-09' },
+    tabs12ultra: { name: 'Galaxy Tab S12 Ultra', line: 'Galaxy Tab S Ultra', announced: '2026-09' },
   },
   appleWatch: {
     series11: { name: 'Apple Watch Series 11', line: 'Apple Watch Series', announced: '2025-09' },

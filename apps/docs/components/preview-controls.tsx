@@ -245,6 +245,7 @@ const MODELS = new Map<unknown, ModelControls>([
       variants: [
         { value: 'tabs11', label: 'Galaxy Tab S11' },
         { value: 'tabs11ultra', label: 'Tab S11 Ultra' },
+        { value: 'tabs12ultra', label: 'Tab S12 Ultra' },
       ],
       catalogs: GALAXY_TAB_COLORWAYS as Record<string, Colorway[]>,
       controls: [ORIENTATION],

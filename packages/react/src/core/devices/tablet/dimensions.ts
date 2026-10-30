@@ -368,6 +368,24 @@ const TAB_S11_ULTRA: TabletSpec = {
   speakers: { style: 'slots', xs: [-1.075, 1.075], length: 0.64, width: 0.02 },
 }
 
+/**
+ * Galaxy Tab S12 Ultra (14.6", Sep 2026) - the Tab S11 Ultra's chassis.
+ * Samsung publishes its 326.3 x 208.5 x 5.1 mm Armor Aluminum body (692 g
+ * Wi-Fi, 695 g 5G), the S11 Ultra's to the tenth of a millimetre, around the
+ * same 14.6" 2960x1848 120 Hz Dynamic AMOLED 2X. Launch photography shows the
+ * same small U-shaped notch on the landscape-top edge, the same two
+ * protruding rear rings (13 MP wide + 8 MP ultra-wide) with the flash
+ * inboard, the same keys on the landscape-top edge and the same magnetic
+ * S Pen spot. On GSMArena's back shots of both generations the ring pitch
+ * (~19 mm) and flash position (~50 mm in) read the same, against this spec's
+ * 19.2 and 49.5 mm. The generation is internal, so the geometry is the
+ * S11 Ultra's, carried over deliberately rather than remeasured, and the
+ * logical grid stays 924x1480 dp.
+ */
+const TAB_S12_ULTRA: TabletSpec = {
+  ...TAB_S11_ULTRA,
+}
+
 /** The iPad lineup: two Pros, two Airs and the standard iPad. */
 export const IPAD_VARIANTS: Record<
   'ipadpro13' | 'ipadpro11' | 'ipadair13' | 'ipadair11' | 'ipad11',
@@ -380,10 +398,11 @@ export const IPAD_VARIANTS: Record<
   ipad11: IPAD_11,
 }
 
-/** The Galaxy Tab S11 family. */
-export const GALAXY_TAB_VARIANTS: Record<'tabs11' | 'tabs11ultra', TabletSpec> = {
+/** The Galaxy Tab S11 family, and the S12 Ultra on the S11 Ultra's chassis. */
+export const GALAXY_TAB_VARIANTS: Record<'tabs11' | 'tabs11ultra' | 'tabs12ultra', TabletSpec> = {
   tabs11: TAB_S11,
   tabs11ultra: TAB_S11_ULTRA,
+  tabs12ultra: TAB_S12_ULTRA,
 }
 
 export type IPadVariant = keyof typeof IPAD_VARIANTS

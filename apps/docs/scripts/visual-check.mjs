@@ -102,6 +102,9 @@ const CASES = [
   // the 18 Pro Max: the 17 Pro Max's chassis under the narrower island
   ['iphone-18promax', 'device=iphone&pvariant=18promax&ry=24'],
   ['ipad', 'device=tablet&variant=ipadpro13&ry=22'],
+  // the Galaxy Tab S12 Ultra, the first Galaxy Tab case: the S11 Ultra's
+  // body, notch and grid, so it defends both Ultras' geometry
+  ['galaxytab-s12ultra', 'device=tablet&variant=tabs12ultra&ry=22'],
   ['laptop', 'device=laptop&lvariant=pro14&ry=18'],
   // the notchless Neo: square-cornered panel, camera in the bezel
   ['laptop-neo', 'device=laptop&lvariant=neo13&ry=18'],

@@ -7,6 +7,18 @@ breaking change can ship in a minor release, and is always listed under
 
 ## Unreleased
 
+### Added
+
+- **Galaxy Tab S12 Ultra.** `GalaxyTabMockup` gains `variant="tabs12ultra"`,
+  announced 30 September 2026. Samsung publishes the Tab S11 Ultra's body to
+  the tenth of a millimetre (326.3×208.5×5.1 mm) around the same 14.6"
+  2960×1848 panel (924×1480 logical), and launch and review photography
+  show the same U-shaped notch, two rear rings and flash, so the model is
+  the S11 Ultra's geometry under the new name, in the same Gray and Silver.
+  It is now the current model of the Galaxy Tab S Ultra line, so the S11
+  Ultra folds under "older models" in the docs; the family default stays
+  `tabs11`.
+
 ### Fixed
 
 - **Screens off their glass in Safari and on iPhone.** A live screen could

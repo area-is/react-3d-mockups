@@ -201,6 +201,9 @@ const GALAXY_TAB_COLORS: Colorway[] = [
 export const GALAXY_TAB_COLORWAYS: Record<GalaxyTabVariant, Colorway[]> = {
   tabs11: GALAXY_TAB_COLORS,
   tabs11ultra: GALAXY_TAB_COLORS,
+  // The S12 Ultra ships in the same Gray and Silver. Launch and review
+  // photography shows no visibly different shade, so the pair is shared.
+  tabs12ultra: GALAXY_TAB_COLORS,
 }
 
 export const APPLE_WATCH_COLORWAYS: Record<AppleWatchVariant, Colorway[]> = {

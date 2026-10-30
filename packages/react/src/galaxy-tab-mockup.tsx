@@ -34,14 +34,14 @@ const GalaxyTabMockupBase = createMockup({
  * ```
  */
 function GalaxyTabMockupImpl({ camera, ...props }: GalaxyTabMockupProps) {
-  // The framing's camera is the iPad-class pose; the 14.6" Tab Ultra needs a
+  // The framing's camera is the iPad-class pose; the 14.6" Tab Ultras need a
   // bit more room, which a static framing can't express per variant.
   return (
     <GalaxyTabMockupBase
       {...props}
       camera={
         camera ??
-        (props.variant === 'tabs11ultra'
+        (props.variant === 'tabs11ultra' || props.variant === 'tabs12ultra'
           ? {
               position: [...TABLET_ULTRA_CAMERA.position] as [number, number, number],
               fov: TABLET_ULTRA_CAMERA.fov,

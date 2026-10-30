@@ -229,6 +229,7 @@ const DEVICES: Record<string, ExplorerSpec> = {
     variants: [
       { id: 'tabs11', label: 'Galaxy Tab S11' },
       { id: 'tabs11ultra', label: 'Galaxy Tab S11 Ultra' },
+      { id: 'tabs12ultra', label: 'Galaxy Tab S12 Ultra' },
     ],
     colorways: GALAXY_TAB_COLORWAYS,
     orientation: true,
