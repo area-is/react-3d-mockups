@@ -31,9 +31,12 @@ export interface LaptopProps extends Omit<GroupProps, 'children' | 'color'>, Sur
    * Which laptop to render, at true relative sizes: `air13` / `air15`
    * (MacBook Air 13" / 15", uniform thin slab, clean deck), `pro14` /
    * `pro16` (MacBook Pro 14" / 16", thicker body, HDMI/SDXC ports,
-   * perforated speaker grilles, larger feet and a deeper notch) or `neo13`
-   * (MacBook Neo 13", the entry model: a notchless square-cornered panel
-   * with the camera in a deeper bezel, two USB-C ports and no MagSafe).
+   * perforated speaker grilles, larger feet and a deeper notch),
+   * `proled14` / `proled16` (MacBook Pro 14" / 16" with PROLED XDR display:
+   * the Pro's ports and grilles in a smaller body, a Dynamic Island in place
+   * of the notch, thinner bezels and a glowing lid logo) or `neo13` (MacBook
+   * Neo 13", the entry model: a notchless square-cornered panel with the
+   * camera in a deeper bezel, two USB-C ports and no MagSafe).
    */
   variant?: LaptopVariant
   /**
@@ -744,9 +747,10 @@ function Keys({
 /**
  * A procedurally built Apple MacBook: rounded unibody base with a
  * Magic-Keyboard deck and Force Touch trackpad, and a thin hinged lid whose
- * display carries your live content - notched on the Airs and Pros, set in a
- * deeper camera bezel on the Neo. No 3D asset files - everything is generated
- * from geometry at runtime.
+ * display carries your live content - notched on the Airs and mini-LED Pros,
+ * under a Dynamic Island on the PROLED Pros, set in a deeper camera bezel on
+ * the Neo. No 3D asset files - everything is generated from geometry at
+ * runtime.
  *
  * The opened pose (deck + raised lid) is centered on the group origin, the
  * pose the stage camera and shadow framing are tuned for.
@@ -781,7 +785,7 @@ function LaptopImpl({
     [matchedCaps, color]
   )
   const legendInk = matchedCaps ? 'rgba(46, 48, 56, 0.82)' : 'rgba(228, 231, 240, 0.85)'
-  const { footprint, base, lid, display, notch: notchDims, bezelCamera, keyboard, trackpad } = spec
+  const { footprint, base, lid, display, notch: notchDims, island, bezelCamera, keyboard, trackpad } = spec
   // Default scaled desktops (native/2): 1280x832 / 1440x932 on the Airs,
   // 1512x982 / 1728x1117 on the Pros, 1204x753 on the Neo - from core, so the
   // rendered grid and the measured one cannot disagree.
@@ -856,13 +860,19 @@ function LaptopImpl({
       ),
     [footprint]
   )
+  // The cover glass stops 5 mm short of the lid's edge unless the spec sets
+  // its own rim: the PROLED Pro's panel reaches nearer the edge than that,
+  // and would otherwise overhang the glass onto bare aluminium.
+  const glassRim = spec.glass?.rim
   const glassGeometry = React.useMemo(
     () =>
       new THREE.ShapeGeometry(
-        roundedRectShape(footprint.width - 0.14, footprint.depth - 0.14, footprint.radius - 0.05),
+        glassRim === undefined
+          ? roundedRectShape(footprint.width - 0.14, footprint.depth - 0.14, footprint.radius - 0.05)
+          : roundedRectShape(footprint.width - glassRim * 2, footprint.depth - glassRim * 2, footprint.radius - glassRim),
         16
       ),
-    [footprint]
+    [footprint, glassRim]
   )
   React.useEffect(() => {
     return () => {
@@ -934,7 +944,7 @@ function LaptopImpl({
     [logoGeometry, bottomTextTexture]
   )
 
-  // CSS px per world unit for the display overlay (notch).
+  // CSS px per world unit for the display overlay (notch or island).
   const pxPerUnit = res / display.width
   const px = (units: number) => units * pxPerUnit
 
@@ -1122,15 +1132,34 @@ function LaptopImpl({
             rotation-y={Math.PI}
             position={[0, footprint.depth / 2 + spec.logo.offsetY, -lid.thickness / 2 - 0.003]}
           >
-            <meshPhysicalMaterial
-              color={logoColor}
-              metalness={0.55}
-              roughness={0.06}
-              clearcoat={1}
-              envMapIntensity={1.2}
-              polygonOffset
-              polygonOffsetFactor={-1}
-            />
+            {spec.logo.lit ? (
+              // Lit from behind (the PROLED Pro): a milky white glyph that
+              // glows on its own rather than reflecting the studio. Emissive
+              // well short of full, so it reads as a soft light on Space Black
+              // without blowing out, and still stands brighter than the
+              // aluminium on Silver - where a tone-on-tone badge would sink.
+              <meshPhysicalMaterial
+                color="#eef1f6"
+                emissive="#ffffff"
+                emissiveIntensity={0.62}
+                metalness={0}
+                roughness={0.32}
+                clearcoat={0.6}
+                envMapIntensity={0.35}
+                polygonOffset
+                polygonOffsetFactor={-1}
+              />
+            ) : (
+              <meshPhysicalMaterial
+                color={logoColor}
+                metalness={0.55}
+                roughness={0.06}
+                clearcoat={1}
+                envMapIntensity={1.2}
+                polygonOffset
+                polygonOffsetFactor={-1}
+              />
+            )}
           </mesh>
 
           {/* edge-to-edge cover glass on the inner face */}
@@ -1179,9 +1208,14 @@ function LaptopImpl({
             // The camera notch is part of the hardware, so it is always drawn:
             // it eats the same strip of your layout here that it eats on the
             // real panel, which is most of the point of looking at a mockup.
-            // (The Neo has none - its camera is in the bezel above.)
+            // (The Neo has none - its camera is in the bezel above.) The
+            // PROLED's Dynamic Island is drawn the same way, as the iPhone's
+            // is. Neither publishes a safe area, unlike the iPhone's island:
+            // macOS keeps windows below the menu bar strip the camera sits
+            // in and reports no top inset to web content, so what is under
+            // the cutout is the desktop's own business, as on the hardware.
             overlay={
-              notchDims && (
+              notchDims ? (
               <div
                 aria-hidden
                 data-mockup-cutout=""
@@ -1211,7 +1245,43 @@ function LaptopImpl({
                   }}
                 />
               </div>
-              )
+              ) : island ? (
+                // A pill floating below the panel's top edge, as the iPhone
+                // draws its island (portrait). The lens sits at the centre of
+                // its right-hand cap, where Apple's display hero shows it.
+                <div
+                  aria-hidden
+                  data-mockup-cutout=""
+                  style={{
+                    position: 'absolute',
+                    top: px(island.offsetY - island.height / 2),
+                    left: '50%',
+                    transform: 'translateX(-50%)',
+                    width: px(island.width),
+                    height: px(island.height),
+                    borderRadius: px(island.height / 2),
+                    background: '#020308',
+                    boxShadow: '0 0 0 1px rgba(255, 255, 255, 0.04)',
+                    pointerEvents: 'none',
+                    zIndex: 2147483647,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'flex-end',
+                    padding: `0 ${px(island.height * 0.3)}px 0 0`,
+                    boxSizing: 'border-box',
+                  }}
+                >
+                  <div
+                    style={{
+                      width: px(island.height * 0.4),
+                      height: px(island.height * 0.4),
+                      borderRadius: '50%',
+                      background:
+                        'radial-gradient(circle at 38% 38%, #1b2436 0%, #05060a 55%, #000 100%)',
+                    }}
+                  />
+                </div>
+              ) : undefined
             }
           >
             {screen?.children}

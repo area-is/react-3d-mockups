@@ -261,6 +261,8 @@ const MODELS = new Map<unknown, ModelControls>([
         { value: 'pro14', label: 'MacBook Pro 14″' },
         { value: 'pro16', label: 'MacBook Pro 16″' },
         { value: 'neo13', label: 'MacBook Neo 13″' },
+        { value: 'proled14', label: 'MacBook Pro 14″ PROLED' },
+        { value: 'proled16', label: 'MacBook Pro 16″ PROLED' },
       ],
       catalogs: LAPTOP_COLORWAYS as Record<string, Colorway[]>,
       controls: [openAngle(40, 130, 110), toggle('notch', 'notch', true)],

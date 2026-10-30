@@ -166,6 +166,10 @@ export const LAPTOP_COLORWAYS: Record<LaptopVariant, Colorway[]> = {
   pro14: MACBOOK_PRO_COLORS,
   pro16: MACBOOK_PRO_COLORS,
   neo13: MACBOOK_NEO_COLORS,
+  // The same two anodized finishes as the mini-LED Pro, by name and by
+  // Apple's product shots of the closed lids.
+  proled14: MACBOOK_PRO_COLORS,
+  proled16: MACBOOK_PRO_COLORS,
 }
 
 const IPAD_PRO_COLORS: Colorway[] = [

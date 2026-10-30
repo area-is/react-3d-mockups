@@ -110,6 +110,14 @@ const CASES = [
   ['laptop', 'device=laptop&lvariant=pro14&ry=18'],
   // the notchless Neo: square-cornered panel, camera in the bezel
   ['laptop-neo', 'device=laptop&lvariant=neo13&ry=18'],
+  // the PROLED Pros: a Dynamic Island floating below the panel's top edge
+  // where the notch was, 4.2 mm bezels with the glass reaching out to meet
+  // them, and the lid logo lit from behind - from the back on Space Black
+  // and on Silver, the finish a lit logo has to work hardest to read on
+  ['laptop-proled14', 'device=laptop&lvariant=proled14&ry=18'],
+  ['laptop-proled16', 'device=laptop&lvariant=proled16&ry=18'],
+  ['laptop-proled14-lid', 'device=laptop&lvariant=proled14&color=spaceblack&ry=200&rx=8&dist=10&cy=0.6'],
+  ['laptop-proled16-lid', 'device=laptop&lvariant=proled16&color=silver&ry=200&rx=8&dist=10&cy=0.6'],
   ['fold-open', 'device=fold&ry=22'],
   ['fold-closed', 'device=fold&open=0&ry=22'],
   // the flex poses' split screens must meet seamlessly at the crease - the

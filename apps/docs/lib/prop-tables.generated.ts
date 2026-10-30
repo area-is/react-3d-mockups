@@ -87,10 +87,10 @@ export const COMPONENT_PROPS: Record<string, PropDoc[]> = {
     {"name":"coverScreenUntil","type":"number","default":"30","description":"The hinge angle, in degrees, up to which the cover screen stays lit as the device opens; above it your content moves to the main display, so one of the two is lit at every angle, as on the hardware. 30 is where Android's reference foldable swaps; 90 keeps the cover on through the half-open tent pose, 0 swaps the moment the hinge moves."},
   ],
   "LaptopMockup": [
-    {"name":"variant","type":"'air13' | 'air15' | 'pro14' | 'pro16' | 'neo13'","default":"'air13'","description":"MacBook Air 13\"/15\", MacBook Pro 14\"/16\" or MacBook Neo 13\" - true relative sizes, per-model ports, feet, speaker grilles, and the notch (the Neo has none: its camera sits in the bezel)."},
+    {"name":"variant","type":"'air13' | 'air15' | 'pro14' | 'pro16' | 'neo13' | 'proled14' | 'proled16'","default":"'air13'","description":"MacBook Air 13\"/15\", MacBook Pro 14\"/16\", MacBook Neo 13\" or MacBook Pro 14\"/16\" with PROLED XDR display - true relative sizes, per-model ports, feet, speaker grilles, and the camera cutout: a notch, a Dynamic Island (the PROLED Pros) or none (the Neo's camera sits in the bezel)."},
     {"name":"openAngle","type":"number","default":"110","description":"Lid angle in degrees between deck and screen (90 is upright)."},
     {"name":"color","type":"string","default":"'#e3e4e6'","description":"Aluminum finish. Takes a colorway id from LAPTOP_COLORWAYS[variant] (see Colorways) or any CSS color."},
-    {"name":"resolution","type":"number","default":"per variant","description":"Virtual display width - each variant defaults to its real scaled desktop: 1280×832 (air13), 1440×932 (air15), 1512×982 (pro14), 1728×1117 (pro16), 1204×753 (neo13) - so desktop breakpoints apply."},
+    {"name":"resolution","type":"number","default":"per variant","description":"Virtual display width - each variant defaults to its real scaled desktop: 1280×832 (air13), 1440×932 (air15), 1512×982 (pro14), 1728×1117 (pro16), 1204×753 (neo13), 1512×993 (proled14), 1736×1133 (proled16) - so desktop breakpoints apply."},
   ],
   "IPadMockup": [
     {"name":"variant","type":"'ipadpro13' | 'ipadpro11' | 'ipadair13' | 'ipadair11' | 'ipad11'","default":"'ipadpro13'","description":"Which iPad: Pro 13\"/11\" (camera pod, Pencil strip, Face ID), Air 13\"/11\" (single lens, Touch ID top button), or the A16 iPad (single lens, edge Smart Connector)."},

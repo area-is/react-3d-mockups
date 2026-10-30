@@ -202,6 +202,8 @@ const DEVICES: Record<string, ExplorerSpec> = {
       { id: 'pro14', label: 'MacBook Pro 14"' },
       { id: 'pro16', label: 'MacBook Pro 16"' },
       { id: 'neo13', label: 'MacBook Neo 13"' },
+      { id: 'proled14', label: 'MacBook Pro 14" PROLED' },
+      { id: 'proled16', label: 'MacBook Pro 16" PROLED' },
     ],
     colorways: LAPTOP_COLORWAYS,
   },

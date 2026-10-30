@@ -49,6 +49,8 @@ const ROWS = {
   pro14: ['laptop', { variant: 'pro14' }],
   pro16: ['laptop', { variant: 'pro16' }],
   neo13: ['laptop', { variant: 'neo13' }],
+  proled14: ['laptop', { variant: 'proled14' }],
+  proled16: ['laptop', { variant: 'proled16' }],
   ipadpro13: ['ipad', { variant: 'ipadpro13' }],
   ipadpro11: ['ipad', { variant: 'ipadpro11' }],
   ipadair13: ['ipad', { variant: 'ipadair13' }],

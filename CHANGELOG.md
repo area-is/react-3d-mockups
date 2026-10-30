@@ -28,6 +28,21 @@ breaking change can ship in a minor release, and is always listed under
   keys at the camera end. The USB-C is on the opposite short edge. Gray and
   Silver. The rest of the detail is measured off Samsung's and GSMArena's
   orthographic renders. The family's default stays `tabs11`.
+- **MacBook Pro 14″ and 16″ with PROLED XDR display** (`variant="proled14"`,
+  `"proled16"` on `Laptop` / `LaptopMockup`), Apple's October 2026 OLED
+  touchscreen Pros. Each is a new body (310.8 × 216.3 × 15.0 mm and
+  355.5 × 244.2 × 16.0 mm) around a taller panel at the same 254 ppi, so the
+  default desktops are 1512×993 and 1736×1133. There is no notch: a Dynamic
+  Island floats just below the top edge instead, drawn over your content as
+  the notch is, and measured off Apple's product imagery at 11.8 × 6.2 mm
+  because Apple publishes no size for it. The bezels are 4.2 mm, the lid
+  logo glows, and the editing keys carry symbols. Both come in Space Black
+  and Silver. They are product lines of their own, so the mini-LED
+  `pro14` / `pro16`, which Apple still sells, stay current rather than
+  folding away as older models. `LaptopSpec` gains an optional `island`
+  (`IPhoneSpec.island`'s `{ width, height, offsetY }`), which a spec carries
+  instead of a `notch`, never with one, plus `glass.rim` for the thinner
+  bezels and `logo.lit`.
 
 ### Fixed
 

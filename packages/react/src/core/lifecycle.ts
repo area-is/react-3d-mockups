@@ -101,6 +101,14 @@ export const DEVICE_LINEUP: { readonly [K in DeviceKind]: Readonly<Record<Device
     pro14: { name: 'MacBook Pro 14″', line: 'MacBook Pro 14″', announced: '2025-10' },
     pro16: { name: 'MacBook Pro 16″', line: 'MacBook Pro 16″', announced: '2026-03' },
     neo13: { name: 'MacBook Neo 13″', line: 'MacBook Neo', announced: '2026-03' },
+    // Lines of their own, not the 'MacBook Pro 14″' / '16″' ones: Apple still
+    // sells the mini-LED Pros beside them as the cheaper Pro, and refreshes
+    // the two ranges separately (the mini-LED 14″ took the M6 the day before
+    // the PROLED models were announced on the M5 Pro / M5 Max). In one line
+    // the PROLED would supersede pro14 / pro16 and fold them away under
+    // "older models" while they are still on sale.
+    proled14: { name: 'MacBook Pro 14″ PROLED XDR', line: 'MacBook Pro 14″ PROLED', announced: '2026-10' },
+    proled16: { name: 'MacBook Pro 16″ PROLED XDR', line: 'MacBook Pro 16″ PROLED', announced: '2026-10' },
   },
   ipad: {
     ipadpro13: { name: 'iPad Pro 13″', line: 'iPad Pro 13″', announced: '2025-10' },

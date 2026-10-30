@@ -106,6 +106,12 @@ export const DEVICES = [
   device('macbook-neo-13', 'MacBook Neo 13″', 'LaptopMockup', 'neo13', 'device=laptop&lvariant=neo13&color=indigo&ry=-18', 'Laptops and displays', [
     'macbook neo', 'neo', 'laptop', 'notebook', 'mac', 'budget macbook', 'neo13',
   ]),
+  device('macbook-pro-14-proled', 'MacBook Pro 14″ PROLED XDR', 'LaptopMockup', 'proled14', 'device=laptop&lvariant=proled14&color=spaceblack&ry=-18', 'Laptops and displays', [
+    'proled', 'oled', 'oled macbook', 'touchscreen', 'touch screen mac', 'dynamic island', 'macbook pro', 'laptop', 'mac', 'proled14',
+  ]),
+  device('macbook-pro-16-proled', 'MacBook Pro 16″ PROLED XDR', 'LaptopMockup', 'proled16', 'device=laptop&lvariant=proled16&color=silver&ry=-18', 'Laptops and displays', [
+    'proled', 'oled', 'touchscreen', 'dynamic island', 'laptop', 'mac', 'proled16',
+  ]),
   device('ipad-pro-13', 'iPad Pro 13″', 'IPadMockup', 'ipadpro13', 'device=tablet&variant=ipadpro13&color=spaceblack&ry=-22', 'Tablets', [
     'ipad pro', 'tablet', 'ipados', 'ipadpro13',
   ]),
