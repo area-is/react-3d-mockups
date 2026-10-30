@@ -234,6 +234,7 @@ const MODELS = new Map<unknown, ModelControls>([
         { value: 'ipadair13', label: 'iPad Air 13″' },
         { value: 'ipadair11', label: 'iPad Air 11″' },
         { value: 'ipad11', label: 'iPad (A16)' },
+        { value: 'ipadmini', label: 'iPad mini' },
       ],
       catalogs: IPAD_COLORWAYS as Record<string, Colorway[]>,
       controls: [ORIENTATION],
@@ -244,7 +245,9 @@ const MODELS = new Map<unknown, ModelControls>([
     {
       variants: [
         { value: 'tabs11', label: 'Galaxy Tab S11' },
+        { value: 'tabs12plus', label: 'Tab S12+' },
         { value: 'tabs11ultra', label: 'Tab S11 Ultra' },
+        { value: 'tabs12ultra', label: 'Tab S12 Ultra' },
       ],
       catalogs: GALAXY_TAB_COLORWAYS as Record<string, Colorway[]>,
       controls: [ORIENTATION],
@@ -259,6 +262,8 @@ const MODELS = new Map<unknown, ModelControls>([
         { value: 'pro14', label: 'MacBook Pro 14″' },
         { value: 'pro16', label: 'MacBook Pro 16″' },
         { value: 'neo13', label: 'MacBook Neo 13″' },
+        { value: 'proled14', label: 'MacBook Pro 14″ PROLED' },
+        { value: 'proled16', label: 'MacBook Pro 16″ PROLED' },
       ],
       catalogs: LAPTOP_COLORWAYS as Record<string, Colorway[]>,
       controls: [openAngle(40, 130, 110), toggle('notch', 'notch', true)],

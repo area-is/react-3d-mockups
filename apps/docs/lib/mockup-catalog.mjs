@@ -106,6 +106,12 @@ export const DEVICES = [
   device('macbook-neo-13', 'MacBook Neo 13″', 'LaptopMockup', 'neo13', 'device=laptop&lvariant=neo13&color=indigo&ry=-18', 'Laptops and displays', [
     'macbook neo', 'neo', 'laptop', 'notebook', 'mac', 'budget macbook', 'neo13',
   ]),
+  device('macbook-pro-14-proled', 'MacBook Pro 14″ PROLED XDR', 'LaptopMockup', 'proled14', 'device=laptop&lvariant=proled14&color=spaceblack&ry=-18', 'Laptops and displays', [
+    'proled', 'oled', 'oled macbook', 'touchscreen', 'touch screen mac', 'dynamic island', 'macbook pro', 'laptop', 'mac', 'proled14',
+  ]),
+  device('macbook-pro-16-proled', 'MacBook Pro 16″ PROLED XDR', 'LaptopMockup', 'proled16', 'device=laptop&lvariant=proled16&color=silver&ry=-18', 'Laptops and displays', [
+    'proled', 'oled', 'touchscreen', 'dynamic island', 'laptop', 'mac', 'proled16',
+  ]),
   device('ipad-pro-13', 'iPad Pro 13″', 'IPadMockup', 'ipadpro13', 'device=tablet&variant=ipadpro13&color=spaceblack&ry=-22', 'Tablets', [
     'ipad pro', 'tablet', 'ipados', 'ipadpro13',
   ]),
@@ -121,11 +127,22 @@ export const DEVICES = [
   device('ipad-11', 'iPad 11″', 'IPadMockup', 'ipad11', 'device=tablet&variant=ipad11&color=blue&ry=-22', 'Tablets', [
     'ipad', 'apple tablet', 'tablet', 'ipados', 'ipad a16', 'ipad11',
   ]),
+  // Framed closer than its siblings' default 8.6 so the 195 mm mini fills its
+  // tile as they do theirs.
+  device('ipad-mini', 'iPad mini', 'IPadMockup', 'ipadmini', 'device=tablet&variant=ipadmini&color=midnight&ry=-22&dist=6.8', 'Tablets', [
+    'ipad mini', 'mini', 'small tablet', 'oled ipad', 'tablet', 'ipados', 'ipadmini',
+  ]),
   device('galaxy-tab-s11', 'Galaxy Tab S11', 'GalaxyTabMockup', 'tabs11', 'device=tablet&variant=tabs11&color=gray&ry=-22', 'Tablets', [
     'galaxy tab', 'samsung tablet', 'android tablet', 'tablet', 'tabs11',
   ]),
+  device('galaxy-tab-s12-plus', 'Galaxy Tab S12+', 'GalaxyTabMockup', 'tabs12plus', 'device=tablet&variant=tabs12plus&color=silver&ry=-22', 'Tablets', [
+    'tab s12+', 'tab s12 plus', 'galaxy tab plus', 'samsung tablet', 'android tablet', 'tablet', 'tabs12plus',
+  ]),
   device('galaxy-tab-s11-ultra', 'Galaxy Tab S11 Ultra', 'GalaxyTabMockup', 'tabs11ultra', 'device=tablet&variant=tabs11ultra&color=silver&ry=-22', 'Tablets', [
     'tab ultra', 'samsung tablet', 'android tablet', 'tablet', 'tabs11ultra',
+  ]),
+  device('galaxy-tab-s12-ultra', 'Galaxy Tab S12 Ultra', 'GalaxyTabMockup', 'tabs12ultra', 'device=tablet&variant=tabs12ultra&color=gray&ry=-22', 'Tablets', [
+    'samsung tablet', 'android tablet', 'tablet', 'tabs12ultra',
   ]),
   device('apple-watch-series-11', 'Apple Watch Series 11', 'AppleWatchMockup', 'series11', 'device=watch&wvariant=series11&color=jetblack&ry=-18', 'Wearables', [
     'apple watch', 'watch', 'smartwatch', 'wearable', 'watchos', 'series 11',

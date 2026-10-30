@@ -1,0 +1,150 @@
+---
+title: MacBook Pro 16″ PROLED XDR
+description: The MacBook Pro 16″ PROLED XDR in WebGL, with a live prop explorer and the full LaptopMockup reference.
+---
+
+Drive every prop from the inspector; the `demo.tsx` panel rewrites itself to
+exactly what is being passed. The explorer and every example below are pinned to `variant="proled16"`; the props, regions and colorways apply to the whole family.
+
+<MockupExplorer component="LaptopMockup" variant="proled16" />
+
+`<Laptop>` and `<LaptopMockup>` render an Apple-style laptop: unibody deck
+with the real 78-key Magic Keyboard layout (printed legends, instanced
+keycaps, set in a well milled into the deck at Apple's pitch and position),
+trackpad, hinge band, ports, and the display. Seven variants at true
+relative size: MacBook Air 13" / 15" and MacBook Pro 14" / 16" (M5), with
+their notched panels - the Pro adds its full port array (MagSafe, 2×
+Thunderbolt and headphone jack left; HDMI, Thunderbolt and SDXC right), the
+black well floor the Air does without, perforated speaker strips flanking
+the keyboard, bigger feet, the lid badge and the embossed underside wordmark -
+the MacBook Pro 14" / 16" with PROLED XDR display, the Pro in a smaller body
+with a Dynamic Island in place of the notch, thinner bezels and a glowing lid
+logo, and the MacBook Neo 13", the entry model with a notchless panel, the
+camera in the bezel above it, colour-matched keycaps, two USB-C ports and no
+MagSafe.
+
+The window on screen is real DOM, not a texture - drag anywhere to orbit. The
+keyboard and palm rest occlude it per-pixel, so the screen's reflection ends
+exactly where the hardware begins.
+
+## `<Laptop>` vs `<LaptopMockup>`
+
+<BareVsMockup object="Laptop" kind="laptop" slot="Screen" />
+
+To render this model, pass `variant="proled16"`.
+
+```tsx
+import { MockupCanvas, Laptop, LaptopMockup } from 'react-3d-mockups'
+
+// The one-liner: its own canvas, with lighting, a ground shadow, drag-to-orbit
+// controls and a camera already framed on the object.
+<LaptopMockup variant="proled16" float style={{ height: 520 }}>
+  <YourApp />
+</LaptopMockup>
+
+// The same model with no stage of its own. Inside a canvas you arrange
+// yourself it can be posed, animated, lit and joined by anything else.
+<MockupCanvas>
+  <Laptop variant="proled16" rotation={[0, 0.4, 0]}>
+    <YourApp />
+  </Laptop>
+</MockupCanvas>
+```
+
+## Props
+
+Beyond the [shared screen props](/docs/screen-content) and, on the mockup, the
+[shared mockup props](/docs/api):
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `variant` | `'air13' \| 'air15' \| 'pro14' \| 'pro16' \| 'neo13' \| 'proled14' \| 'proled16'` | `'air13'` | MacBook Air 13"/15", MacBook Pro 14"/16", MacBook Neo 13" or MacBook Pro 14"/16" with PROLED XDR display - true relative sizes, per-model ports, feet, speaker grilles, and the camera cutout: a notch, a Dynamic Island (the PROLED Pros) or none (the Neo's camera sits in the bezel). |
+| `openAngle` | `number` | `110` | Lid angle in degrees between deck and screen (90 is upright). |
+| `color` | `string` | `'#e3e4e6'` | Aluminum finish. Takes a colorway id from `LAPTOP_COLORWAYS[variant]` (see [Colorways](#colorways)) or any CSS color. |
+| `resolution` | `number` | per variant | Virtual display width - each variant defaults to its real scaled desktop: 1280×832 (air13), 1440×932 (air15), 1512×982 (pro14), 1728×1117 (pro16), 1204×753 (neo13), 1512×993 (proled14), 1736×1133 (proled16) - so desktop breakpoints apply. |
+
+There is no `orientation` prop: a laptop has one pose.
+
+## Regions
+
+One region: the screen (bare children). Use the explicit
+`<LaptopMockup.Screen>` slot when you want per-surface overrides -
+`surfaceBackground`, `resolution`, `surfaceStyle`. The same slot exists on
+the bare `<Laptop>`.
+
+## Notch, island and bezel camera
+
+The camera cutout is hardware, so it is always drawn over your content, in
+the same place it sits on the real panel: the notch hanging from the top
+edge on the Airs and the mini-LED Pros, a Dynamic Island floating just below
+it on the PROLED Pros, and nothing at all on the Neo, whose camera is in the
+bezel. None of them shrinks the screen region or publishes a safe area -
+macOS keeps windows below the menu bar the camera sits in - so lay out your
+desktop the way the Mac would and leave that strip to the menu bar.
+
+The spec says which one a model has: `LAPTOP_VARIANTS[variant]` carries
+`notch`, `island` or neither, never both, in world units. An island takes
+`IPhoneSpec.island`'s shape, `{ width, height, offsetY }`, with `offsetY`
+measured from the top display edge to the pill's centre.
+
+```ts
+import { LAPTOP_MM_PER_UNIT, LAPTOP_VARIANTS } from 'react-3d-mockups/core'
+
+const { island } = LAPTOP_VARIANTS.proled14
+// 11.8 x 6.2 mm, centred 4.6 mm below the top edge of the panel
+const islandMm = island && {
+  width: island.width * LAPTOP_MM_PER_UNIT,
+  height: island.height * LAPTOP_MM_PER_UNIT,
+  offsetY: island.offsetY * LAPTOP_MM_PER_UNIT,
+}
+```
+
+## Colorways
+
+Pass a colorway id from `LAPTOP_COLORWAYS[variant]` for that model's retail
+finish, or any CSS color for a custom one. An id wins over a CSS color of the
+same name - pass hex if you mean the CSS one.
+
+| Model | Colorway ids (body color) |
+| --- | --- |
+| MacBook Air 13″, MacBook Air 15″ (`air13`, `air15`) | `silver` (`#e3e4e6`), `starlight` (`#e8e0d4`), `midnight` (`#2e3642`), `skyblue` (`#aec6d9`) |
+| MacBook Pro 14″, MacBook Pro 16″, MacBook Pro 14″ / 16″ PROLED XDR (`pro14`, `pro16`, `proled14`, `proled16`) | `spaceblack` (`#4a484b`), `silver` (`#e3e4e6`) |
+| MacBook Neo 13″ (`neo13`) | `silver` (`#e3e4e6`), `blush` (`#e9cfd0`), `citrus` (`#dedb92`), `indigo` (`#505b73`) |
+
+## This model
+
+### MacBook Pro 16" PROLED XDR in Silver
+
+`variant="proled16"`: the same design at 16.3" - the island, thin bezels and
+glowing logo on a body 3.9 mm shallower than the mini-LED 16"'s, with the
+1736×1133 point grid.
+
+<MockupExplorer
+  component="LaptopMockup"
+  variant="proled16"
+  props={{ color: 'silver', rotation: [0, -0.35, 0] }}
+/>
+
+## Mockup-able areas
+
+Every live surface filled with chroma green, labeled with the slot that
+feeds it - the fastest way to see exactly where your content lands and
+what stays 3D hardware.
+
+<MockupExplorer component="LaptopMockup" variant="proled16" screen="chroma" />
+
+## More examples
+
+Every example renders live: drag to spin it, and the screens are live DOM.
+
+### Midnight, tighter lid angle
+
+`openAngle` poses the hinge; 100° reads more "working", 110° more "display".
+
+<MockupExplorer
+  component="LaptopMockup"
+  variant="proled16"
+  props={{ color: '#2e3642', openAngle: 100, float: true, rotation: [0, 0.3, 0] }}
+/>
+
+<DeviceDisclaimer brands="Apple" />

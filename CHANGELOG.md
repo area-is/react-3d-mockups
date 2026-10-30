@@ -7,6 +7,59 @@ breaking change can ship in a minor release, and is always listed under
 
 ## Unreleased
 
+### Added
+
+- **Galaxy Tab S12 Ultra.** `GalaxyTabMockup` gains `variant="tabs12ultra"`,
+  announced 30 September 2026. Samsung publishes the Tab S11 Ultra's body to
+  the tenth of a millimetre (326.3×208.5×5.1 mm) around the same 14.6"
+  2960×1848 panel (924×1480 logical), and launch and review photography
+  show the same U-shaped notch, two rear rings and flash, so the model is
+  the S11 Ultra's geometry under the new name, in the same Gray and Silver.
+  It is now the current model of the Galaxy Tab S Ultra line, so the S11
+  Ultra folds under "older models" in the docs; the family default stays
+  `tabs11`.
+- **Galaxy Tab S12+ (`<GalaxyTab variant="tabs12plus">`).** Samsung's 12.6″
+  tablet from September 2026, a size the catalog has not had before (there
+  was no Tab S11+), so it starts its own `Galaxy Tab S+` line and supersedes
+  nothing. Published 289.5 × 187.8 × 5.3 mm body and 2800 × 1752 panel on
+  the family's half-scale dp grid, 876 × 1400 (1400 × 876 in landscape). It
+  has the S11's layout at a larger size: a uniform ~9 mm bezel with the front
+  camera in it rather than a notch, one rear ring and flash, and the S11's
+  keys at the camera end. The USB-C is on the opposite short edge. Gray and
+  Silver. The rest of the detail is measured off Samsung's and GSMArena's
+  orthographic renders. The family's default stays `tabs11`.
+- **MacBook Pro 14″ and 16″ with PROLED XDR display** (`variant="proled14"`,
+  `"proled16"` on `Laptop` / `LaptopMockup`), Apple's October 2026 OLED
+  touchscreen Pros. Each is a new body (310.8 × 216.3 × 15.0 mm and
+  355.5 × 244.2 × 16.0 mm) around a taller panel at the same 254 ppi, so the
+  default desktops are 1512×993 and 1736×1133. There is no notch: a Dynamic
+  Island floats just below the top edge instead, drawn over your content as
+  the notch is, and measured off Apple's product imagery at 11.8 × 6.2 mm
+  because Apple publishes no size for it. The bezels are 4.2 mm, the lid
+  logo glows, and the editing keys carry symbols. Both come in Space Black
+  and Silver. They are product lines of their own, so the mini-LED
+  `pro14` / `pro16`, which Apple still sells, stay current rather than
+  folding away as older models. `LaptopSpec` gains an optional `island`
+  (`IPhoneSpec.island`'s `{ width, height, offsetY }`), which a spec carries
+  instead of a `notch`, never with one, plus `glass.rim` for the thinner
+  bezels and `logo.lit`.
+- **The iPad mini (A20 Pro, October 2026).** `IPadMockup` gains
+  `variant="ipadmini"`, the catalog's first iPad mini, in a line of its own
+  (so nothing is superseded and the family default stays `ipadpro13`): the
+  published 195.3 × 132.6 × 5.4 mm body, the 8.5" 2316×1512 OLED panel at
+  326 ppi (756×1158 logical, the 2x grid, as Apple has not listed the point
+  size yet) behind a uniform 7.4 mm bezel with 7.4 mm display corners, the
+  front camera on the landscape edge 12.8 mm off centre, one lens with a
+  True Tone flash below it, Touch ID in an 18.5 mm top button with both
+  volume keys at the far end of the same edge, the Pencil Pro window, no
+  Smart Connector and no speaker holes (its Acoustic Display plays through
+  the glass), in Midnight and Starlight. Apple has not published its
+  dimensional drawing yet, so the detail geometry is measured off Apple's
+  straight-on product renders, with the camera module from the A17 Pro
+  mini's drawing. `TabletSpec` gains three optional fields, inert on every
+  other tablet: `frontCamera.offsetY`, a `flash` on the single-lens camera,
+  and `edge: 'top'` keys in `sideButtons`.
+
 ### Fixed
 
 - **Screens off their glass in Safari and on iPhone.** A live screen could

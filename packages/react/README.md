@@ -4,7 +4,7 @@
   <img src="https://raw.githubusercontent.com/area-is/react-3d-mockups/main/assets/hero.png" alt="A laptop, a phone and a watch mockup, each screen showing the same budgeting app" width="720" />
 </p>
 
-[Docs, live demos and a gallery of all 58 models →](https://area.is/react-3d-mockups/docs/gallery)
+[Docs, live demos and a gallery of all 63 models →](https://area.is/react-3d-mockups/docs/gallery)
 
 **3D device mockups for React**, generated from code, with no 3D files to host. What you
 put on a device's screen is regular DOM, positioned on the glass with CSS 3D
@@ -19,13 +19,15 @@ prop, `experimentalScreenInput`, lets the screens take clicks, scrolling and typ
 > pin an exact version (`npm install --save-exact react-3d-mockups`) if you need it to
 > stay put.
 
-- **Thirty-three devices** - the Galaxy S26 line (S26, S26 Ultra), two foldable
+- **Thirty-eight devices** - the Galaxy S26 line (S26, S26 Ultra), two foldable
   generations (Z Fold 7, the wide Z Fold 8, Z Fold 8 Ultra, Z Flip 7, Z Flip 8) and
   Apple's foldable iPhone Duo, the full iPhone 17 family (17, 17 Air, 17 Pro, 17 Pro
-  Max) and the iPhone 18 Pro / Pro Max, MacBook Air 13"/15", MacBook Pro 14"/16" (M5)
-  and the MacBook Neo 13", iPad Pro 13"/11" (M5), iPad Air 13"/11" (M4), iPad (A16),
-  Galaxy Tab S11 / S11 Ultra, the Apple Watch Series 11, Series 12 and Ultra 4 and the
-  Galaxy Watch 8, Watch 9 and Watch Ultra 2 on
+  Max) and the iPhone 18 Pro / Pro Max, MacBook Air 13"/15", MacBook Pro 14"/16" (M5),
+  the MacBook Pro 14"/16" with PROLED XDR display and the MacBook Neo 13", iPad Pro
+  13"/11" (M5), iPad Air 13"/11" (M4), iPad (A16), iPad mini (A20 Pro),
+  Galaxy Tab S11 / S12+ / S11 Ultra and the Tab S12 Ultra, the Apple Watch
+  Series 11, Series 12 and Ultra 4 and the Galaxy Watch 8, Watch 9 and Watch
+  Ultra 2 on
   full wristbands, and a Studio Display-style 27" monitor, all procedurally generated
   at runtime. No GLB files and nothing to host. The phones, foldables, tablets,
   watches and laptops use a small CSG engine (`three-bvh-csg`, a regular dependency)
@@ -233,16 +235,19 @@ defaulting to the variant's scaled desktop (Air 1280×832, Pro 14 1512×982, Neo
 desktop breakpoints apply). `color` sets the aluminum finish - a `LAPTOP_COLORWAYS` id
 (`'skyblue'`, `'starlight'`, `'midnight'`, the Neo's `'citrus'` and `'indigo'`) or any CSS
 color. The Neo (`'neo13'`) is the notchless one: its camera sits in the bezel above a
-square-cornered panel.
+square-cornered panel. The MacBook Pro with PROLED XDR display (`'proled14'`,
+`'proled16'`, 1512×993 and 1736×1133) has a Dynamic Island floating below the top edge in
+place of the notch, thinner bezels and a lid logo that glows.
 
-### `<IPad>` - the iPad lineup · `<GalaxyTab>` - the Galaxy Tab S11 family
+### `<IPad>` - the iPad lineup · `<GalaxyTab>` - the Galaxy Tab family
 
 Same screen API as the phones, plus `orientation`. `<IPad>` takes `variant`
-`'ipadpro13' | 'ipadpro11' | 'ipadair13' | 'ipadair11' | 'ipad11'`, and `<GalaxyTab>`
-takes `'tabs11' | 'tabs11ultra'`; each accepts only its own. Fully procedural and
+`'ipadpro13' | 'ipadpro11' | 'ipadair13' | 'ipadair11' | 'ipad11' | 'ipadmini'`, and `<GalaxyTab>`
+takes `'tabs11' | 'tabs12plus' | 'tabs11ultra' | 'tabs12ultra'`; each accepts only its own. Fully procedural and
 per-variant accurate: the Pro's camera pod (wide lens, LiDAR, flash) and Pencil
 charging window, the Air's and standard iPad's bare single lens with the Touch ID top
-button, back or edge Smart Connector dots and speaker drill rows; protruding camera
+button, back or edge Smart Connector dots and speaker drill rows, the mini's lens and
+flash, top-edge volume keys and hole-free edges (it plays through its display); protruding camera
 rings, quad speaker slots, gold pogo contacts and (on the Ultra) the U-shaped display
 notch on the Galaxy Tabs; brand marks as real vector geometry (Apple glyph,
 edge-aligned SAMSUNG wordmark) and model wordmarks on the backs; landscape-edge front
@@ -341,14 +346,19 @@ Every variant's screen defaults to the real device's logical resolution (CSS px)
 | MacBook Air 15" (M5) | `air15` | - | 1440×932 | 2880×1864 @ 2x default scaled |
 | MacBook Pro 14" (M5) | `pro14` | - | 1512×982 | 3024×1964 @ 2x default scaled |
 | MacBook Pro 16" (M5) | `pro16` | - | 1728×1117 | 3456×2234 @ 2x default scaled |
+| MacBook Pro 14" PROLED XDR | `proled14` | - | 1512×993 | 3024×1986 @ 2x default scaled |
+| MacBook Pro 16" PROLED XDR | `proled16` | - | 1736×1133 | 3472×2266 @ 2x default scaled |
 | MacBook Neo 13" | `neo13` | - | 1204×753 | 2408×1506 @ 2x default scaled |
 | iPad Pro 13" (M5) | `ipadpro13` | 1032×1376 | 1376×1032 | 2752×2064 @ 2x point grid |
 | iPad Pro 11" (M5) | `ipadpro11` | 834×1210 | 1210×834 | 2420×1668 @ 2x point grid |
 | iPad Air 13" (M4) | `ipadair13` | 1024×1366 | 1366×1024 | 2732×2048 @ 2x point grid |
 | iPad Air 11" (M4) | `ipadair11` | 820×1180 | 1180×820 | 2360×1640 @ 2x point grid |
 | iPad (A16) | `ipad11` | 820×1180 | 1180×820 | 2360×1640 @ 2x point grid |
+| iPad mini (A20 Pro) | `ipadmini` | 756×1158 | 1158×756 | 2316×1512 @ 2x (derived; Apple has not listed its point size yet) |
 | Galaxy Tab S11 | `tabs11` | 800×1280 | 1280×800 | 2560×1600 panel at ½ (xhdpi) |
+| Galaxy Tab S12+ | `tabs12plus` | 876×1400 | 1400×876 | 2800×1752 panel at ½ (xhdpi) |
 | Galaxy Tab S11 Ultra | `tabs11ultra` | 924×1480 | 1480×924 | 2960×1848 panel at ½ (xhdpi) |
+| Galaxy Tab S12 Ultra | `tabs12ultra` | 924×1480 | 1480×924 | 2960×1848 panel at ½ (xhdpi) |
 | Apple Watch Series 11 46mm | `series11` | 208×248 | - | 416×496 @ 2x point grid |
 | Apple Watch Series 12 46mm | `series12` | 208×248 | - | 416×496 @ 2x point grid |
 | Apple Watch Ultra 4 49mm | `ultra4` | 211×257 | - | 422×514 @ 2x point grid |

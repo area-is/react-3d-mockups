@@ -101,6 +101,14 @@ export const DEVICE_LINEUP: { readonly [K in DeviceKind]: Readonly<Record<Device
     pro14: { name: 'MacBook Pro 14″', line: 'MacBook Pro 14″', announced: '2025-10' },
     pro16: { name: 'MacBook Pro 16″', line: 'MacBook Pro 16″', announced: '2026-03' },
     neo13: { name: 'MacBook Neo 13″', line: 'MacBook Neo', announced: '2026-03' },
+    // Lines of their own, not the 'MacBook Pro 14″' / '16″' ones: Apple still
+    // sells the mini-LED Pros beside them as the cheaper Pro, and refreshes
+    // the two ranges separately (the mini-LED 14″ took the M6 the day before
+    // the PROLED models were announced on the M5 Pro / M5 Max). In one line
+    // the PROLED would supersede pro14 / pro16 and fold them away under
+    // "older models" while they are still on sale.
+    proled14: { name: 'MacBook Pro 14″ PROLED XDR', line: 'MacBook Pro 14″ PROLED', announced: '2026-10' },
+    proled16: { name: 'MacBook Pro 16″ PROLED XDR', line: 'MacBook Pro 16″ PROLED', announced: '2026-10' },
   },
   ipad: {
     ipadpro13: { name: 'iPad Pro 13″', line: 'iPad Pro 13″', announced: '2025-10' },
@@ -108,10 +116,14 @@ export const DEVICE_LINEUP: { readonly [K in DeviceKind]: Readonly<Record<Device
     ipadair13: { name: 'iPad Air 13″', line: 'iPad Air 13″', announced: '2026-03' },
     ipadair11: { name: 'iPad Air 11″', line: 'iPad Air 11″', announced: '2026-03' },
     ipad11: { name: 'iPad 11″', line: 'iPad', announced: '2025-03' },
+    ipadmini: { name: 'iPad mini', line: 'iPad mini', announced: '2026-10' },
   },
   galaxyTab: {
     tabs11: { name: 'Galaxy Tab S11', line: 'Galaxy Tab S', announced: '2025-09' },
+    // A line of its own: there was no Tab S11+, so it supersedes nothing.
+    tabs12plus: { name: 'Galaxy Tab S12+', line: 'Galaxy Tab S+', announced: '2026-09' },
     tabs11ultra: { name: 'Galaxy Tab S11 Ultra', line: 'Galaxy Tab S Ultra', announced: '2025-09' },
+    tabs12ultra: { name: 'Galaxy Tab S12 Ultra', line: 'Galaxy Tab S Ultra', announced: '2026-09' },
   },
   appleWatch: {
     series11: { name: 'Apple Watch Series 11', line: 'Apple Watch Series', announced: '2025-09' },

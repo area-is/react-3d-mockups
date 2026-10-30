@@ -1,0 +1,103 @@
+---
+title: Galaxy Tab S12 Ultra
+description: The Galaxy Tab S12 Ultra in WebGL, with a live prop explorer and the full GalaxyTabMockup reference.
+---
+
+Drive every prop from the inspector; the `demo.tsx` panel rewrites itself to
+exactly what is being passed. The explorer and every example below are pinned to `variant="tabs12ultra"`; the props, regions and colorways apply to the whole family.
+
+<MockupExplorer component="GalaxyTabMockup" variant="tabs12ultra" />
+
+`<GalaxyTab>` and `<GalaxyTabMockup>` render the Samsung Galaxy Tab S11 family
+and its successors at true relative sizes - the 11" S11, the 12.6" S12+, the
+14.6" S11 Ultra and the S12 Ultra, which keeps the S11 Ultra's body. Each gets
+its real hardware: the protruding camera rings and flash floating straight on
+the back panel (two rings on the Ultras, one on the S11 and S12+), the volume
+rocker and power key on the long edge, the magnetic S Pen side-mount, the
+keyboard pogo column, milled speaker slots near all four corners, USB-C on a
+short edge (beside the camera corner on the S11s and the S12 Ultra, opposite it
+on the S12+), and the SAMSUNG wordmark set for the landscape hold - so
+it lies along the edge in portrait, exactly like the print on the hardware.
+The Ultras add the front camera's U-shaped display notch, which rides the right
+edge in portrait and the top center in landscape, just like the physical panel.
+
+## `<GalaxyTab>` vs `<GalaxyTabMockup>`
+
+<BareVsMockup object="GalaxyTab" kind="galaxyTab" slot="Screen" />
+
+To render this model, pass `variant="tabs12ultra"`.
+
+```tsx
+import { MockupCanvas, GalaxyTab, GalaxyTabMockup } from 'react-3d-mockups'
+
+// The one-liner: its own canvas, with lighting, a ground shadow, drag-to-orbit
+// controls and a camera already framed on the object.
+<GalaxyTabMockup variant="tabs12ultra" float style={{ height: 520 }}>
+  <YourApp />
+</GalaxyTabMockup>
+
+// The same model with no stage of its own. Inside a canvas you arrange
+// yourself it can be posed, animated, lit and joined by anything else.
+<MockupCanvas>
+  <GalaxyTab variant="tabs12ultra" rotation={[0, 0.4, 0]}>
+    <YourApp />
+  </GalaxyTab>
+</MockupCanvas>
+```
+
+## Props
+
+Beyond the [shared screen props](/docs/screen-content) and, on the mockup, the
+[shared mockup props](/docs/api):
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `variant` | `'tabs11' \| 'tabs12plus' \| 'tabs11ultra' \| 'tabs12ultra'` | `'tabs11'` | Tab S11 (single camera ring), Tab S12+ (single ring, 12.6" panel with the camera in the bezel), Tab S11 Ultra (dual rings, 14.6" panel with the U-shaped notch) or Tab S12 Ultra (the S11 Ultra's body with the generation's internals). |
+| `orientation` | `'portrait' \| 'landscape'` | `'portrait'` | Landscape lays the tablet on its side and swaps the virtual display with upright content. |
+| `statusBar` | `boolean \| StatusBarOption` | `false` | Draw the system status bar across the top of the screen. `true` gives the platform's defaults - One UI's tablet bar, with the clock at the leading inset and the meters at the trailing one; an object sets the clock, the meters and the ink (`{{ time: '14:05', battery: 0.42, batteryPercent: true, color: '#1c1c1e' }}`). It is placed from this device's own camera cutout and logical grid, so it lines up with the hardware on every variant. See [Status bar](/docs/screen-content#status-bar). |
+| `color` | `string` | `'#2b292c'` | Body color. Takes a colorway id from `GALAXY_TAB_COLORWAYS[variant]` (see [Colorways](#colorways)) or any CSS color. |
+| `resolution` | `number` | per variant | Defaults to the variant's logical grid: 800×1280 (tabs11), 876×1400 (tabs12plus), 924×1480 (tabs11ultra, tabs12ultra). |
+
+## Regions
+
+One region: the screen (bare children). Use the explicit
+`<GalaxyTabMockup.Screen>` slot when you want per-surface overrides -
+`surfaceBackground`, `resolution`, `surfaceStyle`. The same slot exists on
+the bare `<GalaxyTab>`.
+
+## Colorways
+
+Pass a colorway id from `GALAXY_TAB_COLORWAYS[variant]` for that model's
+retail finish, or any CSS color for a custom one. An id wins over a CSS color
+of the same name - pass hex if you mean the CSS one.
+
+| Model | Colorway ids (body color) |
+| --- | --- |
+| Galaxy Tab S11, Galaxy Tab S12+, Galaxy Tab S11 Ultra, Galaxy Tab S12 Ultra (`tabs11`, `tabs12plus`, `tabs11ultra`, `tabs12ultra`) | `gray` (`#63656a`), `silver` (`#d3d4d8`) |
+
+## This model
+
+### Galaxy Tab S12 Ultra
+
+The S11 Ultra's body to the tenth of a millimetre - 326.3 × 208.5 × 5.1 mm
+around the same 14.6″ 2960×1848 panel (924×1480 logical) - with the same
+U-shaped notch, the two protruding rear rings and flash, and the S Pen on the
+long side. The generation is internal, none of it visible from outside, so
+the model shares the S11 Ultra's geometry deliberately. Retail finishes:
+`gray`, `silver`.
+
+<MockupExplorer
+  component="GalaxyTabMockup"
+  variant="tabs12ultra"
+  props={{ color: 'silver', float: true, rotation: [0, -0.3, 0] }}
+/>
+
+## Mockup-able areas
+
+Every live surface filled with chroma green, labeled with the slot that
+feeds it - the fastest way to see exactly where your content lands and
+what stays 3D hardware.
+
+<MockupExplorer component="GalaxyTabMockup" variant="tabs12ultra" screen="chroma" />
+
+<DeviceDisclaimer brands="Samsung" />

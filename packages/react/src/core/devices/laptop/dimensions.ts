@@ -1,6 +1,7 @@
 /**
  * Laptop device dimensions - MacBook Air 13" / 15" (M5), MacBook Pro 14" /
- * 16" (M5) and the MacBook Neo 13".
+ * 16" (M5), the MacBook Pro 14" / 16" with PROLED XDR display and the MacBook
+ * Neo 13".
  *
  * Every variant shares one world scale (~72.4 mm per unit, set so the Air's
  * closed footprint is exactly 4.2 x 2.97 units), so they keep their true
@@ -24,6 +25,24 @@ export interface LaptopPort {
   shape?: 'pill' | 'round'
 }
 
+/** The notch: a cutout hanging from the display's top edge, menu-bar deep. */
+export interface LaptopNotch {
+  width: number
+  height: number
+  radius: number
+}
+
+/**
+ * A Dynamic Island: a pill floating just below the display's top edge. The
+ * shape is `IPhoneSpec.island`'s: `offsetY` is the distance from the top
+ * display edge to the pill's centre.
+ */
+export interface LaptopIsland {
+  width: number
+  height: number
+  offsetY: number
+}
+
 export interface LaptopSpec {
   /** Footprint shared by the base and the lid. `radius` is the corner radius. */
   footprint: { width: number; depth: number; radius: number }
@@ -31,6 +50,14 @@ export interface LaptopSpec {
   base: { thickness: number; bevel: number }
   /** Top half: the display lid. When open it stands `footprint.depth` tall. */
   lid: { thickness: number; bevel: number }
+  /**
+   * The black cover glass over the lid's inner face stops `rim` short of the
+   * lid's edge on every side, its corners concentric with the lid's. Leave
+   * it unset for the 5 mm aluminium-and-mask margin of the Air, the mini-LED
+   * Pro and the Neo. The PROLED Pro's panel comes within 4.2 mm of the edge,
+   * so its glass has to reach further out or the panel would overhang it.
+   */
+  glass?: { rim: number }
   /**
    * Active display area within the open lid. `offsetY` is the distance from
    * the lid's vertical center to the display center - the chin below the panel
@@ -43,12 +70,24 @@ export interface LaptopSpec {
     offsetY: number
   }
   /**
+   * What interrupts the top of the panel: a notch, an island or neither (the
+   * Neo), never both - a panel has one camera cutout. The unit tests hold
+   * every variant to that; the type stays an interface with two optional
+   * fields rather than a union, so code that extends `LaptopSpec` keeps
+   * compiling.
+   *
    * Camera notch: sits at the top-center of the display, menu-bar deep. The
-   * notch is the 2021-on Air and Pro design; a laptop without one (the
-   * MacBook Neo) keeps its camera in the bezel above the panel instead - see
-   * `bezelCamera`.
+   * notch is the 2021-on Air and mini-LED Pro design; a laptop without one
+   * keeps its camera in the bezel above the panel (the MacBook Neo - see
+   * `bezelCamera`) or in a Dynamic Island (`island`).
    */
-  notch?: { width: number; height: number; radius: number }
+  notch?: LaptopNotch
+  /**
+   * Dynamic Island: the PROLED MacBook Pros' floating pill, drawn over the
+   * panel the way the notch is. The camera sits in its right-hand end, as on
+   * the iPhone.
+   */
+  island?: LaptopIsland
   /**
    * A camera set in the black bezel above the display rather than in a notch:
    * `offsetY` is how far its centre sits above the display's top edge. Only
@@ -108,8 +147,13 @@ export interface LaptopSpec {
     holePitchZ: number
     holeR: number
   }
-  /** Apple mark on the lid back: width/height and offset from lid center (+ = toward top). */
-  logo: { width: number; height: number; offsetY: number }
+  /**
+   * Apple mark on the lid back: width/height and offset from lid center (+ =
+   * toward top). `lit` makes it glow white from behind, as the PROLED Pro's
+   * does (the first lit Apple on a Mac lid since 2016) - otherwise it is the
+   * glossy tone-on-tone badge.
+   */
+  logo: { width: number; height: number; offsetY: number; lit?: boolean }
   /** Embossed wordmark near the front of the underside. */
   bottomText?: { text: string; width: number; height: number; offsetZ: number }
 }
@@ -340,12 +384,160 @@ const MACBOOK_NEO_13: LaptopSpec = {
   logo: { width: 0.49, height: 0.6, offsetY: 0.05 },
 }
 
-export const LAPTOP_VARIANTS: Record<'air13' | 'air15' | 'pro14' | 'pro16' | 'neo13', LaptopSpec> = {
+/**
+ * The PROLED Pros' Dynamic Island - one part on both sizes. Apple publishes
+ * no size or position for it, so it is measured off the product imagery on
+ * apple.com/macbook-pro/proled-xdr-display, with the panel's own width as
+ * the ruler. Three frames of the 16" (the lit "PRO" hero face-on, the same
+ * art from above, and the display hero) put the pill at 11.84, 11.67 and
+ * 11.74 mm wide; the sharpest, black on the white "PRO" art, at 6.2 mm tall
+ * and centred 4.6 mm below the panel's top edge. That leaves a 1.5 mm strip
+ * of live panel above it, which is what makes it an island and not a notch.
+ */
+const PROLED_ISLAND: LaptopIsland = { width: 0.1623, height: 0.0856, offsetY: 0.0635 }
+
+/**
+ * MacBook Pro 14" with PROLED XDR display (M5 Pro / M5 Max, October 2026) -
+ * 310.8 x 216.3 x 15.0 mm closed, 14.2" tandem OLED touchscreen at 3024x1986
+ * and 254 ppi. A new body, 1.8 mm narrower and 4.9 mm shallower than the
+ * mini-LED 14"'s, around a panel 22 px taller: no notch but a Dynamic Island
+ * (`PROLED_ISLAND`), 4.2 mm bezels and a lid logo that glows. Apple sells it
+ * beside the mini-LED `pro14`, not in its place.
+ *
+ * Body and panel are Apple's tech specs; 254 ppi makes the active area
+ * 302.4 x 198.6 mm, which leaves the 4.2 mm side bezels. Measured off Apple's
+ * product imagery: the island, a 4.3 mm top bezel (the sides' width again), a
+ * 3.4 mm lid against the mini-LED's 3.9 (its base keeps the 14"'s 10.8 mm,
+ * which with the feet is the published 15.0), the M5 Air's symbol legends on
+ * the editing keys, and unchanged drilled grilles beside the keyboard. The
+ * deck keeps the mini-LED 14"'s layout from the front edge, so the depth it
+ * loses comes out behind the keyboard (the 16"'s top-down render agrees), and
+ * the ports keep their distances from the back edge (Apple's side view agrees
+ * to a millimetre). Default scaled resolution 1512x993 (2x).
+ */
+const MACBOOK_PRO_14_PROLED: LaptopSpec = {
+  footprint: { width: 4.293, depth: 2.988, radius: 0.113 },
+  base: { thickness: 0.149, bevel: 0.028 },
+  lid: { thickness: 0.047, bevel: 0.008 },
+  // The glass reaches to 1.1 mm from the lid's edge: the panel stops 4.2 mm
+  // in, and the default 5 mm rim would leave aluminium showing beside it.
+  glass: { rim: 0.015 },
+  // Active area 302.4 x 198.6 mm (3024:1986 exactly, so 1512 points render
+  // 993 tall), 4.3 mm below the lid's top edge. The chin takes the rest of
+  // the lid, 13.4 mm, as it does on the mini-LED Pros. Corners as the
+  // mini-LED's bezel drawing (3.8 mm top, square bottom) - the PROLED's
+  // imagery cannot tell its panel corners from the art's.
+  display: { width: 4.1768, height: 2.7431, radius: [0.052, 0.052, 0, 0], offsetY: 0.063 },
+  island: PROLED_ISLAND,
+  // The well 9.4 mm from the back edge: the mini-LED 14"'s 14.2 less the
+  // 4.9 mm the body lost.
+  keyboard: { width: 3.85, depth: 1.587, offsetZ: -0.5705, tray: true },
+  legends: 'symbols',
+  scoop: { width: 0.753, radius: 0.0593, bite: 0.0345 },
+  // The mini-LED 14"'s trackpad, still 8.1 mm from the front edge.
+  trackpad: { width: 1.792, depth: 1.127, offsetZ: 0.8185 },
+  openAngle: 110,
+  ports: {
+    // The mini-LED 14"'s connectors at its distances from the back edge.
+    left: [
+      { z: -1.1085, width: 0.243, height: 0.046 }, // MagSafe 3
+      { z: -0.8525, width: 0.119, height: 0.039 }, // Thunderbolt 5
+      { z: -0.6475, width: 0.119, height: 0.039 }, // Thunderbolt 5
+      { z: -0.4705, width: 0.055, height: 0.055, shape: 'round' }, // headphone jack
+    ],
+    right: [
+      { z: -1.1085, width: 0.202, height: 0.068 }, // HDMI
+      { z: -0.8525, width: 0.119, height: 0.039 }, // Thunderbolt 5
+      { z: -0.5145, width: 0.369, height: 0.037 }, // SDXC
+    ],
+  },
+  // The mini-LED 14"'s feet, at the same distance in from each edge.
+  feet: { x: 1.7615, z: 1.1125, radius: 0.132 },
+  // 1.8 mm narrower body, same well: the drilling narrows to 12.2 mm, still
+  // 1.8 mm in from the side and ~2 mm off the well.
+  speakers: {
+    x: 2.0373,
+    width: 0.1686,
+    depth: 1.4586,
+    offsetZ: -0.5705,
+    holePitchX: 0.0129,
+    holePitchZ: 0.0129,
+    holeR: 0.00435,
+  },
+  logo: { width: 0.521, height: 0.641, offsetY: 0.054, lit: true },
+  bottomText: { text: 'MacBook Pro', width: 0.793, height: 0.104, offsetZ: 1.3865 },
+}
+
+/**
+ * MacBook Pro 16" with PROLED XDR display (M5 Pro / M5 Max, October 2026) -
+ * 355.5 x 244.2 x 16.0 mm closed, 16.3" tandem OLED touchscreen at 3472x2266
+ * and 254 ppi. The 14" PROLED's design at the mini-LED 16"'s width, 3.9 mm
+ * shallower and 0.8 mm thinner: the same island, bezels, lit logo, symbol
+ * legends and lid, beside the mini-LED `pro16` rather than replacing it.
+ *
+ * Body and panel are Apple's tech specs (active area 347.2 x 226.6 mm at
+ * 254 ppi, so 4.2 mm side bezels). This is the size Apple's face-on imagery
+ * shows: panel-to-lid width 0.976 (the 14"'s would be 0.973) and a lit
+ * panel of 0.6516 aspect (3472:2266 is 0.6526, 3024:1986 0.6567). The base
+ * measures 11.8 mm and the lid 3.4 mm off Apple's side view, which with the
+ * feet is the published 16.0. The deck and ports follow the mini-LED 16"
+ * the way the 14" PROLED follows the 14". Default scaled 1736x1133 (2x).
+ */
+const MACBOOK_PRO_16_PROLED: LaptopSpec = {
+  footprint: { width: 4.91, depth: 3.373, radius: 0.113 },
+  base: { thickness: 0.163, bevel: 0.028 },
+  lid: { thickness: 0.047, bevel: 0.008 },
+  glass: { rim: 0.015 },
+  // Active area 347.2 x 226.6 mm, 4.3 mm below the lid's top edge; the chin
+  // takes the rest, 13.3 mm.
+  display: { width: 4.7956, height: 3.1298, radius: [0.052, 0.052, 0, 0], offsetY: 0.062 },
+  island: PROLED_ISLAND,
+  // 18.8 mm from the back edge: the mini-LED 16"'s 22.6 less the 3.9 mm the
+  // body lost. Apple's top-down render puts it ~18 mm behind the deck's edge.
+  keyboard: { width: 3.85, depth: 1.587, offsetZ: -0.634, tray: true },
+  legends: 'symbols',
+  scoop: { width: 0.753, radius: 0.0593, bite: 0.0345 },
+  trackpad: { width: 2.21, depth: 1.374, offsetZ: 0.885 },
+  openAngle: 110,
+  ports: {
+    left: [
+      { z: -1.301, width: 0.243, height: 0.046 }, // MagSafe 3
+      { z: -1.045, width: 0.119, height: 0.039 }, // Thunderbolt 5
+      { z: -0.84, width: 0.119, height: 0.039 }, // Thunderbolt 5
+      { z: -0.663, width: 0.055, height: 0.055, shape: 'round' }, // headphone jack
+    ],
+    right: [
+      { z: -1.301, width: 0.202, height: 0.068 }, // HDMI
+      { z: -1.045, width: 0.119, height: 0.039 }, // Thunderbolt 5
+      { z: -0.707, width: 0.369, height: 0.037 }, // SDXC
+    ],
+  },
+  feet: { x: 2.0705, z: 1.305, radius: 0.145 },
+  // 34.4 mm of drilling, 1.8 mm in from the side as on the mini-LED 16".
+  speakers: {
+    x: 2.1926,
+    width: 0.475,
+    depth: 1.4586,
+    offsetZ: -0.634,
+    holePitchX: 0.0129,
+    holePitchZ: 0.0129,
+    holeR: 0.00435,
+  },
+  logo: { width: 0.55, height: 0.677, offsetY: 0.054, lit: true },
+  bottomText: { text: 'MacBook Pro', width: 0.793, height: 0.104, offsetZ: 1.579 },
+}
+
+export const LAPTOP_VARIANTS: Record<
+  'air13' | 'air15' | 'pro14' | 'pro16' | 'neo13' | 'proled14' | 'proled16',
+  LaptopSpec
+> = {
   air13: MACBOOK_AIR_13,
   air15: MACBOOK_AIR_15,
   pro14: MACBOOK_PRO_14,
   pro16: MACBOOK_PRO_16,
   neo13: MACBOOK_NEO_13,
+  proled14: MACBOOK_PRO_14_PROLED,
+  proled16: MACBOOK_PRO_16_PROLED,
 }
 
 export type LaptopVariant = keyof typeof LAPTOP_VARIANTS
@@ -372,7 +564,9 @@ export const LAPTOP_MM_PER_UNIT = 72.4
 /**
  * Default CSS px width of each variant's virtual display: the panel's own
  * point grid at 2x (a 2560x1664 Air 13 renders 1280x832, the Neo's
- * 2408x1506 renders 1204x753).
+ * 2408x1506 renders 1204x753). The PROLED panels are taller than the
+ * mini-LED ones at the same 254 ppi: 1512x993 and 1736x1133 (Apple's spec
+ * page lists no other "looks like" default).
  */
 export const LAPTOP_RESOLUTIONS: Record<LaptopVariant, number> = {
   air13: 1280,
@@ -380,6 +574,8 @@ export const LAPTOP_RESOLUTIONS: Record<LaptopVariant, number> = {
   pro14: 1512,
   pro16: 1728,
   neo13: 1204,
+  proled14: 1512,
+  proled16: 1736,
 }
 
 /** Live geometry of the display. Laptops have one pose - always landscape. */

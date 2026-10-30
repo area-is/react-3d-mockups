@@ -102,9 +102,27 @@ const CASES = [
   // the 18 Pro Max: the 17 Pro Max's chassis under the narrower island
   ['iphone-18promax', 'device=iphone&pvariant=18promax&ry=24'],
   ['ipad', 'device=tablet&variant=ipadpro13&ry=22'],
+  // the Galaxy Tabs: the Tab S12+, a notchless panel with the camera in the
+  // bezel on the S11's layout at 12.6", and the Tab S12 Ultra - the S11
+  // Ultra's body, notch and grid, so it defends both Ultras' geometry
+  ['galaxytab-s12plus', 'device=tablet&variant=tabs12plus&ry=22'],
+  ['galaxytab-s12ultra', 'device=tablet&variant=tabs12ultra&ry=22'],
+  // the iPad mini, tipped to show its top edge: the off-centre front camera
+  // and the volume keys beside the Touch ID button, then from behind the
+  // lens, mic and flash down one column on a back with no speaker holes
+  ['ipad-mini', 'device=tablet&variant=ipadmini&ry=22&rx=12&dist=6.8'],
+  ['ipad-mini-back', 'device=tablet&variant=ipadmini&ry=200&rx=12&dist=6.8'],
   ['laptop', 'device=laptop&lvariant=pro14&ry=18'],
   // the notchless Neo: square-cornered panel, camera in the bezel
   ['laptop-neo', 'device=laptop&lvariant=neo13&ry=18'],
+  // the PROLED Pros: a Dynamic Island floating below the panel's top edge
+  // where the notch was, 4.2 mm bezels with the glass reaching out to meet
+  // them, and the lid logo lit from behind - from the back on Space Black
+  // and on Silver, the finish a lit logo has to work hardest to read on
+  ['laptop-proled14', 'device=laptop&lvariant=proled14&ry=18'],
+  ['laptop-proled16', 'device=laptop&lvariant=proled16&ry=18'],
+  ['laptop-proled14-lid', 'device=laptop&lvariant=proled14&color=spaceblack&ry=200&rx=8&dist=10&cy=0.6'],
+  ['laptop-proled16-lid', 'device=laptop&lvariant=proled16&color=silver&ry=200&rx=8&dist=10&cy=0.6'],
   ['fold-open', 'device=fold&ry=22'],
   ['fold-closed', 'device=fold&open=0&ry=22'],
   // the flex poses' split screens must meet seamlessly at the crease - the

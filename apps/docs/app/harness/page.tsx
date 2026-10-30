@@ -644,7 +644,10 @@ function HarnessScene() {
     )
   }
 
-  const dist = Number(params.get('dist') ?? (variant === 'tabs11ultra' ? 9.6 : 8.6))
+  // The 14.6" Tab Ultras (the S12 Ultra is the S11 Ultra's body) need the
+  // wrapper's wider TABLET_ULTRA_CAMERA pose; every other tablet fits at 8.6.
+  const ultra = variant === 'tabs11ultra' || variant === 'tabs12ultra'
+  const dist = Number(params.get('dist') ?? (ultra ? 9.6 : 8.6))
   return (
     <MockupCanvas
       controls={controls}

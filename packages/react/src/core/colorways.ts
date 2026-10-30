@@ -166,6 +166,10 @@ export const LAPTOP_COLORWAYS: Record<LaptopVariant, Colorway[]> = {
   pro14: MACBOOK_PRO_COLORS,
   pro16: MACBOOK_PRO_COLORS,
   neo13: MACBOOK_NEO_COLORS,
+  // The same two anodized finishes as the mini-LED Pro, by name and by
+  // Apple's product shots of the closed lids.
+  proled14: MACBOOK_PRO_COLORS,
+  proled16: MACBOOK_PRO_COLORS,
 }
 
 const IPAD_PRO_COLORS: Colorway[] = [
@@ -191,6 +195,13 @@ export const IPAD_COLORWAYS: Record<IPadVariant, Colorway[]> = {
     { id: 'pink', name: 'Pink', color: '#f9899c' },
     { id: 'yellow', name: 'Yellow', color: '#fbe778' },
   ],
+  // The A20 Pro mini's two finishes: the median of the flat back in Apple's
+  // launch renders. Its Midnight is a blue-grey slate, much lighter than the
+  // MacBook Air's navy of the same name.
+  ipadmini: [
+    { id: 'midnight', name: 'Midnight', color: '#5e6368' },
+    { id: 'starlight', name: 'Starlight', color: '#eae2d9' },
+  ],
 }
 
 const GALAXY_TAB_COLORS: Colorway[] = [
@@ -200,7 +211,13 @@ const GALAXY_TAB_COLORS: Colorway[] = [
 
 export const GALAXY_TAB_COLORWAYS: Record<GalaxyTabVariant, Colorway[]> = {
   tabs11: GALAXY_TAB_COLORS,
+  // The same Gray and Silver: Samsung's S12+ renders sample #d5d6da on the
+  // Silver back against the S11's #d3d4d8.
+  tabs12plus: GALAXY_TAB_COLORS,
   tabs11ultra: GALAXY_TAB_COLORS,
+  // The S12 Ultra ships in the same Gray and Silver. Launch and review
+  // photography shows no visibly different shade, so the pair is shared.
+  tabs12ultra: GALAXY_TAB_COLORS,
 }
 
 export const APPLE_WATCH_COLORWAYS: Record<AppleWatchVariant, Colorway[]> = {

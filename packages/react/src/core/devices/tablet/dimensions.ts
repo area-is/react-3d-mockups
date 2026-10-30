@@ -35,6 +35,12 @@ export interface TabletSpec {
   resolution: number
   /** Optional front-camera display notch (Galaxy Tab Ultra), portrait top edge. */
   notch?: { width: number; height: number; radius: number }
+  /**
+   * The bezel front camera on the landscape-top edge (the portrait right
+   * edge), centred on it unless `offsetY` moves it along that edge: the iPad
+   * mini's sits 12.8 mm toward its top button. Unused with a `notch`.
+   */
+  frontCamera?: { offsetY: number }
   /** Rear camera, front-view coordinates (mirrored on the back panel). */
   rearCamera:
     | {
@@ -48,7 +54,8 @@ export interface TabletSpec {
       }
     | {
         /** iPad-Air/iPad-style bare raised lens: polished ring straight out of
-         * the aluminum, no plate, no flash - plus the pinhole mic beside it.
+         * the aluminum, no plate, no flash (but the mini's `flash`) - plus the
+         * pinhole mic beside it.
          * `r` is the black lens window's ring; `boss` the wider body-colored
          * mound it rises from (Apple draws Ø16.92 around an Ø11.89 window). */
         style: 'single'
@@ -57,6 +64,9 @@ export interface TabletSpec {
         r: number
         boss?: number
         mic: { x: number; y: number }
+        /** The iPad mini's True Tone flash, flush in the back below the mic
+         * (`r` is the window's radius). The Air and the iPad have none. */
+        flash?: { x: number; y: number; r: number }
       }
     | {
         /** Galaxy-Tab-style individual floating ring(s) + flash dot. */
@@ -70,12 +80,15 @@ export interface TabletSpec {
    * Buttons on the portrait-right edge (the landscape-top edge), from the
    * top: the iPads' two separate volume pills, or the Galaxy Tabs' volume
    * rocker + power key (volume sits closer to the corner, per Samsung's
-   * layout diagram).
+   * layout diagram). A key with `edge: 'top'` rides the portrait-top edge
+   * instead, placed by `x`: the iPad mini's volume pills, at the far end of
+   * the top edge from its top button.
    */
-  sideButtons: { y: number; length: number }[]
-  /** Which short edge carries the USB-C port in portrait. The Galaxy Tabs'
-   * port sits on the edge adjacent to the camera corner - the portrait TOP
-   * edge (it centers on the landscape-left edge); iPads use the bottom. */
+  sideButtons: ({ edge?: 'right'; y: number; length: number } | { edge: 'top'; x: number; length: number })[]
+  /** Which short edge carries the USB-C port in portrait. The Tab S11 specs
+   * put it on the edge adjacent to the camera corner - the portrait TOP edge
+   * (it centers on the landscape-left edge); the Tab S12+ and the iPads use
+   * the bottom. */
   usbEdge?: 'top' | 'bottom'
   /**
    * Stylus attachment strip on the portrait right edge (the landscape-top
@@ -304,6 +317,63 @@ const IPAD_11: TabletSpec = {
 }
 
 /**
+ * iPad mini (A20 Pro, Oct 2026 - a new body, not the A17 Pro's): 195.3 x
+ * 132.6 x 5.4 mm, 8.5" 2316x1512 OLED at 326 ppi, so a 180.45 x 117.81 mm
+ * panel inside a uniform ~7.4 mm bezel. Logical resolution 756x1158 pt
+ * (the panel at Apple's 2x iPad scale: Apple's HIG has not listed this
+ * model's point size yet). Bare single lens with a True Tone flash below it,
+ * Touch ID top button, both volume pills on the TOP edge, the Pencil Pro
+ * window and the front camera on the landscape edge, no Smart Connector, and
+ * no speaker holes at all: the "Acoustic Display" drives its woofers through
+ * the glass and hides the tweeters between the glass and the aluminium.
+ *
+ * Apple has not published this model's dimensional drawing yet (the
+ * accessories page still ends at the A17 Pro mini), so unlike the other iPads
+ * the details below are measured off Apple's product imagery: the straight-on
+ * front and back renders on apple.com/ipad-mini (3.56 and 4.34 px/mm, the two
+ * agreeing within 0.4 mm) and the 3840 px newsroom masters. The camera module
+ * carries the A17 Pro mini's drawn sizes, which the photos match.
+ */
+const IPAD_MINI: TabletSpec = {
+  // 14.2-14.3 mm corners on both renders.
+  body: { width: 2.0719, height: 3.0516, depth: 0.0844, radius: 0.223, bevel: 0.01 },
+  glass: { width: 2.0149, height: 2.9946, radius: 0.203 },
+  // 7.4 mm display corners on both renders - the roundest of any iPad.
+  display: { width: 1.8408, height: 2.8195, radius: 0.116 },
+  resolution: 756,
+  // On the landscape edge, 12.8 mm off centre toward the top button (an
+  // ambient-light dot 6.6 mm further on is not modelled).
+  frontCamera: { offsetY: 0.2 },
+  // Lens, mic and flash in one column 14.2 mm in from the long edge, at
+  // 14.2, 25.0 and 32.2 mm from the top. The A17 Pro mini's drawing gives the
+  // module: an Ø11.89 window (the Air's, so the Air's ring) in an Ø15.44
+  // mound; the flash measures Ø6.7, the iPad Pro pod's Ø6.70 window.
+  rearCamera: {
+    style: 'single',
+    x: 2.0719 / 2 - 0.2219,
+    y: 3.0516 / 2 - 0.2219,
+    r: 0.1084,
+    boss: 0.1206,
+    mic: { x: 2.0719 / 2 - 0.2219, y: 3.0516 / 2 - 0.3906 },
+    flash: { x: 2.0719 / 2 - 0.2219, y: 3.0516 / 2 - 0.5031, r: 0.0523 },
+  },
+  // Touch ID top button ~18.5 mm long, 14.4 mm from the corner - longer than
+  // the Air's 12.69 mm part the A17 Pro mini used.
+  topButton: { x: 2.0719 / 2 - 0.3695, length: 0.2891 },
+  // Apple's 10.06 mm volume pills on the usual 12.06 mm pitch, but at the far
+  // end of the TOP edge, starting 14.6 mm from the corner.
+  sideButtons: [
+    { edge: 'top', x: -2.0719 / 2 + 0.3067, length: 0.1572 },
+    { edge: 'top', x: -2.0719 / 2 + 0.4952, length: 0.1572 },
+  ],
+  // The Pencil Pro's window, ~17 mm and centred (one oblique render).
+  stylus: { length: 0.269, offsetY: 0 },
+  // The glyph is out of sight on every new render, so it keeps the A17 Pro
+  // mini's drawn 25.9 x 31.6 mm, 2.6 mm above centre.
+  logo: { mark: 'apple', y: 0.04, width: 0.405, height: 0.494 },
+}
+
+/**
  * Galaxy Tab S11 (11") - 253.8 x 165.3 x 5.5 mm, 11" 2560x1600 (16:10)
  * AMOLED, uniform ~8.5 mm bezel, no notch (bezel front camera on the
  * landscape-top edge). Single 13 MP rear ring (~13.3 mm, photo-measured
@@ -332,6 +402,75 @@ const TAB_S11: TabletSpec = {
   pogo: { surface: 'back', x: -2.583 / 2 + 0.175, y: 0, axis: 'y', spacing: 0.083 },
   logo: { mark: 'samsung', x: 1.057, y: -1.514, width: 0.47, height: 0.073, rotate: true },
   speakers: { style: 'slots', xs: [-0.73, 0.73], length: 0.64, width: 0.02 },
+}
+
+/**
+ * Galaxy Tab S12+ (12.6", Sep 2026 - a size of its own; there was no Tab
+ * S11+): 289.5 x 187.8 x 5.3 mm, 12.6" 2800x1752 (16:10) AMOLED. The panel
+ * is derived from the published diagonal and grid (271.3 x 169.8 mm), which
+ * leaves a uniform ~9.0 mm bezel and NO notch: Samsung's front render and
+ * the launch hands-ons show the 12 MP front camera as a dot centered in the
+ * landscape-top bezel, ~4 mm in from the edge - the Tab S11's arrangement,
+ * not the Ultra's. Single 13 MP rear ring + flash; keys on the landscape-top
+ * edge at the camera end; three keyboard pogo dots; quad speaker slots;
+ * USB-C on the short edge AWAY from the camera. Logical resolution 876x1400
+ * dp (xhdpi estimate, the panel at half scale, as on the other Tabs).
+ *
+ * Measured off Samsung's orthographic front render (6.27 px/mm; its body
+ * outline is 1.5416:1 against the published 1.5415) and GSMArena's
+ * orthographic back and edge renders (2.45 px/mm on the back, 3.77 on the
+ * edges). GSMArena's matching Tab S11 renders reproduce the S11 spec's
+ * ring, flash and wordmark positions to within 0.7 mm, which is what
+ * calibrates them.
+ */
+const TAB_S12_PLUS: TabletSpec = {
+  // Front render: 9.8 mm body corners (two corners fitted, 9.76 / 9.82).
+  body: { width: 2.9344, height: 4.5234, depth: 0.0828, radius: 0.153, bevel: 0.01 },
+  // Front render: a 0.96 mm ring of frame shows around the glass on all sides.
+  glass: { width: 2.9044, height: 4.4934, radius: 0.138 },
+  // 12.6" at 2800:1752 is 169.76 x 271.31 mm (the render reads 170.4 x 272.0).
+  // 3.0 mm display corners, derived from Samsung's two diagonals - 32.04 cm
+  // full rectangle, 31.78 cm with the corners rounded (the render reads 3.6).
+  display: { width: 2.6525, height: 4.2392, radius: 0.047 },
+  resolution: 876,
+  rearCamera: {
+    style: 'rings',
+    // Ring center 16.3 mm from the landscape-top edge and 16.2 mm from the
+    // camera end. Chamfer to chamfer it reads 14.8 mm against the S11's 14.2
+    // on the same renders, so it is the S11's modelled 13.3 mm ring scaled by
+    // that ratio. Flash on the ring's row, 29.6 mm from the camera end.
+    rings: [{ x: 2.9344 / 2 - 0.2547, y: 4.5234 / 2 - 0.2531, r: 0.108 }],
+    flash: { x: 2.9344 / 2 - 0.2547, y: 4.5234 / 2 - 0.4625 },
+  },
+  // Front render: the S11's keys at the S11's distances from the camera-end
+  // corner, to 0.2 mm - a 20.2 mm volume rocker at 46.4-66.6 mm, then a
+  // 13.6 mm power key at 76.5-90.1 mm.
+  sideButtons: [
+    { y: 4.5234 / 2 - 0.886, length: 0.316 },
+    { y: 4.5234 / 2 - 1.303, length: 0.209 },
+  ],
+  // GSMArena's edge renders put the USB-C on the edge seen from BELOW (its
+  // strip has the ring's silhouette under it; the mic-hole edge, seen from
+  // above, has it over it), i.e. the end away from the camera. Samsung's
+  // IP68 render shows the port on that short edge, and HiTechCentury's review
+  // puts it on the right of a tablet held with its keys top-left. The S11
+  // spec keeps it at the camera end; its GSMArena renders read the same way
+  // as these, which is worth a second look there.
+  usbEdge: 'bottom',
+  // Not drawn on the Galaxy Tabs (the pen clings to a clean edge); recorded
+  // for completeness. Mapped off a hands-on photo through the display's
+  // homography (checked against the front camera, which it puts 0.25 mm off
+  // the center line): the pen rests 132.5-278.3 mm from the camera end.
+  stylus: { length: 2.278, offsetY: -0.948 },
+  // GSMArena back render: three Ø2.5 dots 4.5 mm apart, centered, 10.9 mm in
+  // from the landscape-bottom edge (the S11's render reads the same).
+  pogo: { surface: 'back', x: -2.9344 / 2 + 0.1703, y: 0, axis: 'y', spacing: 0.0703 },
+  // 29.1 mm wordmark centered 77.5 mm toward the landscape-top edge and
+  // 114.0 mm toward the far end, at the S11 spec's aspect.
+  logo: { mark: 'samsung', x: 1.211, y: -1.781, width: 0.455, height: 0.071, rotate: true },
+  // GSMArena edge renders: two 19.5 mm slots per short edge, centered
+  // ±61.9 mm from its middle.
+  speakers: { style: 'slots', xs: [-0.967, 0.967], length: 0.305, width: 0.02 },
 }
 
 /**
@@ -368,9 +507,27 @@ const TAB_S11_ULTRA: TabletSpec = {
   speakers: { style: 'slots', xs: [-1.075, 1.075], length: 0.64, width: 0.02 },
 }
 
-/** The iPad lineup: two Pros, two Airs and the standard iPad. */
+/**
+ * Galaxy Tab S12 Ultra (14.6", Sep 2026) - the Tab S11 Ultra's chassis.
+ * Samsung publishes its 326.3 x 208.5 x 5.1 mm Armor Aluminum body (692 g
+ * Wi-Fi, 695 g 5G), the S11 Ultra's to the tenth of a millimetre, around the
+ * same 14.6" 2960x1848 120 Hz Dynamic AMOLED 2X. Launch photography shows the
+ * same small U-shaped notch on the landscape-top edge, the same two
+ * protruding rear rings (13 MP wide + 8 MP ultra-wide) with the flash
+ * inboard, the same keys on the landscape-top edge and the same magnetic
+ * S Pen spot. On GSMArena's back shots of both generations the ring pitch
+ * (~19 mm) and flash position (~50 mm in) read the same, against this spec's
+ * 19.2 and 49.5 mm. The generation is internal, so the geometry is the
+ * S11 Ultra's, carried over deliberately rather than remeasured, and the
+ * logical grid stays 924x1480 dp.
+ */
+const TAB_S12_ULTRA: TabletSpec = {
+  ...TAB_S11_ULTRA,
+}
+
+/** The iPad lineup: two Pros, two Airs, the standard iPad and the mini. */
 export const IPAD_VARIANTS: Record<
-  'ipadpro13' | 'ipadpro11' | 'ipadair13' | 'ipadair11' | 'ipad11',
+  'ipadpro13' | 'ipadpro11' | 'ipadair13' | 'ipadair11' | 'ipad11' | 'ipadmini',
   TabletSpec
 > = {
   ipadpro13: IPAD_PRO_13,
@@ -378,12 +535,15 @@ export const IPAD_VARIANTS: Record<
   ipadair13: IPAD_AIR_13,
   ipadair11: IPAD_AIR_11,
   ipad11: IPAD_11,
+  ipadmini: IPAD_MINI,
 }
 
-/** The Galaxy Tab S11 family. */
-export const GALAXY_TAB_VARIANTS: Record<'tabs11' | 'tabs11ultra', TabletSpec> = {
+/** The Galaxy Tab S11 and S12 families: the S12 Ultra is on the S11 Ultra's chassis. */
+export const GALAXY_TAB_VARIANTS: Record<'tabs11' | 'tabs12plus' | 'tabs11ultra' | 'tabs12ultra', TabletSpec> = {
   tabs11: TAB_S11,
+  tabs12plus: TAB_S12_PLUS,
   tabs11ultra: TAB_S11_ULTRA,
+  tabs12ultra: TAB_S12_ULTRA,
 }
 
 export type IPadVariant = keyof typeof IPAD_VARIANTS
