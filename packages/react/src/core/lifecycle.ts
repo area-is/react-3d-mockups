@@ -116,6 +116,7 @@ export const DEVICE_LINEUP: { readonly [K in DeviceKind]: Readonly<Record<Device
     ipadair13: { name: 'iPad Air 13″', line: 'iPad Air 13″', announced: '2026-03' },
     ipadair11: { name: 'iPad Air 11″', line: 'iPad Air 11″', announced: '2026-03' },
     ipad11: { name: 'iPad 11″', line: 'iPad', announced: '2025-03' },
+    ipadmini: { name: 'iPad mini', line: 'iPad mini', announced: '2026-10' },
   },
   galaxyTab: {
     tabs11: { name: 'Galaxy Tab S11', line: 'Galaxy Tab S', announced: '2025-09' },

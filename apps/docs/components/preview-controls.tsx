@@ -234,6 +234,7 @@ const MODELS = new Map<unknown, ModelControls>([
         { value: 'ipadair13', label: 'iPad Air 13″' },
         { value: 'ipadair11', label: 'iPad Air 11″' },
         { value: 'ipad11', label: 'iPad (A16)' },
+        { value: 'ipadmini', label: 'iPad mini' },
       ],
       catalogs: IPAD_COLORWAYS as Record<string, Colorway[]>,
       controls: [ORIENTATION],

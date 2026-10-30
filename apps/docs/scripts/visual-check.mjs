@@ -107,6 +107,11 @@ const CASES = [
   // Ultra's body, notch and grid, so it defends both Ultras' geometry
   ['galaxytab-s12plus', 'device=tablet&variant=tabs12plus&ry=22'],
   ['galaxytab-s12ultra', 'device=tablet&variant=tabs12ultra&ry=22'],
+  // the iPad mini, tipped to show its top edge: the off-centre front camera
+  // and the volume keys beside the Touch ID button, then from behind the
+  // lens, mic and flash down one column on a back with no speaker holes
+  ['ipad-mini', 'device=tablet&variant=ipadmini&ry=22&rx=12&dist=6.8'],
+  ['ipad-mini-back', 'device=tablet&variant=ipadmini&ry=200&rx=12&dist=6.8'],
   ['laptop', 'device=laptop&lvariant=pro14&ry=18'],
   // the notchless Neo: square-cornered panel, camera in the bezel
   ['laptop-neo', 'device=laptop&lvariant=neo13&ry=18'],

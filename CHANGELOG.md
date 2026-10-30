@@ -43,6 +43,22 @@ breaking change can ship in a minor release, and is always listed under
   (`IPhoneSpec.island`'s `{ width, height, offsetY }`), which a spec carries
   instead of a `notch`, never with one, plus `glass.rim` for the thinner
   bezels and `logo.lit`.
+- **The iPad mini (A20 Pro, October 2026).** `IPadMockup` gains
+  `variant="ipadmini"`, the catalog's first iPad mini, in a line of its own
+  (so nothing is superseded and the family default stays `ipadpro13`): the
+  published 195.3 × 132.6 × 5.4 mm body, the 8.5" 2316×1512 OLED panel at
+  326 ppi (756×1158 logical, the 2x grid, as Apple has not listed the point
+  size yet) behind a uniform 7.4 mm bezel with 7.4 mm display corners, the
+  front camera on the landscape edge 12.8 mm off centre, one lens with a
+  True Tone flash below it, Touch ID in an 18.5 mm top button with both
+  volume keys at the far end of the same edge, the Pencil Pro window, no
+  Smart Connector and no speaker holes (its Acoustic Display plays through
+  the glass), in Midnight and Starlight. Apple has not published its
+  dimensional drawing yet, so the detail geometry is measured off Apple's
+  straight-on product renders, with the camera module from the A17 Pro
+  mini's drawing. `TabletSpec` gains three optional fields, inert on every
+  other tablet: `frontCamera.offsetY`, a `flash` on the single-lens camera,
+  and `edge: 'top'` keys in `sideButtons`.
 
 ### Fixed
 

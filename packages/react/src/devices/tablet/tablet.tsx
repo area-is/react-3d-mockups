@@ -263,12 +263,17 @@ function TabletBody({
         </mesh>
 
         {/* front camera - a dot in the bezel on the landscape-top (portrait
-            right) edge, where every current iPad and the Tab S11 put it; the
-            Tab Ultra's camera lives in its display notch instead */}
+            right) edge, where every current iPad and the Tab S11 put it
+            (centred, but the mini's sits toward its top button); the Tab
+            Ultra's camera lives in its display notch instead */}
         {!notch && (
           <mesh
             rotation-x={Math.PI / 2}
-            position={[display.width / 2 + (glass.width - display.width) / 4, 0, body.depth / 2 + 0.004]}
+            position={[
+              display.width / 2 + (glass.width - display.width) / 4,
+              spec.frontCamera?.offsetY ?? 0,
+              body.depth / 2 + 0.004,
+            ]}
           >
             <cylinderGeometry args={[0.016, 0.016, 0.004, 16]} />
             <meshPhysicalMaterial color="#0a1420" metalness={0.4} roughness={0.2} clearcoat={1} />
@@ -349,6 +354,13 @@ function TabletBody({
               <cylinderGeometry args={[0.011, 0.011, 0.008, 12]} />
               <meshStandardMaterial color="#08090c" roughness={0.6} />
             </mesh>
+            {/* the mini's True Tone flash: the Pro pod's flush Fresnel
+                window, set straight into the back below the mic */}
+            {rearCamera.flash && (
+              <group position={[rearCamera.flash.x, rearCamera.flash.y, backZ - 0.002]}>
+                <FlashModule r={rearCamera.flash.r} fresnel />
+              </group>
+            )}
           </>
         )}
 
@@ -485,12 +497,15 @@ function TabletBody({
 
         {/* buttons - machined pills seated in the frame. iPads: the top
             (Touch ID) button on the top edge + two separate volume pills on
-            the right edge. Tabs: volume rocker nearer the corner, then the
-            power key, on the right edge (the top edge in landscape). */}
+            the right edge (the mini's on the top edge's far end). Tabs:
+            volume rocker nearer the corner, then the power key, on the right
+            edge (the top edge in landscape). */}
         {spec.topButton &&
           framePill('top', spec.topButton.x, body.height / 2 - 0.014, spec.topButton.length, true)}
-        {spec.sideButtons.map(({ y, length }, i) =>
-          framePill(i, body.width / 2 - 0.014, y, length, false)
+        {spec.sideButtons.map((key, i) =>
+          key.edge === 'top'
+            ? framePill(i, key.x, body.height / 2 - 0.014, key.length, true)
+            : framePill(i, body.width / 2 - 0.014, key.y, key.length, false)
         )}
 
         {/* speaker machining on the short edges: iPad drilled hole clusters /
@@ -605,8 +620,8 @@ export interface IPadProps extends TabletCommonProps {
   /**
    * Which iPad to render, at true relative sizes: `ipadpro13` (default) or
    * `ipadpro11` - camera pod with LiDAR, Face ID, Thunderbolt - `ipadair13` /
-   * `ipadair11` (bare single lens, Touch ID top button), or `ipad11`, the
-   * standard A16 iPad.
+   * `ipadair11` (bare single lens, Touch ID top button), `ipad11`, the
+   * standard A16 iPad, or `ipadmini`, the 8.5" OLED iPad mini (A20 Pro).
    */
   variant?: IPadVariant
 }
@@ -617,7 +632,8 @@ export interface IPadProps extends TabletCommonProps {
  * wide lens, LiDAR and flash; the Air's and iPad's bare polished lens), the
  * top button, volume pills, Apple Pencil charging strip, Smart Connector pogo
  * dots, the Apple glyph and model wordmark on the back, and drilled speaker
- * clusters in both short edges.
+ * clusters in both short edges (none on the mini, whose speakers play
+ * through the glass).
  *
  * Must be rendered inside a react-three-fiber `<Canvas>` (or `<MockupCanvas>`).
  */

@@ -195,6 +195,13 @@ export const IPAD_COLORWAYS: Record<IPadVariant, Colorway[]> = {
     { id: 'pink', name: 'Pink', color: '#f9899c' },
     { id: 'yellow', name: 'Yellow', color: '#fbe778' },
   ],
+  // The A20 Pro mini's two finishes: the median of the flat back in Apple's
+  // launch renders. Its Midnight is a blue-grey slate, much lighter than the
+  // MacBook Air's navy of the same name.
+  ipadmini: [
+    { id: 'midnight', name: 'Midnight', color: '#5e6368' },
+    { id: 'starlight', name: 'Starlight', color: '#eae2d9' },
+  ],
 }
 
 const GALAXY_TAB_COLORS: Colorway[] = [

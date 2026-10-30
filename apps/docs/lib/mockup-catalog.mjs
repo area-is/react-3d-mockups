@@ -127,6 +127,11 @@ export const DEVICES = [
   device('ipad-11', 'iPad 11″', 'IPadMockup', 'ipad11', 'device=tablet&variant=ipad11&color=blue&ry=-22', 'Tablets', [
     'ipad', 'apple tablet', 'tablet', 'ipados', 'ipad a16', 'ipad11',
   ]),
+  // Framed closer than its siblings' default 8.6 so the 195 mm mini fills its
+  // tile as they do theirs.
+  device('ipad-mini', 'iPad mini', 'IPadMockup', 'ipadmini', 'device=tablet&variant=ipadmini&color=midnight&ry=-22&dist=6.8', 'Tablets', [
+    'ipad mini', 'mini', 'small tablet', 'oled ipad', 'tablet', 'ipados', 'ipadmini',
+  ]),
   device('galaxy-tab-s11', 'Galaxy Tab S11', 'GalaxyTabMockup', 'tabs11', 'device=tablet&variant=tabs11&color=gray&ry=-22', 'Tablets', [
     'galaxy tab', 'samsung tablet', 'android tablet', 'tablet', 'tabs11',
   ]),

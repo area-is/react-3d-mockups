@@ -65,7 +65,11 @@ describe('Galaxy Tab S12+', () => {
   })
 
   it('puts the keys at the camera end and the USB-C at the other', () => {
-    for (const key of spec.sideButtons) expect(key.y).toBeGreaterThan(0)
+    // Long-edge keys, placed by `y` (the iPad mini's top-edge keys take `x`).
+    for (const key of spec.sideButtons) {
+      expect(key.edge).not.toBe('top')
+      if (key.edge !== 'top') expect(key.y).toBeGreaterThan(0)
+    }
     expect(spec.usbEdge).toBe('bottom')
   })
 

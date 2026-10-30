@@ -218,6 +218,7 @@ const DEVICES: Record<string, ExplorerSpec> = {
       { id: 'ipadair13', label: 'iPad Air 13"' },
       { id: 'ipadair11', label: 'iPad Air 11"' },
       { id: 'ipad11', label: 'iPad' },
+      { id: 'ipadmini', label: 'iPad mini' },
     ],
     colorways: IPAD_COLORWAYS,
     orientation: true,

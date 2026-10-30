@@ -55,6 +55,7 @@ const ROWS = {
   ipadpro11: ['ipad', { variant: 'ipadpro11' }],
   ipadair13: ['ipad', { variant: 'ipadair13' }],
   ipadair11: ['ipad', { variant: 'ipadair11' }],
+  ipadmini: ['ipad', { variant: 'ipadmini' }],
   ipad11: ['ipad', { variant: 'ipad11' }],
   tabs11: ['galaxyTab', { variant: 'tabs11' }],
   tabs12plus: ['galaxyTab', { variant: 'tabs12plus' }],

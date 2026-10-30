@@ -4,7 +4,7 @@
   <img src="https://raw.githubusercontent.com/area-is/react-3d-mockups/main/assets/hero.png" alt="A laptop, a phone and a watch mockup, each screen showing the same budgeting app" width="720" />
 </p>
 
-[Docs, live demos and a gallery of all 62 models →](https://area.is/react-3d-mockups/docs/gallery)
+[Docs, live demos and a gallery of all 63 models →](https://area.is/react-3d-mockups/docs/gallery)
 
 **3D device mockups for React**, generated from code, with no 3D files to host. What you
 put on a device's screen is regular DOM, positioned on the glass with CSS 3D
@@ -19,12 +19,12 @@ prop, `experimentalScreenInput`, lets the screens take clicks, scrolling and typ
 > pin an exact version (`npm install --save-exact react-3d-mockups`) if you need it to
 > stay put.
 
-- **Thirty-seven devices** - the Galaxy S26 line (S26, S26 Ultra), two foldable
+- **Thirty-eight devices** - the Galaxy S26 line (S26, S26 Ultra), two foldable
   generations (Z Fold 7, the wide Z Fold 8, Z Fold 8 Ultra, Z Flip 7, Z Flip 8) and
   Apple's foldable iPhone Duo, the full iPhone 17 family (17, 17 Air, 17 Pro, 17 Pro
   Max) and the iPhone 18 Pro / Pro Max, MacBook Air 13"/15", MacBook Pro 14"/16" (M5),
   the MacBook Pro 14"/16" with PROLED XDR display and the MacBook Neo 13", iPad Pro
-  13"/11" (M5), iPad Air 13"/11" (M4), iPad (A16),
+  13"/11" (M5), iPad Air 13"/11" (M4), iPad (A16), iPad mini (A20 Pro),
   Galaxy Tab S11 / S12+ / S11 Ultra and the Tab S12 Ultra, the Apple Watch
   Series 11, Series 12 and Ultra 4 and the Galaxy Watch 8, Watch 9 and Watch
   Ultra 2 on
@@ -242,11 +242,12 @@ place of the notch, thinner bezels and a lid logo that glows.
 ### `<IPad>` - the iPad lineup · `<GalaxyTab>` - the Galaxy Tab family
 
 Same screen API as the phones, plus `orientation`. `<IPad>` takes `variant`
-`'ipadpro13' | 'ipadpro11' | 'ipadair13' | 'ipadair11' | 'ipad11'`, and `<GalaxyTab>`
+`'ipadpro13' | 'ipadpro11' | 'ipadair13' | 'ipadair11' | 'ipad11' | 'ipadmini'`, and `<GalaxyTab>`
 takes `'tabs11' | 'tabs12plus' | 'tabs11ultra' | 'tabs12ultra'`; each accepts only its own. Fully procedural and
 per-variant accurate: the Pro's camera pod (wide lens, LiDAR, flash) and Pencil
 charging window, the Air's and standard iPad's bare single lens with the Touch ID top
-button, back or edge Smart Connector dots and speaker drill rows; protruding camera
+button, back or edge Smart Connector dots and speaker drill rows, the mini's lens and
+flash, top-edge volume keys and hole-free edges (it plays through its display); protruding camera
 rings, quad speaker slots, gold pogo contacts and (on the Ultra) the U-shaped display
 notch on the Galaxy Tabs; brand marks as real vector geometry (Apple glyph,
 edge-aligned SAMSUNG wordmark) and model wordmarks on the backs; landscape-edge front
@@ -353,6 +354,7 @@ Every variant's screen defaults to the real device's logical resolution (CSS px)
 | iPad Air 13" (M4) | `ipadair13` | 1024×1366 | 1366×1024 | 2732×2048 @ 2x point grid |
 | iPad Air 11" (M4) | `ipadair11` | 820×1180 | 1180×820 | 2360×1640 @ 2x point grid |
 | iPad (A16) | `ipad11` | 820×1180 | 1180×820 | 2360×1640 @ 2x point grid |
+| iPad mini (A20 Pro) | `ipadmini` | 756×1158 | 1158×756 | 2316×1512 @ 2x (derived; Apple has not listed its point size yet) |
 | Galaxy Tab S11 | `tabs11` | 800×1280 | 1280×800 | 2560×1600 panel at ½ (xhdpi) |
 | Galaxy Tab S12+ | `tabs12plus` | 876×1400 | 1400×876 | 2800×1752 panel at ½ (xhdpi) |
 | Galaxy Tab S11 Ultra | `tabs11ultra` | 924×1480 | 1480×924 | 2960×1848 panel at ½ (xhdpi) |
