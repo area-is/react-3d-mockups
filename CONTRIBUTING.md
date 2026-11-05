@@ -141,6 +141,31 @@ explain *why*, usually by naming the thing that went wrong without them. If you
 fix a subtle bug, leave the reason behind in a comment. Several of the
 trickiest invariants in this repo are only obvious once someone has broken them.
 
+## Generated images
+
+Any image generated for this repo (docs artwork, example photographs, the
+Remotion films' cut-outs) is made with OpenAI's GPT Image 2.6 at
+`quality: "low"` with `background: "transparent"`. Use `gpt-image-2.6-sunburst`
+or `gpt-image-2.6-flare`: they are one release at one price, and
+`examples/remotion/scripts/generate-art.py` pins `-sunburst`. The images
+already committed were made with GPT Image 2.5 and do not need regenerating.
+
+Three things about 2.6 that are easy to trip over:
+
+- **No Batch API.** A batch naming either 2.6 model fails validation with
+  `model_not_found`, so every request is synchronous, on the generations and
+  the edits endpoint alike.
+- **It costs more at `low` than 2.5 did.** 664 image output tokens at
+  1536x1024 or 1024x1536 and 824 at 1024x1024 (2.5 used 158 and 196), so
+  about $0.02-0.025 an image at $30 per 1M.
+- **A subject comes back at alpha 254, never 255.** Trimming on a low alpha
+  threshold, as `generate-art.py` does, is unaffected; a check that treats
+  anything under 255 as see-through would flag every picture.
+
+Asking for a transparent background is not enough by itself: say what must be
+absent (floor, shadow, backdrop, reflection, glow), or the model stands the
+subject on a white studio sweep. `examples/remotion/README.md` has the details.
+
 ## Commits and pull requests
 
 Describe what changed and why. If a change moves a baseline or a documented

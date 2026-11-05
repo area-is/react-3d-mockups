@@ -154,7 +154,10 @@ Every photograph in the films - fruit, four growers, the shoe in three colours,
 runners, musicians, plants, a moth - is a cut-out on a transparent
 ground in `public/art`, generated with OpenAI's GPT Image 2.5
 (`gpt-image-2.5-sunburst`, `quality: "low"`, `background: "transparent"`).
-`scripts/generate-art.py` holds every prompt and regenerates any of them:
+They stay as they are. `scripts/generate-art.py` holds every prompt and now
+asks GPT Image 2.6 (`gpt-image-2.6-sunburst`) at the same `quality: "low"` and
+`background: "transparent"`, the rule for every generated image in this repo
+(see CONTRIBUTING.md). It regenerates any of them on request:
 
 ```bash
 OPENAI_API_KEY=... npm run art                   # only the missing ones

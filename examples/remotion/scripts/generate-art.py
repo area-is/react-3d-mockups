@@ -1,13 +1,15 @@
 #!/usr/bin/env python3
 """
-Generate the campaign films' cut-out photographs with OpenAI's GPT Image 2.5.
+Generate the campaign films' cut-out photographs with OpenAI's GPT Image 2.6.
 
 Every picture on a printed face or a screen in `src/campaigns` is a cut-out:
 a photographed subject on a transparent ground, so it stands on whatever the
 face is printed on instead of arriving in a rectangle of its own background.
-This script asks `gpt-image-2.5-sunburst` for each one at `quality: low` with
-`background: transparent`, trims the empty margin, and writes
-`public/art/<name>.webp`.
+This script asks `gpt-image-2.6-sunburst` for each one at `quality: low` with
+`background: transparent` (the repo's rule for generated images; see
+CONTRIBUTING.md), trims the empty margin, and writes `public/art/<name>.webp`.
+The files already in `public/art` were made with `gpt-image-2.5-sunburst` and
+are kept; the default run only fills in missing ones.
 
     OPENAI_API_KEY=... python3 scripts/generate-art.py            # only missing files
     OPENAI_API_KEY=... python3 scripts/generate-art.py kite-sky   # just these (regenerates)
@@ -30,7 +32,7 @@ from pathlib import Path
 import requests
 from PIL import Image
 
-MODEL = 'gpt-image-2.5-sunburst'
+MODEL = 'gpt-image-2.6-sunburst'
 QUALITY = 'low'
 ROOT = Path(__file__).resolve().parent.parent
 RAW = ROOT / 'out' / 'art-raw'
