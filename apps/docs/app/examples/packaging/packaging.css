@@ -1,19 +1,21 @@
 /* ------------------------------------------------------------------ */
 /*  /examples/packaging - an isolated custom-size configurator.        */
 /*                                                                     */
-/*  Kraft-coloured paper and one orange, with the box on the left and  */
-/*  the sliders on the right. The tokens override the site's on `.pk`  */
-/*  only.                                                              */
+/*  A white page, a kraft-toned stage and one orange, with the box on  */
+/*  the left and the sliders on the right. The tokens override the     */
+/*  site's on `.pk` only.                                              */
 /* ------------------------------------------------------------------ */
 
 .pk {
-  --pk-bg: #f4efe6;
-  --pk-floor: #e7dfd1;
+  /* A white page; the stages keep a light step of the warm tone. */
+  --pk-bg: #ffffff;
+  --pk-floor: #f2ede5;
   --pk-ink: #1f1c18;
   --pk-muted: #6e675c;
   --pk-line: #d9d0c1;
   --pk-line-strong: #b9ad9a;
-  --pk-accent: #d9480f;
+  --pk-accent: #c4430e;
+  --pk-accent-text: #b83c0c;
   position: relative;
   isolation: isolate;
   min-height: 100svh;
@@ -25,7 +27,8 @@
   color: inherit;
 }
 
-.pk button {
+/* :where() keeps this reset at one class, so a control's own class can set its colour. */
+.pk :where(button) {
   font-family: inherit;
   letter-spacing: inherit;
   color: inherit;
@@ -47,10 +50,10 @@
 .pk-brand {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   font-size: 18px;
-  font-weight: 800;
-  letter-spacing: -0.025em;
+  font-weight: 600;
+  letter-spacing: -0.01em;
   white-space: nowrap;
 }
 
@@ -64,8 +67,8 @@
 
 .pk-nav {
   display: flex;
-  gap: 26px;
-  font-size: 14.5px;
+  gap: 24px;
+  font-size: 14px;
   font-weight: 500;
   color: var(--pk-muted);
 }
@@ -79,16 +82,16 @@
 .pk-top-right {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 16px;
 }
 
 .pk-cta {
   font-size: 14px;
-  font-weight: 700;
+  font-weight: 600;
   color: #fff;
   background: var(--pk-ink);
-  border-radius: 999px;
-  padding: 9px 16px;
+  border-radius: 6px;
+  padding: 8px 16px;
   white-space: nowrap;
 }
 
@@ -110,7 +113,7 @@
   top: 24px;
   height: min(82vh, 820px);
   overflow: clip;
-  border-radius: 22px;
+  border-radius: 10px;
   background:
     radial-gradient(60% 50% at 50% 40%, rgba(255, 255, 255, 0.55) 0%, transparent 70%),
     var(--pk-floor);
@@ -125,24 +128,23 @@
 
 .pk-readout {
   position: absolute;
-  left: 18px;
+  left: 16px;
   bottom: 16px;
   display: flex;
   flex-direction: column;
   gap: 2px;
-  padding: 10px 14px;
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.7);
-  -webkit-backdrop-filter: blur(6px);
-  backdrop-filter: blur(6px);
+  padding: 8px 16px;
+  border: 1px solid var(--pk-line);
+  border-radius: 8px;
+  background: #fbf8f2;
   pointer-events: none;
   font-variant-numeric: tabular-nums;
 }
 
 .pk-readout strong {
   font-size: 15px;
-  font-weight: 800;
-  letter-spacing: -0.02em;
+  font-weight: 600;
+  letter-spacing: 0;
 }
 
 .pk-readout span {
@@ -153,29 +155,29 @@
 .pk-config {
   display: flex;
   flex-direction: column;
-  gap: 18px;
-  padding-top: 6px;
+  gap: 16px;
+  padding-top: 8px;
 }
 
 .pk-eyebrow {
   margin: 0;
-  font-size: 12.5px;
-  font-weight: 700;
+  font-size: 12px;
+  font-weight: 600;
   letter-spacing: 0.02em;
-  color: var(--pk-accent);
+  color: var(--pk-accent-text);
 }
 
 .pk-config h1 {
   margin: 0;
   font-size: clamp(34px, 3.6vw, 46px);
-  font-weight: 800;
-  letter-spacing: -0.04em;
+  font-weight: 600;
+  letter-spacing: -0.02em;
   line-height: 1;
 }
 
 .pk-lede {
   margin: -4px 0 4px;
-  font-size: 15.5px;
+  font-size: 16px;
   line-height: 1.5;
   color: var(--pk-muted);
 }
@@ -193,8 +195,8 @@
   gap: 8px;
   padding: 0;
   margin: 0 0 8px;
-  font-size: 12.5px;
-  font-weight: 700;
+  font-size: 12px;
+  font-weight: 600;
 }
 
 .pk-field-label span {
@@ -205,45 +207,44 @@
 .pk-row {
   display: grid;
   grid-template-columns: 1.4fr 1fr;
-  gap: 18px;
+  gap: 16px;
 }
 
 /* Styles: three cards. */
+/* Choices have no box and no border: the one that is on is at full strength and the rest recede; hover brings one forward. */
 .pk-styles {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
+  gap: 16px;
 }
 
 .pk-style {
   display: flex;
   flex-direction: column;
   gap: 4px;
-  padding: 10px 12px;
   text-align: left;
-  background: rgba(255, 255, 255, 0.5);
-  border: 1.5px solid var(--pk-line);
-  border-radius: 12px;
-  transition: border-color 0.15s ease, background 0.15s ease;
-}
-
-.pk-style:hover {
-  border-color: var(--pk-line-strong);
-}
-
-.pk-style[aria-pressed='true'] {
-  border-color: var(--pk-ink);
-  background: #fff;
+  padding: 4px 0;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  transition: color 0.15s ease;
 }
 
 .pk-style strong {
-  font-size: 13.5px;
-  font-weight: 700;
-  letter-spacing: -0.01em;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0;
+  color: var(--pk-muted);
+  transition: color 0.15s ease;
+}
+
+.pk-style:hover strong,
+.pk-style[aria-pressed='true'] strong {
+  color: var(--pk-ink);
 }
 
 .pk-style span {
-  font-size: 11.5px;
+  font-size: 12px;
   line-height: 1.3;
   color: var(--pk-muted);
 }
@@ -252,7 +253,7 @@
 .pk-sliders {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
 }
 
 .pk-slider {
@@ -273,19 +274,84 @@
   color: var(--pk-muted);
 }
 
+/* A hairline track, inked up to the value, and a plain dot to drag: no
+   native chrome, no border, no shadow. */
 .pk-slider input[type='range'] {
+  -webkit-appearance: none;
+  appearance: none;
   width: 100%;
-  height: 22px;
+  height: 20px;
   margin: 0;
   background: transparent;
-  accent-color: var(--pk-accent);
   cursor: pointer;
+}
+
+.pk-slider input[type='range']::-webkit-slider-runnable-track {
+  height: 2px;
+  border-radius: 2px;
+  background: linear-gradient(to right, var(--pk-ink) 0 var(--pct, 50%), var(--pk-line-strong) var(--pct, 50%) 100%);
+}
+
+.pk-slider input[type='range']::-moz-range-track {
+  height: 2px;
+  border-radius: 2px;
+  background: var(--pk-line-strong);
+}
+
+.pk-slider input[type='range']::-moz-range-progress {
+  height: 2px;
+  border-radius: 2px;
+  background: var(--pk-ink);
+}
+
+.pk-slider input[type='range']::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  margin-top: -6px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--pk-ink);
+  transition: transform 0.15s ease;
+}
+
+.pk-slider input[type='range']::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--pk-ink);
+  transition: transform 0.15s ease;
+}
+
+.pk-slider input[type='range']:hover::-webkit-slider-thumb,
+.pk-slider input[type='range']:active::-webkit-slider-thumb {
+  transform: scale(1.15);
+}
+
+.pk-slider input[type='range']:hover::-moz-range-thumb,
+.pk-slider input[type='range']:active::-moz-range-thumb {
+  transform: scale(1.15);
+}
+
+/* Keyboard focus: a soft halo round the dot instead of an outline round the whole input. */
+.pk-slider input[type='range']:focus-visible {
+  outline: none;
+}
+
+.pk-slider input[type='range']:focus-visible::-webkit-slider-thumb {
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--pk-ink) 18%, transparent);
+}
+
+.pk-slider input[type='range']:focus-visible::-moz-range-thumb {
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--pk-ink) 18%, transparent);
 }
 
 /* Boards: a swatch and a name. */
 .pk-stocks {
   display: flex;
-  gap: 6px;
+  gap: 16px;
 }
 
 .pk-stock {
@@ -293,15 +359,20 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 6px;
-  padding: 8px 4px;
-  font-size: 11.5px;
+  gap: 8px;
+  font-size: 12px;
   font-weight: 600;
   white-space: nowrap;
-  background: rgba(255, 255, 255, 0.5);
-  border: 1.5px solid var(--pk-line);
-  border-radius: 12px;
-  transition: border-color 0.15s ease;
+  color: var(--pk-muted);
+  padding: 4px 0;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  transition: color 0.15s ease;
+}
+
+.pk-stock:hover {
+  color: var(--pk-ink);
 }
 
 .pk-stock span {
@@ -309,32 +380,42 @@
   height: 28px;
   border-radius: 50%;
   border: 1px solid rgba(0, 0, 0, 0.12);
+  opacity: 0.5;
+  transition: opacity 0.15s ease;
+}
+
+.pk-stock:hover span {
+  opacity: 0.8;
+}
+
+.pk-stock[aria-pressed='true'] span {
+  opacity: 1;
 }
 
 .pk-stock[aria-pressed='true'] {
-  border-color: var(--pk-ink);
-  background: #fff;
+  color: var(--pk-ink);
 }
 
 /* Segmented: quantity, print. */
 .pk-seg {
   display: flex;
-  gap: 6px;
+  gap: 24px;
 }
 
 .pk-seg button {
-  flex: 1;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 3px;
-  padding: 9px 8px;
+  align-items: flex-start;
+  text-align: left;
+  gap: 4px;
   font-size: 13px;
-  font-weight: 700;
-  background: rgba(255, 255, 255, 0.5);
-  border: 1.5px solid var(--pk-line);
-  border-radius: 12px;
-  transition: border-color 0.15s ease, background 0.15s ease;
+  font-weight: 600;
+  padding: 4px 0;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  transition: color 0.15s ease;
+  color: var(--pk-muted);
 }
 
 .pk-seg button small {
@@ -342,16 +423,15 @@
   font-weight: 500;
   color: var(--pk-muted);
   line-height: 1.3;
-  text-align: center;
+  text-align: left;
 }
 
 .pk-seg button:hover {
-  border-color: var(--pk-line-strong);
+  color: var(--pk-ink);
 }
 
 .pk-seg button[aria-pressed='true'] {
-  border-color: var(--pk-ink);
-  background: #fff;
+  color: var(--pk-ink);
 }
 
 /* The estimate and the action. */
@@ -360,7 +440,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  margin-top: 6px;
+  margin-top: 8px;
   padding-top: 20px;
   border-top: 1px solid var(--pk-line);
 }
@@ -374,22 +454,22 @@
 
 .pk-estimate-price strong {
   font-size: 28px;
-  font-weight: 800;
-  letter-spacing: -0.03em;
+  font-weight: 600;
+  letter-spacing: -0.01em;
   line-height: 1;
 }
 
 .pk-estimate-price span {
-  font-size: 12.5px;
+  font-size: 12px;
   color: var(--pk-muted);
 }
 
 .pk .pk-btn {
   border: 0;
-  border-radius: 999px;
-  padding: 13px 22px;
+  border-radius: 6px;
+  padding: 12px 24px;
   font-size: 15px;
-  font-weight: 700;
+  font-weight: 600;
   color: #fff;
   background: var(--pk-accent);
   white-space: nowrap;
@@ -397,7 +477,7 @@
 }
 
 .pk .pk-btn:active {
-  transform: scale(0.96);
+  transform: scale(0.98);
 }
 
 .pk-note {
@@ -429,16 +509,16 @@
 .pk-panel-stage {
   position: relative;
   height: 460px;
-  border-radius: 22px;
+  border-radius: 10px;
   overflow: clip;
   background: var(--pk-floor);
 }
 
 .pk-panel-copy h2 {
-  margin: 0 0 10px;
+  margin: 0 0 8px;
   font-size: 26px;
-  font-weight: 800;
-  letter-spacing: -0.035em;
+  font-weight: 600;
+  letter-spacing: -0.01em;
 }
 
 .pk-panel-copy p {
@@ -450,8 +530,8 @@
 
 .pk-panel-price {
   font-size: 14px;
-  font-weight: 700;
-  color: var(--pk-accent);
+  font-weight: 600;
+  color: var(--pk-accent-text);
 }
 
 /* ---- footer ------------------------------------------------------------ */
@@ -463,7 +543,7 @@
   flex-wrap: wrap;
   max-width: 1240px;
   margin: 0 auto;
-  padding: 22px 32px 36px;
+  padding: 24px 32px 36px;
   border-top: 1px solid var(--pk-line);
   font-size: 13px;
   color: var(--pk-muted);
@@ -496,7 +576,7 @@
 
 @media (max-width: 760px) {
   .pk-top {
-    padding: 18px 20px 0;
+    padding: 16px 20px 0;
   }
 
   .pk-nav {
@@ -512,7 +592,7 @@
 
   .pk-stage {
     height: 58vh;
-    border-radius: 16px;
+    border-radius: 10px;
   }
 
   .pk-styles {

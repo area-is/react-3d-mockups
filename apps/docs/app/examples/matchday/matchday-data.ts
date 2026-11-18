@@ -9,7 +9,7 @@ export const CLUB = {
   short: 'ALC',
   founded: 1921,
   ground: 'Estádio do Rio',
-  motto: 'Everybody in.',
+  motto: 'Everybody in',
   green: '#14532d',
   deep: '#0b3320',
   gold: '#f2c14e',

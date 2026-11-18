@@ -52,7 +52,7 @@ export function Ledger() {
         <h1>
           Every euro,
           <br />
-          on every screen.
+          on every screen
         </h1>
         <p className="lg-lede">
           Log a coffee on your wrist and it is on your laptop before you have finished it. Ledger keeps one set of
@@ -77,7 +77,7 @@ export function Ledger() {
               </button>
             ))}
             <button type="button" className="lg-try-reset" onClick={() => setTransactions(SEED_TRANSACTIONS)} disabled={added === 0}>
-              <RotateCcw size={14} strokeWidth={2.2} aria-hidden />
+              <RotateCcw size={16} strokeWidth={1.5} aria-hidden />
               Reset
             </button>
           </div>

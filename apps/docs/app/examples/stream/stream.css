@@ -1,21 +1,19 @@
 /* ------------------------------------------------------------------ */
 /*  /examples/stream - an isolated streaming-service example.          */
 /*                                                                     */
-/*  Cinema dark with the service's prism gradient, on the site's own   */
-/*  tokens. The picker row under the TV is the one control on the     */
-/*  page; every screen follows it.                                     */
+/*  Cinema dark, lit the way a screen lights a room: one ink ramp and  */
+/*  one cool accent, on the site's own tokens. The picker row under    */
+/*  the TV is the one control on the page; every screen follows it.    */
 /* ------------------------------------------------------------------ */
 
 .st {
-  --st-prism: linear-gradient(135deg, #8b7cf8 0%, #22d3ee 100%);
+  --st-accent: #5ec3da;
   --st-panel: #10121b;
   --st-line: #1f2333;
   position: relative;
   isolation: isolate;
   min-height: 100svh;
-  background:
-    radial-gradient(60% 40% at 50% 30%, rgba(139, 124, 248, 0.12) 0%, transparent 70%),
-    #08090f;
+  background: #08090f;
   color: var(--text);
 }
 
@@ -23,7 +21,8 @@
   color: inherit;
 }
 
-.st button {
+/* :where() keeps this reset at one class, so a control's own class can set its colour. */
+.st :where(button) {
   font-family: inherit;
   letter-spacing: inherit;
   color: inherit;
@@ -32,8 +31,8 @@
 
 .st h1,
 .st h2 {
-  font-weight: 800;
-  letter-spacing: -0.045em;
+  font-weight: 500;
+  letter-spacing: -0.02em;
   line-height: 0.98;
 }
 
@@ -46,29 +45,30 @@
   gap: 24px;
   max-width: 1240px;
   margin: 0 auto;
-  padding: 26px 32px 0;
+  padding: 24px 32px 0;
 }
 
 .st-brand {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   font-size: 19px;
-  font-weight: 800;
-  letter-spacing: -0.04em;
+  font-weight: 600;
+  letter-spacing: -0.01em;
 }
 
+/* A flat prism: one glyph in one colour. */
 .st-brand-mark {
   width: 16px;
   height: 16px;
-  border-radius: 4px;
-  background: var(--st-prism);
+  background: var(--st-accent);
+  clip-path: polygon(50% 4%, 98% 92%, 2% 92%);
 }
 
 .st-nav {
   display: flex;
-  gap: 26px;
-  font-size: 14.5px;
+  gap: 24px;
+  font-size: 14px;
   font-weight: 500;
   color: var(--muted);
 }
@@ -76,16 +76,16 @@
 .st-top-right {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 16px;
 }
 
 .st-cta {
   font-size: 14px;
-  font-weight: 700;
+  font-weight: 600;
   color: #08090f;
   background: #fff;
-  border-radius: 999px;
-  padding: 9px 16px;
+  border-radius: 6px;
+  padding: 8px 16px;
   white-space: nowrap;
 }
 
@@ -102,16 +102,13 @@
   margin: 0 0 16px;
   font-size: 13px;
   font-weight: 600;
-  letter-spacing: 0.02em;
-  background: var(--st-prism);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  display: inline-block;
+  letter-spacing: 0.01em;
+  color: var(--muted);
 }
 
 .st-hero h1 {
-  margin: 0 auto 18px;
+  letter-spacing: -0.03em;
+  margin: 0 auto 16px;
   max-width: 760px;
   font-size: clamp(40px, 5.6vw, 76px);
 }
@@ -137,20 +134,15 @@
   position: relative;
   height: min(74vh, 720px);
   overflow: clip;
-  border-radius: 24px;
+  border-radius: 10px;
 }
 
+/* The controls sit under the stage on the page, aligned to its edge. */
 .st-picker {
   display: flex;
   flex-direction: column;
   gap: 12px;
-  margin-top: -6px;
-  padding: 18px 20px 18px;
-  border: 1px solid var(--st-line);
-  border-radius: 18px;
-  background: rgba(16, 18, 27, 0.85);
-  -webkit-backdrop-filter: blur(8px);
-  backdrop-filter: blur(8px);
+  margin-top: 24px;
 }
 
 .st-picker-head {
@@ -163,7 +155,7 @@
 
 .st-picker-label {
   font-size: 13px;
-  font-weight: 700;
+  font-weight: 600;
 }
 
 .st-picker-now {
@@ -173,43 +165,57 @@
 
 .st-picker-now strong {
   color: var(--text);
-  font-weight: 700;
+  font-weight: 600;
 }
 
+/* Choices have no box and no border: the one that is on is at full strength and the rest recede; hover brings one forward. */
 .st-picker-row {
   display: grid;
   grid-template-columns: repeat(8, 1fr);
-  gap: 10px;
+  gap: 12px;
 }
 
 .st-pick {
   display: flex;
   flex-direction: column;
-  gap: 7px;
-  padding: 4px 4px 6px;
-  background: transparent;
-  border: 1.5px solid transparent;
-  border-radius: 12px;
+  gap: 8px;
   text-align: left;
-  transition: border-color 0.15s ease, background 0.15s ease;
+  color: var(--muted);
+  padding: 0;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  transition: color 0.15s ease;
 }
 
 .st-pick:hover {
-  background: rgba(255, 255, 255, 0.04);
+  color: var(--text);
 }
 
 .st-pick[aria-pressed='true'] {
-  border-color: #fff;
+  color: var(--text);
 }
 
 .st-pick-title {
   font-size: 12px;
   font-weight: 600;
-  letter-spacing: -0.01em;
+  letter-spacing: 0;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  padding: 0 3px;
+}
+
+.st-pick > :first-child {
+  opacity: 0.5;
+  transition: opacity 0.15s ease;
+}
+
+.st-pick:hover > :first-child {
+  opacity: 0.8;
+}
+
+.st-pick[aria-pressed='true'] > :first-child {
+  opacity: 1;
 }
 
 .st-picker-note {
@@ -239,7 +245,7 @@
 }
 
 .st-anywhere-head h2 {
-  margin: 0 0 10px;
+  margin: 0 0 8px;
   font-size: clamp(26px, 3vw, 36px);
 }
 
@@ -253,38 +259,39 @@
 .st-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 18px;
+  gap: 40px 24px;
 }
 
+/* No card: the stage is the picture, and its caption sits under it on the page. */
 .st-card {
-  border-radius: 18px;
-  background: var(--st-panel);
-  border: 1px solid var(--st-line);
-  overflow: clip;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
 /* A definite height, so LazyScene has a box to hold while unmounted. */
 .st-card-stage {
   position: relative;
   height: 460px;
+  border-radius: 10px;
+  overflow: clip;
+  background: var(--st-panel);
 }
 
 .st-card-copy {
   display: flex;
   flex-direction: column;
   gap: 4px;
-  padding: 16px 20px 20px;
-  border-top: 1px solid var(--st-line);
 }
 
 .st-card-copy strong {
   font-size: 15px;
-  font-weight: 700;
-  letter-spacing: -0.02em;
+  font-weight: 600;
+  letter-spacing: 0;
 }
 
 .st-card-copy span {
-  font-size: 13.5px;
+  font-size: 14px;
   line-height: 1.5;
   color: var(--muted);
 }
@@ -294,39 +301,33 @@
 .st-plans {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 18px;
+  gap: 32px;
   max-width: 1240px;
   margin: 0 auto;
   padding: clamp(48px, 8vh, 88px) 32px 64px;
 }
 
+/* Three plans as three aligned columns; the one most people pick has its name in the accent. */
 .st-plan {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  padding: 24px 26px;
-  border-radius: 18px;
-  background: var(--st-panel);
-  border: 1px solid var(--st-line);
 }
 
-.st-plan[data-featured='true'] {
-  border-color: transparent;
-  background:
-    linear-gradient(var(--st-panel), var(--st-panel)) padding-box,
-    var(--st-prism) border-box;
+.st-plan[data-featured='true'] .st-plan-name {
+  color: var(--st-accent);
 }
 
 .st-plan-name {
   font-size: 14px;
-  font-weight: 700;
+  font-weight: 600;
   color: var(--muted);
 }
 
 .st-plan-price {
   font-size: 34px;
-  font-weight: 800;
-  letter-spacing: -0.04em;
+  font-weight: 500;
+  letter-spacing: -0.01em;
   line-height: 1;
 }
 
@@ -339,7 +340,7 @@
 }
 
 .st-plan-note {
-  font-size: 13.5px;
+  font-size: 14px;
   color: var(--muted);
 }
 
@@ -352,7 +353,7 @@
   flex-wrap: wrap;
   max-width: 1240px;
   margin: 0 auto;
-  padding: 22px 32px 36px;
+  padding: 24px 32px 36px;
   border-top: 1px solid var(--st-line);
   font-size: 13px;
   color: var(--muted);
@@ -378,7 +379,7 @@
 
 @media (max-width: 760px) {
   .st-top {
-    padding: 18px 20px 0;
+    padding: 16px 20px 0;
   }
 
   .st-nav {
@@ -405,12 +406,12 @@
 
   .st-lede {
     margin-left: 0;
-    font-size: 16.5px;
+    font-size: 16px;
   }
 
   .st-tv-stage {
     height: 50vh;
-    border-radius: 16px;
+    border-radius: 10px;
   }
 
   .st-card-stage {

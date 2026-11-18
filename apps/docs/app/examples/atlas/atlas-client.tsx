@@ -42,7 +42,7 @@ export function Atlas() {
           <p className="at-eyebrow">
             Issue {MAG.issue} · {MAG.theme} · {MAG.season}
           </p>
-          <h1>Twelve islands, one ferry timetable.</h1>
+          <h1>Twelve islands, one ferry timetable</h1>
           <p className="at-lede">
             The autumn issue goes out to the rocks: a lighthouse being switched off, harbours that only wake after
             dark, and a market stall older than the town around it. Ninety-six pages, {MAG.price}.

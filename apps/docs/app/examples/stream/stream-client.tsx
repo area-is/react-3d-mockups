@@ -43,7 +43,7 @@ export function Stream() {
 
       <section className="st-hero">
         <p className="st-eyebrow">Series, films and live sport · 4K on every screen</p>
-        <h1>Something good is on.</h1>
+        <h1>Something good is on</h1>
         <p className="st-lede">
           Prism is the same home on your TV, your tablet and the phone in your pocket, with tonight&rsquo;s feature
           waiting on every one of them.
@@ -88,7 +88,7 @@ export function Stream() {
             </div>
             <div className="st-card-copy">
               <strong>On a Fold</strong>
-              <span>The home screen with room for the rows.</span>
+              <span>The home screen with room for the rows</span>
             </div>
           </article>
           <article className="st-card">
@@ -97,7 +97,7 @@ export function Stream() {
             </div>
             <div className="st-card-copy">
               <strong>On a Flip, in Flex Mode</strong>
-              <span>The picture on the top half, the controls on the bottom, split at the hinge.</span>
+              <span>The picture on the top half, the controls on the bottom, split at the hinge</span>
             </div>
           </article>
           <article className="st-card">
@@ -106,7 +106,7 @@ export function Stream() {
             </div>
             <div className="st-card-copy">
               <strong>On an iPad</strong>
-              <span>The title page, with every episode.</span>
+              <span>The title page, with every episode</span>
             </div>
           </article>
         </div>

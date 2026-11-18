@@ -39,7 +39,7 @@ export function Fleet() {
 
       <section className="fl-hero">
         <p className="fl-eyebrow">Road freight · Benelux, France and Iberia</p>
-        <h1>{COMPANY.tag}.</h1>
+        <h1>{COMPANY.tag}</h1>
         <p className="fl-lede">
           Pallets, parcels and the odd piano, moved between forty European cities while you sleep. Same drivers,
           same vans, same livery from the dock to your door.
@@ -67,7 +67,7 @@ export function Fleet() {
         </div>
         <div className="fl-van-copy">
           <p className="fl-eyebrow">One livery, every vehicle</p>
-          <h2>The same wrap, from a trailer to a box.</h2>
+          <h2>The same wrap, from a trailer to a box</h2>
           <p>
             The livery is one React component. The field of marks at the cab end is a <TabbiedLink /> pattern in
             the two inks; the name and the arrow are type. Everything on this page wears it.
@@ -118,7 +118,7 @@ export function Fleet() {
             </div>
             <div className="fl-card-copy">
               <strong>The box</strong>
-              <span>A double-wall mailer, printed on every face, taped by hand.</span>
+              <span>A double-wall mailer, printed on every face, taped by hand</span>
             </div>
           </article>
           <article className="fl-card">
@@ -127,7 +127,7 @@ export function Fleet() {
             </div>
             <div className="fl-card-copy">
               <strong>Track a parcel</strong>
-              <span>Five stops from Rotterdam to Lisbon, and a button to leave it with a neighbour.</span>
+              <span>Five stops from Rotterdam to Lisbon, and a button to leave it with a neighbour</span>
             </div>
           </article>
         </div>

@@ -60,7 +60,7 @@ export function Cafe() {
         <p className="cf-eyebrow">
           {SHOP.kind} · {SHOP.address}, {SHOP.city}
         </p>
-        <h1>Coffee, bread, and a corner to sit in.</h1>
+        <h1>Coffee, bread, and a corner to sit in</h1>
         <p className="cf-lede">
           We roast on Tuesdays, bake every morning and make our own oat milk because the bought kind would not
           steam. Nine coffees and the tenth is on us.

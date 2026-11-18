@@ -97,7 +97,7 @@ export function Packaging() {
 
         <div className="pk-config">
           <p className="pk-eyebrow">Boxes made to your millimetre</p>
-          <h1>Size it. See it.</h1>
+          <h1>Size it. See it</h1>
           <p className="pk-lede">
             Three box styles, three boards, any dimensions between a ring box and a wine case. The proof on the left is
             built from your numbers, so what you see is the box that arrives.
@@ -129,6 +129,8 @@ export function Packaging() {
                     step={5}
                     value={spec.size[key]}
                     onChange={(e) => setDim(key, Number(e.target.value))}
+                    // How far along the track the value sits, for the filled part of the line.
+                    style={{ ['--pct' as string]: `${((spec.size[key] - style.min[key]) / (style.max[key] - style.min[key])) * 100}%` }}
                   />
                 </label>
               ))}

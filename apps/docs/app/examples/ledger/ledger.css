@@ -13,9 +13,7 @@
   position: relative;
   isolation: isolate;
   min-height: 100svh;
-  background:
-    radial-gradient(60% 40% at 50% 38%, rgba(200, 240, 90, 0.08) 0%, transparent 70%),
-    var(--bg);
+  background: var(--bg);
   color: var(--text);
 }
 
@@ -23,7 +21,8 @@
   color: inherit;
 }
 
-.lg button {
+/* :where() keeps this reset at one class, so a control's own class can set its colour. */
+.lg :where(button) {
   font-family: inherit;
   letter-spacing: inherit;
   cursor: pointer;
@@ -38,30 +37,30 @@
   gap: 24px;
   max-width: 1240px;
   margin: 0 auto;
-  padding: 26px 32px 0;
+  padding: 24px 32px 0;
 }
 
 .lg-brand {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   font-size: 18px;
-  font-weight: 800;
-  letter-spacing: -0.025em;
+  font-weight: 600;
+  letter-spacing: -0.01em;
   white-space: nowrap;
 }
 
 .lg-brand-mark {
   width: 16px;
   height: 16px;
-  border-radius: 5px;
+  border-radius: 4px;
   background: var(--lg-lime);
 }
 
 .lg-nav {
   display: flex;
-  gap: 26px;
-  font-size: 14.5px;
+  gap: 24px;
+  font-size: 14px;
   font-weight: 500;
   color: var(--muted);
 }
@@ -69,16 +68,16 @@
 .lg-top-right {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 16px;
 }
 
 .lg-cta {
   font-size: 14px;
-  font-weight: 700;
+  font-weight: 600;
   color: #0f1420;
   background: var(--lg-lime);
-  border-radius: 999px;
-  padding: 9px 16px;
+  border-radius: 6px;
+  padding: 8px 16px;
   white-space: nowrap;
 }
 
@@ -100,11 +99,11 @@
 }
 
 .lg-hero h1 {
-  margin: 0 auto 18px;
+  margin: 0 auto 16px;
   max-width: 760px;
   font-size: clamp(40px, 5.4vw, 72px);
-  font-weight: 800;
-  letter-spacing: -0.045em;
+  font-weight: 600;
+  letter-spacing: -0.03em;
   line-height: 0.98;
 }
 
@@ -131,21 +130,16 @@
   position: relative;
   height: min(70vh, 680px);
   overflow: clip;
-  border-radius: 24px;
+  border-radius: 10px;
 }
 
+/* The controls sit under the stage on the page, aligned to its edge. */
 .lg-try {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 12px;
-  margin-top: -8px;
-  padding: 18px 20px 20px;
-  border: 1px solid var(--lg-line);
-  border-radius: 18px;
-  background: rgba(18, 22, 31, 0.85);
-  -webkit-backdrop-filter: blur(8px);
-  backdrop-filter: blur(8px);
+  margin-top: 24px;
 }
 
 .lg-try-label {
@@ -165,13 +159,13 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 10px 14px 10px 12px;
+  padding: 8px 16px 8px 12px;
   font-size: 14px;
   font-weight: 600;
   color: var(--text);
   background: var(--lg-panel);
   border: 1px solid var(--border-strong);
-  border-radius: 999px;
+  border-radius: 6px;
   transition: border-color 0.15s ease, transform 0.1s ease;
 }
 
@@ -190,7 +184,7 @@
 }
 
 .lg-try-amount {
-  font-size: 12.5px;
+  font-size: 12px;
   font-weight: 600;
   color: var(--muted);
   font-variant-numeric: tabular-nums;
@@ -199,14 +193,14 @@
 .lg-try-reset {
   display: inline-flex;
   align-items: center;
-  gap: 7px;
-  padding: 10px 14px;
-  font-size: 13.5px;
+  gap: 8px;
+  padding: 8px 16px;
+  font-size: 14px;
   font-weight: 600;
   color: var(--muted);
   background: transparent;
   border: 1px solid var(--border);
-  border-radius: 999px;
+  border-radius: 6px;
   transition: color 0.15s ease;
 }
 
@@ -234,40 +228,42 @@
 .lg-features {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 20px;
+  gap: 40px 24px;
   max-width: 1240px;
   margin: 0 auto;
   padding: clamp(48px, 8vh, 88px) 32px 0;
 }
 
+/* No card: the stage is the picture, and its caption sits under it on the page. */
 .lg-feature {
-  border-radius: 20px;
-  background: var(--lg-panel);
-  border: 1px solid var(--lg-line);
-  overflow: clip;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 
 /* A definite height, so LazyScene has a box to hold while unmounted. */
 .lg-feature-stage {
   position: relative;
   height: 480px;
+  border-radius: 10px;
+  overflow: clip;
+  background: var(--lg-panel);
 }
 
 .lg-feature-copy {
-  padding: 20px 24px 24px;
-  border-top: 1px solid var(--lg-line);
+  padding: 0;
 }
 
 .lg-feature-copy h2 {
   margin: 0 0 8px;
   font-size: 20px;
-  font-weight: 700;
-  letter-spacing: -0.03em;
+  font-weight: 600;
+  letter-spacing: -0.01em;
 }
 
 .lg-feature-copy p {
   margin: 0;
-  font-size: 14.5px;
+  font-size: 14px;
   line-height: 1.55;
   color: var(--muted);
 }
@@ -286,13 +282,13 @@
 .lg-claim h3 {
   margin: 0 0 8px;
   font-size: 16px;
-  font-weight: 700;
-  letter-spacing: -0.02em;
+  font-weight: 600;
+  letter-spacing: -0.01em;
 }
 
 .lg-claim p {
   margin: 0;
-  font-size: 14.5px;
+  font-size: 14px;
   line-height: 1.55;
   color: var(--muted);
 }
@@ -306,7 +302,7 @@
   flex-wrap: wrap;
   max-width: 1240px;
   margin: 0 auto;
-  padding: 22px 32px 36px;
+  padding: 24px 32px 36px;
   border-top: 1px solid var(--lg-line);
   font-size: 13px;
   color: var(--muted);
@@ -326,13 +322,13 @@
 
   .lg-claims {
     grid-template-columns: 1fr;
-    gap: 22px;
+    gap: 24px;
   }
 }
 
 @media (max-width: 760px) {
   .lg-top {
-    padding: 18px 20px 0;
+    padding: 16px 20px 0;
   }
 
   .lg-nav {
@@ -359,14 +355,14 @@
 
   .lg-lede {
     margin-left: 0;
-    font-size: 16.5px;
+    font-size: 16px;
   }
 
   /* Three devices across a phone-width canvas is a small arrangement; the
      height is what keeps them legible at all. */
   .lg-stage {
     height: 52vh;
-    border-radius: 16px;
+    border-radius: 10px;
   }
 
   .lg-try {

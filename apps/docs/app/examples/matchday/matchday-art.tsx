@@ -180,7 +180,7 @@ export function WatchTracker({ seconds }: { seconds: number }) {
         <span style={{ fontSize: 15, fontWeight: 800, opacity: 0.6 }}>{MATCH.away.short}</span>
       </div>
       <span style={{ fontSize: 11.5, fontWeight: 600, opacity: 0.75 }}>
-        ⚽ {goal.who} {goal.minute}&rsquo;
+        {goal.who} {goal.minute}&rsquo;
       </span>
     </Face>
   )
