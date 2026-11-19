@@ -139,6 +139,13 @@ this machine, `book`, `tv`, `watch` (the Solo Loop), `creditcard`, `creditcard-e
 `watch-ultra4` and `watch-ultra2` differ only at the fin, the handles and the strap
 ends. No region changed size.
 
+Typecheck, 596 unit tests (three new, for the strap tip), the docs data, size and
+example checks and the docs build all pass. `npm run bench` met every budget on one run
+and on another reported the home-page carousel advancing one slide in a hidden tab
+(budget 0). Nothing in this change touches the carousel, the same build passed on the
+rerun, and the failing run shared the machine with other work, so it reads as a timing
+race in that scenario rather than a regression - but it is a flake CI could hit.
+
 **Known limits.** The buckle-side strap still runs a little past its buckle, which a
 real one does not: it now ends in a tongue rather than a stub, but it should end at the
 bar. The printed-back path of the card's impressions still shades each stroke on its
