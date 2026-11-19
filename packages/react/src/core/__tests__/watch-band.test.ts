@@ -1,6 +1,15 @@
 import { describe, expect, it } from 'vitest'
 import { BoxGeometry } from 'three'
-import { bendAlongStrap, flatStrapPath, wristLoopAt, wristLoopPath, wristLoopArcLength, type WristLoop } from '../geometry/strap'
+import {
+  bendAlongStrap,
+  flatStrapPath,
+  wristLoopAt,
+  wristLoopPath,
+  wristLoopArcLength,
+  sweptStrapGeometry,
+  STRAP_SECTION_POINTS,
+  type WristLoop,
+} from '../geometry/strap'
 import { gearShape } from '../geometry/gear'
 import { WATCH_MM_PER_UNIT, WATCH_VARIANTS, watchStrapLengths, type FastenedWatchBand } from '../devices/watch/dimensions'
 
@@ -139,5 +148,57 @@ describe('watch bands', () => {
     expect(frame.z).toBeLessThan(spec.body.depth / 2)
     // And through the band slot where the case has one.
     if (spec.bandSlot) expect(Math.abs(frame.z - spec.bandSlot.z)).toBeLessThan(spec.bandSlot.height / 2)
+  })
+})
+
+describe('sweptStrapGeometry tip', () => {
+  // A straight strap four units long, lying along y.
+  const straight = (t: number) => ({ y: t * 4, z: 0, ny: 0, nz: 1 })
+  const strap = (tip?: number) =>
+    sweptStrapGeometry({
+      path: straight,
+      width: () => 1,
+      thickness: () => 0.1,
+      crown: () => 0,
+      segments: 80,
+      capEnd: true,
+      tip,
+    })
+  /** Half-width of the strap at each ring, in order along it. */
+  const halfWidths = (geometry: ReturnType<typeof strap>) => {
+    const position = geometry.getAttribute('position')
+    return Array.from({ length: 81 }, (_, ring) => {
+      let half = 0
+      for (let j = 0; j < STRAP_SECTION_POINTS; j++) half = Math.max(half, Math.abs(position.getX(ring * STRAP_SECTION_POINTS + j)))
+      return half
+    })
+  }
+
+  it('leaves a strap with no tip the full width to its end', () => {
+    // the half-round edge is sampled, so its widest point sits a hair inside the width
+    for (const half of halfWidths(strap())) expect(half).toBeCloseTo(0.5, 2)
+  })
+
+  it('rounds the end off to nothing, and only the end', () => {
+    // a half-round: the tip is half the width over the length
+    const widths = halfWidths(strap(0.5 / 4))
+    expect(widths[0]).toBeCloseTo(0.5, 2)
+    expect(widths[70]).toBeCloseTo(0.5, 2)
+    expect(widths[80]!).toBeLessThan(0.001)
+    for (let ring = 71; ring <= 80; ring++) expect(widths[ring]!).toBeLessThanOrEqual(widths[ring - 1]! + 1e-9)
+  })
+
+  it('keeps the strap its length, and puts the tip on a circle', () => {
+    const geometry = strap(0.5 / 4)
+    const position = geometry.getAttribute('position')
+    let end = 0
+    for (let i = 0; i < position.count; i++) {
+      const x = position.getX(i)
+      const y = position.getY(i)
+      end = Math.max(end, y)
+      // nothing in the tip lies outside the half-round centred half a width back
+      if (y > 3.5) expect(Math.hypot(x, y - 3.5)).toBeLessThanOrEqual(0.5 + 1e-4)
+    }
+    expect(end).toBeCloseTo(4, 4)
   })
 })

@@ -213,6 +213,14 @@ export interface StrapOptions {
   capStart?: boolean
   /** Close the end end with a cap. */
   capEnd?: boolean
+  /**
+   * Round the end off in plan, over this last fraction of the path: a strap's
+   * free tip is a tongue, not a square cut. The width runs out on a quarter
+   * ellipse - a true half-round when the fraction is half the tip's width
+   * over the strap's length - and the rings bunch up toward the end so the
+   * curve stays a curve. Without it the tip looks cut off with scissors.
+   */
+  tip?: number
 }
 
 /** Section resolution: doming samples, then each half-round edge. */
@@ -276,6 +284,7 @@ export function sweptStrapGeometry({
   segments = 64,
   capStart = false,
   capEnd = false,
+  tip = 0,
 }: StrapOptions): BufferGeometry {
   const cols = STRAP_SECTION_POINTS
   const rings = segments
@@ -286,10 +295,17 @@ export function sweptStrapGeometry({
   const centre = new Vector3()
 
   for (let i = 0; i <= rings; i++) {
-    const t = i / rings
+    let t = i / rings
+    let round = 1
+    if (tip > 0 && t > 1 - tip) {
+      // equal steps of angle round the tip, not of distance along it
+      const angle = ((t - (1 - tip)) / tip) * (Math.PI / 2)
+      t = 1 - tip + tip * Math.sin(angle)
+      round = Math.cos(angle)
+    }
     const frame = path(t)
     const ride = lift ? lift(t) : 0
-    strapSection(width(t), thickness(t), crown(t), section)
+    strapSection(width(t) * round, thickness(t), crown(t), section)
     for (let j = 0; j < cols; j++) {
       const s = section[j]!
       const v = s.y + ride

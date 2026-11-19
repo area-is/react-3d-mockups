@@ -109,6 +109,8 @@ const SHOULDER_STEPS = 4
 const FOOT_SINK = 0.25
 /** Segments around a stroke's joints and ends. */
 const ROUND = 16
+/** The share of an embossed stroke's height its debossed impression keeps, to sort its grooves (see `flattenedGeometry`). */
+const IMPRESSION_LIFT = 0.03
 
 /** Triangles being built: flat arrays, so a whole line is one geometry. */
 interface MeshData {
@@ -249,17 +251,27 @@ function shoulderGeometry(strokes: Strokes, crestHalf: number, footHalf: number,
  * and three.js turns a back-facing triangle's normal around before lighting
  * it - which would quietly undo the hand-set normals of an impression seen
  * from behind.
+ *
+ * `lift` keeps that share of each vertex's height, turned to face the back,
+ * instead of none of it. An impression is the union of its strokes' grooves,
+ * and dead flat they are a pile of coplanar capsules: every joint showed the
+ * end-cap of each stroke that met there, and the lettering read as a
+ * wireframe. A groove's deepest part is where its stroke stood highest, so
+ * with a sliver of that height left in, the depth buffer keeps the deepest
+ * groove at every pixel - which is the union. The sliver is microns, far too
+ * little to see as relief.
  */
 function flattenedGeometry(
   source: THREE.BufferGeometry,
   normal: (x: number, y: number, z: number) => [number, number, number],
-  facingBack = false
+  facingBack = false,
+  lift = 0
 ): THREE.BufferGeometry {
   const flat = source.clone()
   const position = flat.getAttribute('position') as THREE.BufferAttribute
   const normals = flat.getAttribute('normal') as THREE.BufferAttribute
   for (let i = 0; i < position.count; i++) {
-    position.setZ(i, 0)
+    position.setZ(i, -position.getZ(i) * lift)
     normals.setXYZ(i, ...normal(normals.getX(i), normals.getY(i), normals.getZ(i)))
   }
   const index = flat.getIndex()
@@ -638,7 +650,14 @@ function CreditCardImpl({
   const impressions = React.useMemo(
     () =>
       [numberLine, expiryLine, nameLine].flatMap((line) =>
-        line?.kind === 'raised' ? [flattenedGeometry(line.shoulders, (x, y, z) => [-x, -y, -z], true)] : []
+        line?.kind === 'raised'
+          ? [
+              flattenedGeometry(line.shoulders, (x, y, z) => [-x, -y, -z], true, IMPRESSION_LIFT),
+              // the groove's flat floor, which hides the walls of any stroke
+              // crossing under it
+              flattenedGeometry(line.crest, (x, y, z) => [-x, -y, -z], true, IMPRESSION_LIFT),
+            ]
+          : []
       ),
     [numberLine, expiryLine, nameLine]
   )
@@ -867,7 +886,8 @@ function CreditCardImpl({
         <group position-z={-faceZ - 0.0006}>
           {impressions.map((geometry, i) =>
             backPrinted ? (
-              <mesh key={i} geometry={geometry} material={impressionMaterial} />
+              // walls only: over a print the floor is the print, unshaded
+              i % 2 === 0 && <mesh key={i} geometry={geometry} material={impressionMaterial} />
             ) : (
               <mesh key={i} geometry={geometry}>
                 {stockMaterial}

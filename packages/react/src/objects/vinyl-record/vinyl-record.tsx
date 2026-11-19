@@ -103,6 +103,27 @@ function VinylRecordImpl({
   }, [disc])
   React.useEffect(() => () => grooveTexture?.dispose(), [grooveTexture])
 
+  // The groove band itself. Each vertex carries a tangent pointing out along
+  // its radius, which is the direction anisotropic shading smears a highlight
+  // in: ACROSS the grooves, into the wedge of light that makes a record look
+  // like a record. Without it the face is a black mirror with lines drawn on.
+  // A vertex attribute rather than tangents derived from UVs, which are
+  // constant over a triangle and showed the ring's 96 segments as spokes.
+  const grooveGeometry = React.useMemo(() => {
+    const geometry = new THREE.RingGeometry(disc.deadWaxRadius, disc.radius * 0.995, 96, 1)
+    const position = geometry.getAttribute('position')
+    const tangents = new Float32Array(position.count * 4)
+    for (let i = 0; i < position.count; i++) {
+      const x = position.getX(i)
+      const y = position.getY(i)
+      const r = Math.hypot(x, y)
+      tangents.set([x / r, y / r, 0, 1], i * 4)
+    }
+    geometry.setAttribute('tangent', new THREE.BufferAttribute(tangents, 4))
+    return geometry
+  }, [disc.deadWaxRadius, disc.radius])
+  React.useEffect(() => () => grooveGeometry.dispose(), [grooveGeometry])
+
   // Disc slides out to the right, far enough that the whole label is clear
   // of the jacket edge (two CSS3D layers can't depth-sort against each
   // other, so the label must never overlap the cover).
@@ -162,6 +183,15 @@ function VinylRecordImpl({
   const discFace = (s: 1 | -1) => (
     <group key={s} rotation-y={s === 1 ? 0 : Math.PI}>
       {/* the grooved playing surface, lead-in to dead wax */}
+      <mesh geometry={grooveGeometry} position-z={disc.thickness / 2 + 0.0006}>
+        <meshPhysicalMaterial
+          color={vinylColor}
+          metalness={0}
+          roughness={0.34}
+          ior={1.65}
+          anisotropy={0.9}
+        />
+      </mesh>
       {grooveTexture && (
         <mesh position-z={disc.thickness / 2 + 0.001}>
           <ringGeometry args={[disc.deadWaxRadius, disc.radius * 0.995, 96]} />

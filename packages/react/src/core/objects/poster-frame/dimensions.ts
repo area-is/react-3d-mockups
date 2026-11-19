@@ -49,6 +49,13 @@ export function posterFrameSpec(size: PosterFrameSize = {}) {
     frame: { width: 0.157, depth: 0.214, radius: 0.02, bevel: 0.012 },
     /** How far the sheet sits recessed behind the frame's front lip (~2 mm). */
     recess: 0.014,
+    /**
+     * Hanging hardware on the back: a ~45 x 8 mm sawtooth hanger nailed to the
+     * top rail, and a ~10 mm felt bumper in each bottom corner that holds the
+     * frame off the wall.
+     */
+    hanger: { width: 0.32, height: 0.057, thickness: 0.008 },
+    bumper: { radius: 0.036, thickness: 0.014 },
     /** Optional matboard border width (a 2.5" gallery mat). */
     matWidth: 0.457,
     /** Default CSS px width of the virtual visible opening. */

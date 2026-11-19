@@ -280,20 +280,19 @@ export function LensRing({
           />
         </mesh>
       )}
-      {/* the bore wall, tapering in toward the optics - dark, but not the same
+      {/* the bore wall, stepping in toward the optics - dark, but not the same
           black as the floor behind it: in the macro shots it is the one
-          surface in there that still catches light, and that is what reads as
-          depth rather than as a hole punched in the plateau */}
-      <mesh rotation-x={Math.PI / 2} position-z={(boreTopZ + floorZ) / 2}>
-        <cylinderGeometry args={[glassR * 1.14, boreR, boreDepth, 48, 1, true]} />
+          surface in there that still catches light, ring by ring, and that
+          is what reads as depth rather than as a hole punched in the plateau */}
+      <BarrelSteps outer={boreR} inner={glassR * 1.14} top={-boreTopZ} depth={boreDepth}>
         <meshPhysicalMaterial
           color="#15171c"
-          metalness={0.2}
-          roughness={0.45}
-          envMapIntensity={0.5}
+          metalness={0.3}
+          roughness={0.5}
+          envMapIntensity={0.32}
           side={THREE.DoubleSide}
         />
-      </mesh>
+      </BarrelSteps>
       {/* the bore's floor - opaque, so the bore never shows the pedestal it is
           standing on however shallow the collar is */}
       <mesh rotation-y={Math.PI} position-z={floorZ}>
@@ -407,6 +406,54 @@ function lipProfile(outer: number, inner: number, base: number, crown: number): 
     points.push(new THREE.Vector2(c + w * Math.cos(a), base + (crown - base) * Math.sin(a)))
   }
   return points
+}
+
+/**
+ * The stepped face of a lens barrel, for a lathe: from `outer` at `top` down
+ * and in to `inner`, `depth` lower, as `steps` flat ledges each ending in a
+ * chamfer. Those chamfers are the fine concentric rings every photograph of a
+ * phone camera shows between the collar and the glass - each one turned a
+ * little differently to the light, so each catches its own thin arc. A
+ * smooth funnel there is one even shade, and the lens reads as a black disc
+ * with a bead in the middle. Points are (radius, height off the mount).
+ */
+function baffleProfile(outer: number, inner: number, top: number, depth: number, steps = 3): THREE.Vector2[] {
+  const run = (outer - inner) / steps
+  const drop = depth / steps
+  const points: THREE.Vector2[] = [new THREE.Vector2(outer, top)]
+  for (let i = 0; i < steps; i++) {
+    const ledge = outer - run * (i + 0.55)
+    // doubled points keep each edge hard (see `collarProfile`)
+    points.push(new THREE.Vector2(ledge, top - drop * i), new THREE.Vector2(ledge, top - drop * i))
+    points.push(new THREE.Vector2(outer - run * (i + 1), top - drop * (i + 1)), new THREE.Vector2(outer - run * (i + 1), top - drop * (i + 1)))
+  }
+  return points
+}
+
+/** `baffleProfile` turned into a mesh, facing the device's back; its child is the material. */
+function BarrelSteps({
+  outer,
+  inner,
+  top,
+  depth,
+  children,
+}: {
+  outer: number
+  inner: number
+  top: number
+  depth: number
+  children: React.ReactNode
+}) {
+  const geometry = React.useMemo(
+    () => new THREE.LatheGeometry(baffleProfile(outer, inner, top, depth), 64),
+    [outer, inner, top, depth]
+  )
+  React.useEffect(() => () => geometry.dispose(), [geometry])
+  return (
+    <mesh geometry={geometry} rotation-x={-Math.PI / 2}>
+      {children}
+    </mesh>
+  )
 }
 
 /** An aperture: a disc with an `blades`-sided hole, the blades' edges. */
@@ -544,18 +591,17 @@ function AppleLens({
         <ringGeometry args={[r * maskInner, r * collar, 64]} />
         <meshBasicMaterial color="#030304" />
       </mesh>
-      {/* the barrel's face, funnelling down to the bore: dark violet-grey */}
-      <mesh rotation-x={Math.PI / 2} position-z={glassZ + 0.0004 + barrelDepth / 2}>
-        <cylinderGeometry args={[boreR, r * maskInner, barrelDepth, 64, 1, true]} />
+      {/* the barrel's face, stepping down to the bore: dark violet-grey, with
+          just enough sheen for each step's chamfer to draw its ring */}
+      <BarrelSteps outer={r * maskInner} inner={boreR} top={proud - 0.0004} depth={barrelDepth}>
         <meshPhysicalMaterial
           color="#1d1c24"
-          metalness={0}
-          roughness={0.8}
-          specularIntensity={0.3}
-          envMapIntensity={0.35}
+          metalness={0.35}
+          roughness={0.42}
+          envMapIntensity={0.42}
           side={THREE.DoubleSide}
         />
-      </mesh>
+      </BarrelSteps>
       {/* the bore */}
       <mesh rotation-x={Math.PI / 2} position-z={glassZ + barrelDepth + (depth - barrelDepth) / 2}>
         <cylinderGeometry args={[boreR * 0.9, boreR, depth - barrelDepth, 48, 1, true]} />

@@ -80,6 +80,13 @@ function roundedRectOutline(width: number, height: number, radius: number, step 
 }
 
 /**
+ * How far back from a strap's free end its rounding starts, as a share of the
+ * tip's width: 0.5 is a full half-round, and the bands modelled here are a
+ * little blunter than that.
+ */
+const TIP_ROUND = 0.42
+
+/**
  * A buckle frame in strap-local terms (x across the strap, z along it, y
  * outward): a rounded rectangle of bar stock `bar` wide and `height` deep,
  * swept as a tube so the metal reads as bent wire - round, or oval where the
@@ -539,6 +546,10 @@ function WatchBody({
         segments: ridges ? Math.max(run.segments, Math.ceil((run.length / ridges.pitch) * 10)) : run.segments,
         capStart: true,
         capEnd: true,
+        // Both straps end in a rounded tongue: the tail's free tip, and the
+        // end the buckle is moulded onto, which stands a little past the
+        // frame and showed as a stub cut off square. A loop has no ends.
+        tip: seamless ? 0 : (tipWidth * TIP_ROUND) / run.length,
       })
     })
     if (band.closure === 'seamless' || pose.kind === 'seamless') return runs

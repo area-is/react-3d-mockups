@@ -60,8 +60,63 @@ breaking change can ship in a minor release, and is always listed under
   other tablet: `frontCamera.offsetY`, a `flash` on the single-lens camera,
   and `edge: 'top'` keys in `sideButtons`.
 
+### Changed
+
+- **Print and packaging bodies have a surface, not just a colour.** Nine
+  objects were lit as one flat colour wherever your design does not print,
+  which is what gave them away as renders. They now carry procedural grain,
+  drawn in code at load with nothing to download:
+  - `Book`: a page block whose head, tail and fore edge show their leaves,
+    and a buckram weave on the cloth that resolves as you move in on it.
+  - `Magazine`: the trimmed block's three open edges show their leaves.
+  - `MailerBox` and `ShoppingBag`: mottled kraft fibre.
+  - `PosterFrame`: a fibrous kraft dust cover, with a sawtooth hanger on the
+    top rail and a felt bumper in each bottom corner.
+  - `AFrameSign` and the `BusShelter` bench: timber grain.
+  - `IDCard`: a ribbed polyester lanyard.
+  - `VinylRecord`: the groove band is shaded anisotropically, so it throws
+    the radial wedges of light a pressed record does instead of reading as
+    a black disc with rings drawn on it.
+
+  Live regions are unchanged in size and place; only the bodies around them
+  differ. A pale `color` (a white bag, white-top board, a painted sign) keeps
+  the relief and takes no tint, since bleached and painted stock shows no
+  grain. Each of the first eight imports costs about 1 KB gzip more (the
+  record about 0.1 KB), devices and every other object nothing. The grain is
+  exported from `/core` for your own r3f meshes: `grainMap(FIBRE, 2)` and
+  `grainNormal(FIBRE, 2)` return a white-based tint `map` and a `normalMap`
+  for the `FIBRE`, `SHEETS`, `WEAVE` and `WOOD` grains, and
+  `grainTint(FIBRE, color, 2)` is the `map` that leaves pale stock alone.
+
+- **Device details that read as drawn rather than made.**
+  - **Phone, foldable and tablet cameras.** Every lens barrel now steps down
+    to its glass in fine chamfered rings, each catching its own arc of light,
+    where it was a smooth dark funnel and the lens read as a black disc with
+    a bead in the middle.
+  - **MacBook Touch ID.** The sensor is a shallow dish inside a fine tactile
+    ring, so a crescent of light moves round it as the laptop turns. It was a
+    flat disc in a ring of one even grey, which read as an icon printed on
+    the key.
+  - **Watch straps.** Both ends of the Ocean Band and the Galaxy bands are
+    rounded tongues. They were capped flat, so the end that stands past the
+    buckle looked cut off. `sweptStrapGeometry` takes a `tip` for this.
+  - **Milk carton.** The sealed fin carries the heat seal's crimp on both
+    flanks and is one thickness end to end; the block at each end is gone,
+    and `MILK_CARTON.fin.knuckle` with it.
+
+  These cost a device import 0.1 to 0.2 KB gzip, and the carton nothing.
+
 ### Fixed
 
+- **Credit card: the back's debossed lettering looked like wireframes.** On
+  a card with no back design, each stroke of the embossing's reverse was
+  drawn as its own flat capsule, so every joint showed the rounded end of
+  each stroke meeting there. The strokes now sort by depth and read as solid
+  pressed characters.
+- **Shopping bag: the handle cords came through the board.** Each cord drew a
+  dark line down the outside of an unprinted back, and stood in front of the
+  glued patch meant to cover it. The cords now run inside the wall, under
+  their patches.
 - **Screens off their glass in Safari and on iPhone.** A live screen could
   be drawn tens of pixels away from the display it belongs on in WebKit
   (every iOS browser and desktop Safari). The

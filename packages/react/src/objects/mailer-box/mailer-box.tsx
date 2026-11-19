@@ -1,7 +1,15 @@
 import * as React from 'react'
 import { RoundedBox } from '@react-three/drei'
 import type { ThreeElements } from '@react-three/fiber'
-import { MAILER_BOX, MAILER_BOX_REGIONS, mailerBoxLayout, type MailerBoxSizeMm } from '../../core'
+import {
+  FIBRE,
+  MAILER_BOX,
+  MAILER_BOX_REGIONS,
+  grainNormal,
+  grainTint,
+  mailerBoxLayout,
+  type MailerBoxSizeMm,
+} from '../../core'
 import { DeviceScreen } from '../../screen/device-screen'
 import { collectSlots, createSlots, resolveSurface, type SurfaceProps } from '../../slots'
 
@@ -143,7 +151,17 @@ function MailerBoxImpl({
     <group {...groupProps}>
       {/* the shipper */}
       <RoundedBox args={[body.width, body.height, body.depth]} radius={body.radius}>
-        <meshPhysicalMaterial color={color} metalness={0} roughness={0.85} />
+        {/* kraft liner: mottled fibre, so the board does not read as painted
+            plastic (white-top board is pale, and keeps only the relief). The
+            rounded box carries world-unit UVs. */}
+        <meshPhysicalMaterial
+          color={color}
+          metalness={0}
+          roughness={0.88}
+          map={grainTint(FIBRE, color, 1.5)}
+          normalMap={grainNormal(FIBRE, 1.5)}
+          normalScale={0.22}
+        />
       </RoundedBox>
 
       {/* geometry seam gap + tape for the unprinted faces (hidden under live
@@ -180,7 +198,14 @@ function MailerBoxImpl({
           {([1, -1] as const).map((s) => (
             <mesh key={s} position={[0, 0.001, s * (body.depth / 4 + 0.006)]} rotation-x={-Math.PI / 2}>
               <planeGeometry args={[body.width - 0.012, body.depth / 2 - 0.012]} />
-              <meshPhysicalMaterial color={color} metalness={0} roughness={0.82} />
+              <meshPhysicalMaterial
+                color={color}
+                metalness={0}
+                roughness={0.85}
+                map={grainTint(FIBRE, color, body.width * 1.5, (body.depth / 2) * 1.5)}
+                normalMap={grainNormal(FIBRE, body.width * 1.5, (body.depth / 2) * 1.5)}
+                normalScale={0.22}
+              />
             </mesh>
           ))}
           {/* Kept inside the flat of the lid: skewed and pushed toward the
