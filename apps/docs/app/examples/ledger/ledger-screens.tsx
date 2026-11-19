@@ -4,6 +4,7 @@ import type { CSSProperties, ReactNode } from 'react'
 import { halftone } from 'tabbied/patterns'
 import { Pattern } from '@/components/screens/swiss-art'
 import { Face } from '../_shared/face'
+import { LedgerMark } from './ledger-mark'
 import {
   CATEGORIES,
   DAILY_BUDGET,
@@ -174,7 +175,7 @@ export function Dashboard({ state }: { state: LedgerState }) {
       <style>{KEYFRAMES}</style>
       <aside style={{ borderRight: `1px solid ${LINE}`, padding: '28px 22px', display: 'flex', flexDirection: 'column', gap: 30 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 18, fontWeight: 800, letterSpacing: '-0.03em' }}>
-          <span style={{ width: 16, height: 16, borderRadius: 5, background: LIME }} />
+          <LedgerMark size={16} color={LIME} />
           Ledger
         </div>
         <nav style={{ display: 'flex', flexDirection: 'column', gap: 4, fontSize: 14, fontWeight: 600 }}>

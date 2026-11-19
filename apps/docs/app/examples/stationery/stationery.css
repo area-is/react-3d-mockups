@@ -1,7 +1,7 @@
 /* ------------------------------------------------------------------ */
 /*  /examples/stationery - an isolated text-driven print example.      */
 /*                                                                     */
-/*  Warm paper, a serif, and the palette's accent read from            */
+/*  A white page, a serif, and the palette's accent read from          */
 /*  `--am-accent` so the page follows the suite. The tokens override   */
 /*  the site's on `.am` only.                                          */
 /* ------------------------------------------------------------------ */
@@ -9,8 +9,9 @@
 .am {
   --am-accent: #b8a56a;
   --am-ink: #2f4a3a;
-  --am-paper: #faf7f1;
-  --am-panel: #f1ece2;
+  /* A white page; the stages keep a light step of the warm tone. */
+  --am-paper: #ffffff;
+  --am-panel: #f5f2ec;
   --am-text: #2b2823;
   --am-muted: #746d62;
   --am-line: #e0d8c8;
@@ -33,7 +34,8 @@
   color: inherit;
 }
 
-.am button {
+/* :where() keeps this reset at one class, so a control's own class can set its colour. */
+.am :where(button) {
   cursor: pointer;
 }
 
@@ -65,8 +67,8 @@
 
 .am-nav {
   display: flex;
-  gap: 26px;
-  font-size: 14.5px;
+  gap: 24px;
+  font-size: 14px;
   font-weight: 500;
   color: var(--am-muted);
 }
@@ -74,16 +76,16 @@
 .am-top-right {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 16px;
 }
 
 .am-cta {
   font-size: 14px;
-  font-weight: 700;
+  font-weight: 600;
   color: #fff;
   background: var(--am-ink);
-  border-radius: 999px;
-  padding: 9px 16px;
+  border-radius: 6px;
+  padding: 8px 16px;
   white-space: nowrap;
   transition: background 0.4s ease;
 }
@@ -97,17 +99,17 @@
 }
 
 .am-eyebrow {
-  margin: 0 0 14px;
+  margin: 0 0 16px;
   font-size: 13px;
   font-weight: 600;
   letter-spacing: 0.02em;
-  color: var(--am-accent);
+  color: color-mix(in srgb, var(--am-accent) 50%, var(--am-text));
   transition: color 0.4s ease;
 }
 
 .am-hero h1 {
   max-width: 760px;
-  margin: 0 0 18px;
+  margin: 0 0 16px;
   font-size: clamp(40px, 5.4vw, 72px);
   line-height: 1.02;
 }
@@ -132,31 +134,28 @@
   padding: 0 32px 64px;
 }
 
+/* The fields sit on the page, in the column beside the pieces. */
 .am-form {
   position: sticky;
   top: 24px;
   display: flex;
   flex-direction: column;
-  gap: 14px;
-  padding: 22px;
-  border: 1px solid var(--am-line);
-  border-radius: 18px;
-  background: rgba(255, 255, 255, 0.5);
+  gap: 16px;
 }
 
 .am-form-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 10px;
+  gap: 8px;
 }
 
 .am-text {
   display: flex;
   flex-direction: column;
-  gap: 5px;
+  gap: 4px;
   min-width: 0;
-  font-size: 12.5px;
-  font-weight: 700;
+  font-size: 12px;
+  font-weight: 600;
 }
 
 /* `width: 100%` and `min-width: 0`, or the two inputs in a row keep their
@@ -165,12 +164,12 @@
   width: 100%;
   min-width: 0;
   box-sizing: border-box;
-  padding: 10px 12px;
+  padding: 8px 12px;
   font-size: 15px;
   font-weight: 500;
   background: #fff;
   border: 1.5px solid var(--am-line);
-  border-radius: 10px;
+  border-radius: 6px;
   outline: none;
   transition: border-color 0.15s ease;
 }
@@ -189,33 +188,37 @@
 .am-field legend {
   padding: 0;
   margin: 0 0 8px;
-  font-size: 12.5px;
-  font-weight: 700;
+  font-size: 12px;
+  font-weight: 600;
 }
 
+/* Choices have no box and no border: the one that is on is at full strength and the rest recede; hover brings one forward. */
 .am-palettes {
   display: flex;
-  gap: 8px;
+  gap: 24px;
 }
 
 .am-palette {
-  flex: 1;
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 7px 10px 7px 7px;
   font-size: 13px;
   font-weight: 600;
   white-space: nowrap;
-  background: rgba(255, 255, 255, 0.6);
-  border: 1.5px solid var(--am-line);
-  border-radius: 10px;
-  transition: border-color 0.15s ease;
+  color: var(--am-muted);
+  padding: 4px 0;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  transition: color 0.15s ease;
+}
+
+.am-palette:hover {
+  color: var(--am-text);
 }
 
 .am-palette[aria-pressed='true'] {
-  border-color: var(--am-ink);
-  background: #fff;
+  color: var(--am-text);
 }
 
 .am-palette-chip {
@@ -224,10 +227,23 @@
   gap: 2px;
   width: 30px;
   height: 22px;
-  padding: 3px;
+  padding: 4px;
   box-sizing: border-box;
-  border-radius: 5px;
+  border-radius: 4px;
   border: 1px solid rgba(0, 0, 0, 0.12);
+}
+
+.am-palette .am-palette-chip {
+  opacity: 0.5;
+  transition: opacity 0.15s ease;
+}
+
+.am-palette:hover .am-palette-chip {
+  opacity: 0.8;
+}
+
+.am-palette[aria-pressed='true'] .am-palette-chip {
+  opacity: 1;
 }
 
 .am-palette-chip span {
@@ -238,17 +254,21 @@
 
 .am-seg {
   display: flex;
-  gap: 6px;
+  gap: 16px;
 }
 
 .am-seg button {
-  flex: 1;
-  padding: 9px 8px;
   font-size: 15px;
-  background: rgba(255, 255, 255, 0.6);
-  border: 1.5px solid var(--am-line);
-  border-radius: 10px;
-  transition: border-color 0.15s ease;
+  padding: 4px 0;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  transition: color 0.15s ease;
+  color: var(--am-muted);
+}
+
+.am-seg button:hover {
+  color: var(--am-text);
 }
 
 .am-seg button[data-face='serif'] {
@@ -257,18 +277,17 @@
 }
 
 .am-seg button[data-face='sans'] {
-  font-weight: 700;
+  font-weight: 600;
   letter-spacing: -0.03em;
 }
 
 .am-seg button[aria-pressed='true'] {
-  border-color: var(--am-ink);
-  background: #fff;
+  color: var(--am-text);
 }
 
 .am-form-note {
   margin: 4px 0 0;
-  font-size: 12.5px;
+  font-size: 12px;
   line-height: 1.5;
   color: var(--am-muted);
 }
@@ -282,34 +301,35 @@
 .am-pieces {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 18px;
+  gap: 40px 24px;
 }
 
+/* No card: the stage is the picture, and its caption sits under it on the page. */
 .am-piece {
-  border-radius: 18px;
-  border: 1px solid var(--am-line);
-  background: rgba(255, 255, 255, 0.4);
-  overflow: clip;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
 /* A definite height, so LazyScene has a box to hold while unmounted. */
 .am-piece-stage {
   position: relative;
   height: 400px;
+  border-radius: 10px;
+  overflow: clip;
   background: var(--am-panel);
 }
 
 .am-piece-meta {
   display: flex;
   flex-direction: column;
-  gap: 3px;
-  padding: 14px 18px 18px;
+  gap: 4px;
 }
 
 .am-piece-meta strong {
   font-size: 15px;
-  font-weight: 700;
-  letter-spacing: -0.01em;
+  font-weight: 600;
+  letter-spacing: 0;
 }
 
 .am-piece-meta span {
@@ -327,7 +347,7 @@
   flex-wrap: wrap;
   max-width: 1240px;
   margin: 0 auto;
-  padding: 22px 32px 36px;
+  padding: 24px 32px 36px;
   border-top: 1px solid var(--am-line);
   font-size: 13px;
   color: var(--am-muted);
@@ -353,7 +373,7 @@
 
 @media (max-width: 760px) {
   .am-top {
-    padding: 18px 20px 0;
+    padding: 16px 20px 0;
   }
 
   .am-nav {
@@ -372,7 +392,7 @@
   }
 
   .am-lede {
-    font-size: 16.5px;
+    font-size: 16px;
   }
 
   .am-pieces {

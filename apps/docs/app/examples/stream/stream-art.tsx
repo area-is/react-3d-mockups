@@ -24,7 +24,8 @@ export const INK = '#08090f'
 const PANEL = 'rgba(255, 255, 255, 0.06)'
 const TEXT = '#f2f3f8'
 const MUTED = '#9aa1b6'
-export const PRISM = 'linear-gradient(135deg, #8b7cf8 0%, #22d3ee 100%)'
+/** The service's one accent: the cool light of a screen in a dark room. */
+export const ACCENT = '#5ec3da'
 
 /**
  * Where a tile's object stands: over the label on a poster (`top`), in the
@@ -94,7 +95,7 @@ export function Tile({
       ) : null}
       {show.progress !== undefined ? (
         <div style={{ position: 'absolute', left: 0, right: 0, bottom: 0, height: Math.max(3, size * 0.25), background: 'rgba(255,255,255,0.15)' }}>
-          <div style={{ width: `${show.progress * 100}%`, height: '100%', background: PRISM }} />
+          <div style={{ width: `${show.progress * 100}%`, height: '100%', background: ACCENT }} />
         </div>
       ) : null}
       {children}
@@ -105,7 +106,7 @@ export function Tile({
 function Wordmark({ size }: { size: number }) {
   return (
     <span style={{ display: 'inline-flex', alignItems: 'center', gap: size * 0.4, fontSize: size, fontWeight: 800, letterSpacing: '-0.04em', color: TEXT }}>
-      <span style={{ width: size * 0.8, height: size * 0.8, borderRadius: size * 0.2, background: PRISM, display: 'inline-block' }} />
+      <span style={{ width: size * 0.8, height: size * 0.8, background: ACCENT, clipPath: 'polygon(50% 4%, 98% 92%, 2% 92%)', display: 'inline-block' }} />
       Prism
     </span>
   )
@@ -168,7 +169,7 @@ export function TVHome({ featured, live = true }: { featured: string; live?: boo
           <div style={{ position: 'absolute', inset: 0, background: `linear-gradient(to right, ${INK} 0%, rgba(8,9,15,0.85) 22%, rgba(8,9,15,0.2) 60%, rgba(8,9,15,0) 100%), linear-gradient(to top, ${INK} 0%, rgba(8,9,15,0) 45%)` }} />
         </div>
         <div style={{ position: 'relative', padding: '150px 60px 0 40px', maxWidth: 760, display: 'flex', flexDirection: 'column', gap: 18 }}>
-          <span style={{ fontSize: 16, fontWeight: 700, letterSpacing: '-0.01em', color: '#22d3ee' }}>Tonight&rsquo;s feature</span>
+          <span style={{ fontSize: 16, fontWeight: 700, letterSpacing: '-0.01em', color: ACCENT }}>Tonight&rsquo;s feature</span>
           <h1 style={{ margin: 0, fontSize: 78, fontWeight: 800, letterSpacing: '-0.045em', lineHeight: 0.95, color: TEXT }}>{show.title}</h1>
           <span style={{ fontSize: 18, fontWeight: 600, color: MUTED }}>
             {show.kind} · {show.meta}
@@ -225,7 +226,7 @@ export function FoldHome({ featured }: { featured: string }) {
         <Tile show={show} live grid={show.grid} labeled={false} art="right" style={{ position: 'absolute', inset: 0, borderRadius: 0 }} />
         <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(8,9,15,0.92) 0%, rgba(8,9,15,0.2) 55%, rgba(8,9,15,0) 100%)' }} />
         <div style={{ position: 'absolute', left: 22, right: 22, bottom: 20, display: 'flex', flexDirection: 'column', gap: 8 }}>
-          <span style={{ fontSize: 12.5, fontWeight: 700, letterSpacing: '-0.01em', color: '#22d3ee' }}>Tonight&rsquo;s feature</span>
+          <span style={{ fontSize: 12.5, fontWeight: 700, letterSpacing: '-0.01em', color: ACCENT }}>Tonight&rsquo;s feature</span>
           <span style={{ fontSize: 38, fontWeight: 800, letterSpacing: '-0.04em', lineHeight: 1 }}>{show.title}</span>
           <span style={{ fontSize: 13, fontWeight: 600, color: MUTED }}>
             {show.kind} · {show.meta}
@@ -279,7 +280,7 @@ export function FlipPlayer({ featured }: { featured: string }) {
         <Tile show={show} live grid={show.grid} labeled={false} style={{ position: 'absolute', inset: 0, borderRadius: 0 }} />
         <div style={{ position: 'absolute', left: 16, right: 16, top: 'calc(var(--mockup-safe-area-top, 0px) + 12px)', display: 'flex', justifyContent: 'space-between', fontSize: 12, fontWeight: 700, textShadow: '0 1px 6px rgba(0,0,0,0.6)' }}>
           <span>{show.title}</span>
-          <span style={{ color: '#22d3ee' }}>4K · HDR</span>
+          <span style={{ color: ACCENT }}>4K · HDR</span>
         </div>
       </div>
       <div style={{ height: '50%', flex: 'none', display: 'flex', flexDirection: 'column', padding: '22px 22px 28px', gap: 14, background: INK }}>
@@ -290,7 +291,7 @@ export function FlipPlayer({ featured }: { featured: string }) {
         </div>
         <div style={{ marginTop: 'auto' }}>
           <div style={{ height: 5, borderRadius: 3, background: 'rgba(255,255,255,0.15)', overflow: 'hidden' }}>
-            <div style={{ width: `${(show.progress ?? 0.3) * 100}%`, height: '100%', background: PRISM }} />
+            <div style={{ width: `${(show.progress ?? 0.3) * 100}%`, height: '100%', background: ACCENT }} />
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11.5, fontWeight: 600, color: MUTED, marginTop: 6, fontVariantNumeric: 'tabular-nums' }}>
             <span>31:04</span>
@@ -331,7 +332,7 @@ export function IPadTitle({ featured }: { featured: string }) {
           <Wordmark size={22} />
         </div>
         <div style={{ position: 'absolute', left: 36, right: 60, bottom: 36, display: 'flex', flexDirection: 'column', gap: 10 }}>
-          <span style={{ fontSize: 14, fontWeight: 700, letterSpacing: '-0.01em', color: '#22d3ee' }}>{show.kind}</span>
+          <span style={{ fontSize: 14, fontWeight: 700, letterSpacing: '-0.01em', color: ACCENT }}>{show.kind}</span>
           <span style={{ fontSize: 56, fontWeight: 800, letterSpacing: '-0.045em', lineHeight: 0.95 }}>{show.title}</span>
           <span style={{ fontSize: 15, fontWeight: 600, color: MUTED }}>{show.meta}</span>
           <p style={{ margin: 0, fontSize: 16, lineHeight: 1.45, color: '#c9cddb' }}>{show.blurb}</p>

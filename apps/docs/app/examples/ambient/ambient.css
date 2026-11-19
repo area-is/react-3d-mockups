@@ -1,19 +1,19 @@
 /* ------------------------------------------------------------------ */
 /*  /examples/ambient - an isolated living-art example.                */
 /*                                                                     */
-/*  A gallery wall: warm grey plaster, and the channel's ground read   */
-/*  from `--ab-ground` for the page's small accents. Tokens override   */
-/*  the site's on `.ab` only.                                          */
+/*  A white gallery: a white page, stages a step of warm grey, and the */
+/*  channel's ground from `--ab-ground` for the small accents. Tokens  */
+/*  override the site's on `.ab` only.                                 */
 /* ------------------------------------------------------------------ */
 
 .ab {
   --ab-ground: #0f1b33;
   --ab-ink: #5ec8ff;
-  --ab-wall: #ece8e1;
-  --ab-plaster: #e2ddd4;
+  --ab-wall: #ffffff;
+  --ab-plaster: #f2f0ec;
   --ab-text: #23211d;
   --ab-muted: #6f6a62;
-  --ab-line: #d8d2c7;
+  --ab-line: #e6e2db;
   position: relative;
   isolation: isolate;
   min-height: 100svh;
@@ -25,7 +25,8 @@
   color: inherit;
 }
 
-.ab button {
+/* :where() keeps this reset at one class, so a control's own class can set its colour. */
+.ab :where(button) {
   font-family: inherit;
   letter-spacing: inherit;
   color: inherit;
@@ -34,8 +35,8 @@
 
 .ab h1,
 .ab h2 {
-  font-weight: 700;
-  letter-spacing: -0.04em;
+  font-weight: 500;
+  letter-spacing: -0.02em;
   line-height: 1;
 }
 
@@ -54,10 +55,10 @@
 .ab-brand {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   font-size: 18px;
-  font-weight: 700;
-  letter-spacing: -0.03em;
+  font-weight: 600;
+  letter-spacing: -0.01em;
 }
 
 .ab-brand-mark {
@@ -71,8 +72,8 @@
 
 .ab-nav {
   display: flex;
-  gap: 26px;
-  font-size: 14.5px;
+  gap: 24px;
+  font-size: 14px;
   font-weight: 500;
   color: var(--ab-muted);
 }
@@ -80,16 +81,16 @@
 .ab-top-right {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 16px;
 }
 
 .ab-cta {
   font-size: 14px;
-  font-weight: 700;
+  font-weight: 600;
   color: #fff;
   background: var(--ab-text);
-  border-radius: 999px;
-  padding: 9px 16px;
+  border-radius: 6px;
+  padding: 8px 16px;
   white-space: nowrap;
 }
 
@@ -111,7 +112,8 @@
 }
 
 .ab-hero h1 {
-  margin: 0 auto 18px;
+  letter-spacing: -0.03em;
+  margin: 0 auto 16px;
   max-width: 760px;
   font-size: clamp(38px, 5.2vw, 68px);
 }
@@ -138,23 +140,18 @@
   position: relative;
   height: min(72vh, 700px);
   overflow: clip;
-  border-radius: 24px;
+  border-radius: 10px;
   background:
     radial-gradient(70% 60% at 50% 30%, rgba(255, 255, 255, 0.55) 0%, transparent 70%),
     var(--ab-plaster);
 }
 
+/* The controls sit under the stage on the page, aligned to its edge. */
 .ab-controls {
   display: flex;
   flex-direction: column;
   gap: 16px;
-  margin-top: -6px;
-  padding: 18px 20px 20px;
-  border: 1px solid var(--ab-line);
-  border-radius: 18px;
-  background: rgba(255, 255, 255, 0.6);
-  -webkit-backdrop-filter: blur(8px);
-  backdrop-filter: blur(8px);
+  margin-top: 24px;
 }
 
 .ab-control {
@@ -171,50 +168,69 @@
 }
 
 .ab-control-label {
-  font-size: 12.5px;
-  font-weight: 700;
+  font-size: 12px;
+  font-weight: 600;
   color: var(--ab-muted);
 }
 
+/* Choices have no box and no border: the one that is on is at full strength and the rest recede; hover brings one forward. */
 .ab-channels {
   display: grid;
   grid-template-columns: repeat(6, 1fr);
-  gap: 8px;
+  gap: 12px;
 }
 
 .ab-channel {
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  padding: 5px 5px 7px;
-  background: transparent;
-  border: 1.5px solid transparent;
-  border-radius: 12px;
+  gap: 8px;
   text-align: left;
-  transition: border-color 0.15s ease, background 0.15s ease;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  transition: color 0.15s ease;
 }
 
 .ab-channel:hover {
-  background: rgba(255, 255, 255, 0.6);
+  color: var(--ab-text);
 }
 
 .ab-channel[aria-pressed='true'] {
-  border-color: var(--ab-text);
-  background: #fff;
+  color: var(--ab-text);
 }
 
 .ab-channel-chip {
   display: block;
   width: 100%;
   aspect-ratio: 16 / 10;
-  border-radius: 8px;
+  border-radius: 6px;
   overflow: hidden;
 }
 
+.ab-channel .ab-channel-chip {
+  opacity: 0.5;
+  transition: opacity 0.15s ease;
+}
+
+.ab-channel:hover .ab-channel-chip {
+  opacity: 0.8;
+}
+
+.ab-channel[aria-pressed='true'] .ab-channel-chip {
+  opacity: 1;
+}
+
 .ab-channel-name {
-  font-size: 12.5px;
+  font-size: 12px;
   font-weight: 600;
-  padding: 0 2px;
+  color: var(--ab-muted);
+  transition: color 0.15s ease;
+}
+
+.ab-channel:hover .ab-channel-name,
+.ab-channel[aria-pressed='true'] .ab-channel-name {
+  color: var(--ab-text);
 }
 
 .ab-finishes {
@@ -223,11 +239,10 @@
 }
 
 .ab-finish {
-  padding: 3px;
+  padding: 4px;
   background: transparent;
-  border: 1.5px solid transparent;
+  border: 0;
   border-radius: 50%;
-  transition: border-color 0.15s ease;
 }
 
 .ab-finish span {
@@ -236,35 +251,40 @@
   height: 26px;
   border-radius: 50%;
   border: 1px solid rgba(0, 0, 0, 0.14);
+  opacity: 0.5;
+  transition: opacity 0.15s ease;
 }
 
-.ab-finish[aria-pressed='true'] {
-  border-color: var(--ab-text);
+.ab-finish:hover span {
+  opacity: 0.8;
+}
+
+.ab-finish[aria-pressed='true'] span {
+  opacity: 1;
 }
 
 .ab-seg {
   display: flex;
-  gap: 4px;
-  padding: 4px;
-  border: 1px solid var(--ab-line);
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.7);
+  gap: 16px;
 }
 
 .ab-seg button {
-  padding: 6px 14px;
   font-size: 13px;
   font-weight: 600;
+  padding: 4px 0;
   background: transparent;
   border: 0;
-  border-radius: 999px;
+  border-radius: 0;
+  transition: color 0.15s ease;
   color: var(--ab-muted);
-  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.ab-seg button:hover {
+  color: var(--ab-text);
 }
 
 .ab-seg button[aria-pressed='true'] {
-  background: var(--ab-text);
-  color: #fff;
+  color: var(--ab-text);
 }
 
 .ab-control-note {
@@ -296,11 +316,11 @@
 
 .ab-screens-head {
   max-width: 600px;
-  margin-bottom: 22px;
+  margin-bottom: 24px;
 }
 
 .ab-screens-head h2 {
-  margin: 0 0 10px;
+  margin: 0 0 8px;
   font-size: clamp(26px, 3vw, 36px);
 }
 
@@ -314,14 +334,14 @@
 .ab-grid {
   display: grid;
   grid-template-columns: 2fr 1fr;
-  gap: 18px;
+  gap: 40px 24px;
 }
 
+/* No card: the stage is the picture, and its caption sits under it on the page. */
 .ab-card {
-  border-radius: 18px;
-  background: var(--ab-plaster);
-  border: 1px solid var(--ab-line);
-  overflow: clip;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
 .ab-card:last-child {
@@ -332,25 +352,25 @@
 .ab-card-stage {
   position: relative;
   height: 480px;
+  border-radius: 10px;
+  overflow: clip;
+  background: var(--ab-plaster);
 }
 
 .ab-card-copy {
   display: flex;
   flex-direction: column;
   gap: 4px;
-  padding: 16px 20px 20px;
-  border-top: 1px solid var(--ab-line);
-  background: rgba(255, 255, 255, 0.4);
 }
 
 .ab-card-copy strong {
   font-size: 15px;
-  font-weight: 700;
-  letter-spacing: -0.02em;
+  font-weight: 600;
+  letter-spacing: 0;
 }
 
 .ab-card-copy span {
-  font-size: 13.5px;
+  font-size: 14px;
   line-height: 1.5;
   color: var(--ab-muted);
 }
@@ -360,44 +380,40 @@
 .ab-plans {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 18px;
+  gap: 32px;
   max-width: 1240px;
   margin: 0 auto;
   padding: clamp(48px, 8vh, 88px) 32px 64px;
 }
 
+/* Three plans as three aligned columns; the house plan is marked by its name in the channel colour. */
 .ab-plan {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  padding: 24px 26px;
-  border-radius: 18px;
-  border: 1px solid var(--ab-line);
-  background: rgba(255, 255, 255, 0.5);
 }
 
-.ab-plan[data-featured='true'] {
-  background: var(--ab-ground);
-  color: #fff;
-  border-color: transparent;
-  transition: background 0.5s ease;
+.ab-plan[data-featured='true'] .ab-plan-name {
+  color: var(--ab-ground);
+  opacity: 1;
+  transition: color 0.5s ease;
 }
 
 .ab-plan-name {
   font-size: 14px;
-  font-weight: 700;
+  font-weight: 600;
   opacity: 0.7;
 }
 
 .ab-plan-price {
   font-size: 34px;
-  font-weight: 700;
-  letter-spacing: -0.04em;
+  font-weight: 500;
+  letter-spacing: -0.01em;
   line-height: 1;
 }
 
 .ab-plan-note {
-  font-size: 13.5px;
+  font-size: 14px;
   opacity: 0.75;
 }
 
@@ -410,7 +426,7 @@
   flex-wrap: wrap;
   max-width: 1240px;
   margin: 0 auto;
-  padding: 22px 32px 36px;
+  padding: 24px 32px 36px;
   border-top: 1px solid var(--ab-line);
   font-size: 13px;
   color: var(--ab-muted);
@@ -441,7 +457,7 @@
 
 @media (max-width: 760px) {
   .ab-top {
-    padding: 18px 20px 0;
+    padding: 16px 20px 0;
   }
 
   .ab-nav {
@@ -468,12 +484,12 @@
 
   .ab-lede {
     margin-left: 0;
-    font-size: 16.5px;
+    font-size: 16px;
   }
 
   .ab-wall-stage {
     height: 50vh;
-    border-radius: 16px;
+    border-radius: 10px;
   }
 
   .ab-card-stage {

@@ -1,15 +1,18 @@
 /* ------------------------------------------------------------------ */
 /*  /examples/cafe - an isolated local-business example.               */
 /*                                                                     */
-/*  Cream paper and the shop's own paint, which the page reads from    */
-/*  `--cf-paint` so the swatches recolour the site as they recolour    */
-/*  the shopfront. The tokens override the site's on `.cf` only.       */
+/*  A white page, a warm stage, and the shop's own paint, which the    */
+/*  page reads from `--cf-paint` so the swatches recolour the site as  */
+/*  they recolour the shopfront. The tokens override the site's on     */
+/*  `.cf` only.                                                        */
 /* ------------------------------------------------------------------ */
 
 .cf {
   --cf-paint: #2e4638;
   --cf-cream: #f3ead9;
-  --cf-paper: #f7f1e6;
+  /* A white page; the stages keep a light step of the warm tone. */
+  --cf-paper: #ffffff;
+  --cf-stage: #f4efe6;
   --cf-ink: #24201a;
   --cf-muted: #6f675b;
   --cf-line: #ded4c2;
@@ -26,7 +29,8 @@
   color: inherit;
 }
 
-.cf button {
+/* :where() keeps this reset at one class, so a control's own class can set its colour. */
+.cf :where(button) {
   font-family: inherit;
   letter-spacing: inherit;
   color: inherit;
@@ -56,15 +60,15 @@
   font-family: var(--font-fraunces), Fraunces, serif;
   font-size: 24px;
   font-weight: 600;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.01em;
   color: var(--cf-paint);
   transition: color 0.4s ease;
 }
 
 .cf-nav {
   display: flex;
-  gap: 26px;
-  font-size: 14.5px;
+  gap: 24px;
+  font-size: 14px;
   font-weight: 500;
   color: var(--cf-muted);
 }
@@ -72,16 +76,16 @@
 .cf-top-right {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 16px;
 }
 
 .cf-cta {
   font-size: 14px;
-  font-weight: 700;
+  font-weight: 600;
   color: var(--cf-cream);
   background: var(--cf-paint);
-  border-radius: 999px;
-  padding: 9px 16px;
+  border-radius: 6px;
+  padding: 8px 16px;
   white-space: nowrap;
   transition: background 0.4s ease;
 }
@@ -95,7 +99,7 @@
 }
 
 .cf-eyebrow {
-  margin: 0 0 14px;
+  margin: 0 0 16px;
   font-size: 13px;
   font-weight: 600;
   letter-spacing: 0.02em;
@@ -105,7 +109,7 @@
 
 .cf-hero h1 {
   max-width: 760px;
-  margin: 0 0 18px;
+  margin: 0 0 16px;
   font-size: clamp(40px, 5.4vw, 72px);
   line-height: 1.02;
 }
@@ -133,22 +137,19 @@
   position: relative;
   height: min(72vh, 700px);
   overflow: clip;
-  border-radius: 22px;
+  border-radius: 10px;
   background:
     radial-gradient(70% 60% at 50% 45%, rgba(255, 255, 255, 0.5) 0%, transparent 70%),
-    #e9e0cd;
+    var(--cf-stage);
 }
 
+/* The controls sit under the stage on the page, aligned to its edge. */
 .cf-controls {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: 18px 34px;
-  padding: 18px 22px;
-  margin-top: 14px;
-  border: 1px solid var(--cf-line);
-  border-radius: 16px;
-  background: rgba(255, 255, 255, 0.45);
+  gap: 16px 32px;
+  margin-top: 24px;
 }
 
 .cf-control {
@@ -163,29 +164,29 @@
   color: var(--cf-muted);
 }
 
+/* Choices have no box and no border: the one that is on is at full strength and the rest recede; hover brings one forward. */
 .cf-seg {
   display: flex;
-  gap: 4px;
-  padding: 4px;
-  border: 1px solid var(--cf-line);
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.6);
+  gap: 16px;
 }
 
 .cf-seg button {
-  padding: 7px 16px;
-  font-size: 13.5px;
+  font-size: 14px;
   font-weight: 600;
+  padding: 4px 0;
   background: transparent;
   border: 0;
-  border-radius: 999px;
+  border-radius: 0;
+  transition: color 0.15s ease;
   color: var(--cf-muted);
-  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.cf-seg button:hover {
+  color: var(--cf-ink);
 }
 
 .cf-seg button[aria-pressed='true'] {
-  background: var(--cf-ink);
-  color: var(--cf-cream);
+  color: var(--cf-ink);
 }
 
 .cf-paints {
@@ -194,11 +195,10 @@
 }
 
 .cf-paint {
-  padding: 3px;
+  padding: 4px;
   background: transparent;
-  border: 1.5px solid transparent;
+  border: 0;
   border-radius: 50%;
-  transition: border-color 0.15s ease;
 }
 
 .cf-paint span {
@@ -206,10 +206,16 @@
   width: 26px;
   height: 26px;
   border-radius: 50%;
+  opacity: 0.5;
+  transition: opacity 0.15s ease;
 }
 
-.cf-paint[aria-pressed='true'] {
-  border-color: var(--cf-ink);
+.cf-paint:hover span {
+  opacity: 0.8;
+}
+
+.cf-paint[aria-pressed='true'] span {
+  opacity: 1;
 }
 
 .cf-control-note {
@@ -235,20 +241,20 @@
 
 .cf-board-copy h2,
 .cf-good-copy h2 {
-  margin: 0 0 10px;
+  margin: 0 0 8px;
   font-size: clamp(28px, 3.2vw, 40px);
   line-height: 1.05;
 }
 
 .cf-board-copy > p {
-  margin: 0 0 22px;
+  margin: 0 0 24px;
   font-size: 16px;
   line-height: 1.55;
   color: var(--cf-muted);
 }
 
 .cf-menu {
-  margin-bottom: 18px;
+  margin-bottom: 16px;
 }
 
 .cf-menu h3 {
@@ -265,8 +271,8 @@
 .cf-menu-row {
   display: flex;
   align-items: baseline;
-  gap: 10px;
-  padding: 6px 0;
+  gap: 8px;
+  padding: 8px 0;
   font-size: 15px;
   font-weight: 500;
 }
@@ -274,7 +280,7 @@
 .cf-menu-name em {
   margin-left: 8px;
   font-style: normal;
-  font-size: 12.5px;
+  font-size: 12px;
   color: var(--cf-muted);
 }
 
@@ -292,9 +298,9 @@
 .cf-board-stage {
   position: relative;
   height: 600px;
-  border-radius: 22px;
+  border-radius: 10px;
   overflow: clip;
-  background: #e9e0cd;
+  background: var(--cf-stage);
 }
 
 /* ---- the goods ------------------------------------------------------------ */
@@ -302,28 +308,30 @@
 .cf-goods {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 20px;
+  gap: 40px 24px;
   max-width: 1240px;
   margin: 0 auto;
   padding: clamp(48px, 8vh, 88px) 32px 64px;
 }
 
+/* No card: the stage is the picture, and its caption sits under it on the page. */
 .cf-good {
-  border-radius: 22px;
-  border: 1px solid var(--cf-line);
-  background: rgba(255, 255, 255, 0.4);
-  overflow: clip;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 
 /* A definite height, so LazyScene has a box to hold while unmounted. */
 .cf-good-stage {
   position: relative;
   height: 460px;
-  background: #e9e0cd;
+  border-radius: 10px;
+  overflow: clip;
+  background: var(--cf-stage);
 }
 
 .cf-good-copy {
-  padding: 22px 26px 26px;
+  padding: 0;
 }
 
 .cf-good-copy p {
@@ -341,7 +349,7 @@
 
 .cf-good-price {
   font-size: 14px;
-  font-weight: 700;
+  font-weight: 600;
   color: var(--cf-paint);
   transition: color 0.4s ease;
 }
@@ -363,12 +371,12 @@
   grid-template-columns: repeat(3, auto);
   justify-content: start;
   gap: 40px;
-  margin-bottom: 26px;
+  margin-bottom: 24px;
 }
 
 .cf-foot strong {
   color: var(--cf-ink);
-  font-weight: 700;
+  font-weight: 600;
 }
 
 .cf-foot-note {
@@ -408,7 +416,7 @@
 
 @media (max-width: 760px) {
   .cf-top {
-    padding: 18px 20px 0;
+    padding: 16px 20px 0;
   }
 
   .cf-nav {
@@ -429,12 +437,12 @@
   }
 
   .cf-lede {
-    font-size: 16.5px;
+    font-size: 16px;
   }
 
   .cf-shop-stage {
     height: 56vh;
-    border-radius: 16px;
+    border-radius: 10px;
   }
 
   .cf-board-stage,

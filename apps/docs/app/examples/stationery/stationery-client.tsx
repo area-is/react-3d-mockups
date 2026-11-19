@@ -51,7 +51,7 @@ export function Stationery() {
 
       <section className="am-hero">
         <p className="am-eyebrow">Wedding stationery · letterpress and litho, Lisbon</p>
-        <h1>Your names, on everything.</h1>
+        <h1>Your names, on everything</h1>
         <p className="am-lede">
           Type them once. The invitation, the reply card, the sign at the gate and the table plan set themselves as
           you go, in the paper and the palette you choose.
@@ -139,7 +139,7 @@ export function Stationery() {
             </div>
             <div className="am-piece-meta">
               <strong>The table plan</strong>
-              <span>18 × 24″, framed, eight tables named for trees.</span>
+              <span>18 × 24″, framed, eight tables named for trees</span>
             </div>
           </article>
         </div>

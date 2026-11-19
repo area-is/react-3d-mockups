@@ -178,6 +178,8 @@ export function PrintShop() {
             </div>
           </Field>
 
+          {/* Frame and print are short pickers and share a row; the mat names
+              are too long for half a column, so the mat gets a row of its own. */}
           <div className="ps-field-row">
             <Field label="Frame">
               <div className="ps-frames" role="group" aria-label="Frame">
@@ -198,18 +200,6 @@ export function PrintShop() {
               </div>
             </Field>
 
-            <Field label="Mat">
-              <div className="ps-seg" role="group" aria-label="Mat">
-                {MATS.map((m) => (
-                  <button key={m.id} type="button" aria-pressed={m.id === order.mat} onClick={() => set({ mat: m.id })}>
-                    {m.label}
-                  </button>
-                ))}
-              </div>
-            </Field>
-          </div>
-
-          <div className="ps-field-row">
             <Field label="Print">
               <div className="ps-seg" role="group" aria-label="Print">
                 {BLEEDS.map((b) => (
@@ -219,17 +209,27 @@ export function PrintShop() {
                 ))}
               </div>
             </Field>
-
-            <Field label="Composition" hint="the seed is the edition number">
-              <div className="ps-seed-row">
-                <code className="ps-seed">No. {order.seed}</code>
-                <button type="button" className="ps-shuffle" onClick={() => set({ seed: newSeed() })}>
-                  <Shuffle size={15} strokeWidth={2.2} aria-hidden />
-                  Shuffle
-                </button>
-              </div>
-            </Field>
           </div>
+
+          <Field label="Mat">
+            <div className="ps-seg" role="group" aria-label="Mat">
+              {MATS.map((m) => (
+                <button key={m.id} type="button" aria-pressed={m.id === order.mat} onClick={() => set({ mat: m.id })}>
+                  {m.label}
+                </button>
+              ))}
+            </div>
+          </Field>
+
+          <Field label="Composition" hint="the seed is the edition number">
+            <div className="ps-seed-row">
+              <code className="ps-seed">No. {order.seed}</code>
+              <button type="button" className="ps-shuffle" onClick={() => set({ seed: newSeed() })}>
+                <Shuffle size={16} strokeWidth={1.5} aria-hidden />
+                Shuffle
+              </button>
+            </div>
+          </Field>
 
           <div className="ps-buy">
             <span className="ps-price">
@@ -247,7 +247,7 @@ export function PrintShop() {
               Add to bag
             </button>
             <button type="button" className="ps-btn-ghost" onClick={downloadProof}>
-              <Download size={15} strokeWidth={2.2} aria-hidden />
+              <Download size={16} strokeWidth={1.5} aria-hidden />
               Download proof (SVG)
             </button>
           </div>

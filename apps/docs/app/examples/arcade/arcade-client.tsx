@@ -46,7 +46,7 @@ export function Arcade() {
         <p className="ar-eyebrow">
           {GAME.platforms} · {GAME.release}
         </p>
-        <h1>{GAME.tag}.</h1>
+        <h1>{GAME.tag}</h1>
         <p className="ar-lede">
           You are not the moth. You are the person who leaves the lamps on. Seven nights, forty lamps, and a small
           creature that will find every one of them if you let it.
@@ -95,7 +95,7 @@ export function Arcade() {
             </div>
             <div className="ar-card-copy">
               <strong>Pocket edition</strong>
-              <span>The same night, portrait, one tap per lamp.</span>
+              <span>The same night, portrait, one tap per lamp</span>
             </div>
           </article>
           <article className="ar-card">
@@ -104,7 +104,7 @@ export function Arcade() {
             </div>
             <div className="ar-card-copy">
               <strong>Boxed, for the shelf</strong>
-              <span>A slim case with a code inside and nothing else.</span>
+              <span>A slim case with a code inside and nothing else</span>
             </div>
           </article>
           <article className="ar-card">

@@ -43,7 +43,7 @@ export function Ambient() {
 
       <section className="ab-hero">
         <p className="ab-eyebrow">Living art for the screens you already own</p>
-        <h1>Never the same picture twice.</h1>
+        <h1>Never the same picture twice</h1>
         <p className="ab-lede">
           Six channels of generative art that redraw themselves every few seconds, on the TV when it is off, the
           monitor when you are away, the tablet on the shelf and the watch on your wrist. All of them turn together.
@@ -109,7 +109,7 @@ export function Ambient() {
             </div>
             <div className="ab-card-copy">
               <strong>On the desk</strong>
-              <span>A screensaver with the time, on a 27&Prime; display.</span>
+              <span>A screensaver with the time, on a 27&Prime; display</span>
             </div>
           </article>
           <article className="ab-card">
@@ -118,7 +118,7 @@ export function Ambient() {
             </div>
             <div className="ab-card-copy">
               <strong>On your wrist</strong>
-              <span>A watch face that is a little different every time you look.</span>
+              <span>A watch face that is a little different every time you look</span>
             </div>
           </article>
           <article className="ab-card ab-card-wide">
@@ -127,7 +127,7 @@ export function Ambient() {
             </div>
             <div className="ab-card-copy">
               <strong>On the shelf</strong>
-              <span>A tablet on a stand as a digital frame, matted like a print.</span>
+              <span>A tablet on a stand as a digital frame, matted like a print</span>
             </div>
           </article>
         </div>

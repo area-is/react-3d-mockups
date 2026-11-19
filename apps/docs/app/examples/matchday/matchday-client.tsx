@@ -93,7 +93,7 @@ export function Matchday() {
             </div>
             <div className="md-card-copy">
               <strong>The broadcast</strong>
-              <span>Score bug, live clock and the goal lower-third on a 65&Prime; set.</span>
+              <span>Score bug, live clock and the goal lower-third on a 65&Prime; set</span>
             </div>
           </article>
           <article className="md-card">
@@ -102,7 +102,7 @@ export function Matchday() {
             </div>
             <div className="md-card-copy">
               <strong>On your wrist</strong>
-              <span>The score, the minute and the last scorer, on a round dial.</span>
+              <span>The score, the minute and the last scorer, on a round dial</span>
             </div>
           </article>
         </div>
@@ -123,7 +123,7 @@ export function Matchday() {
         </div>
         <div className="md-pass-copy">
           <p className="md-eyebrow">Season 2026 / 27</p>
-          <h2>Your seat, all season.</h2>
+          <h2>Your seat, all season</h2>
           <p>
             Nineteen home matches, the cup, and a card that gets you through the turnstile before the queue. North
             Stand from €240, family enclosure from €140.

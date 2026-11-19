@@ -73,7 +73,7 @@ export default function CampaignExamplePage() {
         <h1>
           One pattern.
           <br />
-          Every surface in the city.
+          Every surface in the city
         </h1>
         <p className="cp-lede">
           {FESTIVAL.name} is {FESTIVAL.tagline.toLowerCase()} on the Lisbon docks. It needed an identity that could be a
