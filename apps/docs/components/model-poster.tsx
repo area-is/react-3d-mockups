@@ -23,7 +23,7 @@ export function posterFor(component: string, variant?: string): string | null {
  *
  * An example mounts when it scrolls near, and a first mount builds geometry
  * and compiles shaders - on a phone, long enough to scroll past a stage
- * holding nothing but the transparency checkerboard. The poster is the
+ * holding nothing but its empty dotted ground. The poster is the
  * sidebar's thumbnail (`npm run thumbs`), so it is a real render of that very
  * model, and it costs one small image the sidebar has usually loaded already.
  * Greyed, because its screens are the thumbnails' chroma green, which on a

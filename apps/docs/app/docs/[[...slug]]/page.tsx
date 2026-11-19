@@ -93,6 +93,9 @@ export default async function Page(props: PageParams) {
       // Hands the column the missing table of contents would have taken back
       // to the article - see `#nd-page[data-wide]` in docs.css.
       data-wide={isMockupPage || undefined}
+      // A hook for the previous / next links, which docs.css draws without
+      // fumadocs' cards.
+      footer={{ className: 'docs-pager' }}
     >
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd(breadcrumbData(page)) }} />
       <DocsTitle>{page.data.title}</DocsTitle>
