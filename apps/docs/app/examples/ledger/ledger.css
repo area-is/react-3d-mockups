@@ -247,9 +247,17 @@
 .lg-feature-stage {
   position: relative;
   height: 480px;
-  border-radius: 10px;
   overflow: clip;
-  background: var(--lg-panel);
+}
+
+/* Under the canvas, which is transparent: the device stands on the pattern,
+   which fades out before the stage's edge so no box shows. */
+.lg-feature-pattern {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  -webkit-mask-image: radial-gradient(closest-side, #000 55%, transparent 100%);
+  mask-image: radial-gradient(closest-side, #000 55%, transparent 100%);
 }
 
 .lg-feature-copy {

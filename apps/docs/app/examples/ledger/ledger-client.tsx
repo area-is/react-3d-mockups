@@ -4,7 +4,9 @@ import { useMemo, useState } from 'react'
 import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import { Coffee, Download, House, RotateCcw, ShoppingBasket, Ticket, TrainFront, type LucideIcon } from 'lucide-react'
+import { dotwash } from 'tabbied/patterns'
 import { SceneBoundary } from '@/components/scene-boundary'
+import { Pattern } from '@/components/screens/swiss-art'
 import { lazyScene } from '../_shared/stage'
 import { LedgerMark } from './ledger-mark'
 import { CATEGORIES, DAILY_BUDGET, QUICK_ADDS, SEED_TRANSACTIONS, addTransaction, eur, summarize, type Category, type Tx } from './ledger-data'
@@ -21,6 +23,21 @@ const CATEGORY_ICONS: Record<Category, LucideIcon> = {
   transport: TrainFront,
   home: House,
   fun: Ticket,
+}
+
+/**
+ * The ground under the two foldables: a dot wash on a transparent ground, in
+ * dark neutrals a step above the page, so the device sits on a soft texture
+ * rather than in a box.
+ */
+const STAGE_PALETTE = ['transparent', '#161a22', '#1a1f29', '#1e2430', '#222836', '#262d3b']
+
+function StagePattern({ seed }: { seed: string }) {
+  return (
+    <div className="lg-feature-pattern" aria-hidden>
+      <Pattern pattern={dotwash} seed={seed} palette={STAGE_PALETTE} grid="6x9" />
+    </div>
+  )
 }
 
 const FoldStage = lazyScene<{ state: LedgerState }>(() => import('./ledger-extras').then((m) => m.FoldScene))
@@ -108,6 +125,7 @@ export function Ledger() {
       <section className="lg-features">
         <article className="lg-feature">
           <div className="lg-feature-stage">
+            <StagePattern seed="ledger-fold" />
             <FoldStage state={state} />
           </div>
           <div className="lg-feature-copy">
@@ -120,6 +138,7 @@ export function Ledger() {
         </article>
         <article className="lg-feature">
           <div className="lg-feature-stage">
+            <StagePattern seed="ledger-flip" />
             <FlipStage state={state} />
           </div>
           <div className="lg-feature-copy">
