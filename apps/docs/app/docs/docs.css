@@ -254,6 +254,7 @@
 @media (prefers-reduced-motion: reduce) {
   .mockup-older-summary,
   .mockup-tile-thumb img,
+  .model-gallery-chip,
   .model-gallery-thumb,
   .model-gallery-thumb img,
   .model-gallery-label {
@@ -340,23 +341,24 @@
   color: var(--color-fd-muted-foreground);
 }
 
+/* Borderless pills, like the tiles below them: plain text at rest, a soft
+   fill on hover, and a green tint for the kind that is showing. */
 .model-gallery-chip {
   display: inline-flex;
   align-items: center;
   gap: 6px;
   min-height: 32px;
   padding: 4px 12px;
-  border: 1px solid var(--color-fd-border);
+  border: 0;
   border-radius: 999px;
-  background: var(--color-fd-card);
+  background: transparent;
   color: var(--color-fd-muted-foreground);
   font-size: 13px;
   line-height: 1.2;
   cursor: pointer;
   transition:
     background 0.15s ease,
-    color 0.15s ease,
-    border-color 0.15s ease;
+    color 0.15s ease;
 }
 
 .model-gallery-chip:hover {
@@ -365,9 +367,16 @@
 }
 
 .model-gallery-chip[aria-pressed='true'] {
-  border-color: var(--color-fd-primary);
-  background: color-mix(in oklab, var(--color-fd-primary) 12%, transparent);
+  background: color-mix(in oklab, var(--color-fd-primary) 14%, transparent);
   color: var(--color-fd-foreground);
+}
+
+/* Forced colours drop backgrounds, which is all that marks the pressed
+   pill now - so outline it there instead. */
+@media (forced-colors: active) {
+  .model-gallery-chip[aria-pressed='true'] {
+    outline: 1px solid Highlight;
+  }
 }
 
 .model-gallery-chip:focus-visible,
