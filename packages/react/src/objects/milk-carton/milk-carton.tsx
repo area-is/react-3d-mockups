@@ -1,6 +1,5 @@
 import * as React from 'react'
 import * as THREE from 'three'
-import { RoundedBox } from '@react-three/drei'
 import type { ThreeElements } from '@react-three/fiber'
 import {
   MILK_CARTON,
@@ -42,6 +41,9 @@ export interface MilkCartonProps extends Omit<GroupProps, 'children' | 'color'>,
 
 type V3 = [number, number, number]
 
+/** Grooves in the fin's heat-seal crimp, each side. */
+const FIN_CRIMPS = 6
+
 /**
  * A procedurally built gable-top beverage carton: poly-coated board walls, the
  * roof folding up to a ridge, an ear fold pinching each end inward the way the
@@ -55,8 +57,8 @@ type V3 = [number, number, number]
  * small radius of bent board. So the walls' corners are rounded, the eave
  * where the roof leaves the wall is a fillet rather than a crease line, the
  * ridge runs out onto a flat the fin stands on, and the fin itself is four
- * plies thick with a pressed round top and a knuckle at each end where the
- * ears fold into it. The first pass here had all of those as single planes
+ * plies thick with a pressed round top and the heat seal's crimp pressed into
+ * both flanks. The first pass here had all of those as single planes
  * meeting at lines, and it read as a paper model of a carton rather than the
  * carton.
  *
@@ -263,16 +265,40 @@ function MilkCartonImpl({
    * The sealed fin: its profile - four plies thick at the root where the ears
    * fold in, tapering to the sealed top edge, which is pressed round - swept
    * across the carton's width.
+   *
+   * Both flanks carry the seal's crimp: the row of fine grooves the heated
+   * jaws press into the board when they close the top. They are in the
+   * profile, so sweeping it draws them the full width for nothing, and they
+   * are what a fin has that a plain strip of board does not - without them
+   * it read as a slab stood on the ridge.
    */
   const finGeometry = React.useMemo(() => {
     const t0 = fin.thickness
     const t1 = t0 * fin.taper
     const h = finHeight
+    const shoulder = h - t1 / 2
+    const half = (y: number) => t0 / 2 + ((t1 - t0) / 2) * (y / shoulder)
+    // the crimped band: the fin's upper half, clear of the root and the round top
+    const from = shoulder * 0.38
+    const pitch = (shoulder * 0.9 - from) / FIN_CRIMPS
+    const bite = t0 * 0.09
     const profile = new THREE.Shape()
     profile.moveTo(-t0 / 2, 0)
     profile.lineTo(t0 / 2, 0)
-    profile.lineTo(t1 / 2, h - t1 / 2)
-    profile.absarc(0, h - t1 / 2, t1 / 2, 0, Math.PI, false)
+    for (let i = 0; i < FIN_CRIMPS; i++) {
+      const y = from + pitch * i
+      profile.lineTo(half(y), y)
+      profile.lineTo(half(y + pitch / 2) - bite, y + pitch / 2)
+      profile.lineTo(half(y + pitch), y + pitch)
+    }
+    profile.lineTo(t1 / 2, shoulder)
+    profile.absarc(0, shoulder, t1 / 2, 0, Math.PI, false)
+    for (let i = FIN_CRIMPS - 1; i >= 0; i--) {
+      const y = from + pitch * i
+      profile.lineTo(-half(y + pitch), y + pitch)
+      profile.lineTo(-half(y + pitch / 2) + bite, y + pitch / 2)
+      profile.lineTo(-half(y), y)
+    }
     profile.lineTo(-t0 / 2, 0)
     const geometry = new THREE.ExtrudeGeometry(profile, {
       depth: body.width,
@@ -402,8 +428,6 @@ function MilkCartonImpl({
   const seamLap = Math.min(body.width * 0.07, height * 0.028)
   const seamPly = LIFT * 0.85
 
-  const knuckleWidth = Math.min(fin.height * 0.6, body.width * 0.12)
-  const knuckleThickness = fin.thickness * (1 + fin.knuckle)
 
   return (
     <group {...groupProps}>
@@ -442,22 +466,6 @@ function MilkCartonImpl({
         <cylinderGeometry args={[fin.thickness * 0.55, fin.thickness * 0.55, body.width, 24]} />
         <meshPhysicalMaterial {...board} />
       </mesh>
-
-      {/* The knuckles: each end of the fin is where an ear's worth of board
-          folds in and gets sealed, so the fin is fatter there than in the run
-          between - the detail that says the top was folded rather than cut. */}
-      {([1, -1] as const).map((s) => (
-        <RoundedBox
-          key={`knuckle-${s}`}
-          args={[knuckleWidth, finHeight * 0.92, knuckleThickness]}
-          radius={Math.min(fin.radius, knuckleThickness * 0.4, knuckleWidth * 0.4)}
-          steps={1}
-          smoothness={4}
-          position={[s * (hw - knuckleWidth / 2), apex + (finHeight * 0.92) / 2, 0]}
-        >
-          <meshPhysicalMaterial {...board} />
-        </RoundedBox>
-      ))}
 
       {/* the screw cap, moulded onto the front roof panel. Its collar sits on
           the panel and the cap stands proud of it, so it masks whatever the

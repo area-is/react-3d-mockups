@@ -88,8 +88,35 @@ breaking change can ship in a minor release, and is always listed under
   for the `FIBRE`, `SHEETS`, `WEAVE` and `WOOD` grains, and
   `grainTint(FIBRE, color, 2)` is the `map` that leaves pale stock alone.
 
+- **Device details that read as drawn rather than made.**
+  - **Phone, foldable and tablet cameras.** Every lens barrel now steps down
+    to its glass in fine chamfered rings, each catching its own arc of light,
+    where it was a smooth dark funnel and the lens read as a black disc with
+    a bead in the middle.
+  - **MacBook Touch ID.** The sensor is a shallow dish inside a fine tactile
+    ring, so a crescent of light moves round it as the laptop turns. It was a
+    flat disc in a ring of one even grey, which read as an icon printed on
+    the key.
+  - **Watch straps.** Both ends of the Ocean Band and the Galaxy bands are
+    rounded tongues. They were capped flat, so the end that stands past the
+    buckle looked cut off. `sweptStrapGeometry` takes a `tip` for this.
+  - **Milk carton.** The sealed fin carries the heat seal's crimp on both
+    flanks and is one thickness end to end; the block at each end is gone,
+    and `MILK_CARTON.fin.knuckle` with it.
+
+  These cost a device import 0.1 to 0.2 KB gzip, and the carton nothing.
+
 ### Fixed
 
+- **Credit card: the back's debossed lettering looked like wireframes.** On
+  a card with no back design, each stroke of the embossing's reverse was
+  drawn as its own flat capsule, so every joint showed the rounded end of
+  each stroke meeting there. The strokes now sort by depth and read as solid
+  pressed characters.
+- **Shopping bag: the handle cords came through the board.** Each cord drew a
+  dark line down the outside of an unprinted back, and stood in front of the
+  glued patch meant to cover it. The cords now run inside the wall, under
+  their patches.
 - **Screens off their glass in Safari and on iPhone.** A live screen could
   be drawn tens of pixels away from the display it belongs on in WebKit
   (every iOS browser and desktop Safari). The

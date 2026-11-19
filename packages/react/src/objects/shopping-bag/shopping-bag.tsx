@@ -193,6 +193,11 @@ function ShoppingBagImpl({
   // handle hardware hangs from the rim in proportion to the handle itself
   const cordDrop = handle.radius * 0.4
   const patchDrop = handle.radius * 0.31
+  // The cords run down INSIDE the wall, clear of it by their own radius, and
+  // the patch is glued over them. They were set 0.03 in on a 0.046 cord, so
+  // each one came through the board and drew a dark line down the outside of
+  // an unprinted back - and stood in front of the patch that should cover it.
+  const cordInset = handle.tube + 0.004
 
   return (
     <group {...groupProps}>
@@ -227,7 +232,7 @@ function ShoppingBagImpl({
 
       {/* twisted-rope handles over the rim, with glued patches inside */}
       {([1, -1] as const).map((s) => (
-        <group key={s} position={[0, body.height / 2, s * (body.depth / 2 - wall - 0.03)]}>
+        <group key={s} position={[0, body.height / 2, s * (body.depth / 2 - wall - cordInset)]}>
           <mesh scale={[1, handle.rise, 1]}>
             <torusGeometry args={[handle.radius, handle.tube, 10, 40, Math.PI]} />
             <meshPhysicalMaterial color={handleColor} metalness={0} roughness={0.8} />
@@ -239,7 +244,7 @@ function ShoppingBagImpl({
             </mesh>
           ))}
           {([1, -1] as const).map((x) => (
-            <mesh key={`p${x}`} position={[x * handle.radius, -patchDrop, -s * 0.012]} rotation-y={s === 1 ? Math.PI : 0}>
+            <mesh key={`p${x}`} position={[x * handle.radius, -patchDrop, -s * (handle.tube + 0.003)]} rotation-y={s === 1 ? Math.PI : 0}>
               <planeGeometry args={[handle.patch.width, handle.patch.height]} />
               <meshPhysicalMaterial color="#a67f52" metalness={0} roughness={0.9} />
             </mesh>

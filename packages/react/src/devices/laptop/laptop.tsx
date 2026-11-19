@@ -110,6 +110,12 @@ const WELL_RADIUS = 0.068
 /** A cap stands from just off the well's floor to 0.1 mm under the deck. */
 const CAP_BOTTOM_Y = 0.002
 const CAP_TOP_Y = WELL_DEPTH - 0.0015
+/** Touch ID's sensor: Ø9.5 mm, concentric with its cap. */
+const SENSOR_RADIUS = 0.0656
+/** Slope of the sensor dish at its rim. Deeper than the real ~0.1 mm dish measures, to read at mockup size. */
+const SENSOR_DISH = 0.22
+/** Width of the tactile ring round the sensor, ~0.6 mm. */
+const SENSOR_RING = 0.008
 
 type KeyIcon =
   | 'sunlo' | 'sunhi' | 'mission' | 'spot' | 'mic' | 'moon'
@@ -555,7 +561,7 @@ function Keys({
   capColor = '#0c0d10',
   ink = 'rgba(228, 231, 240, 0.85)',
   symbols = false,
-  sensorRing = '#6f7278',
+  sensorRing = '#25272b',
 }: {
   keyboard: { width: number; depth: number; offsetZ: number }
   /** Keycap colour - the Air and Pro's black, or the Neo's colour-matched caps. */
@@ -564,7 +570,7 @@ function Keys({
   ink?: string
   /** Symbols rather than words on the editing keys (see `buildKeyboardLayout`). */
   symbols?: boolean
-  /** Touch ID's metal ring. */
+  /** Touch ID's tactile ring: near-black on black caps, the body colour on matched ones. */
   sensorRing?: string
 }) {
   const layout = React.useMemo(() => buildKeyboardLayout(keyboard, symbols), [keyboard, symbols])
@@ -713,8 +719,36 @@ function Keys({
   }, [layout, keyboard, ink])
   React.useEffect(() => () => legendsTexture?.dispose(), [legendsTexture])
 
-  // Touch ID's ring is Ø9.5 mm, concentric with its cap.
-  const sensorR = 0.0656
+  // Touch ID is a shallow dish Ø9.5 mm in the cap, inside a fine raised ring
+  // you find by feel. Both are flat meshes lying on the cap, carrying the
+  // normals of the shapes they stand for: the dish leans in toward its
+  // centre, the ring rolls from leaning in to leaning out. Lit that way the
+  // sensor shows a crescent of light that moves round it as the laptop
+  // turns. A flat disc in a flat ring showed a circle of one even grey at
+  // every angle, which read as an icon printed on the key.
+  const sensorGeometry = React.useMemo(() => {
+    const lean = (geometry: THREE.BufferGeometry, slopeAt: (r: number) => number) => {
+      const position = geometry.getAttribute('position')
+      const normal = geometry.getAttribute('normal')
+      for (let i = 0; i < position.count; i++) {
+        const x = position.getX(i)
+        const y = position.getY(i)
+        const r = Math.hypot(x, y) || 1
+        const slope = slopeAt(r)
+        const length = Math.hypot(slope, 1)
+        normal.setXYZ(i, ((x / r) * slope) / length, ((y / r) * slope) / length, 1 / length)
+      }
+      return geometry
+    }
+    return [
+      lean(new THREE.RingGeometry(0, SENSOR_RADIUS, 48, 5), (r) => (-SENSOR_DISH * r) / SENSOR_RADIUS),
+      lean(new THREE.RingGeometry(SENSOR_RADIUS, SENSOR_RADIUS + SENSOR_RING, 48, 2), (r) =>
+        // -1 at the ring's inner edge, +1 at its outer: the two flanks of a ridge
+        (((r - SENSOR_RADIUS) / SENSOR_RING) * 2 - 1) * 1.1
+      ),
+    ] as const
+  }, [])
+  React.useEffect(() => () => sensorGeometry.forEach((geometry) => geometry.dispose()), [sensorGeometry])
 
   return (
     <>
@@ -730,15 +764,13 @@ function Keys({
           <meshBasicMaterial map={legendsTexture} transparent toneMapped={false} depthWrite={false} />
         </mesh>
       )}
-      {/* Touch ID: a flush sapphire disc, a shade glossier than the cap, in a
-          thin bright metal ring */}
-      <mesh position={[layout.touchId.x, CAP_TOP_Y + 0.0003, layout.touchId.z]} rotation-x={-Math.PI / 2}>
-        <circleGeometry args={[sensorR, 40]} />
-        <meshPhysicalMaterial color={capColor} metalness={0} roughness={0.35} specularIntensity={0.35} envMapIntensity={0.45} />
+      {/* Touch ID: the dished sensor, a shade glossier than the cap, inside
+          its tactile ring */}
+      <mesh geometry={sensorGeometry[0]} position={[layout.touchId.x, CAP_TOP_Y + 0.0003, layout.touchId.z]} rotation-x={-Math.PI / 2}>
+        <meshPhysicalMaterial color={capColor} metalness={0} roughness={0.3} specularIntensity={0.5} />
       </mesh>
-      <mesh position={[layout.touchId.x, CAP_TOP_Y + 0.0005, layout.touchId.z]} rotation-x={-Math.PI / 2}>
-        <ringGeometry args={[sensorR - 0.003, sensorR, 48]} />
-        <meshPhysicalMaterial color={sensorRing} metalness={0.8} roughness={0.3} envMapIntensity={0.8} />
+      <mesh geometry={sensorGeometry[1]} position={[layout.touchId.x, CAP_TOP_Y + 0.0005, layout.touchId.z]} rotation-x={-Math.PI / 2}>
+        <meshPhysicalMaterial color={sensorRing} metalness={0.6} roughness={0.25} />
       </mesh>
     </>
   )

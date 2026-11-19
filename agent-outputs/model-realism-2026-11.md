@@ -90,6 +90,60 @@ with the outlined area enlarged underneath.
 
 ![Vinyl record: another angle, before and after](model-realism-2026-11/vinyl-2.jpg)
 
+## Round two: the parts that were asked about
+
+A second pass, on request, over the watch straps, the credit card, the milk carton, the
+phone cameras, the laptop keyboards and the shopping bag again. These models already had
+a great deal of work in them, so the question was narrower: what still reads as drawn
+rather than made?
+
+| Model | What was wrong | Change |
+| --- | --- | --- |
+| MacBooks | Touch ID was a flat disc in a ring of one even grey: an icon printed on the key. | A dished sensor inside a tactile ring, both flat meshes carrying the normals of the shapes they stand for. |
+| Phones, foldables, tablets | Each lens barrel was a smooth dark funnel, so the lens read as a black disc with a bead in it. | The barrel steps down to the glass in three chamfered rings (`baffleProfile`), in both the Apple and the Galaxy lens. |
+| Buckled watch bands | Both strap ends were capped flat, and the one standing past the buckle looked cut off. | `sweptStrapGeometry` takes a `tip`, rounding an end off on a quarter ellipse. The Solo Loop has no ends. |
+| Credit card | With no back design, the embossing's reverse was a pile of coplanar capsules: every joint showed the end of each stroke. | The impressions keep 3% of their depth, so the depth buffer takes the union. |
+| Milk carton | The fin was a plain slab with a block at each end. | Six crimp grooves in the fin's swept profile, one thickness end to end. `MILK_CARTON.fin.knuckle` is removed. |
+| Shopping bag | The handle cords came through the board, and stood in front of their patches. | The cords sit inside the wall by their own radius, under the patches. |
+
+![MacBook: Touch ID key, before and after](model-realism-2026-11/r2-touchid.jpg)
+
+![iPhone: camera lenses, before and after](model-realism-2026-11/r2-lens-iphone.jpg)
+
+![Galaxy: camera lenses, before and after](model-realism-2026-11/r2-lens-galaxy.jpg)
+
+![Apple Watch Ultra: strap end, before and after](model-realism-2026-11/r2-strap-ultra.jpg)
+
+![Galaxy Watch: strap end, before and after](model-realism-2026-11/r2-strap-galaxy.jpg)
+
+![Credit card: debossed back, before and after](model-realism-2026-11/r2-card-back.jpg)
+
+![Milk carton: the sealed fin, before and after](model-realism-2026-11/r2-carton.jpg)
+
+![Shopping bag: outside of the back, before and after](model-realism-2026-11/r2-bag-back.jpg)
+
+![Shopping bag: handles inside, before and after](model-realism-2026-11/r2-bag-handles.jpg)
+
+**Reviewed and left alone.** The strap material, the buckle and keeper hardware, the
+laptop keycaps and legends, the card's front embossing and chip, and the carton's ear
+folds, cap and board. Each was looked at close up and none had a defect cheap to fix.
+
+**Cost.** Every device import grows by 0.1 to 0.2 KB gzip (0.3%), for the shared lens
+and the strap; the carton, card and bag are unchanged to the nearest 0.1 KB. The whole
+library is 150.0 KB.
+
+**Checked** the same way as the first round: against the previous commit rendered on
+this machine, `book`, `tv`, `watch` (the Solo Loop), `creditcard`, `creditcard-emboss`,
+`galaxy`, `iphone-promax` and `fold-closed` are identical; `laptop`, `laptop-proled14`,
+`ipad-mini-back` and `creditcard-back` move by under 0.01%; and `milkcarton`, `bag`,
+`watch-ultra4` and `watch-ultra2` differ only at the fin, the handles and the strap
+ends. No region changed size.
+
+**Known limits.** The buckle-side strap still runs a little past its buckle, which a
+real one does not: it now ends in a tongue rather than a stub, but it should end at the
+bar. The printed-back path of the card's impressions still shades each stroke on its
+own; it was not reported and was not changed.
+
 ## What it costs
 
 Measured with `scripts/measure-size.mjs` on this machine, original code against the

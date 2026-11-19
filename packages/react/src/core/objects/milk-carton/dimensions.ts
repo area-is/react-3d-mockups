@@ -59,10 +59,11 @@ export const MILK_CARTON = {
    * seal between them: 5 mm thick where the ears fold into its root, tapering
    * to `taper` of that at the sealed top edge, which is pressed round. It was
    * modelled at 1.5 mm - a single ply - and read as a sheet of paper stood on
-   * the roof. `knuckle` is the extra thickness at each end, where the ear
-   * folds gather: a real fin is visibly fatter at its ends than in the middle.
+   * the roof. It is the same thickness end to end: the ears fold in across the
+   * whole ridge, so there is no fatter knuckle at each end (one was modelled,
+   * and read as a clip on the fin).
    */
-  fin: { height: 0.237, thickness: 0.095, taper: 0.62, radius: 0.03, knuckle: 0.3 },
+  fin: { height: 0.237, thickness: 0.095, taper: 0.62, radius: 0.03 },
   /**
    * The screw cap on the front roof panel: the cap itself, the collar it is
    * moulded onto, and `offset` - how far up the slant it sits, as a fraction
@@ -182,8 +183,8 @@ export interface MilkCartonLayout {
     fold: number
     panel: { length: number; centerZ: number; centerY: number }
   }
-  /** Root thickness, the top edge's share of it, the edge rounding, and the end knuckles' extra. */
-  fin: { height: number; thickness: number; taper: number; radius: number; knuckle: number }
+  /** Root thickness, the top edge's share of it, and the edge rounding. */
+  fin: { height: number; thickness: number; taper: number; radius: number }
   cap: {
     radius: number
     height: number
@@ -220,7 +221,6 @@ export function milkCartonLayout(size: MilkCartonSizeMm = MILK_CARTON_SIZE_MM): 
     // The sealed edge is a half-round of the tapered thickness, so the
     // rounding can never exceed what the top has to round.
     radius: Math.min(width * FIN_RADIUS, thickness * MILK_CARTON.fin.taper * 0.5),
-    knuckle: MILK_CARTON.fin.knuckle,
   }
   // The walls are what the overall height has left over once the roof and fin
   // have taken their share (see MIN_WALL_SHARE).
