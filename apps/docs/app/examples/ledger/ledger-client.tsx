@@ -3,16 +3,26 @@
 import { useMemo, useState } from 'react'
 import dynamic from 'next/dynamic'
 import Link from 'next/link'
-import { RotateCcw } from 'lucide-react'
+import { Coffee, Download, House, RotateCcw, ShoppingBasket, Ticket, TrainFront, type LucideIcon } from 'lucide-react'
 import { SceneBoundary } from '@/components/scene-boundary'
 import { lazyScene } from '../_shared/stage'
-import { CATEGORIES, DAILY_BUDGET, QUICK_ADDS, SEED_TRANSACTIONS, addTransaction, eur, summarize, type Tx } from './ledger-data'
+import { LedgerMark } from './ledger-mark'
+import { CATEGORIES, DAILY_BUDGET, QUICK_ADDS, SEED_TRANSACTIONS, addTransaction, eur, summarize, type Category, type Tx } from './ledger-data'
 import type { LedgerState } from './ledger-screens'
 
 const Hero = dynamic(() => import('./ledger-scene'), {
   ssr: false,
   loading: () => <div className="ex-loading">Warming up the GPU…</div>,
 })
+/** One line icon per category, drawn in the category's colour so it matches the charts on the screens. */
+const CATEGORY_ICONS: Record<Category, LucideIcon> = {
+  coffee: Coffee,
+  groceries: ShoppingBasket,
+  transport: TrainFront,
+  home: House,
+  fun: Ticket,
+}
+
 const FoldStage = lazyScene<{ state: LedgerState }>(() => import('./ledger-extras').then((m) => m.FoldScene))
 const FlipStage = lazyScene<{ state: LedgerState }>(() => import('./ledger-extras').then((m) => m.FlipScene))
 
@@ -34,7 +44,7 @@ export function Ledger() {
     <main className="lg">
       <header className="lg-top">
         <span className="lg-brand">
-          <span className="lg-brand-mark" aria-hidden />
+          <LedgerMark className="lg-brand-mark" />
           Ledger
         </span>
         <nav className="lg-nav" aria-label="Site">
@@ -43,7 +53,10 @@ export function Ledger() {
           <span>Changelog</span>
         </nav>
         <div className="lg-top-right">
-          <span className="lg-cta">Get the app</span>
+          <span className="lg-cta">
+            <Download size={16} strokeWidth={1.5} aria-hidden />
+            Get the app
+          </span>
         </div>
       </header>
 
@@ -69,13 +82,16 @@ export function Ledger() {
         <div className="lg-try">
           <span className="lg-try-label">Try it: add an expense</span>
           <div className="lg-try-buttons">
-            {QUICK_ADDS.map((q) => (
-              <button key={q.label} type="button" className="lg-try-btn" onClick={() => setTransactions((t) => addTransaction(t, q))}>
-                <span className="lg-try-dot" style={{ background: CATEGORIES[q.category].color }} aria-hidden />
-                {q.label}
-                <span className="lg-try-amount">{eur(q.amount)}</span>
-              </button>
-            ))}
+            {QUICK_ADDS.map((q) => {
+              const Icon = CATEGORY_ICONS[q.category]
+              return (
+                <button key={q.label} type="button" className="lg-try-btn" onClick={() => setTransactions((t) => addTransaction(t, q))}>
+                  <Icon size={16} strokeWidth={1.5} color={CATEGORIES[q.category].color} aria-hidden />
+                  {q.label}
+                  <span className="lg-try-amount">{eur(q.amount)}</span>
+                </button>
+              )
+            })}
             <button type="button" className="lg-try-reset" onClick={() => setTransactions(SEED_TRANSACTIONS)} disabled={added === 0}>
               <RotateCcw size={16} strokeWidth={1.5} aria-hidden />
               Reset

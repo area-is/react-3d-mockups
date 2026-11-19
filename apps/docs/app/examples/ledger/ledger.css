@@ -51,15 +51,14 @@
 }
 
 .lg-brand-mark {
-  width: 16px;
-  height: 16px;
-  border-radius: 4px;
-  background: var(--lg-lime);
+  display: block;
+  flex: none;
+  color: var(--lg-lime);
 }
 
 .lg-nav {
   display: flex;
-  gap: 24px;
+  gap: 40px;
   font-size: 14px;
   font-weight: 500;
   color: var(--muted);
@@ -72,6 +71,9 @@
 }
 
 .lg-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
   font-size: 14px;
   font-weight: 600;
   color: #0f1420;
@@ -152,55 +154,55 @@
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 8px;
+  gap: 8px 32px;
 }
 
+/* Each expense is its icon, its name and its price on the page: no box,
+   no border. Hover brings the text up to full strength; a press sinks it
+   a little. */
 .lg-try-btn {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 8px 16px 8px 12px;
+  padding: 8px 0;
   font-size: 14px;
   font-weight: 600;
-  color: var(--text);
-  background: var(--lg-panel);
-  border: 1px solid var(--border-strong);
-  border-radius: 6px;
-  transition: border-color 0.15s ease, transform 0.1s ease;
+  color: color-mix(in srgb, var(--text) 80%, transparent);
+  background: transparent;
+  border: 0;
+  transition: color 0.15s ease, transform 0.1s ease;
 }
 
 .lg-try-btn:hover {
-  border-color: var(--lg-lime);
+  color: var(--text);
 }
 
 .lg-try-btn:active {
   transform: scale(0.97);
 }
 
-.lg-try-dot {
-  width: 9px;
-  height: 9px;
-  border-radius: 50%;
-}
-
 .lg-try-amount {
   font-size: 12px;
   font-weight: 600;
-  color: var(--muted);
+  color: var(--text-low);
   font-variant-numeric: tabular-nums;
+  transition: color 0.15s ease;
+}
+
+.lg-try-btn:hover .lg-try-amount {
+  color: var(--muted);
 }
 
 .lg-try-reset {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 8px 16px;
+  padding: 8px 0;
   font-size: 14px;
   font-weight: 600;
   color: var(--muted);
   background: transparent;
-  border: 1px solid var(--border);
-  border-radius: 6px;
+  border: 0;
   transition: color 0.15s ease;
 }
 
