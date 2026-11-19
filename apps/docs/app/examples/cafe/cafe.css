@@ -1,18 +1,16 @@
 /* ------------------------------------------------------------------ */
 /*  /examples/cafe - an isolated local-business example.               */
 /*                                                                     */
-/*  A white page, a warm stage, and the shop's own paint, which the    */
-/*  page reads from `--cf-paint` so the swatches recolour the site as  */
-/*  they recolour the shopfront. The tokens override the site's on     */
-/*  `.cf` only.                                                        */
+/*  A white page, and the shop's own paint, which the page reads from  */
+/*  `--cf-paint` so the swatches recolour the site as they recolour    */
+/*  the shopfront - down to the faint dots every object stands on.     */
+/*  The tokens override the site's on `.cf` only.                      */
 /* ------------------------------------------------------------------ */
 
 .cf {
   --cf-paint: #2e4638;
   --cf-cream: #f3ead9;
-  /* A white page; the stages keep a light step of the warm tone. */
   --cf-paper: #ffffff;
-  --cf-stage: #f4efe6;
   --cf-ink: #24201a;
   --cf-muted: #6f675b;
   --cf-line: #ded4c2;
@@ -130,17 +128,34 @@
   padding: 0 32px;
 }
 
-/* A wide, definite box for a building. The pavement colour is a touch
-   darker than the page, so the shop stands on a street rather than on
-   paper. */
+/* Registered so the dots can fade to a new paint with the rest of the page;
+   unregistered, a custom property only snaps. */
+@property --cf-dot {
+  syntax: '<color>';
+  inherits: false;
+  initial-value: transparent;
+}
+
+/* The ground every object on the page stands on, in place of a card: no
+   fill, no border, only a sparse grid of 1px dots 14px apart in the shop's
+   paint, faint enough to read as texture on the white page rather than as
+   a box. Centred, so every stage sits on the same rhythm, and repainted
+   with the shopfront. */
+.cf-shop-stage,
+.cf-board-stage,
+.cf-good-stage {
+  --cf-dot: color-mix(in oklab, var(--cf-paint) 12%, transparent);
+  background-image: radial-gradient(circle, var(--cf-dot) 1px, transparent 1.5px);
+  background-size: 14px 14px;
+  background-position: center;
+  transition: --cf-dot 0.4s ease;
+}
+
+/* A wide, definite box for a building. */
 .cf-shop-stage {
   position: relative;
   height: min(72vh, 700px);
   overflow: clip;
-  border-radius: 10px;
-  background:
-    radial-gradient(70% 60% at 50% 45%, rgba(255, 255, 255, 0.5) 0%, transparent 70%),
-    var(--cf-stage);
 }
 
 /* The controls sit under the stage on the page, aligned to its edge. */
@@ -298,9 +313,7 @@
 .cf-board-stage {
   position: relative;
   height: 600px;
-  border-radius: 10px;
   overflow: clip;
-  background: var(--cf-stage);
 }
 
 /* ---- the goods ------------------------------------------------------------ */
@@ -325,9 +338,7 @@
 .cf-good-stage {
   position: relative;
   height: 460px;
-  border-radius: 10px;
   overflow: clip;
-  background: var(--cf-stage);
 }
 
 .cf-good-copy {
@@ -442,7 +453,6 @@
 
   .cf-shop-stage {
     height: 56vh;
-    border-radius: 10px;
   }
 
   .cf-board-stage,

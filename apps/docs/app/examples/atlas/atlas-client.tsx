@@ -2,6 +2,8 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import { halftone } from 'tabbied/patterns'
+import { TabbiedPattern } from 'tabbied/react'
 import { lazyScene } from '../_shared/stage'
 import { Picture } from './atlas-art'
 import { BOOK, CONTENTS, MAG, PHOTOS, findPhoto } from './atlas-data'
@@ -10,6 +12,25 @@ const MagazineStage = lazyScene<{ cover: string; glossy: boolean }>(() => import
 const BookStage = lazyScene(() => import('./atlas-scenes').then((m) => m.BookScene))
 const PrintStage = lazyScene<{ cover: string }>(() => import('./atlas-scenes').then((m) => m.PrintScene))
 const CardStage = lazyScene<{ cover: string }>(() => import('./atlas-scenes').then((m) => m.CardScene))
+
+/**
+ * The ground under every object on the page, in place of a panel: Tabbied's
+ * `halftone`, a fine screen of dots in the masthead's ink on a transparent
+ * ground, growing heavier towards the foot of the stage the way a floor
+ * darkens under what stands on it. The pictures in a magazine are printed
+ * as dots like these, so the issue stands on its own print screen. The
+ * stylesheet keeps it faint and fades it out before the stage's edge, so
+ * no box shows.
+ */
+const GROUND_PALETTE = ['transparent', '#171512']
+
+function StageGround({ seed }: { seed: string }) {
+  return (
+    <div className="at-stage-ground" aria-hidden>
+      <TabbiedPattern pattern={halftone} seed={seed} palette={GROUND_PALETTE} fit="grid" cellSize={16} />
+    </div>
+  )
+}
 
 /**
  * Atlas's issue page. An editor's two decisions are the page's two
@@ -77,6 +98,7 @@ export function Atlas() {
           </p>
         </div>
         <div className="at-hero-stage">
+          <StageGround seed="atlas-issue" />
           <MagazineStage cover={cover} glossy={glossy} />
         </div>
       </section>
@@ -102,6 +124,7 @@ export function Atlas() {
         <div className="at-shop-grid">
           <article className="at-item">
             <div className="at-item-stage">
+              <StageGround seed="atlas-print" />
               <PrintStage cover={cover} />
             </div>
             <div className="at-item-meta">
@@ -111,6 +134,7 @@ export function Atlas() {
           </article>
           <article className="at-item">
             <div className="at-item-stage">
+              <StageGround seed="atlas-card" />
               <CardStage cover={cover} />
             </div>
             <div className="at-item-meta">
@@ -120,6 +144,7 @@ export function Atlas() {
           </article>
           <article className="at-item">
             <div className="at-item-stage">
+              <StageGround seed="atlas-annual" />
               <BookStage />
             </div>
             <div className="at-item-meta">

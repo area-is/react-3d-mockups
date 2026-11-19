@@ -1,16 +1,16 @@
 /* ------------------------------------------------------------------ */
 /*  /examples/ambient - an isolated living-art example.                */
 /*                                                                     */
-/*  A white gallery: a white page, stages a step of warm grey, and the */
-/*  channel's ground from `--ab-ground` for the small accents. Tokens  */
-/*  override the site's on `.ab` only.                                 */
+/*  A white gallery: a white page, screens that stand on a faint grid  */
+/*  of dots rather than in boxes, and the channel's ground from        */
+/*  `--ab-ground` for the small accents. Tokens override the site's on */
+/*  `.ab` only.                                                        */
 /* ------------------------------------------------------------------ */
 
 .ab {
   --ab-ground: #0f1b33;
   --ab-ink: #5ec8ff;
   --ab-wall: #ffffff;
-  --ab-plaster: #f2f0ec;
   --ab-text: #23211d;
   --ab-muted: #6f6a62;
   --ab-line: #e6e2db;
@@ -134,16 +134,23 @@
   padding: 8px 32px 0;
 }
 
-/* Plaster, lit from above: the Frame hangs on a wall, and a wall has a
-   little light on it. */
+/* The ground every screen on the page stands on, in place of a card: no
+   fill, no border, only a sparse grid of 1px dots 14px apart in the page's
+   ink, faint enough to read as texture on the white wall rather than as a
+   box. Neutral rather than the channel's colours, because the screens are
+   already showing those, and centred so every stage sits on the same
+   rhythm. */
+.ab-wall-stage,
+.ab-card-stage {
+  background-image: radial-gradient(circle, color-mix(in oklab, var(--ab-text) 10%, transparent) 1px, transparent 1.5px);
+  background-size: 14px 14px;
+  background-position: center;
+}
+
 .ab-wall-stage {
   position: relative;
   height: min(72vh, 700px);
   overflow: clip;
-  border-radius: 10px;
-  background:
-    radial-gradient(70% 60% at 50% 30%, rgba(255, 255, 255, 0.55) 0%, transparent 70%),
-    var(--ab-plaster);
 }
 
 /* The controls sit under the stage on the page, aligned to its edge. */
@@ -352,9 +359,7 @@
 .ab-card-stage {
   position: relative;
   height: 480px;
-  border-radius: 10px;
   overflow: clip;
-  background: var(--ab-plaster);
 }
 
 .ab-card-copy {
@@ -489,7 +494,6 @@
 
   .ab-wall-stage {
     height: 50vh;
-    border-radius: 10px;
   }
 
   .ab-card-stage {

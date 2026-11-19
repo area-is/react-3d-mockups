@@ -6,7 +6,7 @@
 /* ------------------------------------------------------------------ */
 
 .at {
-  /* A white page; the stages keep a light step of the warm tone. */
+  /* A white page; the cover choices keep a light step of the warm tone. */
   --at-paper: #ffffff;
   --at-panel: #f2efe9;
   --at-ink: #171512;
@@ -202,7 +202,19 @@
   position: relative;
   height: min(78vh, 760px);
   overflow: clip;
-  background: var(--at-panel);
+}
+
+/* Under the canvas, which is transparent: each object stands on a faint
+   halftone screen (see StageGround in atlas-client.tsx) instead of a warm
+   panel. Kept to a whisper of the ink, and faded out well before the
+   stage's edge, so the page reads as one sheet of paper with no box on it. */
+.at-stage-ground {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.1;
+  -webkit-mask-image: radial-gradient(closest-side, #000 35%, transparent 100%);
+  mask-image: radial-gradient(closest-side, #000 35%, transparent 100%);
 }
 
 /* ---- contents ------------------------------------------------------------ */
@@ -290,7 +302,6 @@
   position: relative;
   height: 440px;
   overflow: clip;
-  background: var(--at-panel);
 }
 
 .at-item-meta {
