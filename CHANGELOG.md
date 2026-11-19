@@ -60,6 +60,34 @@ breaking change can ship in a minor release, and is always listed under
   other tablet: `frontCamera.offsetY`, a `flash` on the single-lens camera,
   and `edge: 'top'` keys in `sideButtons`.
 
+### Changed
+
+- **Print and packaging bodies have a surface, not just a colour.** Nine
+  objects were lit as one flat colour wherever your design does not print,
+  which is what gave them away as renders. They now carry procedural grain,
+  drawn in code at load with nothing to download:
+  - `Book`: a page block whose head, tail and fore edge show their leaves,
+    and a buckram weave on the cloth that resolves as you move in on it.
+  - `Magazine`: the trimmed block's three open edges show their leaves.
+  - `MailerBox` and `ShoppingBag`: mottled kraft fibre.
+  - `PosterFrame`: a fibrous kraft dust cover, with a sawtooth hanger on the
+    top rail and a felt bumper in each bottom corner.
+  - `AFrameSign` and the `BusShelter` bench: timber grain.
+  - `IDCard`: a ribbed polyester lanyard.
+  - `VinylRecord`: the groove band is shaded anisotropically, so it throws
+    the radial wedges of light a pressed record does instead of reading as
+    a black disc with rings drawn on it.
+
+  Live regions are unchanged in size and place; only the bodies around them
+  differ. A pale `color` (a white bag, white-top board, a painted sign) keeps
+  the relief and takes no tint, since bleached and painted stock shows no
+  grain. Each of the first eight imports costs about 1 KB gzip more (the
+  record about 0.1 KB), devices and every other object nothing. The grain is
+  exported from `/core` for your own r3f meshes: `grainMap(FIBRE, 2)` and
+  `grainNormal(FIBRE, 2)` return a white-based tint `map` and a `normalMap`
+  for the `FIBRE`, `SHEETS`, `WEAVE` and `WOOD` grains, and
+  `grainTint(FIBRE, color, 2)` is the `map` that leaves pale stock alone.
+
 ### Fixed
 
 - **Screens off their glass in Safari and on iPhone.** A live screen could

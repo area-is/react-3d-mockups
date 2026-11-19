@@ -2,8 +2,11 @@ import * as React from 'react'
 import * as THREE from 'three'
 import type { ThreeElements } from '@react-three/fiber'
 import {
+  FIBRE,
   POSTER_FRAME,
   POSTER_FRAME_REGIONS,
+  grainMap,
+  grainNormal,
   posterFrameSpec,
   type PosterFrameSize,
   roundedRectShape,
@@ -64,7 +67,7 @@ function PosterFrameImpl({
   ...groupProps
 }: PosterFrameProps) {
   const posterSlot = collectSlots(children, POSTER_FRAME_REGIONS).poster
-  const { poster, opening, frame, recess, matWidth } = React.useMemo(
+  const { poster, opening, frame, recess, matWidth, hanger, bumper } = React.useMemo(
     () => (size ? posterFrameSpec(size) : POSTER_FRAME),
     [size?.width, size?.height]
   )
@@ -180,8 +183,37 @@ function PosterFrameImpl({
 
       {/* kraft dust cover on the back */}
       <mesh geometry={dustCoverGeometry} rotation-y={Math.PI} position-z={-frame.depth / 2 - 0.002}>
-        <meshPhysicalMaterial color="#8d7c62" metalness={0} roughness={0.95} />
+        <meshPhysicalMaterial
+          color="#8d7c62"
+          metalness={0}
+          roughness={0.95}
+          map={grainMap(FIBRE, 1.5)}
+          normalMap={grainNormal(FIBRE, 1.5)}
+          normalScale={0.25}
+        />
       </mesh>
+
+      {/* what a framer fits last: a zinc sawtooth hanger on the top rail and
+          a felt bumper in each bottom corner - the back of a frame with
+          nothing on it reads as a slab */}
+      <mesh position={[0, outerHeight / 2 - frame.width / 2, -frame.depth / 2 - hanger.thickness / 2]}>
+        <boxGeometry args={[hanger.width, hanger.height, hanger.thickness]} />
+        <meshPhysicalMaterial color="#b9bcc0" metalness={0.9} roughness={0.4} />
+      </mesh>
+      {([1, -1] as const).map((side) => (
+        <mesh
+          key={side}
+          rotation-x={Math.PI / 2}
+          position={[
+            side * (outerWidth / 2 - frame.width / 2),
+            -outerHeight / 2 + frame.width / 2,
+            -frame.depth / 2 - bumper.thickness / 2,
+          ]}
+        >
+          <cylinderGeometry args={[bumper.radius, bumper.radius, bumper.thickness, 20]} />
+          <meshPhysicalMaterial color="#2a2b2d" metalness={0} roughness={0.95} />
+        </mesh>
+      ))}
 
       {/* the live art: real DOM, CSS3D-transformed onto the recessed sheet */}
       <DeviceScreen

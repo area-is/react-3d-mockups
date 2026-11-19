@@ -1,11 +1,22 @@
 import * as React from 'react'
 import * as THREE from 'three'
 import type { ThreeElements } from '@react-three/fiber'
-import { SHOPPING_BAG, SHOPPING_BAG_REGIONS, shoppingBagLayout, type ShoppingBagSizeMm } from '../../core'
+import {
+  FIBRE,
+  SHOPPING_BAG,
+  SHOPPING_BAG_REGIONS,
+  grainNormal,
+  grainTint,
+  shoppingBagLayout,
+  type ShoppingBagSizeMm,
+} from '../../core'
 import { DeviceScreen } from '../../screen/device-screen'
 import { collectSlots, createSlots, resolveSurface, type SurfaceProps } from '../../slots'
 
 type GroupProps = ThreeElements['group']
+
+/** Fibre tiles per world unit of kraft. */
+const KRAFT_REPEAT = 1.5
 
 export interface ShoppingBagProps extends Omit<GroupProps, 'children' | 'color'>, SurfaceProps {
   /**
@@ -63,7 +74,19 @@ function ShoppingBagImpl({
     [size?.width, size?.height, size?.depth]
   )
 
-  const paper = { color, metalness: 0, roughness: 0.82 }
+  // Kraft is not a flat brown: its fibres mottle the sheet and catch the
+  // light. `kraft(w, h)` tiles that grain at one scale over a face of that
+  // size in world units, so walls and gussets match.
+  const kraft = (width: number, height: number) => ({
+    color,
+    metalness: 0,
+    roughness: 0.86,
+    // a bleached or coated bag is `color`ed pale, and shows no fibre
+    map: grainTint(FIBRE, color, width * KRAFT_REPEAT, height * KRAFT_REPEAT),
+    normalMap: grainNormal(FIBRE, width * KRAFT_REPEAT, height * KRAFT_REPEAT),
+    // kraft is machine-glazed: the fibre shows as colour far more than as relief
+    normalScale: 0.22,
+  })
   const paperInside = { color: '#b08a5e', metalness: 0, roughness: 0.9 }
 
   // Each side gusset is two ruled panels meeting at an inward crease down the
@@ -76,8 +99,14 @@ function ShoppingBagImpl({
     const top = body.height / 2
     const bottom = -body.height / 2
     const positions: number[] = []
+    // UVs in 0..1 over the gusset's depth and height, so the kraft grain tiles
+    // on it exactly as it does on the boxed walls
+    const uvs: number[] = []
     const push = (...vs: [number, number, number][]) => {
-      for (const v of vs) positions.push(...v)
+      for (const v of vs) {
+        positions.push(...v)
+        uvs.push(v[2] / body.depth + 0.5, v[1] / body.height + 0.5)
+      }
     }
     for (const sx of [1, -1] as const) {
       for (const sz of [1, -1] as const) {
@@ -93,6 +122,7 @@ function ShoppingBagImpl({
     }
     const geometry = new THREE.BufferGeometry()
     geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3))
+    geometry.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2))
     geometry.computeVertexNormals()
     return geometry
   }, [body, wall, gusset])
@@ -169,16 +199,16 @@ function ShoppingBagImpl({
       {/* front and back walls */}
       <mesh position={[0, 0, body.depth / 2 - wall / 2]}>
         <boxGeometry args={[body.width, body.height, wall]} />
-        <meshPhysicalMaterial {...paper} />
+        <meshPhysicalMaterial {...kraft(body.width, body.height)} />
       </mesh>
       <mesh position={[0, 0, -body.depth / 2 + wall / 2]}>
         <boxGeometry args={[body.width, body.height, wall]} />
-        <meshPhysicalMaterial {...paper} />
+        <meshPhysicalMaterial {...kraft(body.width, body.height)} />
       </mesh>
 
       {/* side gussets - creased at the mouth, flat at the base */}
       <mesh geometry={gussetGeometry}>
-        <meshPhysicalMaterial {...paper} side={THREE.DoubleSide} />
+        <meshPhysicalMaterial {...kraft(body.depth, body.height)} side={THREE.DoubleSide} />
       </mesh>
 
       {/* floor slab, flush with the base and spanning wall to wall */}

@@ -2,7 +2,7 @@ import * as React from 'react'
 import * as THREE from 'three'
 import { RoundedBox } from '@react-three/drei'
 import type { ThreeElements } from '@react-three/fiber'
-import { BUS_SHELTER, BUS_SHELTER_REGIONS } from '../../core'
+import { BUS_SHELTER, BUS_SHELTER_REGIONS, WOOD, grainMap, grainNormal } from '../../core'
 import { DeviceScreen } from '../../screen/device-screen'
 import { LEDText, isLedText } from '../../led-text'
 import { collectSlots, createSlots, resolveSurface, type SurfaceProps } from '../../slots'
@@ -147,7 +147,16 @@ function BusShelterImpl({
       {/* bench on two supports along the back wall */}
       <group position={[bench.x, 0, -body.depth / 2 + bench.depth / 2 + 0.16]}>
         <RoundedBox args={[bench.width, bench.thickness, bench.depth]} radius={0.02} position={[0, floorY + bench.height, 0]}>
-          <meshPhysicalMaterial color="#6e614d" metalness={0.1} roughness={0.7} />
+          {/* slatted hardwood: the grain runs the length of the seat, a
+              quarter turn from the rounded box's UVs */}
+          <meshPhysicalMaterial
+            color="#7a6a52"
+            metalness={0}
+            roughness={0.7}
+            map={grainMap(WOOD, 0.5, 2, true)}
+            normalMap={grainNormal(WOOD, 0.5, 2, true)}
+            normalScale={0.6}
+          />
         </RoundedBox>
         {([1, -1] as const).map((s) => (
           <mesh key={s} position={[s * (bench.width / 2 - 0.3), floorY + bench.height / 2, 0]}>

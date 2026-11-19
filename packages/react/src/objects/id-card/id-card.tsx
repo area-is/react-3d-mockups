@@ -5,8 +5,10 @@ import type { ThreeElements } from '@react-three/fiber'
 import {
   ID_CARD,
   ID_CARD_REGIONS,
+  WEAVE,
   clipRoundedRect,
   clipRoundedRectOutline,
+  grainNormal,
   roundedRectShape,
   roundedRectShapeCorners,
 } from '../../core'
@@ -92,7 +94,17 @@ function IDCardImpl({
 
   const metal = <meshPhysicalMaterial color="#c3c7cd" metalness={0.9} roughness={0.3} />
   const fabric = (
-    <meshPhysicalMaterial color={lanyardColor} metalness={0} roughness={0.85} sheen={1} sheenColor="#ffffff" sheenRoughness={0.6} />
+    // a ribbed polyester strap: ~20 ribs across its 15 mm, coarse enough to
+    // resolve at the size a badge is usually shown
+    <meshPhysicalMaterial
+      color={lanyardColor}
+      metalness={0}
+      roughness={0.85}
+      sheen={1}
+      sheenColor="#ffffff"
+      sheenRoughness={0.6}
+      normalMap={grainNormal(WEAVE, 2.6)}
+    />
   )
 
   // Hardware chain, referenced from the standard retail swivel J-hook: the

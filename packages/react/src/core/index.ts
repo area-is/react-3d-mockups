@@ -75,6 +75,19 @@ export {
 export { roundedRectShape, roundedRectShapeCorners } from './geometry/rounded-rect'
 export { gearShape } from './geometry/gear'
 export {
+  type Grain,
+  GRAIN_SIZE,
+  FIBRE,
+  SHEETS,
+  WEAVE,
+  WOOD,
+  grainHeights,
+  grainMap,
+  grainNormal,
+  grainTint,
+  sheetBlockGeometry,
+} from './geometry/grain'
+export {
   type WristLoop,
   type LoopFrame,
   type StrapPath,

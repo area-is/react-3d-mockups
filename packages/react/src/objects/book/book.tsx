@@ -1,8 +1,18 @@
 import * as React from 'react'
 import * as THREE from 'three'
-import { RoundedBox } from '@react-three/drei'
 import type { ThreeElements } from '@react-three/fiber'
-import { BOOK, BOOK_REGIONS, bookSpec, type BookSize, roundedRectShape } from '../../core'
+import {
+  BOOK,
+  BOOK_REGIONS,
+  bookSpec,
+  type BookSize,
+  SHEETS,
+  WEAVE,
+  grainMap,
+  grainNormal,
+  roundedRectShape,
+  sheetBlockGeometry,
+} from '../../core'
 import { DeviceScreen } from '../../screen/device-screen'
 import { collectSlots, createSlots, resolveSurface, type SurfaceProps } from '../../slots'
 
@@ -26,6 +36,14 @@ export interface BookProps extends Omit<GroupProps, 'children' | 'color'>, Surfa
   /** Paper color of the page block edges. */
   pageColor?: string
 }
+
+/**
+ * Weave tiles per world unit: 16 threads a tile, so a thread every ~0.9 mm.
+ * Coarser read as basket-work up close. At this pitch the threads resolve as
+ * you move in on the book, and it is plain cloth at arm's length - as it is
+ * in a photograph.
+ */
+const CLOTH_REPEAT = 4
 
 /**
  * A procedurally built trade hardcover: cloth-wrapped binder's boards with a
@@ -114,12 +132,34 @@ function BookImpl({
     return geometry
   }, [spineOut, spineJoint, thickness, board.height])
 
+  // The page block's rim reads as a stack of leaves: one tile of sheets per
+  // ~11 mm of thickness, so a fat novel shows more pages than a slim one.
+  const pagesGeometry = React.useMemo(
+    () => sheetBlockGeometry(pages.width, pages.height, pages.thickness, Math.max(1, Math.round(pages.thickness / 0.2))),
+    [pages]
+  )
+
   React.useEffect(() => {
     return () => {
       boardGeometry.dispose()
       spineGeometry.dispose()
+      pagesGeometry.dispose()
     }
-  }, [boardGeometry, spineGeometry])
+  }, [boardGeometry, spineGeometry, pagesGeometry])
+
+  // Book cloth: a buckram weave over every cloth part. The extrusions
+  // carry world-unit UVs, so one repeat gives the same thread count on the
+  // boards and the backbone; the groove strips are 0..1 boxes and take their
+  // own repeat from their size.
+  const cloth = (repeatX = CLOTH_REPEAT, repeatY = repeatX) => (
+    <meshPhysicalMaterial
+      color={color}
+      metalness={0}
+      roughness={0.78}
+      normalMap={grainNormal(WEAVE, repeatX, repeatY)}
+      normalScale={0.6}
+    />
+  )
 
   const boardZ = thickness / 2 - board.thickness / 2
 
@@ -127,10 +167,10 @@ function BookImpl({
     <group {...groupProps}>
       {/* front and back binder's boards, shifted clear of the french groove */}
       <mesh geometry={boardGeometry} position={[groove.width / 2, 0, boardZ]}>
-        <meshPhysicalMaterial color={color} metalness={0} roughness={0.72} />
+        {cloth()}
       </mesh>
       <mesh geometry={boardGeometry} position={[groove.width / 2, 0, -boardZ]}>
-        <meshPhysicalMaterial color={color} metalness={0} roughness={0.72} />
+        {cloth()}
       </mesh>
 
       {/* french grooves: a shallow recessed cloth strip on each cover along
@@ -141,25 +181,27 @@ function BookImpl({
           position={[-board.width / 2 + (groove.width + 0.01) / 2, 0, sign * (boardZ - groove.depth / 2)]}
         >
           <boxGeometry args={[groove.width + 0.01, board.height - 0.016, board.thickness - groove.depth]} />
-          <meshPhysicalMaterial color={color} metalness={0} roughness={0.72} />
+          {cloth(groove.width * CLOTH_REPEAT, board.height * CLOTH_REPEAT)}
         </mesh>
       ))}
 
       {/* page block, flush at the spine and recessed behind the board squares
           on the three open edges (the fore edge overhang is what you see) */}
-      <RoundedBox
-        args={[pages.width, pages.height, pages.thickness]}
-        radius={0.008}
-        position-x={-pages.inset / 2}
-      >
-        <meshPhysicalMaterial color={pageColor} metalness={0} roughness={0.92} />
-      </RoundedBox>
+      <mesh geometry={pagesGeometry} position-x={-pages.inset / 2}>
+        <meshPhysicalMaterial
+          color={pageColor}
+          metalness={0}
+          roughness={0.92}
+          map={grainMap(SHEETS, 1, 3)}
+          normalMap={grainNormal(SHEETS, 1, 3)}
+        />
+      </mesh>
 
       {/* cloth backbone wrapping OUTSIDE the bound edge and projecting past
           the boards: a flat crown carrying the spine print, rolling off into
           the joints at both hinges */}
       <mesh geometry={spineGeometry} position-x={-board.width / 2 + 0.012}>
-        <meshPhysicalMaterial color={color} metalness={0} roughness={0.72} />
+        {cloth()}
       </mesh>
 
       {/* headbands at the head and tail of the spine, spanning the text block */}

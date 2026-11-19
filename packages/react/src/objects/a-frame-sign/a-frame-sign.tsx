@@ -1,7 +1,7 @@
 import * as React from 'react'
 import * as THREE from 'three'
 import type { ThreeElements } from '@react-three/fiber'
-import { A_FRAME_SIGN, A_FRAME_SIGN_REGIONS, roundedRectShape } from '../../core'
+import { A_FRAME_SIGN, A_FRAME_SIGN_REGIONS, WOOD, grainNormal, grainTint, roundedRectShape } from '../../core'
 import { DeviceScreen } from '../../screen/device-screen'
 import { collectSlots, createSlots, resolveSurface, type SurfaceProps } from '../../slots'
 
@@ -92,6 +92,21 @@ function AFrameSignImpl({
     radius: face.radius,
   }
 
+  // Stained timber, the grain running up the stiles; a pale `color` is
+  // paint, which hides the figure and leaves only its relief. The frame is an
+  // extrusion with world-unit UVs; the leg tips are 0..1 boxes, so they take
+  // the same grain scaled by their own size.
+  const timber = (width = 1, height = 1) => (
+    <meshPhysicalMaterial
+      color={color}
+      metalness={0}
+      roughness={0.75}
+      map={grainTint(WOOD, color, width * 2.2, height * 0.6)}
+      normalMap={grainNormal(WOOD, width * 2.2, height * 0.6)}
+      normalScale={0.6}
+    />
+  )
+
   return (
     <group {...groupProps}>
       {([-1, 1] as const).map((dir) => {
@@ -107,7 +122,7 @@ function AFrameSignImpl({
           >
             {/* wood frame with a true opening */}
             <mesh geometry={frameGeometry} rotation-y={isFront ? 0 : Math.PI}>
-              <meshPhysicalMaterial color={color} metalness={0} roughness={0.75} />
+              {timber()}
             </mesh>
             {/*
               Board behind the opening. DOUBLE-SIDED, and it has to be: this is
@@ -128,7 +143,7 @@ function AFrameSignImpl({
                 position={[side * (panel.width / 2 - panel.frameWidth / 2), -panel.height / 2 - legDrop / 2 + 0.05, 0]}
               >
                 <boxGeometry args={[panel.frameWidth, legDrop + 0.1, panel.frameDepth - 0.02]} />
-                <meshPhysicalMaterial color={color} metalness={0} roughness={0.75} />
+                {timber(panel.frameWidth, legDrop + 0.1)}
               </mesh>
             ))}
 

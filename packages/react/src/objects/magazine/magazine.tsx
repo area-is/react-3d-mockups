@@ -2,7 +2,17 @@ import * as React from 'react'
 import * as THREE from 'three'
 import { RoundedBox } from '@react-three/drei'
 import type { ThreeElements } from '@react-three/fiber'
-import { MAGAZINE, MAGAZINE_REGIONS, magazineSpec, type MagazineSize, roundedRectShape } from '../../core'
+import {
+  MAGAZINE,
+  MAGAZINE_REGIONS,
+  magazineSpec,
+  type MagazineSize,
+  SHEETS,
+  grainMap,
+  grainNormal,
+  roundedRectShape,
+  sheetBlockGeometry,
+} from '../../core'
 import { DeviceScreen } from '../../screen/device-screen'
 import { collectSlots, createSlots, resolveSurface, type SurfaceProps } from '../../slots'
 
@@ -103,7 +113,19 @@ function MagazineImpl({
     [body]
   )
 
-  React.useEffect(() => () => backGeometry.dispose(), [backGeometry])
+  // the trimmed block's three open edges show their leaves; the cuts are
+  // square, so a plain box loses nothing to the old hair of rounding
+  const blockGeometry = React.useMemo(
+    () => sheetBlockGeometry(body.width, body.height, body.thickness, Math.max(1, Math.round(body.thickness / 0.09))),
+    [body]
+  )
+  React.useEffect(
+    () => () => {
+      backGeometry.dispose()
+      blockGeometry.dispose()
+    },
+    [backGeometry, blockGeometry]
+  )
 
   const surfaceDefaults = {
     surfaceBackground,
@@ -114,9 +136,15 @@ function MagazineImpl({
   return (
     <group {...groupProps}>
       {/* trimmed page block - the paper edges you see on the three open sides */}
-      <RoundedBox args={[body.width, body.height, body.thickness]} radius={body.radius}>
-        <meshPhysicalMaterial color={pageColor} metalness={0} roughness={0.9} />
-      </RoundedBox>
+      <mesh geometry={blockGeometry}>
+        <meshPhysicalMaterial
+          color={pageColor}
+          metalness={0}
+          roughness={0.9}
+          map={grainMap(SHEETS, 1, 3)}
+          normalMap={grainNormal(SHEETS, 1, 3)}
+        />
+      </mesh>
 
       {/* perfect-bound spine: the cover stock wraps only the bound edge,
           trimmed flush with the block on the other sides (the hair of
