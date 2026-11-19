@@ -254,7 +254,9 @@
 @media (prefers-reduced-motion: reduce) {
   .mockup-older-summary,
   .mockup-tile-thumb img,
-  .model-gallery-thumb img {
+  .model-gallery-thumb,
+  .model-gallery-thumb img,
+  .model-gallery-label {
     transition: none;
   }
 }
@@ -314,8 +316,9 @@
 /* ------------------------------------------------------------------ */
 /*  Gallery (components/model-gallery.tsx)                             */
 /*                                                                     */
-/*  The sidebar grid's tiles, grown up: same thumbnails, same quiet    */
-/*  card, with the kind under the name and filter chips above.         */
+/*  The sidebar grid's thumbnails, grown up: no card around them, just */
+/*  a faint dot field behind each model, with the kind under the name  */
+/*  and filter chips above.                                            */
 /* ------------------------------------------------------------------ */
 
 .model-gallery {
@@ -423,7 +426,7 @@
 .model-gallery-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  gap: 10px;
+  gap: 20px 14px;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -433,26 +436,40 @@
   display: flex;
   flex-direction: column;
   height: 100%;
-  padding: 10px 10px 12px;
-  border: 1px solid var(--color-fd-border);
-  border-radius: 12px;
-  background: var(--color-fd-card);
+  border-radius: 10px;
   color: inherit;
   text-decoration: none;
-  transition:
-    background 0.15s ease,
-    border-color 0.15s ease;
 }
 
-.model-gallery-card:hover {
-  background: var(--color-fd-accent);
-  border-color: color-mix(in oklab, var(--color-fd-foreground) 18%, transparent);
+/* Registered so the dots' colour can fade on hover; unregistered, a custom
+   property only snaps. */
+@property --model-gallery-dot {
+  syntax: '<color>';
+  inherits: false;
+  initial-value: transparent;
 }
 
+/*
+ * No card: the model stands on a transparent ground, marked only by a
+ * sparse grid of small dots - 1px dots 14px apart, faint enough to read as
+ * texture rather than a box. The dots are centred in each tile so every
+ * model sits on the same rhythm, and they firm up a little on hover in
+ * place of the old card's fill.
+ */
 .model-gallery-thumb {
+  --model-gallery-dot: color-mix(in oklab, var(--color-fd-foreground) 9%, transparent);
   display: block;
   aspect-ratio: 1;
   margin-bottom: 8px;
+  border-radius: 10px;
+  background-image: radial-gradient(circle, var(--model-gallery-dot) 1px, transparent 1.5px);
+  background-size: 14px 14px;
+  background-position: center;
+  transition: --model-gallery-dot 0.15s ease;
+}
+
+.model-gallery-card:hover .model-gallery-thumb {
+  --model-gallery-dot: color-mix(in oklab, var(--color-fd-foreground) 18%, transparent);
 }
 
 .model-gallery-thumb img {
@@ -475,14 +492,23 @@
 }
 
 .model-gallery-label {
+  padding: 0 2px;
   font-size: 14px;
   font-weight: 500;
   line-height: 1.3;
   color: var(--color-fd-foreground);
+  text-decoration: underline 1px transparent;
+  text-underline-offset: 3px;
+  transition: text-decoration-color 0.15s ease;
+}
+
+.model-gallery-card:hover .model-gallery-label {
+  text-decoration-color: currentColor;
 }
 
 .model-gallery-kind {
   margin-top: 2px;
+  padding: 0 2px;
   font-size: 12px;
   color: var(--color-fd-muted-foreground);
 }
@@ -490,11 +516,7 @@
 @media (max-width: 420px) {
   .model-gallery-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 8px;
-  }
-
-  .model-gallery-card {
-    padding: 8px 8px 10px;
+    gap: 16px 10px;
   }
 }
 
