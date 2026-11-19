@@ -2,6 +2,8 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import { pindot } from 'tabbied/patterns'
+import { TabbiedPattern } from 'tabbied/react'
 import { TabbiedLink } from '../_shared/badge'
 import { lazyScene } from '../_shared/stage'
 import { Tile } from './stream-art'
@@ -12,6 +14,25 @@ const TVStage = lazyScene<Props>(() => import('./stream-scenes').then((m) => m.T
 const FoldStage = lazyScene<Props>(() => import('./stream-scenes').then((m) => m.FoldScene))
 const FlipStage = lazyScene<Props>(() => import('./stream-scenes').then((m) => m.FlipScene))
 const IPadStage = lazyScene<Props>(() => import('./stream-scenes').then((m) => m.IPadScene))
+
+/**
+ * The ground under every screen: Tabbied's pindot on a transparent ground,
+ * in cool darks a step or two above the page with one in the accent's teal,
+ * like the spill of light a screen throws on a dark floor. It is a texture,
+ * not a picture - the key art on the screens is the picture - so it stays
+ * close to the page and fades out before the stage's edge. The cells are a
+ * fixed size rather than a fixed count, so the dots keep one pitch on the
+ * wide TV stage and the narrow device stages alike.
+ */
+const GROUND_PALETTE = ['transparent', '#131724', '#161b29', '#1a2030', '#1d2436', '#11252c']
+
+function Ground({ seed }: { seed: string }) {
+  return (
+    <div className="st-ground" aria-hidden>
+      <TabbiedPattern pattern={pindot} seed={seed} palette={GROUND_PALETTE} fit="grid" cellSize={128} />
+    </div>
+  )
+}
 
 /**
  * Prism's landing page. One piece of state - which title is featured -
@@ -52,6 +73,7 @@ export function Stream() {
 
       <section className="st-tv" aria-label="Prism on a TV">
         <div className="st-tv-stage">
+          <Ground seed="prism-tv" />
           <TVStage featured={featured} />
         </div>
         <div className="st-picker">
@@ -84,6 +106,7 @@ export function Stream() {
         <div className="st-grid">
           <article className="st-card">
             <div className="st-card-stage">
+              <Ground seed="prism-fold" />
               <FoldStage featured={featured} />
             </div>
             <div className="st-card-copy">
@@ -93,6 +116,7 @@ export function Stream() {
           </article>
           <article className="st-card">
             <div className="st-card-stage">
+              <Ground seed="prism-flip" />
               <FlipStage featured={featured} />
             </div>
             <div className="st-card-copy">
@@ -102,6 +126,7 @@ export function Stream() {
           </article>
           <article className="st-card">
             <div className="st-card-stage">
+              <Ground seed="prism-ipad" />
               <IPadStage featured={featured} />
             </div>
             <div className="st-card-copy">

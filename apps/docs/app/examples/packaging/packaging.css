@@ -1,16 +1,17 @@
 /* ------------------------------------------------------------------ */
 /*  /examples/packaging - an isolated custom-size configurator.        */
 /*                                                                     */
-/*  A white page, a kraft-toned stage and one orange, with the box on  */
-/*  the left and the sliders on the right. The tokens override the     */
-/*  site's on `.pk` only.                                              */
+/*  A white page and one orange, with the box on the left, standing on */
+/*  a faint field of ink dots, and the sliders on the right. The       */
+/*  tokens override the site's on `.pk` only.                          */
 /* ------------------------------------------------------------------ */
 
 .pk {
-  /* A white page; the stages keep a light step of the warm tone. */
+  /* A white page, and no tinted panel under the models: they stand on
+     the page itself, on a sparse grid of dots in the ink at 9%. */
   --pk-bg: #ffffff;
-  --pk-floor: #f2ede5;
   --pk-ink: #1f1c18;
+  --pk-dots: color-mix(in oklab, var(--pk-ink) 9%, transparent);
   --pk-muted: #6e675c;
   --pk-line: #d9d0c1;
   --pk-line-strong: #b9ad9a;
@@ -107,16 +108,34 @@
   padding: 28px 32px 56px;
 }
 
-/* The bench. Sticky, so the box stays in view while the sliders scroll. */
+/* The bench. Sticky, so the box stays in view while the sliders scroll.
+   Isolated, so the dot ground below can sit behind the canvas without
+   slipping behind the page. */
 .pk-stage {
   position: sticky;
   top: 24px;
   height: min(82vh, 820px);
   overflow: clip;
-  border-radius: 10px;
-  background:
-    radial-gradient(60% 50% at 50% 40%, rgba(255, 255, 255, 0.55) 0%, transparent 70%),
-    var(--pk-floor);
+  isolation: isolate;
+}
+
+/* What both models stand on: not a panel, which made each one a card on
+   the page, but the docs' dotted ground - 1px dots 14px apart in the ink at
+   9%, faint enough to read as texture. The field fades out well before the
+   stage's edge, so no box shows where it stops, and it sits under the
+   canvas, which is transparent. */
+.pk-stage::before,
+.pk-panel-stage::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image: radial-gradient(circle, var(--pk-dots) 1px, transparent 1.5px);
+  background-size: 14px 14px;
+  background-position: center;
+  -webkit-mask-image: radial-gradient(closest-side, #000 60%, transparent 100%);
+  mask-image: radial-gradient(closest-side, #000 60%, transparent 100%);
 }
 
 /* No bleed here, unlike the print shop: a box fills its frame more fully
@@ -509,9 +528,8 @@
 .pk-panel-stage {
   position: relative;
   height: 460px;
-  border-radius: 10px;
   overflow: clip;
-  background: var(--pk-floor);
+  isolation: isolate;
 }
 
 .pk-panel-copy h2 {
@@ -592,7 +610,6 @@
 
   .pk-stage {
     height: 58vh;
-    border-radius: 10px;
   }
 
   .pk-styles {

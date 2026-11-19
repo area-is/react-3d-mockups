@@ -31,9 +31,17 @@ export function InviteScene({ suite }: { suite: Suite }) {
   )
 }
 
+/**
+ * The card's stock framing fills the stage edge to edge, and its shadow ran
+ * off the side - which a panel's edge used to excuse. With the piece on the
+ * open page, the camera stands a step back so the card and its shadow both
+ * land inside the ground.
+ */
+const REPLY_CAMERA = { position: [0, 0.3, 6.6] as [number, number, number], fov: 40 }
+
 export function ReplyScene({ suite }: { suite: Suite }) {
   return (
-    <BusinessCardMockup float color={paper(suite)} surfaceBackground={paper(suite)} rotation={[-0.12, -0.3, 0]}>
+    <BusinessCardMockup float color={paper(suite)} surfaceBackground={paper(suite)} rotation={[-0.12, -0.3, 0]} camera={REPLY_CAMERA}>
       <BusinessCardMockup.Front>
         <ReplyFront suite={suite} />
       </BusinessCardMockup.Front>

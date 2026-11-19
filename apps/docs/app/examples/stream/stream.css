@@ -8,7 +8,6 @@
 
 .st {
   --st-accent: #5ec3da;
-  --st-panel: #10121b;
   --st-line: #1f2333;
   position: relative;
   isolation: isolate;
@@ -134,7 +133,17 @@
   position: relative;
   height: min(74vh, 720px);
   overflow: clip;
-  border-radius: 10px;
+}
+
+/* Under the canvas, which is transparent: every screen on the page stands
+   on the same faint pindot, which fades out well before the stage's edge,
+   so no box shows where it stops. */
+.st-ground {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  -webkit-mask-image: radial-gradient(closest-side, #000 50%, transparent 100%);
+  mask-image: radial-gradient(closest-side, #000 50%, transparent 100%);
 }
 
 /* The controls sit under the stage on the page, aligned to its edge. */
@@ -269,13 +278,12 @@
   gap: 12px;
 }
 
-/* A definite height, so LazyScene has a box to hold while unmounted. */
+/* A definite height, so LazyScene has a box to hold while unmounted. No
+   panel: a lighter fill made each device a card on the page. */
 .st-card-stage {
   position: relative;
   height: 460px;
-  border-radius: 10px;
   overflow: clip;
-  background: var(--st-panel);
 }
 
 .st-card-copy {
@@ -411,7 +419,6 @@
 
   .st-tv-stage {
     height: 50vh;
-    border-radius: 10px;
   }
 
   .st-card-stage {
