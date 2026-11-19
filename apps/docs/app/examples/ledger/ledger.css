@@ -88,7 +88,7 @@
 .lg-hero {
   max-width: 1240px;
   margin: 0 auto;
-  padding: clamp(44px, 8vh, 80px) 32px 8px;
+  padding: clamp(44px, 8vh, 80px) 32px 0;
   text-align: center;
 }
 
@@ -122,17 +122,19 @@
 .lg-stage-wrap {
   max-width: 1240px;
   margin: 0 auto;
-  padding: 8px 32px 0;
+  padding: 0 32px;
 }
 
 /* Wide and definite: three devices side by side need the width, and the
-   canvas needs a height to size against. The glow is the page's, not the
-   canvas's, so the devices sit in the room rather than on a card. */
+   canvas needs a height to size against. No card: the devices stand on the
+   same faded dot wash as the foldables further down (`.lg-ground`). The
+   height is only what the arrangement fills - the scene lifts the devices
+   into the middle of the canvas - so the copy above and the controls below
+   stay close to them. */
 .lg-stage {
   position: relative;
-  height: min(70vh, 680px);
+  height: min(54vh, 520px);
   overflow: clip;
-  border-radius: 10px;
 }
 
 /* The controls sit under the stage on the page, aligned to its edge. */
@@ -141,7 +143,7 @@
   flex-direction: column;
   align-items: center;
   gap: 12px;
-  margin-top: 24px;
+  margin-top: 16px;
 }
 
 .lg-try-label {
@@ -233,7 +235,7 @@
   gap: 40px 24px;
   max-width: 1240px;
   margin: 0 auto;
-  padding: clamp(48px, 8vh, 88px) 32px 0;
+  padding: clamp(40px, 6vh, 64px) 32px 0;
 }
 
 /* No card: the stage is the picture, and its caption sits under it on the page. */
@@ -250,9 +252,11 @@
   overflow: clip;
 }
 
-/* Under the canvas, which is transparent: the device stands on the pattern,
-   which fades out before the stage's edge so no box shows. */
-.lg-feature-pattern {
+/* Under every canvas on the page, which are transparent: the devices stand
+   on the pattern, which fades out before the stage's edge so no box shows.
+   The fade is an ellipse fitted to the stage, so it holds on the wide hero
+   as well as on the foldables' squarer stages. */
+.lg-ground {
   position: absolute;
   inset: 0;
   pointer-events: none;
@@ -368,11 +372,13 @@
     font-size: 16px;
   }
 
-  /* Three devices across a phone-width canvas is a small arrangement; the
-     height is what keeps them legible at all. */
+  /* Three devices across a phone-width canvas is a small arrangement, so
+     the scene's camera comes in as close as the width allows to keep them
+     legible. The stage is only as tall as they then are, so they fill it
+     top to bottom rather than leaving a band of empty canvas over and under
+     them; the camera distance is matched to this height. */
   .lg-stage {
-    height: 52vh;
-    border-radius: 10px;
+    height: 32vh;
   }
 
   .lg-try {

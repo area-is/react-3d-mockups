@@ -12,6 +12,8 @@
   --md-gold: #f2c14e;
   --md-panel: #0f1512;
   --md-line: #1e2a22;
+  /* The ground under every 3D stage: the club's bright green, faint. */
+  --md-dot: color-mix(in oklab, var(--md-bright) 18%, transparent);
   position: relative;
   isolation: isolate;
   min-height: 100svh;
@@ -138,6 +140,22 @@
   color: var(--muted);
 }
 
+/* ---- the stages ------------------------------------------------------------ */
+
+/*
+ * No card: a stage is the page's own near-black, marked only by a sparse
+ * grid of 1px dots 14px apart in the club's green - the ground the docs set
+ * their models on - faint enough to read as texture rather than a box. The
+ * dots are centred, so every object sits on the same rhythm.
+ */
+.md-coach-stage,
+.md-card-stage,
+.md-pass-stage {
+  background-image: radial-gradient(circle, var(--md-dot) 1px, transparent 1.5px);
+  background-size: 14px 14px;
+  background-position: center;
+}
+
 /* ---- the coach ------------------------------------------------------------ */
 
 .md-coach {
@@ -150,8 +168,6 @@
   position: relative;
   height: min(66vh, 640px);
   overflow: clip;
-  border-radius: 4px;
-  background: linear-gradient(to bottom, #121a15 0%, #0b100d 100%);
 }
 
 .md-caption {
@@ -204,9 +220,7 @@
 .md-card-stage {
   position: relative;
   height: 520px;
-  border-radius: 4px;
   overflow: clip;
-  background: var(--md-panel);
 }
 
 .md-card-copy {
@@ -275,13 +289,14 @@
   padding: clamp(56px, 9vh, 96px) 32px 64px;
 }
 
+/* The pass hangs from a lanyard that runs off the top of its stage; the top
+   fades out, so the strap comes down out of the dark rather than off a line. */
 .md-pass-stage {
   position: relative;
   height: 560px;
-  border-radius: 4px;
   overflow: clip;
-  background: var(--md-panel);
-  border: 1px solid var(--md-line);
+  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 24%);
+  mask-image: linear-gradient(to bottom, transparent, #000 24%);
 }
 
 .md-eyebrow {
