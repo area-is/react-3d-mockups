@@ -2,7 +2,7 @@ import * as React from 'react'
 import * as THREE from 'three'
 import { mergeVertices } from 'three/examples/jsm/utils/BufferGeometryUtils.js'
 import { Brush, Evaluator, SUBTRACTION } from 'three-bvh-csg'
-import { roundedRectShape } from '../core'
+import { roundedRectShape, type HingeSpine } from '../core'
 
 /**
  * Shared machined hardware details used across the device models: side keys,
@@ -879,6 +879,36 @@ export const USB_CUT_DEPTH = 0.15
  * reads continuous.
  */
 export const CREASE_OVERLAP = 0.02
+
+/**
+ * How far past its seats a foldable's hinge barrel is drawn, in radians at
+ * the barrel's axis, once the fold has turned (it scales in with the fold, so
+ * a nearly flat hinge still ends exactly on the back corners).
+ *
+ * The barrel meets each half on that half's hinge-end face, and the edges
+ * there are bevelled: an arc stopped exactly on the ideal face ends in mid
+ * air over the bevel and leaves a hairline into the fold's hollow. Carried a
+ * little further it ends inside the shell, which is solid and hides it.
+ */
+export const HINGE_SEAL = 0.14
+
+/**
+ * A foldable hinge's cross-section, for the caps that close the fold's V at
+ * both ends of the spine: from the crease out to where the barrel meets each
+ * half, and round the barrel's exposed arc between. In the shape's frame the
+ * crease is the origin, x runs across the fold and y out along its bisector,
+ * toward the spine's crown.
+ */
+export function hingeCapShape(spine: HingeSpine): THREE.Shape {
+  const x = spine.seat * Math.sin(spine.fold)
+  const y = spine.seat * Math.cos(spine.fold)
+  const shape = new THREE.Shape()
+  shape.moveTo(0, 0)
+  shape.lineTo(-x, y)
+  shape.absarc(0, -spine.inset, spine.radius, Math.PI / 2 + spine.halfArc, Math.PI / 2 - spine.halfArc, true)
+  shape.closePath()
+  return shape
+}
 
 let evaluator: Evaluator | null = null
 

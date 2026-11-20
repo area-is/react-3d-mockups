@@ -130,6 +130,11 @@ const CASES = [
   ['fold-flex', 'device=fold&openAngle=110&ry=22'],
   ['flip-flex', 'device=flip&openAngle=100&ry=22'],
   ['flip-closed', 'device=flip&open=0&ry=22'],
+  // the hinge from behind, part way shut: the spine barrel the two back
+  // shells are closing round, the caps sealing the fold at both ends, and
+  // each half's side of the seam beside it - none of which a front view shows
+  ['fold-spine', 'device=fold&openAngle=40&ry=150&rx=14&color=silvershadow'],
+  ['flip-spine', 'device=flip&openAngle=40&ry=205&rx=24&color=mint'],
   // the 2026 foldable generation: the wide fold8's landscape inner panel and
   // short cover, the fold8ultra sharing the fold7 chassis, the flip8 refresh
   ['fold8-open', 'device=fold&fvariant=fold8&ry=22'],
