@@ -760,23 +760,30 @@
   flex: none;
 }
 
+/* The view switch and the props toggle carry no fill, at rest or otherwise:
+   ink comes up under the pointer, and the view showing takes the same green
+   underline as the code panel's file tabs. Labels are set in their own case
+   (`iPhone`, `Business card`), so no text-transform. */
 .mx-views button {
   border: 0;
-  border-radius: 8px;
+  border-radius: 0;
   padding: 6px 11px;
   font-size: 12.5px;
   font-weight: 600;
   letter-spacing: -0.005em;
   cursor: pointer;
   white-space: nowrap;
-  text-transform: capitalize;
   background: transparent;
   color: var(--color-fd-muted-foreground);
 }
 
+.mx-views button:hover,
 .mx-views button[data-on='true'] {
-  background: var(--color-fd-accent);
   color: var(--color-fd-foreground);
+}
+
+.mx-views button[data-on='true'] {
+  box-shadow: inset 0 -2px 0 var(--mx-accent);
 }
 
 .mx-props-btn {
@@ -793,8 +800,8 @@
   cursor: pointer;
 }
 
+.mx-props-btn:hover,
 .mx-props-btn[data-on='true'] {
-  background: var(--color-fd-accent);
   color: var(--color-fd-foreground);
 }
 

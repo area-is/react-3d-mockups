@@ -420,6 +420,15 @@ function useStageSize(ref: React.RefObject<HTMLElement | null>) {
 }
 
 const REGION_LABEL = (name: string) => name.replace(/([a-z])([A-Z])/g, '$1 $2').toLowerCase()
+/**
+ * `coverInner` -> `Cover inner`, the header button's name. Sentence case set
+ * here rather than by CSS: `text-transform: capitalize` would also turn the
+ * object button's `iPhone` into `IPhone`.
+ */
+const REGION_TITLE = (name: string) => {
+  const label = REGION_LABEL(name)
+  return label.charAt(0).toUpperCase() + label.slice(1)
+}
 /** `coverInner` -> `cover-inner.tsx`, the name the tab carries. */
 const REGION_FILE = (name: string) => `${name.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase()}.tsx`
 /** `ChromaSurface` -> `chroma-surface`, for a screen whose module is unknown. */
@@ -1119,7 +1128,7 @@ function MockupExplorerImpl({
                 aria-pressed={view === region.name}
                 onClick={() => setView(region.name)}
               >
-                {REGION_LABEL(region.name)}
+                {REGION_TITLE(region.name)}
               </button>
             </span>
           ))}
