@@ -64,6 +64,19 @@
   --fd-layout-width: 100%;
 }
 
+/*
+ * Room to scroll past the end. Fumadocs closes the article with 24px, so a
+ * page's last lines and the previous / next links sit on the window's bottom
+ * edge, and a contents link to a short closing section cannot bring its
+ * heading up the screen - the page simply runs out. A share of the viewport
+ * rather than a fixed gap, so the last section can come up toward reading
+ * height on any window, held to a few lines on a short one and capped on a
+ * tall one.
+ */
+#nd-page {
+  padding-bottom: clamp(6rem, 40vh, 24rem);
+}
+
 /* The sidebar reads as part of the page, not as a tinted panel. */
 #nd-sidebar {
   background: transparent;
