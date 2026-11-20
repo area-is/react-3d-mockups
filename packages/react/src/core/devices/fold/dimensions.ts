@@ -2,15 +2,20 @@
  * Book-fold device dimensions - the Galaxy Z Fold 7, the Galaxy Z Fold 8, the
  * Galaxy Z Fold 8 Ultra, and Apple's iPhone Duo.
  *
- * A book-fold foldable has two form factors, and this spec carries both so the
- * one device can render either:
+ * A book-fold foldable is ONE body with a hinge down its middle, and this spec
+ * describes it once, unfolded:
  *
- * - `closed`: the folded candy-bar - a narrow, thick body with a tall cover
- *   display on the front, the camera pill on the back and the hinge spine
- *   capping the left edge.
  * - `open`: the unfolded tablet - a wide, thin body with the large, nearly
- *   square inner display (a faint crease runs down its center) and the
- *   recessed hinge spine on the back.
+ *   square inner display (a faint crease runs down its center), the camera on
+ *   the back of its right half and the cover display on the back of its left.
+ * - `closed`: what the published folded figures add to that - the folded
+ *   bar's size, the air left between the halves, and the cover display.
+ *
+ * The folded candy-bar is not a second model. It is the unfolded one with its
+ * cover half swung shut about the crease (see `hingeSpine`), so every
+ * measurement that rides a half - camera, keys, ports, badge - is given once,
+ * in the unfolded body's coordinates, and cannot disagree with itself between
+ * the two poses.
  *
  * Both share one world scale (the same ~36.66 mm per unit as the Galaxy phone
  * family) so a Fold sits at true relative size beside the S-series. Detail
@@ -36,8 +41,9 @@
 import type { Orientation } from '../../orientation'
 import type { MockupFraming, MockupMetrics } from '../../regions'
 import { coverScreenLit, foldOpenAngle } from '../../regions'
+import { displayStandoff, hingeReach } from '../hinge'
 
-/** The rear camera cluster in one pose's own back-face coordinates. */
+/** The rear camera cluster, in the unfolded body's back-face coordinates. */
 interface FoldRearCamera {
   /** Light pedestal plate under the pill (measured: 19.8 x 52.1 mm, 2.7 mm proud). */
   plateau: { x: number; y: number; width: number; height: number; radius: number; raise: number }
@@ -82,25 +88,24 @@ export interface FoldSpec {
    */
   brand?: 'samsung' | 'apple'
   /**
-   * Folded candy-bar: two stacked slabs (`body.depth` is the whole stack)
-   * with the visible crevice of `gap` air between them, like the real folded
-   * device's side profile.
+   * Folded candy-bar: the two halves of `open.body` stacked, with `gap` of
+   * air between them, like the real folded device's side profile.
    */
   closed: {
     /**
-     * `radius` rounds the free-edge corners; `hingeRadius`, when given, the
-     * two corners along the hinge (the iPhone Duo's hinge ends nearly
-     * square while its free corners are the roundest on any iPhone).
+     * The folded bar's published size. `depth` is the whole stack - two
+     * halves of `open.body.depth` and `gap` - and `width` is what places the
+     * cover display, which is laid out from the free edge on a bar this wide.
+     * Nothing is drawn from this box: the folded body is the unfolded one,
+     * shut.
      */
-    body: {
-      width: number
-      height: number
-      depth: number
-      radius: number
-      hingeRadius?: number
-      bevel: number
-    }
-    /** Air gap between the folded halves (the crevice along the rails). */
+    body: { width: number; height: number; depth: number }
+    /**
+     * Air between the halves when shut (the crevice along the rails): what
+     * the published folded thickness leaves over two unfolded ones. The
+     * display stands half of it above its chassis face, so the two faces
+     * meet at the crease and the stack comes out at the published depth.
+     */
     gap: number
     /**
      * Cover display (content maps here when closed). `hingeRadius` rounds its
@@ -138,60 +143,51 @@ export interface FoldSpec {
      */
     resolution: number
   }
-  /** Rear camera, given in each state's own back-face coordinates. */
-  rearCamera: {
-    closed: FoldRearCamera
-    open: FoldRearCamera
-  }
+  /** Rear camera, on the back of the camera (right) half. */
+  rearCamera: FoldRearCamera
   /**
-   * Keys. On the free (right) rail, `y` places a key along the rail, the
-   * same in both poses. A key on the top edge (`edge: 'top'` - the iPhone
-   * Duo's volume keys ride the camera half's top edge) is placed by `x` in
-   * the CLOSED pose's own coordinates; the open pose carries it across onto
-   * the camera half.
+   * Keys. On the free (right) rail, `y` places a key along the rail. A key
+   * on the top edge (`edge: 'top'` - the iPhone Duo's volume keys ride the
+   * camera half's top edge) is placed by `x` from the FOLDED bar's centre
+   * line, the way the bezel drawing dimensions it; that line sits half of
+   * `closed.body.width` in from the free edge.
    */
   buttons: ({ edge?: 'right'; y: number; length: number } | { edge: 'top'; x: number; length: number })[]
   buttonProfile: { protrusion: number; thickness: number }
   /**
-   * The hinge: open, a recessed spine channel down the center of the back;
-   * closed, a flat band capping the left edge (protruding `overhang` beyond
-   * the frame). `emboss` is the vertical SAMSUNG wordmark on the spine - the
-   * iPhone Duo's spine is bare, micro-blasted titanium, so it carries none.
+   * The hinge housing between the halves' backs: hidden when the device is
+   * flat, and standing `overhang` proud of the halves' hinge ends when it is
+   * shut, where it caps the folded bar's left edge - so the folded bar is
+   * half the unfolded width plus `overhang` wide. `emboss` is the vertical
+   * SAMSUNG wordmark on the spine - the iPhone Duo's spine is bare,
+   * micro-blasted titanium, so it carries none.
    */
   hinge: { width: number; overhang: number; emboss?: { length: number } }
   /**
-   * Bottom-edge machining per pose (x positions in that pose's coordinates).
-   * Folded, the USB lives on the camera half (rear slab) and the speaker on
-   * the cover half (front slab) - each opening is machined into its own slab.
+   * Bottom-edge machining. The USB lives on the camera half and the speaker
+   * on the cover half - each opening is machined into its own half, so
+   * folded they sit one above the other on the stack.
    */
   bottomEdge: {
-    closed: {
-      usb: { x: number; width: number; height: number }
-      speaker: { x: number; width: number; height: number }
-    }
-    open: {
-      usb: { x: number; width: number; height: number }
-      speakers: { x: number; width: number; height: number }[]
-      mics?: { x: number; r: number }[]
-    }
+    usb: { x: number; width: number; height: number }
+    speakers: { x: number; width: number; height: number }[]
+    mics?: { x: number; r: number }[]
   }
   /** Antenna seams on the side rails: y positions, mirrored onto both edges. */
   antennaLines?: number[]
   /**
    * Brand badge on the camera half's back (the iPhone Duo's Apple mark),
-   * boxed `width` x `height` and centred at each pose's own back-face
-   * coordinates, like the camera.
+   * boxed `width` x `height` and centred at `x`, `y` on the back face, like
+   * the camera.
    */
-  logo?: { width: number; height: number; closed: { x: number; y: number }; open: { x: number; y: number } }
+  logo?: { width: number; height: number; x: number; y: number }
 }
 
 const FOLD7: FoldSpec = {
   closed: {
-    body: { width: 1.942, height: 4.321, depth: 0.241, radius: 0.081, bevel: 0.018 },
-    // A hairline seam between the folded halves. (The hardware has about
-    // 1.3 mm of air, but with the slabs' edge bevels that renders as a deep V
-    // groove from the side - the retail device reads closed-flush, so the
-    // model keeps just enough gap to draw the seam line.)
+    body: { width: 1.942, height: 4.321, depth: 0.241 },
+    // A hairline seam between the folded halves: 8.9 mm folded over two
+    // 4.2 mm halves leaves 0.5 mm of air.
     gap: 0.012,
     // 65.98 x 153.03 mm cover panel, centered, with the hardware's sharp corners.
     display: { width: 1.8, height: 4.174, radius: 0.06 },
@@ -206,30 +202,17 @@ const FOLD7: FoldSpec = {
     punchHole: { radius: 0.065, offsetX: 0.952, offsetY: 0.1 },
     resolution: 820,
   },
+  // The pill rides the camera half, right of the spine, toward its free edge.
   rearCamera: {
-    // Folded: pill toward the free (right) edge of the back.
-    closed: {
-      plateau: { x: 0.501, y: 1.281, width: 0.54, height: 1.421, radius: 0.266, raise: 0.073 },
-      island: { x: 0.501, y: 1.281, width: 0.416, height: 1.325, radius: 0.208, raise: 0.059 },
-      // Top to bottom: 12 MP ultra-wide, 200 MP main, 10 MP 3x tele.
-      rings: [
-        { y: 1.735, r: 0.214, pupil: 0.38 },
-        { y: 1.281, r: 0.214, pupil: 0.48 },
-        { y: 0.826, r: 0.214, pupil: 0.32 },
-      ],
-      flash: { x: 0.047, y: 1.501, r: 0.058 },
-    },
-    // Unfolded: same module riding the camera half (right of the spine).
-    open: {
-      plateau: { x: 1.487, y: 1.281, width: 0.54, height: 1.421, radius: 0.266, raise: 0.073 },
-      island: { x: 1.487, y: 1.281, width: 0.416, height: 1.325, radius: 0.208, raise: 0.059 },
-      rings: [
-        { y: 1.735, r: 0.214, pupil: 0.38 },
-        { y: 1.281, r: 0.214, pupil: 0.48 },
-        { y: 0.826, r: 0.214, pupil: 0.32 },
-      ],
-      flash: { x: 1.033, y: 1.501, r: 0.058 },
-    },
+    plateau: { x: 1.487, y: 1.281, width: 0.54, height: 1.421, radius: 0.266, raise: 0.073 },
+    island: { x: 1.487, y: 1.281, width: 0.416, height: 1.325, radius: 0.208, raise: 0.059 },
+    // Top to bottom: 12 MP ultra-wide, 200 MP main, 10 MP 3x tele.
+    rings: [
+      { y: 1.735, r: 0.214, pupil: 0.38 },
+      { y: 1.281, r: 0.214, pupil: 0.48 },
+      { y: 0.826, r: 0.214, pupil: 0.32 },
+    ],
+    flash: { x: 1.033, y: 1.501, r: 0.058 },
   },
   // Measured: volume 18.6 mm at +28.4, power 13.0 mm at +6.5 on the right edge.
   buttons: [
@@ -244,17 +227,10 @@ const FOLD7: FoldSpec = {
   // with the vertical 16.7 mm SAMSUNG emboss at mid-height.
   hinge: { width: 0.166, overhang: 0.03, emboss: { length: 0.456 } },
   bottomEdge: {
-    closed: {
-      // Both center on the folded width but sit on different slabs of the stack.
-      usb: { x: 0, width: 0.264, height: 0.081 },
-      speaker: { x: 0, width: 0.366, height: 0.045 },
-    },
-    open: {
-      // USB on the camera half, speaker centered on the cover half.
-      usb: { x: 0.953, width: 0.264, height: 0.081 },
-      speakers: [{ x: -0.976, width: 0.366, height: 0.045 }],
-      mics: [{ x: 1.693, r: 0.026 }, { x: -1.657, r: 0.023 }],
-    },
+    // USB on the camera half, speaker centered on the cover half.
+    usb: { x: 0.953, width: 0.264, height: 0.081 },
+    speakers: [{ x: -0.976, width: 0.366, height: 0.045 }],
+    mics: [{ x: 1.693, r: 0.026 }, { x: -1.657, r: 0.023 }],
   },
   antennaLines: [1.115],
 }
@@ -270,7 +246,8 @@ const FOLD7: FoldSpec = {
  * identical chassis keeps valid.
  */
 const FOLD8ULTRA: FoldSpec = {
-  closed: FOLD7.closed,
+  // The same 8.9 mm folded over two thinner halves: 0.7 mm of air.
+  closed: { ...FOLD7.closed, gap: 0.017 },
   open: {
     ...FOLD7.open,
     // The tenth of a millimetre the generation shaved off: 4.1 mm.
@@ -301,9 +278,9 @@ const FOLD8ULTRA: FoldSpec = {
  */
 const FOLD8: FoldSpec = {
   closed: {
-    body: { width: 2.234, height: 3.38, depth: 0.265, radius: 0.09, bevel: 0.018 },
-    // The Fold 7's closed-flush hairline seam read carries over.
-    gap: 0.012,
+    body: { width: 2.234, height: 3.38, depth: 0.265 },
+    // 9.7 mm folded over two 4.5 mm halves leaves 0.7 mm of air.
+    gap: 0.019,
     // 74.71 x 118.05 mm cover panel (5.5", 1248x1972), centered.
     display: { width: 2.038, height: 3.22, radius: 0.09 },
     punchHole: { radius: 0.053, offsetY: 0.127 },
@@ -317,30 +294,18 @@ const FOLD8: FoldSpec = {
     punchHole: { radius: 0.065, offsetX: 1.051, offsetY: 0.1 },
     resolution: 1020,
   },
+  // The Fold 7's corner pill at the Fold 7's margins on the camera half -
+  // 17.2 mm in from the free edge, 6.2 mm plateau clearance to the top edge -
+  // shortened to the generation's two lenses on the same 16.7 mm ring pitch.
   rearCamera: {
-    // Folded: the Fold 7's corner pill at the Fold 7's margins - 17.2 mm in
-    // from the free edge, 6.2 mm plateau clearance to the top edge - shortened
-    // to the generation's two lenses on the same 16.7 mm ring pitch.
-    closed: {
-      plateau: { x: 0.647, y: 1.038, width: 0.54, height: 0.966, radius: 0.266, raise: 0.073 },
-      island: { x: 0.647, y: 1.038, width: 0.416, height: 0.87, radius: 0.208, raise: 0.059 },
-      // Top to bottom: 50 MP main, 50 MP ultra-wide.
-      rings: [
-        { y: 1.266, r: 0.214, pupil: 0.48 },
-        { y: 0.811, r: 0.214, pupil: 0.38 },
-      ],
-      flash: { x: 0.193, y: 1.038, r: 0.058 },
-    },
-    // Unfolded: the same module riding the camera half (right of the spine).
-    open: {
-      plateau: { x: 1.757, y: 1.038, width: 0.54, height: 0.966, radius: 0.266, raise: 0.073 },
-      island: { x: 1.757, y: 1.038, width: 0.416, height: 0.87, radius: 0.208, raise: 0.059 },
-      rings: [
-        { y: 1.266, r: 0.214, pupil: 0.48 },
-        { y: 0.811, r: 0.214, pupil: 0.38 },
-      ],
-      flash: { x: 1.303, y: 1.038, r: 0.058 },
-    },
+    plateau: { x: 1.757, y: 1.038, width: 0.54, height: 0.966, radius: 0.266, raise: 0.073 },
+    island: { x: 1.757, y: 1.038, width: 0.416, height: 0.87, radius: 0.208, raise: 0.059 },
+    // Top to bottom: 50 MP main, 50 MP ultra-wide.
+    rings: [
+      { y: 1.266, r: 0.214, pupil: 0.48 },
+      { y: 0.811, r: 0.214, pupil: 0.38 },
+    ],
+    flash: { x: 1.303, y: 1.038, r: 0.058 },
   },
   // The Fold 7's keys at the Fold 7's relative rail positions on the shorter
   // body: volume above power on the right edge.
@@ -351,16 +316,10 @@ const FOLD8: FoldSpec = {
   buttonProfile: { protrusion: 0.01, thickness: 0.05 },
   hinge: { width: 0.166, overhang: 0.03, emboss: { length: 0.456 } },
   bottomEdge: {
-    closed: {
-      usb: { x: 0, width: 0.264, height: 0.081 },
-      speaker: { x: 0, width: 0.366, height: 0.045 },
-    },
-    open: {
-      // USB centered on the camera half, speaker centered on the cover half.
-      usb: { x: 1.101, width: 0.264, height: 0.081 },
-      speakers: [{ x: -1.101, width: 0.366, height: 0.045 }],
-      mics: [{ x: 1.94, r: 0.026 }, { x: -1.906, r: 0.023 }],
-    },
+    // USB centered on the camera half, speaker centered on the cover half.
+    usb: { x: 1.101, width: 0.264, height: 0.081 },
+    speakers: [{ x: -1.101, width: 0.366, height: 0.045 }],
+    mics: [{ x: 1.94, r: 0.026 }, { x: -1.906, r: 0.023 }],
   },
   antennaLines: [0.872],
 }
@@ -412,10 +371,9 @@ export const FOLD_DEFAULT_VARIANT: FoldVariant = 'fold7'
 const IPHONE_DUO: FoldSpec = {
   brand: 'apple',
   closed: {
-    // Apple's bezel drawing: the free-edge corners are 12.4 mm, the hinge
-    // ends 4.3 mm - the hinge cover's squared ends.
-    body: { width: 2.294, height: 3.213, depth: 0.308, radius: 0.338, hingeRadius: 0.12, bevel: 0.02 },
-    gap: 0.012,
+    body: { width: 2.294, height: 3.213, depth: 0.308 },
+    // 11.3 mm folded over two 5.2 mm halves leaves 0.9 mm of air.
+    gap: 0.024,
     // 77.7 x 113.0 mm cover panel (5.4", 1398x2034). Its free-edge corners
     // are 9.6 mm, its hinge-side corners 1.3 mm, and it sits 0.7 mm off
     // centre toward the free edge (3.9 mm of border along the hinge, 2.5 at
@@ -442,32 +400,17 @@ const IPHONE_DUO: FoldSpec = {
     // and Ø3.7 flash stacked at its inner end. No separate island: the
     // collars stand straight on the plateau. Apple's close-ups show the Air's
     // polished two-tier collars, with its amber and blue coatings.
-    closed: {
-      plateau: { x: 0.255, y: 1.196, width: 1.522, height: 0.581, radius: 0.29, raise: 0.065 },
-      // Free edge inward: 48 MP Fusion main, 48 MP ultra-wide.
-      rings: [
-        { x: 0.735, y: 1.196, r: 0.221, pupil: 0.3, glint: '#7a5836' },
-        { x: 0.252, y: 1.196, r: 0.221, pupil: 0.28, glint: '#3f4f7a' },
-      ],
-      mic: { x: -0.206, y: 1.309, width: 0.087, height: 0.038 },
-      flash: { x: -0.206, y: 1.069, r: 0.05, seat: 'plateau' },
-      ringProud: 0.045,
-      ringCollar: 0.85,
-      ringStep: { at: 0.917, rise: 0.21 },
-    },
-    // Unfolded: the same module riding the camera half (right of the spine).
-    open: {
-      plateau: { x: 1.353, y: 1.196, width: 1.522, height: 0.581, radius: 0.29, raise: 0.065 },
-      rings: [
-        { x: 1.833, y: 1.196, r: 0.221, pupil: 0.3, glint: '#7a5836' },
-        { x: 1.35, y: 1.196, r: 0.221, pupil: 0.28, glint: '#3f4f7a' },
-      ],
-      mic: { x: 0.892, y: 1.309, width: 0.087, height: 0.038 },
-      flash: { x: 0.892, y: 1.069, r: 0.05, seat: 'plateau' },
-      ringProud: 0.045,
-      ringCollar: 0.85,
-      ringStep: { at: 0.917, rise: 0.21 },
-    },
+    plateau: { x: 1.353, y: 1.196, width: 1.522, height: 0.581, radius: 0.29, raise: 0.065 },
+    // Free edge inward: 48 MP Fusion main, 48 MP ultra-wide.
+    rings: [
+      { x: 1.833, y: 1.196, r: 0.221, pupil: 0.3, glint: '#7a5836' },
+      { x: 1.35, y: 1.196, r: 0.221, pupil: 0.28, glint: '#3f4f7a' },
+    ],
+    mic: { x: 0.892, y: 1.309, width: 0.087, height: 0.038 },
+    flash: { x: 0.892, y: 1.069, r: 0.05, seat: 'plateau' },
+    ringProud: 0.045,
+    ringCollar: 0.85,
+    ringStep: { at: 0.917, rise: 0.21 },
   },
   // The Touch ID side button alone on the free rail, 18.6 mm long and
   // centred 15.9 mm above the middle; the two 10.8 mm volume keys on the
@@ -479,23 +422,20 @@ const IPHONE_DUO: FoldSpec = {
     { edge: 'top', x: 0.416, length: 0.295 },
   ],
   buttonProfile: { protrusion: 0.011, thickness: 0.06 },
-  // The bare titanium hinge cover: no emboss.
-  hinge: { width: 0.166, overhang: 0.03 },
+  // The bare titanium hinge cover: no emboss. It stands 1.8 mm proud of the
+  // halves' hinge ends when shut - what 84.1 mm folded leaves over half of
+  // 164.6 mm unfolded, and what makes the bezel drawing's 3.9 mm border
+  // along the hinge out of the 2.1 mm the cover half itself carries there.
+  hinge: { width: 0.166, overhang: 0.049 },
   bottomEdge: {
-    closed: {
-      usb: { x: 0, width: 0.245, height: 0.075 },
-      speaker: { x: 0, width: 0.366, height: 0.045 },
-    },
-    open: {
-      usb: { x: 1.098, width: 0.245, height: 0.075 },
-      speakers: [{ x: -1.098, width: 0.366, height: 0.045 }],
-      mics: [{ x: 1.95, r: 0.026 }, { x: -1.92, r: 0.023 }],
-    },
+    usb: { x: 1.098, width: 0.245, height: 0.075 },
+    speakers: [{ x: -1.098, width: 0.366, height: 0.045 }],
+    mics: [{ x: 1.95, r: 0.026 }, { x: -1.92, r: 0.023 }],
   },
   antennaLines: [0.9],
   // The 16.3 x 20.0 mm badge, centred on the camera half's back, its centre
   // 0.8 mm below the middle.
-  logo: { width: 0.445, height: 0.546, closed: { x: 0, y: -0.022 }, open: { x: 1.098, y: -0.022 } },
+  logo: { width: 0.445, height: 0.546, x: 1.098, y: -0.022 },
 }
 
 /** The iPhone Duo family - one model today. */
@@ -510,6 +450,15 @@ export const IPHONE_DUO_DEFAULT_VARIANT: IPhoneDuoVariant = 'duo'
 
 /** Millimetres per world unit - shared with the Galaxy phones. */
 export const FOLD_MM_PER_UNIT = 36.66
+
+/**
+ * How far the inner display stands above its chassis face: half the air the
+ * shut device keeps between its halves, so the two faces meet at the crease.
+ */
+export const foldDisplayStandoff = (spec: FoldSpec): number => displayStandoff(spec.closed.gap)
+
+/** Crease to back face: what the hinge housing has to span (see `hingeSpine`). */
+export const foldHingeReach = (spec: FoldSpec): number => spec.open.body.depth + foldDisplayStandoff(spec)
 
 /** The pose props a book-fold's geometry depends on. */
 export interface FoldPoseProps<V extends string = FoldVariant> {
@@ -562,16 +511,18 @@ function foldFraming<V extends string>(variants: Record<V, FoldSpec>, defaultVar
       const angle = foldOpenAngle(openAngle)
       // Upright, the hinge turns about a vertical line: half the height,
       // whatever the angle.
-      if (orientation !== 'landscape') return (angle > 3 ? spec.open : spec.closed).body.height / 2
+      if (orientation !== 'landscape') return spec.open.body.height / 2
       // On its side the crease runs across the origin and the camera half
-      // lies above it at every angle, so what reaches down is the cover half:
-      // shut, only the hinge edge of the stack, which sits on the camera half;
-      // opening, its free edge, once it swings past square; at worst, the
-      // spine curling round the crease.
+      // lies above it at every angle, so what reaches down is the hinge and
+      // the cover half: shut, only the spine's overhang; opening, the cover
+      // half's hinge end coming round the crease; past square, its free edge.
+      // One expression for the whole swing - it used to switch formulas three
+      // degrees in, and the shadow plane dropped a body's thickness with it.
       const half = spec.open.body.width / 2
-      if (angle <= 3) return Math.max(0, spec.closed.body.width / 2 + spec.hinge.overhang - half / 2)
-      const spine = spec.open.body.depth + 0.006
-      return Math.max(spine, -half * Math.cos((angle * Math.PI) / 180))
+      const reach = foldHingeReach(spec)
+      const turn = (angle * Math.PI) / 180
+      const freeEdge = reach * Math.sin(turn) - half * Math.cos(turn)
+      return Math.max(hingeReach(angle, reach, spec.hinge.overhang), freeEdge)
     },
   } as const satisfies MockupFraming<FoldPoseProps<V>>
 }

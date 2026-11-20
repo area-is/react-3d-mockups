@@ -1,13 +1,18 @@
 /**
  * Galaxy Z Flip-style device dimensions - the Galaxy Z Flip 7 and Z Flip 8.
  *
- * A clamshell foldable has two form factors, and this spec carries both:
+ * A clamshell foldable is ONE body with a hinge across its middle, and this
+ * spec carries what its two form factors add to that:
  *
  * - `open`: the unfolded tall phone - a very slim 2.32:1 slab whose upper back
  *   half is entirely cover-screen glass carrying the two separate lens rings.
- * - `closed`: the folded compact - two stacked halves with a small air gap,
- *   the hinge capping the bottom edge, and the nearly-square cover display
- *   filling the front (with the lens rings and flash sitting on it).
+ * - `closed`: one half of it, the air the folded pair keeps between them, and
+ *   the nearly-square cover display that then fills the front (with the lens
+ *   rings and flash sitting on it).
+ *
+ * The folded compact is not a second model: it is the unfolded phone with its
+ * cover half swung shut about the crease (see `hingeSpine`), the hinge capping
+ * the edge the two halves share.
  *
  * Shares the Galaxy world scale (~36.66 mm per unit) so it sits at true
  * relative size beside the S-series and the Fold. Detail geometry (buttons,
@@ -22,7 +27,8 @@
 
 import type { Orientation } from '../../orientation'
 import type { MockupFraming, MockupMetrics } from '../../regions'
-import { coverScreenLit, foldOpenAngle } from '../../regions'
+import { coverScreenLit } from '../../regions'
+import { displayStandoff } from '../hinge'
 
 export interface FlipSpec {
   /** Unfolded tall phone. */
@@ -41,7 +47,11 @@ export interface FlipSpec {
    */
   closed: {
     body: { width: number; height: number; depth: number; radius: number; bevel: number }
-    /** Air gap between the folded halves. */
+    /**
+     * Air gap between the folded halves. The main display stands half of it
+     * above its chassis face, so the two faces meet at the crease and the
+     * folded stack comes out at its published thickness.
+     */
     gap: number
     /** Cover display (content maps here when closed), centered on the front half. */
     display: { width: number; height: number; radius: number }
@@ -78,8 +88,10 @@ export interface FlipSpec {
     mics: { x: number; r: number }[]
   }
   /**
-   * The hinge band capping the folded bottom: how far it wraps across the
-   * stack, how far it overhangs the halves, and the engraved wordmark length.
+   * The hinge housing between the halves' backs: hidden when the phone is
+   * flat, and capping the folded pair's shared edge when it is shut - how far
+   * it wraps across the stack, how far it then stands proud of the halves'
+   * hinge ends (`overhang`), and the engraved wordmark length.
    */
   hinge: { width: number; overhang: number; emboss: { length: number } }
   /** Darker end-band seams, this far in from each free end (reads as antenna lines). */
@@ -182,12 +194,17 @@ export type FlipVariant = keyof typeof FLIP_VARIANTS
 /** The variant every binding defaults to. */
 export const FLIP_DEFAULT_VARIANT: FlipVariant = 'flip7'
 
-/**
- * Grounded by default: the shadow plane kisses the bottom of the body - the
- * hinge band when folded, the halves' folded extent at partial angles.
- */
 /** Millimetres per world unit - shared with the Galaxy phones. */
 export const FLIP_MM_PER_UNIT = 36.66
+
+/**
+ * How far the main display stands above its chassis face: half the air the
+ * shut phone keeps between its halves, so the two faces meet at the crease.
+ */
+export const flipDisplayStandoff = (spec: FlipSpec): number => displayStandoff(spec.closed.gap)
+
+/** Crease to back face: what the hinge housing has to span (see `hingeSpine`). */
+export const flipHingeReach = (spec: FlipSpec): number => spec.closed.body.depth + flipDisplayStandoff(spec)
 
 /**
  * Live geometry of whichever panel is facing the viewer: the tall main
@@ -215,18 +232,21 @@ export const FLIP_METRICS = {
   coverScreenUntil?: number
 }>
 
+/**
+ * Grounded by default: the shadow plane kisses the bottom of the body, which
+ * is the lower half's free end at every hinge angle.
+ */
 export const FLIP_FRAMING = {
   contactGap: 0.05,
-  extent: ({ variant, openAngle, orientation }) => {
+  extent: ({ variant, orientation }) => {
     const spec = FLIP_VARIANTS[variant ?? FLIP_DEFAULT_VARIANT]
-    const angle = foldOpenAngle(openAngle)
     // On its side the hinge turns about a vertical line: half the width,
     // whatever the angle.
-    if (orientation === 'landscape') return (angle > 3 ? spec.open : spec.closed).body.width / 2
+    if (orientation === 'landscape') return spec.open.body.width / 2
     // Upright, the crease runs across the origin and the lower half hangs
     // below it at every angle, shut included - the cover half only ever
     // swings above it or in front - so its foot never moves.
-    return angle >= 177 ? spec.open.body.height / 2 : spec.closed.body.height
+    return spec.open.body.height / 2
   },
 } as const satisfies MockupFraming<{
   variant?: FlipVariant

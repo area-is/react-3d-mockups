@@ -60,6 +60,31 @@ breaking change can ship in a minor release, and is always listed under
   other tablet: `frontCamera.offsetY`, a `flash` on the single-lens camera,
   and `edge: 'top'` keys in `sideButtons`.
 
+### Changed (breaking)
+
+- **`FoldSpec` measures a book-fold once, unfolded.** A folded Fold or Duo is
+  now the unfolded body with its cover half swung shut (see the hinge fix
+  below), so everything that rides a half is given once, in the unfolded
+  body's coordinates, and the folded copies are gone. If you read these off
+  `FOLD_VARIANTS` / `IPHONE_DUO_VARIANTS`: `rearCamera.open` is `rearCamera`,
+  `bottomEdge.open` is `bottomEdge`, and `logo.open.x` / `.y` are `logo.x` /
+  `.y`; `rearCamera.closed`, `bottomEdge.closed` and `logo.closed` have no
+  replacement. `closed.body` keeps the published folded `width`, `height` and
+  `depth` and drops `radius`, `hingeRadius` and `bevel`, which shaped a body
+  that is no longer drawn. Three numbers moved to what the published figures
+  leave over: `closed.gap` is 0.7 mm on the Fold 8, 0.6 mm on the Fold 8
+  Ultra and 0.9 mm on the iPhone Duo (each had the Fold 7's 0.4 mm, and a
+  fattened folded slab to make up the thickness), and the Duo's
+  `hinge.overhang` is 1.8 mm, which is what makes its folded width the
+  published 84.1 mm.
+- **A folded foldable's hinge corners are square.** The folded bar used to
+  round all four corners; the two along the hinge are now the square ends
+  the rails have at every other angle, since a rail that runs straight
+  across the hinge when the device is open cannot be round-cornered there
+  when it is shut. The iPhone Duo's 4.3 mm hinge-end radius went with it.
+  Folded renders change accordingly, and the folded Flip now shows its two
+  lens rings as hardware rather than as discs printed on the cover screen.
+
 ### Changed
 
 - **Print and packaging bodies have a surface, not just a colour.** Nine
@@ -108,6 +133,44 @@ breaking change can ship in a minor release, and is always listed under
 
 ### Fixed
 
+- **A foldable jumped as its hinge left 0.** `openAngle={0}` and
+  `openAngle={false}` rendered a second, separately built model of the
+  folded device, and `openAngle={1}` rendered the hinged one, which did not
+  arrive where the first one sat. Between those two frames the spine stood
+  3.5 mm further out on a Fold and 4.6 mm on a Flip (a half-round as thick
+  as the whole device, where the folded one had a shallow cap), the folded
+  bar's hinge corners went from round to square, the cover display's bezel
+  changed from black glass to the body colour, and the cover screen was torn
+  down and rebuilt, losing its state. On the Flip the folded model was also
+  mirrored: the side keys, the SIM tray, the speaker and the mics were on
+  the opposite rails from every other angle, and the lenses were flat discs
+  that became hardware a half-degree later. The folded pose is now the
+  hinged rig at 0°. The hinge housing no longer stays centred on the crease:
+  the two back shells close around it as the device shuts, so its axis
+  slides in between the halves and only `hinge.overhang` of it is left
+  standing proud of the folded stack - the motion is `hingeSpine` in
+  `react-3d-mockups/core`. The Fold's cover half is the cover display's
+  glass across its whole outer face at every angle, as it was only when
+  shut. Folded, each device now comes within about a tenth of a millimetre
+  of its published width and thickness.
+- **Small jumps at the flat end of the swing too.** The last twentieth of a
+  degree before flat still swaps two half-screens for one seamless one, and
+  more than the screen changed with it: the Flip's crease shadow, drawn at
+  full strength at every angle short of flat, vanished, and the metal lip
+  round the Flip's back panes and the dark groove across both devices' backs
+  appeared. The shadow now deepens with the fold from nothing, and the
+  hinged halves carry the lip and their own sides of the groove, so the flat
+  pose is where the hinged one arrives. What is left at that swap is a
+  pixel wide: the hairline where the two halves meet, on the rails and down
+  the crease, which the one-piece flat body and its one screen do not have.
+- **The SAMSUNG engraving on the spine fades in and out** as the shells
+  uncover it, instead of appearing at one angle.
+- **A book-fold on its side keeps its shadow under it as it opens.** In
+  landscape the ground line switched formulas three degrees into the swing
+  and dropped a body's thickness there. It now follows the hinge.
+- **The Fold's lit cover screen draws its own camera hole.** While the cover
+  display was lit and the hinge was open at all, the dark screen's glossy
+  punch lens showed through the lit one as a grey disc.
 - **Credit card: the back's debossed lettering looked like wireframes.** On
   a card with no back design, each stroke of the embossing's reverse was
   drawn as its own flat capsule, so every joint showed the rounded end of
