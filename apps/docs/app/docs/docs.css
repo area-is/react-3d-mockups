@@ -101,8 +101,10 @@
   font-size: 13px;
 }
 
+/* A pixel over fumadocs' 13px, which read small beside the prose. */
 #nd-page figure.shiki > [role='region'] {
   padding-block: 0;
+  font-size: 14px;
 }
 
 /* An untitled block's copy button, on the first line's far end. Fumadocs
@@ -267,25 +269,25 @@
   flex-shrink: 0;
 }
 
+/* No box round a tile, at rest or otherwise. Under the pointer the name
+   comes up to full ink and a faint pool of light gathers behind the model;
+   the page being read gets the same light in green, and a green name. */
 .mockup-tile {
+  --tile-glow: color-mix(in oklab, var(--color-fd-foreground) 9%, transparent);
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 8px;
   padding: 10px 6px 8px;
   border-radius: 10px;
-  transition: background 0.15s ease;
-}
-
-.mockup-tile:hover {
-  background: var(--color-fd-accent);
 }
 
 .mockup-tile[data-active='true'] {
-  background: color-mix(in oklab, var(--color-fd-primary) 10%, transparent);
+  --tile-glow: color-mix(in oklab, var(--color-fd-primary) 26%, transparent);
 }
 
 .mockup-tile-thumb {
+  position: relative;
   height: 62px;
   width: 100%;
   display: flex;
@@ -293,7 +295,26 @@
   justify-content: center;
 }
 
+/* The glow: a radial fade with no edge to it, so it reads as light on the
+   model rather than a shape behind it. On a pseudo-element so it can fade in;
+   a gradient itself only snaps. */
+.mockup-tile-thumb::before {
+  content: '';
+  position: absolute;
+  inset: -4px 6%;
+  background: radial-gradient(closest-side, var(--tile-glow), transparent);
+  opacity: 0;
+  transition: opacity 0.15s ease;
+  pointer-events: none;
+}
+
+.mockup-tile:hover .mockup-tile-thumb::before,
+.mockup-tile[data-active='true'] .mockup-tile-thumb::before {
+  opacity: 1;
+}
+
 .mockup-tile-thumb img {
+  position: relative;
   max-width: 88%;
   max-height: 62px;
   object-fit: contain;
@@ -305,11 +326,24 @@
   color: var(--color-fd-muted-foreground);
   text-align: center;
   line-height: 1.35;
+  transition: color 0.15s ease;
 }
 
-.mockup-tile:hover .mockup-tile-label,
-.mockup-tile[data-active='true'] .mockup-tile-label {
+.mockup-tile:hover .mockup-tile-label {
   color: var(--color-fd-foreground);
+}
+
+.mockup-tile[data-active='true'] .mockup-tile-label {
+  color: var(--color-fd-primary);
+  font-weight: 500;
+}
+
+/* Forced colours drop the glow and the label's green, so outline the page
+   being read there instead. */
+@media (forced-colors: active) {
+  .mockup-tile[data-active='true'] {
+    outline: 1px solid Highlight;
+  }
 }
 
 /* An older model's thumbnail in gray. Every thumbnail's screen is chroma
@@ -327,9 +361,14 @@
   opacity: 1;
 }
 
-/* ...and no green behind it either when it is the page being read. */
+/* ...and no green round it either when it is the page being read: the
+   neutral light, and the name in full ink. */
 .mockup-tile[data-older][data-active='true'] {
-  background: var(--color-fd-accent);
+  --tile-glow: color-mix(in oklab, var(--color-fd-foreground) 12%, transparent);
+}
+
+.mockup-tile[data-older][data-active='true'] .mockup-tile-label {
+  color: var(--color-fd-foreground);
 }
 
 /* "Deprecated" under a tile's name: a model the next releases remove. */
@@ -364,9 +403,7 @@
   cursor: pointer;
   list-style: none;
   user-select: none;
-  transition:
-    background 0.15s ease,
-    color 0.15s ease;
+  transition: color 0.15s ease;
 }
 
 /* Safari still draws its own marker unless told twice. */
@@ -374,8 +411,8 @@
   display: none;
 }
 
+/* Ink only, like the tiles round it. */
 .mockup-older-summary:hover {
-  background: var(--color-fd-accent);
   color: var(--color-fd-foreground);
 }
 
@@ -392,6 +429,8 @@
 
 @media (prefers-reduced-motion: reduce) {
   .mockup-older-summary,
+  .mockup-tile-thumb::before,
+  .mockup-tile-label,
   .mockup-tile-thumb img,
   .model-gallery-chip,
   .model-gallery-thumb,
@@ -661,8 +700,8 @@
 /*
  * The Images and Screen content guides' stages: one mockup per example, on
  * the same dotted ground as the explorer's stage so the page reads as one
- * set of demos, but with no card around it. Fixed height so the lazy scene
- * has a box to hold while unmounted.
+ * set of demos. Fixed height so the lazy scene has a box to hold while
+ * unmounted.
  */
 .img-demo {
   position: relative;
@@ -671,16 +710,18 @@
   margin: 1.5rem 0;
 }
 
+/*
+ * The explorer stands on the page, not in a card: no frame, no fill and no
+ * rules between its parts. The stage's dotted ground is what marks out the
+ * model; the header, the inspector and the code sit round it like the prose
+ * does, and their outer edges are the text column's.
+ */
 .mx {
   --mx-accent: var(--color-fd-primary);
   /* One height for every interactive control in the inspector, and one row
      height around it - the panel's whole rhythm comes from these two. */
   --mx-control-h: 26px;
   --mx-row-h: 32px;
-  border: 1px solid var(--color-fd-border);
-  border-radius: 16px;
-  background: var(--color-fd-card);
-  overflow: hidden;
   margin: 1.5rem 0;
   font-size: 12px;
   /* A share link scrolls the explorer into view; this is the clearance
@@ -694,8 +735,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  padding: 9px 12px;
-  border-bottom: 1px solid var(--color-fd-border);
+  padding: 0 0 10px;
   flex-wrap: wrap;
 }
 
@@ -786,9 +826,12 @@
   width: 286px;
   flex: none;
   height: 100%;
-  border-left: 1px solid var(--color-fd-border);
-  padding: 0 16px 22px;
+  /* A few pixels short of the column's edge on the right: a scroll box clips
+     what overhangs it, and the picked swatch's ring and a control's focus
+     outline both do. It also keeps the controls off a classic scrollbar. */
+  padding: 0 6px 22px 20px;
   overflow-y: auto;
+  scrollbar-width: thin;
 }
 
 .mx-inspector-head {
@@ -800,7 +843,7 @@
   align-items: center;
   justify-content: space-between;
   padding: 12px 0 6px;
-  background: var(--color-fd-card);
+  background: var(--color-fd-background);
   font-weight: 600;
   color: var(--color-fd-muted-foreground);
 }
@@ -1214,12 +1257,12 @@
 }
 
 .mx-swatch[data-on='true'] {
-  box-shadow: 0 0 0 2px var(--color-fd-card), 0 0 0 3.5px var(--mx-accent);
+  box-shadow: 0 0 0 2px var(--color-fd-background), 0 0 0 3.5px var(--mx-accent);
 }
 
 .mx-swatch:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 2px var(--color-fd-card), 0 0 0 3.5px var(--mx-accent);
+  box-shadow: 0 0 0 2px var(--color-fd-background), 0 0 0 3.5px var(--mx-accent);
 }
 
 .mx-bg-swatch {
@@ -1241,7 +1284,7 @@
 }
 
 .mx-bg-swatch[data-on='true'] {
-  box-shadow: 0 0 0 2px var(--color-fd-card), 0 0 0 3.5px var(--mx-accent);
+  box-shadow: 0 0 0 2px var(--color-fd-background), 0 0 0 3.5px var(--mx-accent);
 }
 
 /* Flat (surface) view */
@@ -1322,13 +1365,13 @@
 }
 
 /*
- * The library's zoom pill, dressed in the explorer's chrome: the same card,
+ * The library's zoom pill, dressed in the explorer's chrome: the same fill,
  * border, ink and mono as the flat view's control below, so the two views
  * carry one control. The pill reads these custom properties before its own
  * defaults (see `ZOOM_PILL_STYLE` in the library).
  */
 .mx-stage {
-  --mockup-overlay-bg: var(--color-fd-card);
+  --mockup-overlay-bg: var(--color-fd-background);
   --mockup-overlay-border: var(--color-fd-border);
   --mockup-overlay-fg: var(--color-fd-foreground);
   --mockup-overlay-font: var(--font-mono);
@@ -1351,7 +1394,7 @@
   align-items: stretch;
   border: 1px solid var(--color-fd-border);
   border-radius: 7px;
-  background: var(--color-fd-card);
+  background: var(--color-fd-background);
   font-family: var(--font-mono);
   font-size: 11.5px;
   line-height: 1;
@@ -1434,19 +1477,12 @@
 /* Code panel */
 
 .mx-code {
-  border-top: 1px solid var(--color-fd-border);
+  margin-top: 8px;
 }
 
 .mx-tabs {
   display: flex;
   align-items: center;
-  /* No right padding: `.mx-actions` ends the strip and carries its own, so
-     its sticky edge is the strip's edge and nothing scrolls past it. */
-  padding: 0 0 0 12px;
-  border-bottom: 1px solid var(--color-fd-border);
-}
-
-.mx-tabs {
   overflow-x: auto;
   scrollbar-width: thin;
 }
@@ -1473,7 +1509,7 @@
 
 /* Share, StackBlitz and copy, at the strip's far end. Sticky, so on an object
    with enough faces to scroll the tabs, the tabs slide under the buttons
-   rather than taking them off the end - which needs the card's own fill
+   rather than taking them off the end - which needs the page's own fill
    behind them. */
 .mx-actions {
   position: sticky;
@@ -1482,8 +1518,8 @@
   display: flex;
   align-items: center;
   gap: 2px;
-  padding: 0 12px 0 8px;
-  background: var(--color-fd-card);
+  padding-left: 8px;
+  background: var(--color-fd-background);
 }
 
 .mx-action {
@@ -1513,9 +1549,11 @@
   margin: 0;
   max-height: 340px;
   overflow: auto;
-  padding: 13px 14px 15px 0;
+  /* No side padding: the gutter starts at the column's left edge, and a set
+     line's tint runs to its right one. */
+  padding: 13px 0 15px;
   font-family: var(--font-mono);
-  font-size: 12.5px;
+  font-size: 13.5px;
   line-height: 1.7;
 }
 
@@ -1582,8 +1620,7 @@
   .mx-inspector {
     width: 100%;
     height: auto;
-    border-left: 0;
-    border-top: 1px solid var(--color-fd-border);
+    padding-inline: 0;
     /* Stacked, the inspector is in page flow: it scrolls with the page rather
        than trapping a scroll inside a panel the reader cannot see the end of. */
     overflow-y: visible;
@@ -1600,7 +1637,7 @@
 @media (max-width: 520px) {
   .mx-header {
     gap: 6px;
-    padding: 8px 10px;
+    padding-bottom: 8px;
   }
 
   .mx-views button {
@@ -1608,7 +1645,7 @@
   }
 
   .mx-inspector {
-    padding: 0 12px 18px;
+    padding-bottom: 18px;
   }
 
   .mx-doc-type {
