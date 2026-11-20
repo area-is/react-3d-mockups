@@ -17,9 +17,9 @@
 /*                                                                     */
 /*  Fumadocs' light theme paints the page hsl(0 0% 96%) and its cards  */
 /*  hsl(0 0% 94.7%) - a grey sheet the mockups then sit on. White is   */
-/*  what a product shot is composited onto, and it is what the         */
-/*  transparency checkerboard behind every preview is standing in for, */
-/*  so the shell, the sidebar and the preview surfaces all take it.    */
+/*  what a product shot is composited onto, and it is what the dotted  */
+/*  ground behind every preview is standing in for, so the shell, the  */
+/*  sidebar and the preview surfaces all take it.                      */
 /*  Everything else - muted, secondary, accent, borders - stays on     */
 /*  fumadocs' ramp, which is what still separates a code block, an     */
 /*  active sidebar row or a table header from the page.                */
@@ -67,6 +67,145 @@
 /* The sidebar reads as part of the page, not as a tinted panel. */
 #nd-sidebar {
   background: transparent;
+}
+
+/* ------------------------------------------------------------------ */
+/*  Prose: code blocks, tables, inline code, the page footer           */
+/*                                                                     */
+/*  None of them sits in a box. Fumadocs draws each on a tinted card   */
+/*  with a border; here they stand on the page like the text around    */
+/*  them, and alignment and spacing do the separating instead - a code */
+/*  block's first column and a table's first column line up with the   */
+/*  paragraph's left edge, the last with its right.                    */
+/* ------------------------------------------------------------------ */
+
+/* Scoped to `#nd-page` so the id outranks fumadocs' own `.shiki` rule,
+   which sets the line padding these zero. */
+#nd-page figure.shiki {
+  --padding-left: 0px;
+  --padding-right: 0px;
+  margin-block: 1.5rem;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+  overflow: visible;
+}
+
+/* The file name: a quiet caption over the code rather than a ruled title
+   bar. */
+#nd-page figure.shiki > div:has(> figcaption) {
+  height: auto;
+  padding: 0 0 8px;
+  border-bottom: 0;
+  font-size: 13px;
+}
+
+#nd-page figure.shiki > [role='region'] {
+  padding-block: 0;
+}
+
+/* An untitled block's copy button, on the first line's far end. Fumadocs
+   already pads every line clear of it. */
+#nd-page figure.shiki > div.absolute {
+  top: -3px;
+  right: -4px;
+}
+
+/* Tables: no fill and no frame, only the rule under the header and between
+   rows. Vertical rules go, and the outer columns lose their side padding so
+   the table's edges are the text column's. */
+#nd-page .prose table {
+  border: 0;
+  border-radius: 0;
+  background: none;
+}
+
+#nd-page .prose :is(th, td) {
+  border-inline: 0;
+  background: none;
+}
+
+#nd-page .prose :is(th, td):first-child {
+  padding-inline-start: 0;
+}
+
+#nd-page .prose :is(th, td):last-child {
+  padding-inline-end: 0;
+}
+
+/* Inline code keeps its faint fill to mark it out of the sentence, but not
+   the border round it. */
+#nd-page .prose :not(pre) > code {
+  border: 0;
+}
+
+/* Previous and next: two links at the column's edges, not two cards. The
+   title takes the underline on hover, as a link in the text would. */
+.docs-pager {
+  margin-top: 1rem;
+}
+
+.docs-pager > a {
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
+}
+
+.docs-pager > a:hover {
+  background: none;
+  color: inherit;
+}
+
+.docs-pager > a > div > p {
+  text-decoration: underline 1px transparent;
+  text-underline-offset: 3px;
+  transition: text-decoration-color 0.15s ease;
+}
+
+.docs-pager > a:hover > div > p {
+  text-decoration-color: currentColor;
+}
+
+.docs-pager > a:focus-visible {
+  outline: 2px solid var(--color-fd-ring);
+  outline-offset: 4px;
+  border-radius: 4px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .docs-pager > a > div > p {
+    transition: none;
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/*  Dotted ground                                                      */
+/*                                                                     */
+/*  What a model stands on wherever the docs show one: the Gallery's   */
+/*  thumbnails, the Images and Screen content guides' stages, and the  */
+/*  prop explorer's stage. No card and no checkerboard - a transparent */
+/*  ground marked only by a sparse grid of small dots, 1px dots 14px   */
+/*  apart, faint enough to read as texture rather than a box. Centred, */
+/*  so every model sits on the same rhythm.                            */
+/* ------------------------------------------------------------------ */
+
+/* Registered so the dots' colour can fade (the Gallery firms them up on
+   hover); unregistered, a custom property only snaps. */
+@property --dot-ground {
+  syntax: '<color>';
+  inherits: false;
+  initial-value: transparent;
+}
+
+.model-gallery-thumb,
+.img-demo,
+.mx-stage {
+  --dot-ground: color-mix(in oklab, var(--color-fd-foreground) 9%, transparent);
+  background-image: radial-gradient(circle, var(--dot-ground) 1px, transparent 1.5px);
+  background-size: 14px 14px;
+  background-position: center;
 }
 
 /*
@@ -254,7 +393,10 @@
 @media (prefers-reduced-motion: reduce) {
   .mockup-older-summary,
   .mockup-tile-thumb img,
-  .model-gallery-thumb img {
+  .model-gallery-chip,
+  .model-gallery-thumb,
+  .model-gallery-thumb img,
+  .model-gallery-label {
     transition: none;
   }
 }
@@ -314,8 +456,9 @@
 /* ------------------------------------------------------------------ */
 /*  Gallery (components/model-gallery.tsx)                             */
 /*                                                                     */
-/*  The sidebar grid's tiles, grown up: same thumbnails, same quiet    */
-/*  card, with the kind under the name and filter chips above.         */
+/*  The sidebar grid's thumbnails, grown up: no card around them, just */
+/*  a faint dot field behind each model, with the kind under the name  */
+/*  and filter chips above.                                            */
 /* ------------------------------------------------------------------ */
 
 .model-gallery {
@@ -337,23 +480,24 @@
   color: var(--color-fd-muted-foreground);
 }
 
+/* Borderless pills, like the tiles below them: plain text at rest, a soft
+   fill on hover, and a green tint for the kind that is showing. */
 .model-gallery-chip {
   display: inline-flex;
   align-items: center;
   gap: 6px;
   min-height: 32px;
   padding: 4px 12px;
-  border: 1px solid var(--color-fd-border);
+  border: 0;
   border-radius: 999px;
-  background: var(--color-fd-card);
+  background: transparent;
   color: var(--color-fd-muted-foreground);
   font-size: 13px;
   line-height: 1.2;
   cursor: pointer;
   transition:
     background 0.15s ease,
-    color 0.15s ease,
-    border-color 0.15s ease;
+    color 0.15s ease;
 }
 
 .model-gallery-chip:hover {
@@ -362,9 +506,16 @@
 }
 
 .model-gallery-chip[aria-pressed='true'] {
-  border-color: var(--color-fd-primary);
-  background: color-mix(in oklab, var(--color-fd-primary) 12%, transparent);
+  background: color-mix(in oklab, var(--color-fd-primary) 14%, transparent);
   color: var(--color-fd-foreground);
+}
+
+/* Forced colours drop backgrounds, which is all that marks the pressed
+   pill now - so outline it there instead. */
+@media (forced-colors: active) {
+  .model-gallery-chip[aria-pressed='true'] {
+    outline: 1px solid Highlight;
+  }
 }
 
 .model-gallery-chip:focus-visible,
@@ -423,7 +574,7 @@
 .model-gallery-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  gap: 10px;
+  gap: 20px 14px;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -433,32 +584,32 @@
   display: flex;
   flex-direction: column;
   height: 100%;
-  padding: 10px 10px 12px;
-  border: 1px solid var(--color-fd-border);
-  border-radius: 12px;
-  background: var(--color-fd-card);
+  border-radius: 10px;
   color: inherit;
   text-decoration: none;
-  transition:
-    background 0.15s ease,
-    border-color 0.15s ease;
 }
 
-.model-gallery-card:hover {
-  background: var(--color-fd-accent);
-  border-color: color-mix(in oklab, var(--color-fd-foreground) 18%, transparent);
-}
-
+/* The dotted ground (see the top of this file) stands in for the card; it
+   firms up a little on hover in place of the old card's fill. */
 .model-gallery-thumb {
-  display: block;
+  display: grid;
+  place-items: center;
   aspect-ratio: 1;
   margin-bottom: 8px;
+  border-radius: 10px;
+  transition: --dot-ground 0.15s ease;
 }
 
+.model-gallery-card:hover .model-gallery-thumb {
+  --dot-ground: color-mix(in oklab, var(--color-fd-foreground) 18%, transparent);
+}
+
+/* The model a little inside its tile, so the dots show round it on every
+   side and a wide object - a laptop, a bus - does not run to the edges. */
 .model-gallery-thumb img {
   display: block;
-  width: 100%;
-  height: 100%;
+  width: 84%;
+  height: 84%;
   object-fit: contain;
 }
 
@@ -475,14 +626,23 @@
 }
 
 .model-gallery-label {
+  padding: 0 2px;
   font-size: 14px;
   font-weight: 500;
   line-height: 1.3;
   color: var(--color-fd-foreground);
+  text-decoration: underline 1px transparent;
+  text-underline-offset: 3px;
+  transition: text-decoration-color 0.15s ease;
+}
+
+.model-gallery-card:hover .model-gallery-label {
+  text-decoration-color: currentColor;
 }
 
 .model-gallery-kind {
   margin-top: 2px;
+  padding: 0 2px;
   font-size: 12px;
   color: var(--color-fd-muted-foreground);
 }
@@ -490,11 +650,7 @@
 @media (max-width: 420px) {
   .model-gallery-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 8px;
-  }
-
-  .model-gallery-card {
-    padding: 8px 8px 10px;
+    gap: 16px 10px;
   }
 }
 
@@ -503,21 +659,14 @@
 /* ------------------------------------------------------------------ */
 
 /*
- * The Images guide's stages: one mockup per example, in the same card as the
- * explorer so the page reads as one set of demos. Fixed height so the lazy
- * scene has a box to hold while unmounted.
+ * The Images and Screen content guides' stages: one mockup per example, on
+ * the same dotted ground as the explorer's stage so the page reads as one
+ * set of demos, but with no card around it. Fixed height so the lazy scene
+ * has a box to hold while unmounted.
  */
 .img-demo {
   position: relative;
-  border: 1px solid var(--color-fd-border);
   border-radius: 16px;
-  background:
-    repeating-conic-gradient(
-      color-mix(in oklab, var(--color-fd-foreground) 4%, transparent) 0% 25%,
-      transparent 0% 50%
-    )
-    50% / 26px 26px,
-    var(--color-fd-card);
   overflow: hidden;
   margin: 1.5rem 0;
 }
@@ -631,12 +780,6 @@
   min-width: 0;
   height: 100%;
   overflow: hidden;
-  background:
-    repeating-conic-gradient(
-      color-mix(in oklab, var(--color-fd-foreground) 4%, transparent) 0% 25%,
-      transparent 0% 50%
-    )
-    50% / 26px 26px;
 }
 
 .mx-inspector {
@@ -1374,7 +1517,6 @@
   font-family: var(--font-mono);
   font-size: 12.5px;
   line-height: 1.7;
-  background: var(--color-fd-background);
 }
 
 .mx-line {

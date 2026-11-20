@@ -4,14 +4,19 @@
 /*  A long, scrolling page with seven WebGL scenes on it. The layout   */
 /*  gives every scene a box with a definite height (`.cp-stage`,       */
 /*  `.cp-bulletin-stage`) so LazyScene can mount and unmount them      */
-/*  without the page moving under the reader.                          */
+/*  without the page moving under the reader. The box is not drawn:    */
+/*  each object stands on a faint field of bone dots in the night.     */
 /* ------------------------------------------------------------------ */
 
 .cp {
   --cp-acid: #e8ff47;
+  --cp-bone: #f4f1ff;
   --cp-night: #0b0a12;
   --cp-panel: #12111a;
   --cp-line: #23222e;
+  /* The ground under every 3D stage. Bone, the type's ink, rather than
+     acid: acid is the one loud thing on any surface, and a ground is not. */
+  --cp-dot: color-mix(in oklab, var(--cp-bone) 10%, transparent);
   position: relative;
   isolation: isolate;
   min-height: 100svh;
@@ -101,6 +106,21 @@
   color: var(--muted);
 }
 
+/* ---- the stages ---------------------------------------------------------- */
+
+/*
+ * No card: a stage is the page's own night, marked only by a sparse grid of
+ * 1px dots 14px apart - the ground the docs set their models on - faint
+ * enough to read as texture rather than a box. The dots are centred, so
+ * every object on the page sits on the same rhythm.
+ */
+.cp-bulletin-stage,
+.cp-stage {
+  background-image: radial-gradient(circle, var(--cp-dot) 1px, transparent 1.5px);
+  background-size: 14px 14px;
+  background-position: center;
+}
+
 /* ---- the billboard ------------------------------------------------------- */
 
 .cp-bulletin {
@@ -109,14 +129,16 @@
   padding: 0 32px;
 }
 
-/* Wide and grounded: the bulletin stands on a pole, so the box is a
-   landscape one and the sky behind it is the page. */
+/* Wide and grounded: the bulletin stands on a pole, so the stage is a
+   landscape one and the sky behind it is the page. The pole runs off the
+   foot of the stage, so the foot fades out, pole and dots together, rather
+   than cutting the pole off on a line. */
 .cp-bulletin-stage {
   position: relative;
   height: min(72vh, 720px);
   overflow: clip;
-  border-radius: 10px;
-  background: var(--cp-panel);
+  -webkit-mask-image: linear-gradient(to bottom, #000 78%, transparent);
+  mask-image: linear-gradient(to bottom, #000 78%, transparent);
 }
 
 .cp-caption {
@@ -295,9 +317,14 @@
 .cp-stage {
   position: relative;
   height: 520px;
-  border-radius: 10px;
   overflow: clip;
-  background: var(--cp-panel);
+}
+
+/* The pass hangs from a lanyard that runs off the top of its stage; the top
+   fades out, so the strap comes down out of the dark rather than off a line. */
+.cp-stage[data-scene='pass'] {
+  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 24%);
+  mask-image: linear-gradient(to bottom, transparent, #000 24%);
 }
 
 .cp-piece-meta {
@@ -402,7 +429,6 @@
 
   .cp-bulletin-stage {
     height: 56vh;
-    border-radius: 10px;
   }
 
   .cp-stage {

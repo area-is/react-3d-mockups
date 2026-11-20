@@ -26,16 +26,21 @@ const CATEGORY_ICONS: Record<Category, LucideIcon> = {
 }
 
 /**
- * The ground under the two foldables: a dot wash on a transparent ground, in
- * dark neutrals a step above the page, so the device sits on a soft texture
- * rather than in a box.
+ * The ground under every stage on the page, the hero's and the two
+ * foldables': a dot wash on a transparent ground, in dark neutrals a step
+ * above the page, so the devices sit on a soft texture rather than in a box.
  */
 const STAGE_PALETTE = ['transparent', '#161a22', '#1a1f29', '#1e2430', '#222836', '#262d3b']
 
-function StagePattern({ seed }: { seed: string }) {
+/**
+ * The pattern reshapes its grid to the stage, keeping about as many cells as
+ * it is asked for, so the hero - twice as wide as a foldable's stage - asks
+ * for more of them to draw its dots the same size.
+ */
+function StagePattern({ seed, grid = '6x9' }: { seed: string; grid?: string }) {
   return (
-    <div className="lg-feature-pattern" aria-hidden>
-      <Pattern pattern={dotwash} seed={seed} palette={STAGE_PALETTE} grid="6x9" />
+    <div className="lg-ground" aria-hidden>
+      <Pattern pattern={dotwash} seed={seed} palette={STAGE_PALETTE} grid={grid} />
     </div>
   )
 }
@@ -92,6 +97,7 @@ export function Ledger() {
 
       <section className="lg-stage-wrap" aria-label="Ledger on a laptop, a phone and a watch">
         <div className="lg-stage">
+          <StagePattern seed="ledger-hero" grid="8x12" />
           <SceneBoundary>
             <Hero state={state} />
           </SceneBoundary>

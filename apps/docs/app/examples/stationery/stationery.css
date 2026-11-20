@@ -9,9 +9,9 @@
 .am {
   --am-accent: #b8a56a;
   --am-ink: #2f4a3a;
-  /* A white page; the stages keep a light step of the warm tone. */
+  /* A white page, and no tinted panel under the pieces: they lie on the
+     page itself, on a faint veil of the suite's tulle. */
   --am-paper: #ffffff;
-  --am-panel: #f5f2ec;
   --am-text: #2b2823;
   --am-muted: #746d62;
   --am-line: #e0d8c8;
@@ -311,13 +311,24 @@
   gap: 12px;
 }
 
-/* A definite height, so LazyScene has a box to hold while unmounted. */
+/* A definite height, so LazyScene has a box to hold while unmounted. No
+   fill and no corners: a tinted panel made each piece a card on the page. */
 .am-piece-stage {
   position: relative;
   height: 400px;
-  border-radius: 10px;
   overflow: clip;
-  background: var(--am-panel);
+}
+
+/* Under the canvas, which is transparent: the piece lies on the tulle,
+   turned down to a texture and faded out before the stage's edge, so no
+   box shows where it stops. */
+.am-piece-ground {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.12;
+  -webkit-mask-image: radial-gradient(closest-side, #000 50%, transparent 100%);
+  mask-image: radial-gradient(closest-side, #000 50%, transparent 100%);
 }
 
 .am-piece-meta {

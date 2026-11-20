@@ -8,7 +8,6 @@
 .ar {
   --ar-sky: #0a0f1f;
   --ar-lamp: #ffd27a;
-  --ar-panel: rgba(255, 255, 255, 0.04);
   --ar-line: rgba(255, 255, 255, 0.1);
   position: relative;
   isolation: isolate;
@@ -130,11 +129,31 @@
   padding: 8px 32px 0;
 }
 
+/* Registered so the dots can fade to the next night's lamp with the rest of
+   the page; unregistered, a custom property only snaps. */
+@property --ar-dot {
+  syntax: '<color>';
+  inherits: false;
+  initial-value: transparent;
+}
+
+/* The ground every object on the page stands on, in place of a card: no
+   fill, no border, only a sparse grid of 1px dots 14px apart in the lamp
+   colour, faint enough to read as far-off lights in the night rather than
+   as a box. Centred, so every stage sits on the same rhythm. */
+.ar-tv-stage,
+.ar-card-stage {
+  --ar-dot: color-mix(in oklab, var(--ar-lamp) 14%, transparent);
+  background-image: radial-gradient(circle, var(--ar-dot) 1px, transparent 1.5px);
+  background-size: 14px 14px;
+  background-position: center;
+  transition: --ar-dot 0.6s ease;
+}
+
 .ar-tv-stage {
   position: relative;
   height: min(74vh, 720px);
   overflow: clip;
-  border-radius: 10px;
 }
 
 /* The controls sit under the stage on the page, aligned to its edge. */
@@ -289,9 +308,7 @@
 .ar-card-stage {
   position: relative;
   height: 460px;
-  border-radius: 10px;
   overflow: clip;
-  background: rgba(0, 0, 0, 0.3);
 }
 
 .ar-card-copy {
@@ -373,7 +390,6 @@
 
   .ar-tv-stage {
     height: 50vh;
-    border-radius: 10px;
   }
 
   .ar-levels {

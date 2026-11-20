@@ -2,6 +2,8 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import { tulle } from 'tabbied/patterns'
+import { Pattern } from '@/components/screens/swiss-art'
 import { TabbiedLink } from '../_shared/badge'
 import { lazyScene } from '../_shared/stage'
 import { DEFAULT_SUITE, FACES, PALETTES, names, type Suite } from './stationery-data'
@@ -22,6 +24,20 @@ function Text({ label, value, onChange, placeholder }: { label: string; value: s
 }
 
 /**
+ * What each piece stands on: the same tulle the stock is printed with, in
+ * the palette's accent and ink, on a transparent ground. The stage turns it
+ * right down and fades it out before its edge, so a piece lies on a faint
+ * veil of the suite's own dots rather than in a box.
+ */
+function Ground({ seed, accent, ink }: { seed: string; accent: string; ink: string }) {
+  return (
+    <div className="am-piece-ground" aria-hidden>
+      <Pattern pattern={tulle} seed={seed} palette={['transparent', accent, accent, ink, accent, ink]} grid="8x12" />
+    </div>
+  )
+}
+
+/**
  * Ampersand's suite builder. The form on the left is the whole interface:
  * two names, a date, a venue, a reply-by date, a palette and a face. Every
  * keystroke re-renders the invitation, the reply card, the welcome sign and
@@ -33,9 +49,12 @@ export function Stationery() {
   const set = (patch: Partial<Suite>) => setSuite((s) => ({ ...s, ...patch }))
   const n = names(suite)
   const palette = PALETTES.find((p) => p.id === suite.palette) ?? PALETTES[0]
+  // The Ink & gold suite's ink is cream, for a dark stock; on the white page it takes a dark slate instead.
+  const ink = palette.id === 'ink' ? '#1f2937' : palette.ink
+  const ground = (seed: string) => <Ground seed={seed} accent={palette.accent} ink={ink} />
 
   return (
-    <main className="am" style={{ ['--am-accent' as string]: palette.accent, ['--am-ink' as string]: palette.id === 'ink' ? '#1f2937' : palette.ink }}>
+    <main className="am" style={{ ['--am-accent' as string]: palette.accent, ['--am-ink' as string]: ink }}>
       <header className="am-top">
         <span className="am-brand">Ampersand</span>
         <nav className="am-nav" aria-label="Site">
@@ -106,6 +125,7 @@ export function Stationery() {
         <div className="am-pieces">
           <article className="am-piece">
             <div className="am-piece-stage">
+              {ground('invite')}
               <InviteStage suite={suite} />
             </div>
             <div className="am-piece-meta">
@@ -115,6 +135,7 @@ export function Stationery() {
           </article>
           <article className="am-piece">
             <div className="am-piece-stage">
+              {ground('reply')}
               <ReplyStage suite={suite} />
             </div>
             <div className="am-piece-meta">
@@ -126,6 +147,7 @@ export function Stationery() {
           </article>
           <article className="am-piece">
             <div className="am-piece-stage">
+              {ground('sign')}
               <SignStage suite={suite} />
             </div>
             <div className="am-piece-meta">
@@ -135,6 +157,7 @@ export function Stationery() {
           </article>
           <article className="am-piece">
             <div className="am-piece-stage">
+              {ground('plan')}
               <PlanStage suite={suite} />
             </div>
             <div className="am-piece-meta">

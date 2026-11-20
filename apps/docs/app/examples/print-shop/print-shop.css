@@ -8,10 +8,11 @@
 /* ------------------------------------------------------------------ */
 
 .ps {
-  /* A white page; the stages keep a light step of the warm tone. */
+  /* A white page, and no tinted wall behind the goods: they stand on the
+     page itself, on a sparse grid of dots in the ink at 9%. */
   --ps-bg: #ffffff;
-  --ps-wall: #f3f1ec;
   --ps-ink: #1a1917;
+  --ps-dots: color-mix(in oklab, var(--ps-ink) 9%, transparent);
   --ps-muted: #6d6a63;
   --ps-line: #d9d4c8;
   --ps-line-strong: #bdb7a8;
@@ -112,19 +113,36 @@
   padding: 28px 32px 56px;
 }
 
-/* The wall. A fixed-height box the canvas can size against, `overflow:
-   clip` so the bleeding canvas is cropped here and nowhere else, and a
-   soft radial light because a frame on a flat colour reads as a
-   thumbnail rather than a room. */
+/* The stage. A fixed-height box the canvas can size against, `overflow:
+   clip` so the bleeding canvas is cropped here and nowhere else, and
+   isolated so the dot ground below can sit behind the canvas without
+   slipping behind the page. No wall colour and no corners: a tinted panel
+   made the frame a thumbnail in a card. */
 .ps-stage {
   position: sticky;
   top: 24px;
   height: min(82vh, 820px);
   overflow: clip;
-  border-radius: 10px;
-  background:
-    radial-gradient(60% 50% at 50% 38%, rgba(255, 255, 255, 0.55) 0%, transparent 70%),
-    var(--ps-wall);
+  isolation: isolate;
+}
+
+/* What every model on the page stands on: the docs' dotted ground, 1px
+   dots 14px apart in the ink at 9%, faint enough to read as texture and
+   plain enough not to argue with the prints, which are the patterns here.
+   The field fades out well before the stage's edge, so no box shows where
+   it stops, and it sits under the canvas, which is transparent. */
+.ps-stage::before,
+.ps-also-stage::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image: radial-gradient(circle, var(--ps-dots) 1px, transparent 1.5px);
+  background-size: 14px 14px;
+  background-position: center;
+  -webkit-mask-image: radial-gradient(closest-side, #000 60%, transparent 100%);
+  mask-image: radial-gradient(closest-side, #000 60%, transparent 100%);
 }
 
 /* Bleed on every side: however the frame is dragged, floated or zoomed the
@@ -137,7 +155,7 @@
 
 /* A pill, not bare grey type: the frame can be zoomed or turned right over
    this corner of the stage, and grey on a print is unreadable. The pill
-   carries its own wall-coloured ground, so the line reads over anything. */
+   carries its own warm paper-white ground, so the line reads over anything. */
 .ps-stage-hint {
   position: absolute;
   left: 50%;
@@ -591,9 +609,8 @@
 .ps-also-stage {
   position: relative;
   height: 400px;
-  border-radius: 10px;
   overflow: clip;
-  background: var(--ps-wall);
+  isolation: isolate;
 }
 
 .ps-also-meta {
@@ -678,7 +695,6 @@
 
   .ps-stage {
     height: 60vh;
-    border-radius: 10px;
   }
 
   .ps-designs {

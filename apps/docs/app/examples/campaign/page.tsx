@@ -145,7 +145,7 @@ export default function CampaignExamplePage() {
         <div className="cp-grid">
           {PIECES.map((piece) => (
             <article className="cp-piece" key={piece.scene}>
-              <div className="cp-stage">
+              <div className="cp-stage" data-scene={piece.scene}>
                 <Stage scene={piece.scene} />
               </div>
               <div className="cp-piece-meta">

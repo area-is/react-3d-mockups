@@ -14,6 +14,9 @@
   --fl-ink: #14213d;
   --fl-muted: #5f6675;
   --fl-line: #cfd4dc;
+  /* The ground under every 3D stage: the navy the type is set in, at a
+     tenth of its strength. */
+  --fl-dot: color-mix(in oklab, var(--fl-ink) 10%, transparent);
   position: relative;
   isolation: isolate;
   min-height: 100svh;
@@ -114,6 +117,23 @@
   color: var(--fl-muted);
 }
 
+/* ---- the stages ------------------------------------------------------------ */
+
+/*
+ * No card: a stage is the page's own fleet white, marked only by a sparse
+ * grid of 1px navy dots 14px apart - the ground the docs set their models
+ * on - faint enough to read as texture rather than a box. The vehicles keep
+ * their contact shadows, which is all the floor they need. The dots are
+ * centred, so every vehicle sits on the same rhythm.
+ */
+.fl-trailer-stage,
+.fl-van-stage,
+.fl-card-stage {
+  background-image: radial-gradient(circle, var(--fl-dot) 1px, transparent 1.5px);
+  background-size: 14px 14px;
+  background-position: center;
+}
+
 /* ---- the trailer ---------------------------------------------------------- */
 
 .fl-trailer {
@@ -122,13 +142,12 @@
   padding: 0 32px;
 }
 
-/* A road: a definite, wide box with a darker floor. */
+/* Wide and definite: a 53 ft trailer needs the width, and the canvas needs
+   a height to size against. */
 .fl-trailer-stage {
   position: relative;
   height: min(66vh, 640px);
   overflow: clip;
-  border-radius: 4px;
-  background: linear-gradient(to bottom, #e6e9ed 0%, #d7dbe1 100%);
 }
 
 .fl-stats {
@@ -181,8 +200,6 @@
   position: relative;
   height: min(68vh, 620px);
   overflow: clip;
-  border-radius: 4px;
-  background: linear-gradient(to bottom, #e6e9ed 0%, #d7dbe1 100%);
 }
 
 .fl-van-copy h2,
@@ -350,9 +367,7 @@
 .fl-card-stage {
   position: relative;
   height: 460px;
-  border-radius: 4px;
   overflow: clip;
-  background: linear-gradient(to bottom, #e6e9ed 0%, #d7dbe1 100%);
 }
 
 .fl-card-copy {
