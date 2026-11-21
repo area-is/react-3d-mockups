@@ -24,6 +24,7 @@ import {
   roundedRectShape,
 } from '../../core'
 import { checkColorway, checkDeviceVariant } from '../../core/lifecycle'
+import { bezierRoundedRectShape } from '../../core/geometry/rounded-rect'
 import { DeviceScreen } from '../../screen/device-screen'
 import {
   renderStatusBar,
@@ -362,7 +363,9 @@ function FoldBody({
         foldSide === 1
           ? { tl: rFree, tr: rFold, br: rFold, bl: rFree }
           : { tl: rFold, tr: rFree, br: rFree, bl: rFold }
-      const shape = mixedRoundedRectShape(hw - b.bevel * 2, b.height - b.bevel * 2, corners)
+      // Bezier corners, as the flat slab's are: these halves have to be that
+      // slab cut in two, or every free corner changes shape at flat.
+      const shape = bezierRoundedRectShape(hw - b.bevel * 2, b.height - b.bevel * 2, corners)
       const core = b.depth - b.bevel * 2
       const g = new THREE.ExtrudeGeometry(shape, {
         depth: core,

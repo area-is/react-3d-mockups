@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next'
 import Link from 'next/link'
+import { FooterBand } from '@/components/footer-band'
 import { Logo } from '@/components/logo'
 import { SiteNav } from '@/components/site-nav'
 import { SITE_EXAMPLES } from '@/components/site-examples'
@@ -10,7 +11,6 @@ import {
   CHANGELOG_URL,
   GITHUB_URL,
   LICENSE_URL,
-  NPM_URL,
   SITE_DESCRIPTION,
   SITE_TITLE,
   SITE_URL,
@@ -36,15 +36,15 @@ export const viewport: Viewport = {
 /**
  * The footer's links: the site's own places first, then where the project
  * lives off-site. Examples points at the first one rather than at a list,
- * because there is no index page - every example carries a bar linking on to
- * the next, which is the index.
+ * because there is no index page - the header's Examples menu lists them all.
+ * No npm link: the install command under the carousel is where the package
+ * is met, and GitHub links on to it.
  */
 const FOOTER_LINKS: { label: string; href: string; external?: boolean }[] = [
   { label: 'Docs', href: '/docs' },
   { label: 'Gallery', href: '/docs/gallery' },
   { label: 'Examples', href: SITE_EXAMPLES[0].href },
   { label: 'GitHub', href: GITHUB_URL, external: true },
-  { label: 'npm', href: NPM_URL, external: true },
   { label: 'Changelog', href: CHANGELOG_URL, external: true },
   { label: 'License', href: LICENSE_URL, external: true },
 ]
@@ -68,6 +68,8 @@ export default function SiteLayout({ children }: { children: React.ReactNode }) 
           </header>
 
           <main>{children}</main>
+
+          <FooterBand />
 
           <footer className="site-footer">
             <div className="container footer-inner">

@@ -133,6 +133,15 @@ breaking change can ship in a minor release, and is always listed under
 
 ### Fixed
 
+- **A foldable's outer corners changed shape as the hinge reached flat.** The
+  flat pose draws one slab with `roundedRectShape`'s quadratic Bézier
+  corners; every other angle drew two halves with circular-arc corners of
+  the same radius, which sit about 4% of the radius further in on each axis.
+  So at `openAngle={180}` every free corner snapped tighter than it was a
+  degree before - too small to see on a Fold's 2 mm corners, plain on the
+  iPhone Duo's 8 mm ones, and present on the Flip. The hinged halves are now
+  traced with the same Bézier corners, so they are the flat slab cut in two.
+  The flat pose is unchanged.
 - **A foldable jumped as its hinge left 0.** `openAngle={0}` and
   `openAngle={false}` rendered a second, separately built model of the
   folded device, and `openAngle={1}` rendered the hinged one, which did not

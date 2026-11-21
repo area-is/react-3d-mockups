@@ -61,6 +61,12 @@ const STRUCTURED_DATA = {
  * Each claim is one sentence and a qualifier - anything longer stops being a
  * claim and becomes documentation.
  *
+ * Each claim opens with a small white line drawing of what it says, where a
+ * green index used to number them: decoration, so it carries no alt text.
+ * They were drawn by an image model (OpenAI's gpt-image-2.6-sunburst, low
+ * quality, transparent background), trimmed and saved at three times the
+ * size they are shown.
+ *
  * The pictures are renders of the real mockups, made by
  * `scripts/generate-feature-shots.mjs` (`npm run features`), not live canvases:
  * four more WebGL contexts to illustrate four sentences would cost the page
@@ -70,6 +76,7 @@ const STRUCTURED_DATA = {
 const FEATURES = [
   {
     title: 'Rendering',
+    mark: { src: '/features/line-rendering.webp', width: 197, height: 216 },
     image: {
       src: '/features/rendering.webp',
       width: 485,
@@ -86,6 +93,7 @@ const FEATURES = [
   },
   {
     title: 'Live screen content',
+    mark: { src: '/features/line-live-screen.webp', width: 279, height: 216 },
     image: {
       src: '/features/surface.webp',
       width: 1040,
@@ -103,6 +111,7 @@ const FEATURES = [
   },
   {
     title: 'Procedural objects',
+    mark: { src: '/features/line-procedural.webp', width: 171, height: 216 },
     image: {
       src: '/features/procedural.webp',
       width: 1040,
@@ -118,6 +127,7 @@ const FEATURES = [
   },
   {
     title: 'Composable',
+    mark: { src: '/features/line-composable.webp', width: 360, height: 216 },
     image: {
       src: '/features/composable.webp',
       width: 1040,
@@ -139,8 +149,8 @@ const FEATURES = [
  *
  * Shiki's own `<pre>` carries the theme's background and foreground inline,
  * which would win over any stylesheet; dropping the element's attributes keeps
- * the token colours (they are on the spans) and hands the box back to
- * `.code-panel` in globals.css.
+ * the token colours (they are on the spans) and hands the block's look back
+ * to `.quickstart-code pre` in globals.css, which draws no box at all.
  */
 async function CodeBlock({ code, lang }: { code: string; lang: string }) {
   return highlight(code, {
@@ -260,12 +270,18 @@ export default function HomePage() {
       <Film />
 
       <section className="features" aria-label="What the library does">
-        {FEATURES.map((feature, i) => (
+        {FEATURES.map((feature) => (
           <article className="feature" key={feature.title}>
             <div className="feature-copy">
-              <span className="feature-index" aria-hidden>
-                {String(i + 1).padStart(2, '0')}
-              </span>
+              <img
+                className="feature-mark"
+                src={asset(feature.mark.src)}
+                width={Math.round(feature.mark.width / 3)}
+                height={feature.mark.height / 3}
+                alt=""
+                loading="lazy"
+                decoding="async"
+              />
               <h2>{feature.title}</h2>
               <p>{feature.body}</p>
             </div>

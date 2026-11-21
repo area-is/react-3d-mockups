@@ -65,13 +65,13 @@ h4 {
 
 h1 {
   font-size: clamp(34px, 4.5vw, 52px);
-  font-weight: 700;
+  font-weight: 600;
   letter-spacing: -0.03em;
 }
 
 h2 {
   font-size: clamp(22px, 2.7vw, 27px);
-  font-weight: 750;
+  font-weight: 600;
 }
 
 h3 {
@@ -158,7 +158,7 @@ code {
   display: inline-flex;
   align-items: center;
   gap: 9px;
-  font-weight: 650;
+  font-weight: 600;
   font-size: 14px;
   letter-spacing: -0.015em;
   white-space: nowrap;
@@ -441,9 +441,21 @@ code {
   color: var(--text-low);
 }
 
-.site-footer {
-  border-top: 1px solid var(--border);
+/*
+ * The band the page closes on: a Tabbied pattern in greys a step off the
+ * page's black (see FooterBand), full bleed, at a height fixed here so the
+ * page has laid out its foot before the pattern paints. It takes over the
+ * footer's old top margin, and the footer under it needs no rule: the band
+ * is the edge.
+ */
+.footer-band {
+  height: clamp(88px, 10vw, 132px);
   margin-top: clamp(43px, 6.3vw, 72px);
+  overflow: hidden;
+}
+
+.site-footer {
+  margin-top: 0;
 }
 
 .footer-inner {
@@ -485,7 +497,7 @@ code {
   padding: 12px 23px;
   border-radius: 999px;
   font-size: 14px;
-  font-weight: 650;
+  font-weight: 600;
   letter-spacing: -0.01em;
   white-space: nowrap;
   flex: none;
@@ -537,15 +549,15 @@ code {
   }
 }
 
+/* The quiet way in: no outline and no fill - only its ink, beside the one
+   filled button. Hover brings its icon up to the text's colour. */
 .btn-secondary {
-  border-color: rgba(255, 255, 255, 0.16);
   color: var(--text);
   font-weight: 600;
 }
 
 .btn-secondary:hover {
-  border-color: rgba(255, 255, 255, 0.34);
-  background: rgba(255, 255, 255, 0.04);
+  color: #fff;
 }
 
 .btn-secondary .btn-icon {
@@ -619,7 +631,7 @@ code {
    is the next line on the page and it brings its own spacing. */
 .hero h1 {
   font-size: clamp(34px, 6.3vw, 68px);
-  font-weight: 700;
+  font-weight: 600;
   letter-spacing: -0.035em;
   line-height: 1;
   margin: 0;
@@ -712,7 +724,6 @@ code {
 
 .copy-btn:hover {
   color: var(--text);
-  background: rgba(255, 255, 255, 0.07);
 }
 
 .copy-btn:focus-visible {
@@ -1067,20 +1078,16 @@ code {
 }
 
 /*
- * The stage's toolbar: autoplay's toggle and the copy-code button in one
- * capsule, centred under the stage they act on. Set in Inter and in sentence
- * case like the readout above the stage - the bordered mono capitals these
- * used to wear were a second voice on the page. The capsule is a faint fill
- * rather than an outline, and each button lights its own half on hover.
+ * The stage's toolbar: autoplay's toggle and the copy-code button side by
+ * side, centred under the stage they act on. Set in Inter and in sentence
+ * case like the readout above the stage. No capsule, no outline and no fill:
+ * two labels and a hairline between them, and a label comes up to the text's
+ * colour on hover.
  */
 .carousel-tools {
   display: inline-flex;
   align-items: center;
   flex: none;
-  padding: 3px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.045);
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.07);
 }
 
 .carousel-tool {
@@ -1103,19 +1110,7 @@ code {
 }
 
 .carousel-tool:hover {
-  background: rgba(255, 255, 255, 0.07);
   color: var(--text);
-}
-
-/* Two tools share the capsule, so each one's hover fill follows the capsule
-   on its outer side and meets the divider square: Play rounds on the left,
-   Copy code on the right. A tool alone keeps the whole pill. */
-.carousel-tool:first-child:not(:last-child) {
-  border-radius: 999px 0 0 999px;
-}
-
-.carousel-tool:last-child:not(:first-child) {
-  border-radius: 0 999px 999px 0;
 }
 
 .carousel-tool:focus-visible {
@@ -1129,8 +1124,9 @@ code {
 }
 
 /*
- * Autoplay's dwell bar: a 2px line along the foot of the Pause button, inset
- * from its rounded ends, that drains left over one slide while autoplay is on.
+ * Autoplay's dwell bar: a 2px line under the Pause label, clear of it by about
+ * a line's x-height and as wide as the icon and label together, that drains
+ * left over one slide while autoplay is on.
  * It is the timer, not a picture of one - its animationend moves the carousel
  * on - so it pauses whenever autoplay waits (off screen, a hidden tab, before
  * the first frame), and the reduced-motion rule at the end of this file must
@@ -1144,7 +1140,7 @@ code {
   position: absolute;
   left: 14px;
   right: 14px;
-  bottom: 4px;
+  bottom: -3px;
   height: 2px;
   border-radius: 1px;
   background: rgba(255, 255, 255, 0.1);
@@ -1500,20 +1496,21 @@ code {
   gap: clamp(27px, 3.6vw, 43px);
 }
 
-/* The index is the only ornament: it numbers the set without drawing a line
-   around any member of it. */
-.feature-index {
+/* The line drawing over each claim is the only ornament: white strokes on
+   nothing, at a height the four share, so their tops and the headings under
+   them line up whatever each drawing's width. Dimmed a step so it sits under
+   the heading rather than competing with it. */
+.feature-mark {
   display: block;
-  font-family: var(--font-mono);
-  font-size: 14px;
-  letter-spacing: 0.16em;
-  color: var(--accent);
-  font-variant-numeric: tabular-nums;
+  width: auto;
+  height: 72px;
+  margin-bottom: 14px;
+  opacity: 0.85;
 }
 
 .features h2 {
   font-size: clamp(19px, 2vw, 24px);
-  font-weight: 650;
+  font-weight: 600;
   letter-spacing: -0.025em;
   margin: 9px 0 9px;
 }
@@ -1727,7 +1724,7 @@ code {
 .quickstart-code {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: clamp(22px, 2.6vw, 30px);
   /* A grid item's minimum width is its content's by default, so one long
      line would widen the column past the screen instead of wrapping in it. */
   min-width: 0;
@@ -1738,19 +1735,24 @@ code {
  * package-manager switch) and its copy button on the right. The button sits
  * in the head rather than floating over the code so it never covers the end
  * of the first line, which on a phone is exactly where that line wraps.
+ *
+ * No card: no fill, no outline, no rounded box. The block is held together by
+ * alignment instead - the label, every line of code and the column's prose
+ * share one left edge, the copy button's ink ends on the column's right edge -
+ * and the two blocks are told apart by the space between them.
  */
-.code-panel {
-  background: rgba(255, 255, 255, 0.035);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 11px;
-}
-
 .code-panel-head {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 10px;
-  padding: 5px 6px 0 16px;
+  min-height: 30px;
+}
+
+/* The buttons in the head carry padding for their hit area; pulled out by it,
+   so their ink rather than their box lines up with the code. */
+.code-panel-head .copy-btn {
+  margin-right: -11px;
 }
 
 .code-panel-label {
@@ -1783,9 +1785,14 @@ code {
   color: var(--text);
 }
 
+/* The manager showing is marked in the ink and a short accent rule under
+   it, the same mark the explorer's tabs use - not a filled chip. */
 .pm-switch-btn[aria-pressed='true'] {
   color: var(--text);
-  background: rgba(255, 255, 255, 0.07);
+  text-decoration: underline;
+  text-decoration-color: var(--accent);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 7px;
 }
 
 .pm-switch-btn:focus-visible {
@@ -1801,7 +1808,7 @@ code {
  */
 .quickstart-code pre {
   margin: 0;
-  padding: 8px 16px 13px;
+  padding: 8px 0 0;
   white-space: pre-wrap;
   overflow-wrap: anywhere;
   font-family: var(--font-mono);
@@ -1812,12 +1819,8 @@ code {
 
 @media (max-width: 620px) {
   .quickstart-code pre {
-    padding: 6px 12px 11px;
+    padding-top: 6px;
     font-size: 13px;
-  }
-
-  .code-panel-head {
-    padding-left: 12px;
   }
 }
 

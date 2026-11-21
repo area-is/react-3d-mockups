@@ -1677,7 +1677,7 @@ export default function CarouselScene() {
             end of the swatch row, which it is not one of, and the toggle
             beside a hint that fades, which left it stranded off-centre - and
             both in bordered mono capitals, a second voice on a page set in
-            Inter. One capsule, centred on the stage they act on. */}
+            Inter. Side by side, centred on the stage they act on. */}
         <div className="carousel-tools" role="group" aria-label="Carousel controls">
           <button
             type="button"
@@ -1685,7 +1685,7 @@ export default function CarouselScene() {
             onClick={toggleAuto}
             aria-label={autoOn ? 'Pause autoplay' : 'Play autoplay'}
           >
-            {autoOn ? <Pause size={15} strokeWidth={2} aria-hidden /> : <Play size={15} strokeWidth={2} aria-hidden />}
+            {autoOn ? <Pause size={13} strokeWidth={2.25} aria-hidden /> : <Play size={13} strokeWidth={2.25} aria-hidden />}
             <span>{autoOn ? 'Pause' : 'Play'}</span>
             {/* What is left of this slide while autoplay is on; its end moves
                 the carousel on. Keyed on the slide, so each one starts full. */}
