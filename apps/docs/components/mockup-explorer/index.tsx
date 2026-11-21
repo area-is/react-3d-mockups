@@ -1528,7 +1528,7 @@ function MockupExplorerImpl({
             >
               {linked === 'copied' ? <Check size={13} aria-hidden /> : <Link2 size={13} aria-hidden />}
               <span className="mx-action-label">
-                {linked === 'copied' ? 'link copied' : linked === 'failed' ? 'link in address bar' : 'share'}
+                {linked === 'copied' ? 'Link copied' : linked === 'failed' ? 'Link in address bar' : 'Share'}
               </span>
             </button>
             <button
@@ -1549,7 +1549,7 @@ function MockupExplorerImpl({
               onMouseLeave={() => setCopied(false)}
             >
               {copied ? <Check size={13} aria-hidden /> : <Copy size={13} aria-hidden />}
-              <span className="mx-action-label">{copied ? 'copied' : 'copy'}</span>
+              <span className="mx-action-label">{copied ? 'Copied' : 'Copy'}</span>
             </button>
           </span>
           {/* Beside the buttons, not in them: a button's contents are

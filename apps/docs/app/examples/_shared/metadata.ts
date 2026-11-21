@@ -1,4 +1,4 @@
-import type { Metadata, Viewport } from 'next'
+import type { Metadata } from 'next'
 import { SITE_URL, pageMetadata } from '@/lib/site'
 
 /**
@@ -16,12 +16,4 @@ export function exampleMetadata(slug: string, { title, description }: { title: s
     description,
     ...pageMetadata({ path: `/examples/${slug}`, title, description }),
   }
-}
-
-/**
- * The browser chrome matches the example bar at the top (`.ex-bar` in
- * example-bar.css), not the example, so the two read as one frame.
- */
-export const EXAMPLE_VIEWPORT: Viewport = {
-  themeColor: '#111318',
 }

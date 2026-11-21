@@ -19,6 +19,7 @@ import {
   roundedRectShape,
 } from '../../core'
 import { checkColorway, checkDeviceVariant } from '../../core/lifecycle'
+import { bezierRoundedRectShape } from '../../core/geometry/rounded-rect'
 import { DeviceScreen } from '../../screen/device-screen'
 import {
   renderStatusBar,
@@ -34,7 +35,6 @@ import {
   UsbC,
   EdgeSocket,
   cutGeometry,
-  mixedRoundedRectShape,
   stadiumCutter,
   holeCutter,
   USB_CUT_DEPTH,
@@ -272,7 +272,9 @@ function FlipImpl({
         foldEdge === 'bottom'
           ? { tl: rFree, tr: rFree, br: rFold, bl: rFold }
           : { tl: rFold, tr: rFold, br: rFree, bl: rFree }
-      const shape = mixedRoundedRectShape(
+      // Bezier corners, as the flat slab's are: these halves have to be that
+      // slab cut in two, or every free corner changes shape at flat.
+      const shape = bezierRoundedRectShape(
         half.width - half.bevel * 2,
         half.height - half.bevel * 2,
         corners
