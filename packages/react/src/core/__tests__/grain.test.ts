@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
-import { LinearMipmapLinearFilter, RepeatWrapping } from 'three'
+import { ExtrudeGeometry, LinearMipmapLinearFilter, RepeatWrapping } from 'three'
 import {
+  CORD,
   FIBRE,
   GRAIN_SIZE,
   SHEETS,
@@ -13,6 +14,8 @@ import {
   sheetBlockGeometry,
   type Grain,
 } from '../geometry/grain'
+import { createSurfaceSheenMaterial, smoothShaded } from '../geometry/mesh'
+import { roundedRectShape } from '../geometry/rounded-rect'
 import { POSTER_FRAME } from '../objects/poster-frame/dimensions'
 
 /**
@@ -25,6 +28,7 @@ const GRAINS: [string, Grain][] = [
   ['SHEETS', SHEETS],
   ['WEAVE', WEAVE],
   ['WOOD', WOOD],
+  ['CORD', CORD],
 ]
 
 describe.each(GRAINS)('%s', (_name, grain) => {
@@ -145,5 +149,35 @@ describe('the poster frame hardware', () => {
     const { frame, hanger, bumper } = POSTER_FRAME
     expect(hanger.height).toBeLessThan(frame.width)
     expect(bumper.radius * 2).toBeLessThan(frame.width)
+  })
+})
+
+describe('mesh & sheen helpers', () => {
+  it('smoothShaded welds coincident vertices and computes vertex normals', () => {
+    const raw = new ExtrudeGeometry(roundedRectShape(1, 1, 0.1), {
+      depth: 0.2,
+      bevelEnabled: true,
+      bevelThickness: 0.03,
+      bevelSize: 0.03,
+      bevelSegments: 2,
+      curveSegments: 8,
+    })
+    const rawCount = raw.getAttribute('position').count
+    const smooth = smoothShaded(raw)
+    expect(smooth.index).not.toBeNull()
+    expect(smooth.getAttribute('position').count).toBeLessThan(rawCount)
+    expect(smooth.getAttribute('normal')).toBeDefined()
+    smooth.dispose()
+  })
+
+  it('createSurfaceSheenMaterial configures premultiplied light-only reflection', () => {
+    const mat = createSurfaceSheenMaterial({ roughness: 0.08, envMapIntensity: 0.9 })
+    expect(mat.transparent).toBe(true)
+    expect(mat.depthWrite).toBe(false)
+    expect(mat.premultipliedAlpha).toBe(true)
+    expect(mat.roughness).toBeCloseTo(0.08)
+    expect(mat.envMapIntensity).toBeCloseTo(0.9)
+    expect(mat.customProgramCacheKey()).toBe('react-3d-mockups-surface-sheen')
+    mat.dispose()
   })
 })

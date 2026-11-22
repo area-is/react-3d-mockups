@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { RoundedBox } from '@react-three/drei'
 import type { ThreeElements } from '@react-three/fiber'
-import { PRODUCT_BOX, PRODUCT_BOX_REGIONS, productBoxLayout, type ProductBoxSizeMm } from '../../core'
+import { FIBRE, PRODUCT_BOX, PRODUCT_BOX_REGIONS, grainNormal, productBoxLayout, type ProductBoxSizeMm } from '../../core'
 import { DeviceScreen } from '../../screen/device-screen'
 import { collectSlots, createSlots, resolveSurface, type SurfaceProps } from '../../slots'
 
@@ -78,11 +78,21 @@ function ProductBoxImpl({
   // the side panels' virtual width follows the carton depth at the front dpi
   const sideDefaults = { ...panelDefaults, resolution: Math.round(body.depth * pxPerUnit) }
 
+  const stock = {
+    color,
+    metalness: 0,
+    roughness: 0.56,
+    clearcoat: 0.18,
+    clearcoatRoughness: 0.72,
+    normalMap: grainNormal(FIBRE, 2.2),
+    normalScale: 0.12,
+  }
+
   return (
     <group {...groupProps}>
       {/* the carton - satin coated stock, crisp but not razor-sharp folds */}
       <RoundedBox args={[body.width, body.height, body.depth]} radius={body.radius}>
-        <meshPhysicalMaterial color={color} metalness={0} roughness={0.55} clearcoat={0.2} clearcoatRoughness={0.7} />
+        <meshPhysicalMaterial {...stock} />
       </RoundedBox>
 
       {/* tuck flap resting on the top face, its seam short of the back edge */}
@@ -91,18 +101,36 @@ function ProductBoxImpl({
         radius={flap.lift * 0.9}
         position={[0, body.height / 2, (body.depth - flapDepth) / 2 - flap.backGap / 2]}
       >
-        <meshPhysicalMaterial color={color} metalness={0} roughness={0.55} clearcoat={0.2} clearcoatRoughness={0.7} />
+        <meshPhysicalMaterial {...stock} />
       </RoundedBox>
+      {/* subtle die-cut tuck-flap seam line & thumb-notch crescent on unprinted top */}
+      {regions.top == null && (
+        <group position={[0, body.height / 2 + flap.lift + 0.001, -body.depth / 2 + flap.backGap]}>
+          <mesh rotation-x={-Math.PI / 2}>
+            <planeGeometry args={[body.width - 0.06, 0.005]} />
+            <meshBasicMaterial color="#000000" transparent opacity={0.14} depthWrite={false} />
+          </mesh>
+          <mesh rotation-x={-Math.PI / 2} position-z={0.002}>
+            <circleGeometry args={[Math.min(0.11, body.width * 0.08), 18, 0, Math.PI]} />
+            <meshBasicMaterial color="#000000" transparent opacity={0.1} depthWrite={false} />
+          </mesh>
+        </group>
+      )}
 
-      {/* manufacturer's glue seam: the vertical lap joint on the left rear edge */}
-      <mesh position={[-body.width / 2 - 0.0015, 0, -body.depth / 2 + seamWidth / 2 + 0.01]} rotation-y={-Math.PI / 2}>
-        <planeGeometry args={[seamWidth, body.height - 0.02]} />
-        <meshPhysicalMaterial color={color} metalness={0} roughness={0.62} />
-      </mesh>
-      <mesh position={[-body.width / 2 - 0.003, 0, -body.depth / 2 + seamWidth + 0.01]} rotation-y={-Math.PI / 2}>
-        <planeGeometry args={[0.006, body.height - 0.02]} />
-        <meshBasicMaterial color="rgba(0,0,0)" transparent opacity={0.22} />
-      </mesh>
+      {/* manufacturer's glue seam: only on bare stock so it never z-fights
+          through a printed left panel */}
+      {regions.left == null && (
+        <>
+          <mesh position={[-body.width / 2 - 0.0012, 0, -body.depth / 2 + seamWidth / 2 + 0.01]} rotation-y={-Math.PI / 2}>
+            <planeGeometry args={[seamWidth, body.height - 0.02]} />
+            <meshPhysicalMaterial color={color} metalness={0} roughness={0.64} />
+          </mesh>
+          <mesh position={[-body.width / 2 - 0.0018, 0, -body.depth / 2 + seamWidth + 0.01]} rotation-y={-Math.PI / 2}>
+            <planeGeometry args={[0.005, body.height - 0.02]} />
+            <meshBasicMaterial color="#000000" transparent opacity={0.18} depthWrite={false} />
+          </mesh>
+        </>
+      )}
 
       {/* front panel */}
       <DeviceScreen

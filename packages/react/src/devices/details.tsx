@@ -1,8 +1,9 @@
 import * as React from 'react'
 import * as THREE from 'three'
-import { mergeVertices } from 'three/examples/jsm/utils/BufferGeometryUtils.js'
 import { Brush, Evaluator, SUBTRACTION } from 'three-bvh-csg'
-import { roundedRectShape, type HingeSpine } from '../core'
+import { roundedRectShape, smoothShaded, type HingeSpine } from '../core'
+
+export { smoothShaded }
 
 /**
  * Shared machined hardware details used across the device models: side keys,
@@ -10,23 +11,6 @@ import { roundedRectShape, type HingeSpine } from '../core'
  * mic drillings) cut straight into the chassis geometry with CSG. Everything
  * is procedural geometry.
  */
-
-/**
- * Re-weld an extruded solid so its rounded edges shade smoothly. ExtrudeGeometry
- * emits an unindexed mesh with one flat normal per face, so a rolled bevel - a
- * camera plateau's edge, an island's shoulder - renders as a stack of visible
- * bands however many segments it has. Merging the coincident vertices and
- * recomputing the normals turns the roll into one continuous highlight, which
- * is what the product shots show. Consumes `geometry`.
- */
-export function smoothShaded(geometry: THREE.BufferGeometry): THREE.BufferGeometry {
-  geometry.deleteAttribute('normal')
-  geometry.deleteAttribute('uv')
-  const welded = mergeVertices(geometry)
-  welded.computeVertexNormals()
-  geometry.dispose()
-  return welded
-}
 
 /**
  * A side key as a true stadium pill: semicircular ends along its length and a

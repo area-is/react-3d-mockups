@@ -81,12 +81,14 @@ export {
   SHEETS,
   WEAVE,
   WOOD,
+  CORD,
   grainHeights,
   grainMap,
   grainNormal,
   grainTint,
   sheetBlockGeometry,
 } from './geometry/grain'
+export { smoothShaded, createSurfaceSheenMaterial, type SurfaceSheenOptions } from './geometry/mesh'
 export {
   type WristLoop,
   type LoopFrame,

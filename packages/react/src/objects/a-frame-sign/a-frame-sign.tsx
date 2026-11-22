@@ -1,5 +1,6 @@
 import * as React from 'react'
 import * as THREE from 'three'
+import { RoundedBox } from '@react-three/drei'
 import type { ThreeElements } from '@react-three/fiber'
 import { A_FRAME_SIGN, A_FRAME_SIGN_REGIONS, WOOD, grainNormal, grainTint, roundedRectShape } from '../../core'
 import { DeviceScreen } from '../../screen/device-screen'
@@ -18,11 +19,11 @@ export interface AFrameSignProps extends Omit<GroupProps, 'children' | 'color'>,
 }
 
 /**
- * A procedurally built sidewalk A-frame sandwich board: two wood-framed
- * 600 x 900 mm panels hinged near the corners and splayed into an A, held by
- * webbing straps at mid-height, standing on four leg tips - both sides live
- * DOM: chalk menus, sale boards, open/closed signs. No 3D asset files are
- * loaded.
+ * A procedurally built sidewalk A-frame sandwich board: two mortise-and-tenon
+ * wood-framed 600 x 900 mm panels with continuous timber stiles on rubber-tipped
+ * feet and horizontal-grain rails, joined by leaf hinges at the crown and
+ * articulated folding metal stay arms at mid-height - both sides live DOM:
+ * chalk menus, sale boards, open/closed signs. No 3D asset files are loaded.
  *
  * The origin is mid-height between the panels; the pavement sits at the leg
  * bottoms. Must be rendered inside a react-three-fiber `<Canvas>` (or
@@ -46,41 +47,39 @@ function AFrameSignImpl({
   const regions = collectSlots(children, A_FRAME_SIGN_REGIONS)
   const { panel, face, splayAngle } = A_FRAME_SIGN
 
-  const frameGeometry = React.useMemo(() => {
-    const shape = roundedRectShape(panel.width, panel.height, 0.03)
-    shape.holes.push(roundedRectShape(face.width, face.height, face.radius))
-    const geometry = new THREE.ExtrudeGeometry(shape, {
-      depth: panel.frameDepth - 0.02,
-      bevelEnabled: true,
-      bevelThickness: 0.01,
-      bevelSize: 0.01,
-      bevelSegments: 2,
-      curveSegments: 8,
-    })
-    geometry.translate(0, 0, -(panel.frameDepth - 0.02) / 2)
-    return geometry
-  }, [panel, face])
-
   const boardGeometry = React.useMemo(
-    () => new THREE.ShapeGeometry(roundedRectShape(face.width + 0.1, face.height + 0.1, face.radius), 8),
+    () => new THREE.ShapeGeometry(roundedRectShape(face.width + 0.08, face.height + 0.08, face.radius), 8),
     [face]
   )
-
-  React.useEffect(() => {
-    return () => {
-      frameGeometry.dispose()
-      boardGeometry.dispose()
-    }
-  }, [frameGeometry, boardGeometry])
+  React.useEffect(() => () => boardGeometry.dispose(), [boardGeometry])
 
   const tilt = (splayAngle * Math.PI) / 180
   // hinge at the top: panels pivot about their top edge
   const topY = (panel.height / 2) * Math.cos(tilt)
   // the frame stiles run ~40 mm past the panel bottom so the board stands on
-  // four leg tips; lifting the whole sign by the same drop keeps the leg tips
-  // on the original pavement line
+  // four rubber-tipped leg feet; lifting the whole sign keeps the feet on the
+  // original pavement line
   const legDrop = 0.143
   const legLift = legDrop * Math.cos(tilt)
+  const footPadH = 0.032
+
+  // 4-piece timber joinery dimensions: continuous vertical stiles (top to foot)
+  // with horizontal rails fitted cleanly between them so grain runs along every
+  // member with zero cross-grain stripes and zero horizontal leg-joint seam.
+  const stileW = (panel.width - face.width) / 2
+  const stileX = face.width / 2 + stileW / 2
+  const stileH = panel.height + legDrop - footPadH
+  const stileCenterY = (panel.height / 2 + (-panel.height / 2 - legDrop + footPadH)) / 2
+  const railH = (panel.height - face.height) / 2
+  const railY = face.height / 2 + railH / 2
+  const railW = face.width + 0.016
+
+  // Articulated folding scissor-stay geometry spanning the inner stiles at mid-height.
+  const stayHalfSpan = (panel.height / 2) * Math.sin(tilt) - panel.frameDepth * 0.35
+  const stayKneeLift = 0.065
+  const stayArmLen = Math.hypot(stayHalfSpan, stayKneeLift)
+  const stayArmAngle = Math.atan2(stayKneeLift, stayHalfSpan)
+
   const surfaceDefaults = {
     surfaceBackground,
     resolution,
@@ -92,20 +91,26 @@ function AFrameSignImpl({
     radius: face.radius,
   }
 
-  // Stained timber, the grain running up the stiles; a pale `color` is
-  // paint, which hides the figure and leaves only its relief. The frame is an
-  // extrusion with world-unit UVs; the leg tips are 0..1 boxes, so they take
-  // the same grain scaled by their own size.
-  const timber = (width = 1, height = 1) => (
-    <meshPhysicalMaterial
-      color={color}
-      metalness={0}
-      roughness={0.75}
-      map={grainTint(WOOD, color, width * 2.2, height * 0.6)}
-      normalMap={grainNormal(WOOD, width * 2.2, height * 0.6)}
-      normalScale={0.6}
-    />
-  )
+  // Stained timber: grain runs along each member's length (vertical on stiles,
+  // horizontal on rails); pale `color` reads as paint (relief only, no tint).
+  const timber = (width: number, height: number, horizontal = false) => {
+    const rx = horizontal ? height * 2.2 : width * 2.2
+    const ry = horizontal ? width * 0.55 : height * 0.55
+    return (
+      <meshPhysicalMaterial
+        color={color}
+        metalness={0}
+        roughness={0.72}
+        map={grainTint(WOOD, color, rx, ry, horizontal)}
+        normalMap={grainNormal(WOOD, rx, ry, horizontal)}
+        normalScale={0.55}
+      />
+    )
+  }
+
+  const hardware = { color: '#9ea3ab', metalness: 0.86, roughness: 0.3 }
+  const darkMetal = { color: '#2b2e33', metalness: 0.72, roughness: 0.4 }
+  const rubberFoot = { color: '#1b1d20', metalness: 0, roughness: 0.92 }
 
   return (
     <group {...groupProps}>
@@ -120,10 +125,39 @@ function AFrameSignImpl({
             position={[0, legLift, -dir * (panel.height / 2) * Math.sin(tilt)]}
             rotation-x={dir * tilt}
           >
-            {/* wood frame with a true opening */}
-            <mesh geometry={frameGeometry} rotation-y={isFront ? 0 : Math.PI}>
-              {timber()}
-            </mesh>
+            {/* continuous left and right vertical stiles running seamlessly into the feet */}
+            {([1, -1] as const).map((side) => (
+              <group key={side} position-x={side * stileX}>
+                <RoundedBox
+                  args={[stileW, stileH, panel.frameDepth]}
+                  radius={0.015}
+                  position-y={stileCenterY}
+                >
+                  {timber(stileW, stileH, false)}
+                </RoundedBox>
+                {/* non-slip rubber foot cap at the bottom of each leg */}
+                <RoundedBox
+                  args={[stileW + 0.008, footPadH, panel.frameDepth + 0.008]}
+                  radius={0.008}
+                  position-y={-panel.height / 2 - legDrop + footPadH / 2}
+                >
+                  <meshPhysicalMaterial {...rubberFoot} />
+                </RoundedBox>
+              </group>
+            ))}
+
+            {/* horizontal top and bottom rails with true horizontal wood grain */}
+            {([1, -1] as const).map((v) => (
+              <RoundedBox
+                key={v}
+                args={[railW, railH, panel.frameDepth]}
+                radius={0.014}
+                position={[0, v * railY, 0]}
+              >
+                {timber(railW, railH, true)}
+              </RoundedBox>
+            ))}
+
             {/*
               Board behind the opening. DOUBLE-SIDED, and it has to be: this is
               the only opaque thing standing between the camera and the OTHER
@@ -136,16 +170,6 @@ function AFrameSignImpl({
             <mesh geometry={boardGeometry} rotation-y={isFront ? 0 : Math.PI} position-z={isFront ? -0.012 : 0.012}>
               <meshPhysicalMaterial color="#181b17" metalness={0} roughness={0.95} side={THREE.DoubleSide} />
             </mesh>
-            {/* frame stiles extended past the bottom rail into four leg tips */}
-            {([1, -1] as const).map((side) => (
-              <mesh
-                key={side}
-                position={[side * (panel.width / 2 - panel.frameWidth / 2), -panel.height / 2 - legDrop / 2 + 0.05, 0]}
-              >
-                <boxGeometry args={[panel.frameWidth, legDrop + 0.1, panel.frameDepth - 0.02]} />
-                {timber(panel.frameWidth, legDrop + 0.1)}
-              </mesh>
-            ))}
 
             {/* live face */}
             <DeviceScreen
@@ -160,22 +184,71 @@ function AFrameSignImpl({
         )
       })}
 
-      {/* hinge blocks (~80 mm) near the ends - the center gap is the carry-handle area */}
+      {/* architectural butt hinges near the crown ends: segmented knuckle barrel
+          with hinge leaves and screw heads hugging both top rails */}
       {([1, -1] as const).map((side) => (
-        <mesh key={side} rotation-z={Math.PI / 2} position={[side * (panel.width / 2 - 0.35), legLift + topY + 0.02, 0]}>
-          <cylinderGeometry args={[0.035, 0.035, 0.286, 12]} />
-          <meshPhysicalMaterial color="#8f949c" metalness={0.9} roughness={0.35} />
-        </mesh>
+        <group key={side} position={[side * (panel.width / 2 - 0.35), legLift + topY + 0.015, 0]}>
+          {/* central hinge pin */}
+          <mesh rotation-z={Math.PI / 2}>
+            <cylinderGeometry args={[0.014, 0.014, 0.32, 12]} />
+            <meshPhysicalMaterial {...hardware} roughness={0.22} />
+          </mesh>
+          {/* 3 alternating knuckle barrel sleeves */}
+          {[-0.095, 0, 0.095].map((kx) => (
+            <mesh key={kx} rotation-z={Math.PI / 2} position-x={kx}>
+              <cylinderGeometry args={[0.028, 0.028, 0.088, 14]} />
+              <meshPhysicalMaterial {...hardware} />
+            </mesh>
+          ))}
+          {/* front and rear hinge leaf straps seating onto the top rail bevels */}
+          {([-1, 1] as const).map((dir) => (
+            <group key={dir} rotation-x={dir * tilt}>
+              <RoundedBox args={[0.27, 0.012, 0.075]} radius={0.004} position={[0, -0.016, -dir * 0.036]}>
+                <meshPhysicalMaterial {...hardware} />
+              </RoundedBox>
+              {([-0.08, 0.08] as const).map((sx) => (
+                <mesh key={sx} position={[sx, -0.01, -dir * 0.05]}>
+                  <cylinderGeometry args={[0.012, 0.012, 0.008, 10]} />
+                  <meshPhysicalMaterial {...darkMetal} />
+                </mesh>
+              ))}
+            </group>
+          ))}
+        </group>
       ))}
 
-      {/* restraint straps at mid-height: dark webbing on each side, bolted to
-          the frame stiles and spanning the panels' inner faces to hold the splay */}
-      {([1, -1] as const).map((side) => (
-        <mesh key={side} position={[side * (panel.width / 2 - panel.frameWidth / 2), legLift, 0]}>
-          <boxGeometry args={[0.02, 0.13, panel.height * Math.sin(tilt) - panel.frameDepth + 0.06]} />
-          <meshPhysicalMaterial color="#1c1e21" metalness={0} roughness={0.9} />
-        </mesh>
-      ))}
+      {/* articulated folding steel scissor-stay arms on both sides at mid-height:
+          two hinged links meeting at a raised center pivot rivet, pinned into
+          both stiles with metal mounting studs */}
+      {([1, -1] as const).map((side) => {
+        const stayX = side * (stileX - stileW / 2 - 0.012)
+        return (
+          <group key={side} position={[stayX, legLift - 0.02, 0]}>
+            {([1, -1] as const).map((dir) => (
+              <React.Fragment key={dir}>
+                {/* hinged stay link */}
+                <mesh
+                  position={[dir * 0.004, stayKneeLift / 2, dir * (stayHalfSpan / 2)]}
+                  rotation-x={dir * stayArmAngle}
+                >
+                  <boxGeometry args={[0.01, 0.044, stayArmLen + 0.02]} />
+                  <meshPhysicalMaterial {...darkMetal} />
+                </mesh>
+                {/* stile anchor pin */}
+                <mesh rotation-z={Math.PI / 2} position={[side * 0.008, 0, dir * stayHalfSpan]}>
+                  <cylinderGeometry args={[0.018, 0.018, 0.024, 12]} />
+                  <meshPhysicalMaterial {...hardware} />
+                </mesh>
+              </React.Fragment>
+            ))}
+            {/* center elbow pivot rivet */}
+            <mesh rotation-z={Math.PI / 2} position={[0, stayKneeLift, 0]}>
+              <cylinderGeometry args={[0.018, 0.018, 0.028, 12]} />
+              <meshPhysicalMaterial {...hardware} />
+            </mesh>
+          </group>
+        )
+      })}
     </group>
   )
 }

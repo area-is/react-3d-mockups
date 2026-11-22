@@ -428,8 +428,8 @@ const GALAXY_WATCH_8: WatchSpec = {
     closure: 'buckle',
     // A 56 x 43 mm wrist (~157 mm round) with ~165 mm of strap, so the tail
     // stands well past the buckle with holes to spare either side of the one
-    // in use. The short strap runs on to the buckle's hinge bar.
-    pinStrapEnd: 205,
+    // in use. The short strap stops cleanly at the buckle's 12-o'clock hinge bar.
+    pinStrapEnd: 182,
     tailEnd: 98,
     // Holes elongated ACROSS the strap (2.9 x 1.9 mm), 5.2 mm apart.
     holes: [0.35, 0.405, 0.46, 0.514, 0.569, 0.624, 0.679, 0.734, 0.788, 0.843],
@@ -575,7 +575,7 @@ const ULTRA_4: WatchSpec = {
     thickness: 0.16,
     crown: 0.03,
     ridges: { pitch: 0.378, depth: 0.042 },
-    pinStrapEnd: 201,
+    pinStrapEnd: 186,
     tailEnd: 98,
     holes: [0.396, 0.46, 0.524, 0.588, 0.652, 0.716, 0.781],
     holeRadius: 0.12,
@@ -672,7 +672,7 @@ const GALAXY_WATCH_ULTRA_2: WatchSpec = {
     tipWidth: 1.28,
     thickness: 0.15,
     crown: 0.035,
-    pinStrapEnd: 205,
+    pinStrapEnd: 181,
     tailEnd: 98,
     holes: [0.35, 0.405, 0.46, 0.514, 0.569, 0.624, 0.679, 0.734, 0.788, 0.843],
     holeRadius: 0.082,

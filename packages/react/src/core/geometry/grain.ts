@@ -103,6 +103,19 @@ export const WOOD: Grain = {
   relief: 0.9,
 }
 
+/**
+ * Twisted three-ply cord: diagonal strands spiralling around `v` as `u` runs
+ * along a swept tube, over a light paper-fibre tooth for kraft handles.
+ */
+export const CORD: Grain = {
+  height: (u, v) => {
+    const strand = Math.abs(Math.sin(Math.PI * (3 * v - 2 * u)))
+    return 0.82 * Math.pow(strand, 0.72) + 0.18 * noise(u, v, 24, 12)
+  },
+  tint: 0.28,
+  relief: 1.9,
+}
+
 /** The grain's height field sampled at texel centres, row-major. */
 export function grainHeights(grain: Grain, size = GRAIN_SIZE): Float32Array {
   const heights = new Float32Array(size * size)
