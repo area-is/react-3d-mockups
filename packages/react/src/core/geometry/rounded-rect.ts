@@ -24,6 +24,45 @@ export function roundedRectShape(width: number, height: number, radius: number):
 }
 
 /**
+ * `roundedRectShape`'s silhouette with a radius per corner: the same quadratic
+ * Bezier corners, traced from the same point in the same order, so with four
+ * equal radii it is that shape exactly.
+ *
+ * A foldable's hinged halves are built from this, not from
+ * `mixedRoundedRectShape`, because the flat pose is one `roundedRectShape`
+ * slab and the halves have to be that slab cut in two. A Bezier corner sits
+ * further out than the circular arc of the same radius (about 4% of the
+ * radius on each axis), so halves with arc corners changed the outline of
+ * every free corner as the hinge crossed into flat - invisible on a Fold's
+ * 2 mm corners, a plain jump on the iPhone Duo's 8 mm ones.
+ */
+export function bezierRoundedRectShape(
+  width: number,
+  height: number,
+  corners: { tl: number; tr: number; br: number; bl: number }
+): THREE.Shape {
+  const x = -width / 2
+  const y = -height / 2
+  const limit = Math.min(width / 2, height / 2)
+  const clamp = (r: number) => Math.max(0, Math.min(r, limit))
+  const tl = clamp(corners.tl)
+  const tr = clamp(corners.tr)
+  const br = clamp(corners.br)
+  const bl = clamp(corners.bl)
+  const s = new THREE.Shape()
+  s.moveTo(x + bl, y)
+  s.lineTo(x + width - br, y)
+  if (br) s.quadraticCurveTo(x + width, y, x + width, y + br)
+  s.lineTo(x + width, y + height - tr)
+  if (tr) s.quadraticCurveTo(x + width, y + height, x + width - tr, y + height)
+  s.lineTo(x + tl, y + height)
+  if (tl) s.quadraticCurveTo(x, y + height, x, y + height - tl)
+  s.lineTo(x, y + bl)
+  if (bl) s.quadraticCurveTo(x, y, x + bl, y)
+  return s
+}
+
+/**
  * The same silhouette with a radius PER CORNER, in CSS `border-radius` order
  * (top-left, top-right, bottom-right, bottom-left) so it can be built from the
  * same numbers a screen's `border-radius` is built from.

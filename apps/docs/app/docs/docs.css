@@ -818,15 +818,13 @@
   color: var(--color-fd-foreground);
 }
 
+/* How many props differ from the defaults: a count in the accent beside the
+   label, not a filled pill - the label already says what it counts. */
 .mx-badge {
-  min-width: 15px;
-  text-align: center;
-  border-radius: 99px;
-  background: var(--mx-accent);
-  color: var(--color-fd-primary-foreground);
-  font-size: 12px;
-  font-weight: 700;
-  padding: 0 4px;
+  color: var(--mx-accent);
+  font-size: 12.5px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
 }
 
 .mx-body {
@@ -945,7 +943,7 @@
 
 .mx-prop {
   font-family: var(--font-mono);
-  color: var(--color-fd-muted-foreground);
+  color: var(--color-fd-foreground);
   white-space: nowrap;
 }
 
@@ -967,7 +965,7 @@
   height: 20px;
   padding: 0;
   border: 1px solid var(--color-fd-border);
-  border-radius: 6px;
+  border-radius: 3px;
   background: none;
   cursor: pointer;
 }
@@ -1002,7 +1000,7 @@
   box-sizing: border-box;
   height: var(--mx-control-h);
   border: 1px solid var(--color-fd-border);
-  border-radius: 8px;
+  border-radius: 4px;
   background: var(--color-fd-background);
   color: var(--color-fd-foreground);
   padding: 0 7px;
@@ -1083,7 +1081,7 @@
   gap: 2px;
   padding: 2px;
   border: 1px solid var(--color-fd-border);
-  border-radius: 8px;
+  border-radius: 4px;
 }
 
 .mx-segmented {
@@ -1107,7 +1105,7 @@
   align-items: center;
   justify-content: center;
   border: 0;
-  border-radius: 6px;
+  border-radius: 2px;
   padding: 0 9px;
   font-size: 12px;
   line-height: 1;
@@ -1122,30 +1120,36 @@
   color: var(--mx-accent);
 }
 
+/* A fill and a knob, no outline: off is a neutral track a step off the
+   page, on is the accent. */
 .mx-switch {
   position: relative;
   width: 32px;
   height: 18px;
   flex: none;
   border-radius: 999px;
-  border: 1px solid var(--color-fd-border);
-  background: var(--color-fd-accent);
+  border: 0;
+  background: color-mix(in oklab, var(--color-fd-foreground) 16%, transparent);
   cursor: pointer;
   padding: 0;
-  transition: background 0.16s ease, border-color 0.16s ease;
+  transition: background 0.16s ease;
 }
 
 .mx-switch[data-on='true'] {
   background: var(--mx-accent);
-  border-color: color-mix(in oklab, var(--mx-accent) 60%, black);
+}
+
+.mx-switch:focus-visible {
+  outline: 2px solid var(--mx-accent);
+  outline-offset: 2px;
 }
 
 .mx-switch-knob {
   position: absolute;
   top: 2px;
   left: 2px;
-  width: 12px;
-  height: 12px;
+  width: 14px;
+  height: 14px;
   border-radius: 50%;
   background: #fff;
   box-shadow: 0 1px 2px rgba(15, 20, 30, 0.3);
@@ -1153,12 +1157,83 @@
 }
 
 .mx-switch[data-on='true'] .mx-switch-knob {
-  left: 17px;
+  left: 16px;
 }
 
+/*
+ * The slider, drawn rather than left to the platform: a native range with
+ * `accent-color` rings its thumb and outlines its track, and no other control
+ * in the panel wears a border. A plain track filled in the accent up to the
+ * value (`--mx-fill`, set from the value by the control), and a knob like the
+ * switch's.
+ */
 .mx-range {
+  --mx-track: color-mix(in oklab, var(--color-fd-foreground) 16%, transparent);
   width: 74px;
-  accent-color: var(--mx-accent);
+  height: 18px;
+  margin: 0;
+  padding: 0;
+  background: none;
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.mx-range:focus {
+  outline: none;
+}
+
+.mx-range::-webkit-slider-runnable-track {
+  height: 4px;
+  border: 0;
+  border-radius: 2px;
+  background: linear-gradient(
+    to right,
+    var(--mx-accent) var(--mx-fill, 0%),
+    var(--mx-track) var(--mx-fill, 0%)
+  );
+}
+
+.mx-range::-moz-range-track {
+  height: 4px;
+  border: 0;
+  border-radius: 2px;
+  background: var(--mx-track);
+}
+
+.mx-range::-moz-range-progress {
+  height: 4px;
+  border-radius: 2px;
+  background: var(--mx-accent);
+}
+
+.mx-range::-webkit-slider-thumb {
+  width: 14px;
+  height: 14px;
+  margin-top: -5px;
+  border: 0;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(15, 20, 30, 0.35);
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.mx-range::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border: 0;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(15, 20, 30, 0.35);
+}
+
+.mx-range:focus-visible::-webkit-slider-thumb {
+  box-shadow: 0 0 0 2px var(--color-fd-background), 0 0 0 3.5px var(--mx-accent);
+}
+
+.mx-range:focus-visible::-moz-range-thumb {
+  box-shadow: 0 0 0 2px var(--color-fd-background), 0 0 0 3.5px var(--mx-accent);
 }
 
 /*
@@ -1247,7 +1322,7 @@
   align-items: center;
   gap: 4px;
   border: 1px solid var(--color-fd-border);
-  border-radius: 7px;
+  border-radius: 4px;
   padding: 1px 6px;
   color: var(--color-fd-muted-foreground);
   font-family: var(--font-mono);
@@ -1289,7 +1364,7 @@
   width: 18px;
   height: 18px;
   border: 1px solid var(--color-fd-border);
-  border-radius: 5px;
+  border-radius: 3px;
   cursor: pointer;
   padding: 0;
 }

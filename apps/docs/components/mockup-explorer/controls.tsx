@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, type ReactNode } from 'react'
+import { useState, type CSSProperties, type ReactNode } from 'react'
 import { enumKey, propSummary, type EditableProp } from './prop-controls'
 
 /**
@@ -39,6 +39,15 @@ export function colorInputValue(color: string, fallback = '#000000'): string {
   return /^#[0-9a-f]{6}$/i.test(color) ? color : fallback
 }
 
+/**
+ * How far along its track a slider's value sits, for `.mx-range` to fill the
+ * track up to: the drawn slider has no native progress in WebKit.
+ */
+function rangeFill(value: number, min: number, max: number): CSSProperties {
+  const share = max > min ? ((Math.min(max, Math.max(min, value)) - min) / (max - min)) * 100 : 0
+  return { '--mx-fill': `${share}%` } as CSSProperties
+}
+
 export function NumberField({
   label,
   value,
@@ -69,6 +78,7 @@ export function NumberField({
         max={max}
         step={step}
         value={value}
+        style={rangeFill(value, min, max)}
         onChange={(e) => {
           // The slider is now the source of truth; a stale draft would keep
           // showing whatever was typed before.
@@ -408,6 +418,7 @@ export function PropRow({ prop, value, set, onChange, onReset }: PropRowProps) {
                 max={control.max}
                 step={control.step}
                 value={Number(value)}
+                style={rangeFill(Number(value), control.min, control.max)}
                 onChange={(e) => onChange(Number(e.target.value))}
               />
               <span className="mx-hex mx-value">

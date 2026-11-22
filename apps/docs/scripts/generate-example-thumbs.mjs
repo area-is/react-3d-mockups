@@ -59,7 +59,7 @@ for (const slug of SLUGS.filter((s) => !ONLY || s.includes(ONLY))) {
     await page.goto(`${BASE}/examples/${slug}`, { waitUntil: 'networkidle', timeout: 180_000 })
     // `nextjs-portal` is the dev server's badge, which would otherwise sit in
     // the corner of every thumbnail generated against `npm run dev`.
-    await page.addStyleTag({ content: '.ex-bar, nextjs-portal { display: none !important; }' })
+    await page.addStyleTag({ content: 'nextjs-portal { display: none !important; }' })
     // Long enough for the scenes to build and their screens to land under
     // SwiftShader; the pages hold still once they have.
     await page.waitForTimeout(9000)

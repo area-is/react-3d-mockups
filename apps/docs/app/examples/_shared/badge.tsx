@@ -2,9 +2,9 @@
  * "Tabbied", as a link, for prose that names it. A plain anchor to
  * tabbied.com, because that is somebody else's site.
  *
- * The "example · built with …" chip that used to sit in every example's top
- * bar is gone: it was the first thing each header hid on a phone, so the
- * credit now lives in the example bar above the page (example-bar.tsx).
+ * The examples are dressed as independent sites, with no strip of the
+ * library's own across the top, so where an example's artwork is drawn with
+ * Tabbied, the credit is in its own prose, through this link.
  */
 export function TabbiedLink({ children = 'Tabbied' }: { children?: React.ReactNode }) {
   return (

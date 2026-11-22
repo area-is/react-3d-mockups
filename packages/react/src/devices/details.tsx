@@ -826,9 +826,10 @@ export function SensorWindow({ r, color = '#05060a', lip }: { r: number; color?:
 }
 
 /**
- * A rounded rect with per-corner radii, for slabs whose edges differ - e.g.
- * a foldable's flex panels, rounded on the free corners but nearly square
- * along the fold line so the two panels meet tight at the crease.
+ * A rounded rect with per-corner radii in true circular arcs - e.g. a
+ * foldable's cover display panel, which follows a screen's `border-radius`.
+ * A slab that has to line up with a `roundedRectShape` body wants
+ * `bezierRoundedRectShape` instead.
  */
 export function mixedRoundedRectShape(
   width: number,
