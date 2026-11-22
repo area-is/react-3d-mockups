@@ -477,6 +477,16 @@ function WatchBody({
     const lapStart = Math.max(0, lapAt(band.pinStrapEnd + 20))
     const lapFull = Math.min(1, lapAt(band.pinStrapEnd))
     const tailLift = (t: number) => ride * ramp(t, lapStart, lapFull)
+    // On a buckled band, the short strap's rounded tip rises slightly over its
+    // final tenth to meet the buckle's 12-o'clock hinge bar instead of leaving
+    // a visible air gap beneath the frame.
+    const pinLift =
+      band.closure === 'buckle'
+        ? (t: number) => {
+            const u = ramp(t, 0.86, 1)
+            return ride * 0.45 * u * u * (3 - 2 * u)
+          }
+        : flat
     const pin = wristLoopPath(band.loop, startAngle, band.pinStrapEnd)
     const tail = wristLoopPath(band.loop, tailFrom, band.tailEnd)
     const length = watchStrapLengths(band)
@@ -485,11 +495,11 @@ function WatchBody({
       pin,
       tail,
       runs: [
-        { path: pin, length: length.pin, lift: flat, segments: 72 },
+        { path: pin, length: length.pin, lift: pinLift, segments: 72 },
         { path: tail, length: length.tail, lift: tailLift, segments: 112 },
       ],
       tailLift,
-      pinLift: flat,
+      pinLift,
     }
   }, [band, bandOpen, ride, body.depth])
 
@@ -655,7 +665,15 @@ function WatchBody({
     // frame's ends wrap down round the strap's edges to its mid-height.
     const dipFrom = (surface: number, stand: number) => Math.max(0, stand - surface)
 
-    const buckleAt = (path: StrapPath, length: number, at: number, stand: number, dip: number, tongueY: number) => {
+    const buckleAt = (
+      path: StrapPath,
+      length: number,
+      at: number,
+      stand: number,
+      dip: number,
+      tongueY: number,
+      flipTongue = false
+    ) => {
       parts.push({
         geometry: bendAlongStrap(
           buckleFrameGeometry(frame.width, frame.length, frame.bar, barHeight, frame.radius, band.width, dip),
@@ -664,10 +682,9 @@ function WatchBody({
         finish: 'metal',
       })
       // The tongue: a rounded bar from the hinge bar - the end wrapped by the
-      // short strap, toward -z - running down the middle of the frame toward
-      // the free bar, dropping into the engaged hole. Rounded, not boxy: a
-      // flat metal face turned to the camera mirrors whatever is behind it
-      // and reads as a black slot.
+      // short strap - running down the middle of the frame toward the free bar,
+      // dropping into the engaged hole. Rounded, not boxy: a flat metal face
+      // turned to the camera mirrors whatever is behind it and reads as a black slot.
       const tongueHeight = barHeight * 0.55
       const inner = frame.length - frame.bar * 1.2
       const tongueLength = inner * (frame.tongue ?? 1)
@@ -675,7 +692,7 @@ function WatchBody({
       tongue.rotateX(Math.PI / 2)
       tongue.scale(1, tongueHeight / (frame.bar * 0.8), 1)
       tongue.computeVertexNormals()
-      tongue.translate(0, tongueY, -inner / 2 + tongueLength / 2)
+      tongue.translate(0, tongueY, flipTongue ? inner / 2 - tongueLength / 2 : -inner / 2 + tongueLength / 2)
       parts.push({ geometry: bendAlongStrap(tongue, { path, length, at, stand }), finish: 'metal' })
     }
 
@@ -707,18 +724,26 @@ function WatchBody({
       // wrapped round the hinge bar, level with the strap; the keeper sits
       // on the strap just inboard of it.
       const pinLength = pinRun!.length
-      buckleAt(pose.pin, pinLength, 1 + (frame.length / 2 - frame.bar) / pinLength, 0, 0, 0)
+      buckleAt(pose.pin, pinLength, 1 + (frame.length / 2 - frame.bar) / pinLength, 0, 0, 0, false)
       const at = 1 - (keeperLength / 2 + frame.bar + 0.06) / pinLength
       keeperAt(pose.pin, pinLength, at, -band.thickness / 2, 0)
     } else {
       // Worn, the frame lies over the lapping tail at the engaged hole, the
-      // tongue resting on the strap; the keeper holds the tail down on the
-      // other strap further along.
+      // tongue hinging from the 12-o'clock bar where the short strap meets it;
+      // the keeper holds the tail down on the other strap further along.
       const tailLength = tailRun!.length
       const closureT = band.holes[band.closureHole] ?? band.holes[0] ?? 0.6
       const surface = pose.tailLift(closureT)
       const stand = restOn(surface)
-      buckleAt(pose.tail, tailLength, closureT, stand, dipFrom(surface, stand), -barHeight / 2 + (barHeight * 0.55) / 2)
+      buckleAt(
+        pose.tail,
+        tailLength,
+        closureT,
+        stand,
+        dipFrom(surface, stand),
+        -barHeight / 2 + (barHeight * 0.55) / 2,
+        true
+      )
       const keeperT = band.keeperT ?? 0.78
       keeperAt(pose.tail, tailLength, keeperT, -band.thickness / 2, pose.tailLift(keeperT))
     }

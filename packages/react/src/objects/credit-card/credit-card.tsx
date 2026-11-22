@@ -8,6 +8,7 @@ import {
   CREDIT_CARD_DEFAULT_TEXT,
   CREDIT_CARD_REGIONS,
   STAGE_KEY_LIGHT,
+  createSurfaceSheenMaterial,
   creditCardTippingColor,
   layoutStrokeText,
   normalizeStrokeText,
@@ -454,39 +455,6 @@ function createReliefMaterial(
   })
 }
 
-/**
- * The clear gloss film a card is laminated in, over a printed face. The print
- * is DOM under the canvas and reflects nothing, yet the studio's softboxes
- * sliding across the laminate as a card turns are most of what makes it read
- * as plastic rather than paper. So the film is a real, physically lit gloss
- * surface - black, so it adds no colour of its own, and glossy, so it
- * reflects the studio with the Fresnel rise of any clear coat (faint head on,
- * strong at a grazing angle) - drawn as light only: its alpha is set to the
- * reflection's own brightness, so over the print it brightens where it
- * reflects something and leaves the print untouched where it does not.
- */
-function createLaminateMaterial(): THREE.MeshPhysicalMaterial {
-  const material = new THREE.MeshPhysicalMaterial({
-    color: '#000000',
-    metalness: 0,
-    roughness: 0.16,
-    transparent: true,
-    depthWrite: false,
-    // the reflection is light added to the print: premultiplied, so the
-    // canvas carries it as-is and the print shows through by its alpha
-    premultipliedAlpha: true,
-  })
-  material.onBeforeCompile = (shader) => {
-    shader.fragmentShader = shader.fragmentShader.replace(
-      '#include <dithering_fragment>',
-      `#include <dithering_fragment>
-      gl_FragColor.a = clamp(max(gl_FragColor.r, max(gl_FragColor.g, gl_FragColor.b)), 0.0, 1.0);`
-    )
-  }
-  material.customProgramCacheKey = () => 'react-3d-mockups-card-laminate'
-  return material
-}
-
 /* ------------------------------------------------------------------ */
 /*  Back hardware                                                      */
 /* ------------------------------------------------------------------ */
@@ -689,7 +657,7 @@ function CreditCardImpl({
       }),
     []
   )
-  const laminate = React.useMemo(() => createLaminateMaterial(), [])
+  const laminate = React.useMemo(() => createSurfaceSheenMaterial({ roughness: 0.16 }), [])
   React.useEffect(
     () => () => {
       shoulderMaterial.dispose()

@@ -204,17 +204,35 @@ function BookImpl({
         {cloth()}
       </mesh>
 
-      {/* headbands at the head and tail of the spine, spanning the text block */}
-      {[1, -1].map((sign) => (
-        <mesh
-          key={sign}
-          rotation-x={Math.PI / 2}
-          position={[-board.width / 2 + 0.01, sign * (pages.height / 2), 0]}
-        >
-          <cylinderGeometry args={[headband.radius, headband.radius, pages.thickness, 12]} />
-          <meshPhysicalMaterial color="#b6403a" metalness={0} roughness={0.6} />
-        </mesh>
-      ))}
+      {/* two-tone woven silk headbands at the head and tail of the spine,
+          tucked snugly against the inner spine wall beside the page block */}
+      {[1, -1].map((sign) => {
+        const bands = 7
+        const bandLen = (pages.thickness * 0.96) / bands
+        return (
+          <group
+            key={sign}
+            position={[-board.width / 2 + 0.012 + spineOut + headband.radius * 0.5, sign * (pages.height / 2 + headband.radius * 0.15), 0]}
+          >
+            {Array.from({ length: bands }, (_, i) => (
+              <mesh
+                key={i}
+                rotation-x={Math.PI / 2}
+                position-z={(i - (bands - 1) / 2) * bandLen}
+              >
+                <cylinderGeometry args={[headband.radius, headband.radius, bandLen + 0.001, 12]} />
+                <meshPhysicalMaterial
+                  color={i % 2 === 0 ? '#932f2e' : '#eee5d1'}
+                  metalness={0}
+                  roughness={0.68}
+                  normalMap={grainNormal(WEAVE, 1, 1)}
+                  normalScale={0.5}
+                />
+              </mesh>
+            ))}
+          </group>
+        )
+      })}
 
       {/* the live cover: real DOM, CSS3D-transformed onto the front board */}
       <DeviceScreen

@@ -41,6 +41,7 @@ import {
   EdgeSocket,
   cutGeometry,
   mixedRoundedRectShape,
+  smoothShaded,
   stadiumCutter,
   holeCutter,
   USB_CUT_DEPTH,
@@ -398,14 +399,16 @@ function FoldBody({
   const pillGeometry = (part: { width: number; height: number; radius: number; raise: number }) => {
     const bevel = 0.014
     const shape = roundedRectShape(part.width - bevel * 2, part.height - bevel * 2, part.radius - bevel)
-    return new THREE.ExtrudeGeometry(shape, {
-      depth: Math.max(0.008, part.raise - bevel),
-      bevelEnabled: true,
-      bevelThickness: bevel,
-      bevelSize: bevel,
-      bevelSegments: 3,
-      curveSegments: 16,
-    })
+    return smoothShaded(
+      new THREE.ExtrudeGeometry(shape, {
+        depth: Math.max(0.008, part.raise - bevel),
+        bevelEnabled: true,
+        bevelThickness: bevel,
+        bevelSize: bevel,
+        bevelSegments: 3,
+        curveSegments: 16,
+      })
+    )
   }
   const plateauGeometry = React.useMemo(() => pillGeometry(cam.plateau), [cam.plateau])
   const islandGeometry = React.useMemo(() => (cam.island ? pillGeometry(cam.island) : null), [cam.island])

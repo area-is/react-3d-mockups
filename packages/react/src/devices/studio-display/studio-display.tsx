@@ -9,6 +9,7 @@ import {
   SCREEN_REGIONS,
   findColorway,
   roundedRectShape,
+  smoothShaded,
 } from '../../core'
 import { DeviceScreen } from '../../screen/device-screen'
 import { createLogoGeometry } from '../logos'
@@ -92,7 +93,7 @@ function StudioDisplayImpl({
       curveSegments: 12,
     })
     geometry.translate(0, 0, -depth / 2)
-    return geometry
+    return smoothShaded(geometry)
   }, [body])
 
   const glassGeometry = React.useMemo(
@@ -104,7 +105,7 @@ function StudioDisplayImpl({
   // from the hinge barrel three quarters of the way down the back, leans
   // gently back down to the knee and runs forward as the thin foot plate.
   // Foot + knee are one bent side profile (z/y plane) extruded across the
-  // stand width and capped just above the knee, where the separate arm
+  // stand width and capped cleanly above the knee, where the separate arm
   // slab - carrying the real circular cable-routing hole - takes over
   // along the lean axis.
   const standParts = React.useMemo(() => {
@@ -134,60 +135,78 @@ function StudioDisplayImpl({
     const footTopY = deskY + footThickness
     const tangentAngle = Math.atan2(n.y, n.z) + Math.PI
 
+    // Inset the 2D side profile by `bevel` before extruding with `bevelSize = bevel`,
+    // so the finished outer faces sit at exact nominal thickness (`cFront`/`cBack`)
+    // and never expand proud of `armSlab` to cause z-fighting at the seam.
+    const bevel = 0.008
+    const deskYIn = deskY + bevel
+    const footTopYIn = footTopY - bevel
+    const cFrontIn = cFront - bevel
+    const cBackIn = cBack + bevel
+    const RbIn = Rb + bevel
+    const RfIn = Rf + bevel
+
     // Both fillets are CONCAVE - the corners where the arm rises out of the
     // plate - so each circle sits outside the metal: above the plate's top
     // face, and off the arm face it touches.
-    const bC = { y: footTopY + Rb, z: 0 }
-    bC.z = (cBack - Rb - n.y * bC.y) / n.z
-    const bTan = { z: bC.z + n.z * Rb, y: bC.y + n.y * Rb }
-    const fC = { y: footTopY + Rf, z: 0 }
-    fC.z = (cFront + Rf - n.y * fC.y) / n.z
-    const fTan = { z: fC.z - n.z * Rf, y: fC.y - n.y * Rf }
-    // Cap the plate piece just above the tangencies - the cut hides inside
-    // the (slightly thicker) arm slab that overlaps it.
-    const yCut = Math.max(bTan.y, fTan.y) + 0.17
-    const zCutBack = bTan.z + (d.z / d.y) * (yCut - bTan.y)
-    const zCutFront = fTan.z + (d.z / d.y) * (yCut - fTan.y)
+    const bC = { y: footTopYIn + RbIn, z: 0 }
+    bC.z = (cBackIn - RbIn - n.y * bC.y) / n.z
+    const bTan = { z: bC.z + n.z * RbIn, y: bC.y + n.y * RbIn }
+    const fC = { y: footTopYIn + RfIn, z: 0 }
+    fC.z = (cFrontIn + RfIn - n.y * fC.y) / n.z
+    const fTan = { z: fC.z - n.z * RfIn, y: fC.y - n.y * RfIn }
+
+    // Taper the short stub above the fillet tangencies slightly inward on
+    // both front and back faces so it seats cleanly INSIDE `armSlab` without
+    // coplanar overlap or a visible dashed z-fighting line across the arm.
+    const yTang = Math.max(bTan.y, fTan.y)
+    const yCut = yTang + 0.14
+    const stubInset = 0.007
+    const zBackTang = bTan.z + (d.z / d.y) * (yTang - bTan.y)
+    const zFrontTang = fTan.z + (d.z / d.y) * (yTang - fTan.y)
+    const zCutBack = zBackTang + (d.z / d.y) * (yCut - yTang) + n.z * stubInset
+    const zCutFront = zFrontTang + (d.z / d.y) * (yCut - yTang) - n.z * stubInset
+
     // Rounded lips at both ends of the foot plate.
-    const r = footThickness / 2
-    const front = { z: footFrontZ - r, y: deskY + r }
-    const back = { z: footBackZ + r, y: deskY + r }
+    const r = Math.max(0.003, footThickness / 2 - bevel)
+    const front = { z: footFrontZ - bevel - r, y: deskYIn + r }
+    const back = { z: footBackZ + bevel + r, y: deskYIn + r }
 
     const shape = new THREE.Shape()
-    shape.moveTo(front.z, deskY)
-    shape.lineTo(back.z, deskY)
+    shape.moveTo(front.z, deskYIn)
+    shape.lineTo(back.z, deskYIn)
     shape.absarc(back.z, back.y, r, -Math.PI / 2, Math.PI / 2, true)
-    shape.lineTo(bC.z, footTopY)
-    shape.absarc(bC.z, bC.y, Rb, -Math.PI / 2, Math.atan2(n.y, n.z), false)
+    shape.lineTo(bC.z, footTopYIn)
+    shape.absarc(bC.z, bC.y, RbIn, -Math.PI / 2, Math.atan2(n.y, n.z), false)
+    shape.lineTo(zBackTang, yTang)
     shape.lineTo(zCutBack, yCut)
     shape.lineTo(zCutFront, yCut)
+    shape.lineTo(zFrontTang, yTang)
     shape.lineTo(fTan.z, fTan.y)
-    shape.absarc(fC.z, fC.y, Rf, tangentAngle, -Math.PI / 2, false)
-    shape.lineTo(front.z, footTopY)
+    shape.absarc(fC.z, fC.y, RfIn, tangentAngle, -Math.PI / 2, false)
+    shape.lineTo(front.z, footTopYIn)
     shape.absarc(front.z, front.y, r, Math.PI / 2, -Math.PI / 2, true)
 
-    const bevel = 0.012
     const extrudeW = width - bevel * 2
-    const footKnee = new THREE.ExtrudeGeometry(shape, {
+    const footKneeRaw = new THREE.ExtrudeGeometry(shape, {
       depth: extrudeW,
       bevelEnabled: true,
       bevelThickness: bevel,
       bevelSize: bevel,
-      bevelSegments: 2,
+      bevelSegments: 3,
       curveSegments: 24,
     })
-    footKnee.translate(0, 0, -extrudeW / 2)
-    footKnee.rotateY(-Math.PI / 2)
+    footKneeRaw.translate(0, 0, -extrudeW / 2)
+    footKneeRaw.rotateY(-Math.PI / 2)
+    const footKnee = smoothShaded(footKneeRaw)
 
     // Arm slab: rounded-rect face (x across, y down the lean axis, hinge
     // center at +armLen/2) with the stadium cutout as a real punched
-    // opening - the extrude bevel rounds its bore, giving the rim highlight
-    // the product photos show around the opening.
-    // The arm's rounded top stands a little proud of the hinge, exactly as the
-    // rear photography shows it above the pivot.
+    // opening - smooth-shaded so the bore rim catches one continuous highlight.
     const topProud = 0.1
-    const armLen = (hinge.y - yCut) / d.y + 0.24 + topProud
-    const armShape = roundedRectShape(width - 0.016, armLen, 0.05)
+    const armLen = (hinge.y - yTang) / d.y + 0.02 + topProud
+    const armBevel = 0.008
+    const armShape = roundedRectShape(width - armBevel * 2, armLen, 0.025)
     // The cutout's center sits `edgeOffset` above the enclosure's bottom
     // edge: the power inlet shows through its upper half, open air through
     // the lower; from the front it hides behind the panel.
@@ -200,17 +219,18 @@ function StudioDisplayImpl({
     holePath.absarc(0, holeCenterS - straight, capR, 0, -Math.PI, true)
     holePath.closePath()
     armShape.holes.push(holePath)
-    const slabT = thickness + 0.006
-    const armSlab = new THREE.ExtrudeGeometry(armShape, {
-      depth: slabT - 0.016,
+    const slabT = thickness + 0.002
+    const armSlabRaw = new THREE.ExtrudeGeometry(armShape, {
+      depth: slabT - armBevel * 2,
       bevelEnabled: true,
-      bevelThickness: 0.008,
-      bevelSize: 0.008,
-      bevelSegments: 2,
-      curveSegments: 16,
+      bevelThickness: armBevel,
+      bevelSize: armBevel,
+      bevelSegments: 3,
+      curveSegments: 20,
     })
-    armSlab.translate(0, 0, -(slabT - 0.016) / 2)
-    armSlab.rotateX(lean)
+    armSlabRaw.translate(0, 0, -(slabT - armBevel * 2) / 2)
+    armSlabRaw.rotateX(lean)
+    const armSlab = smoothShaded(armSlabRaw)
     const armPos: [number, number, number] = [
       0,
       hinge.y + d.y * (topProud - armLen / 2),
@@ -325,14 +345,26 @@ function StudioDisplayImpl({
         return (
           <React.Fragment key={i}>
             <RoundedBox
-              args={[ports.slot.width, ports.slot.height, 0.02]}
+              args={[ports.slot.width + 0.012, ports.slot.height + 0.012, 0.008]}
+              radius={Math.min(ports.slot.width, ports.slot.height) / 2}
+              position={[x, y, -body.depth / 2 - 0.001]}
+            >
+              <meshPhysicalMaterial color="#5c6068" metalness={0.78} roughness={0.32} />
+            </RoundedBox>
+            <RoundedBox
+              args={[ports.slot.width, ports.slot.height, 0.012]}
               // radius must stay under half the SMALLEST face dimension or the
               // corner spheres self-intersect into a bowtie
               radius={Math.min(ports.slot.width, ports.slot.height) / 2 - 0.004}
-              position={[x, y, -body.depth / 2 - 0.004]}
+              position={[x, y, -body.depth / 2 - 0.0035]}
             >
-              <meshPhysicalMaterial color="#07080c" metalness={0.4} roughness={0.4} />
+              <meshPhysicalMaterial color="#07080c" metalness={0.3} roughness={0.6} />
             </RoundedBox>
+            {/* centered USB-C contact tongue bar inside the dark port bore */}
+            <mesh position={[x, y, -body.depth / 2 - 0.0095]}>
+              <boxGeometry args={[ports.slot.width * 0.62, ports.slot.height * 0.24, 0.003]} />
+              <meshStandardMaterial color="#3c4048" metalness={0.65} roughness={0.4} />
+            </mesh>
             {isThunderbolt && boltGeometry && (
               <mesh
                 geometry={boltGeometry}

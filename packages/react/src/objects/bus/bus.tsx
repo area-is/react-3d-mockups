@@ -610,6 +610,30 @@ function BusImpl({
   ]
   const doorSpans: [number, number][] = doors.map(({ x, width }) => [x - width / 2, x + width / 2])
 
+  // Smooth tubular swan-neck mirror arms sweeping out from each A-pillar pad,
+  // arcing forward past the windshield corner, and dropping cleanly into the
+  // tall transit mirror head.
+  const mirrorArmGeometries = React.useMemo(
+    () =>
+      ([1, -1] as const).map((side) => {
+        const curve = new THREE.CatmullRomCurve3([
+          new THREE.Vector3(3.13, 0.46, side * (hw + 0.015)),
+          new THREE.Vector3(3.26, 0.47, side * (hw + 0.115)),
+          new THREE.Vector3(3.39, 0.43, side * (hw + 0.15)),
+          new THREE.Vector3(3.41, 0.31, side * (hw + 0.15)),
+          new THREE.Vector3(3.41, 0.18, side * (hw + 0.15)),
+        ])
+        return new THREE.TubeGeometry(curve, 24, 0.015, 10, false)
+      }),
+    [hw]
+  )
+  React.useEffect(
+    () => () => {
+      mirrorArmGeometries.forEach((g) => g.dispose())
+    },
+    [mirrorArmGeometries]
+  )
+
   return (
     <group {...groupProps}>
       {/* painted shell. Automotive paint is a dielectric base under a clear
@@ -1065,28 +1089,22 @@ function BusImpl({
         {trimMaterial}
       </RoundedBox>
 
-      {/* door mirrors on swan-neck arms: a pad on the A-pillar, the arm
-          reaching forward and out, then the drop to a tall head hung ~450 mm
-          ahead of the windshield at its mid-height, transit style - the
-          glass facing the driver */}
+      {/* door mirrors on smooth tubular swan-neck arms: a pad on the A-pillar,
+          the curved tube sweeping forward and out, then dropping cleanly into
+          the tall transit mirror head - glass facing the driver */}
       {([1, -1] as const).map((side) => (
         <group key={side}>
-          <RoundedBox args={[0.09, 0.07, 0.03]} radius={0.01} smoothness={1} bevelSegments={1} position={[3.13, 0.46, side * (hw + 0.008)]}>
+          <RoundedBox args={[0.09, 0.075, 0.032]} radius={0.012} smoothness={1} bevelSegments={1} position={[3.13, 0.46, side * (hw + 0.008)]}>
             {trimMaterial}
           </RoundedBox>
-          <mesh position={[3.275, 0.46, side * (hw + 0.085)]} rotation-y={-side * Math.atan2(0.13, 0.27)}>
-            <boxGeometry args={[0.3, 0.028, 0.028]} />
-            {trimMaterial}
-          </mesh>
-          <mesh position={[3.41, 0.31, side * (hw + 0.15)]}>
-            <boxGeometry args={[0.028, 0.3, 0.028]} />
+          <mesh geometry={mirrorArmGeometries[side === 1 ? 0 : 1]}>
             {trimMaterial}
           </mesh>
           <group position={[3.41, 0.05, side * (hw + 0.15)]} rotation-y={side * 0.12}>
-            <RoundedBox args={[0.07, 0.3, 0.16]} radius={0.03} smoothness={2} bevelSegments={1}>
+            <RoundedBox args={[0.072, 0.3, 0.16]} radius={0.032} smoothness={2} bevelSegments={1}>
               {trimMaterial}
             </RoundedBox>
-            <mesh position-x={-0.036}>
+            <mesh position-x={-0.037}>
               <boxGeometry args={[0.006, 0.25, 0.12]} />
               {glassMaterial}
             </mesh>

@@ -1,7 +1,7 @@
 import * as React from 'react'
 import * as THREE from 'three'
 import type { ThreeElements } from '@react-three/fiber'
-import { VINYL_RECORD, VINYL_RECORD_REGIONS, roundedRectShape } from '../../core'
+import { FIBRE, VINYL_RECORD, VINYL_RECORD_REGIONS, grainNormal, roundedRectShape } from '../../core'
 import { DeviceScreen } from '../../screen/device-screen'
 import { collectSlots, createSlots, resolveSurface, type SurfaceProps } from '../../slots'
 
@@ -25,9 +25,10 @@ export interface VinylRecordProps extends Omit<GroupProps, 'children' | 'color'>
  * A procedurally built 12" vinyl LP sliding out of its jacket: a hollow
  * square sleeve - front and back boards joined along the spine, top and
  * bottom edges, open at the mouth - with live front and back cover art, a
- * white paper inner sleeve peeking out of the mouth, and a glossy disc,
- * grooved on both sides, riding INSIDE the sleeve with its center label as
- * a live circular DOM area. No 3D asset files are loaded.
+ * die-cut paper inner sleeve peeking out of the mouth, and a glossy disc
+ * with raised groove-guard bead, anisotropic micro-grooves, mirror-gloss dead
+ * wax, and pressing-ring center label riding INSIDE the sleeve. No 3D asset
+ * files are loaded.
  *
  * Must be rendered inside a react-three-fiber `<Canvas>` (or `<MockupCanvas>`).
  *
@@ -72,7 +73,23 @@ function VinylRecordImpl({
     return geometry
   }, [sleeve])
 
-  React.useEffect(() => () => boardGeometry.dispose(), [boardGeometry])
+  // Paper inner sleeve with die-cut corner chamfers along the mouth edge, like
+  // a real archival LP inner sleeve peeking out of the outer jacket.
+  const innerSleeveGeometry = React.useMemo(() => {
+    const hw = innerSleeve.size / 2
+    const ch = 0.09
+    const shape = new THREE.Shape()
+    shape.moveTo(-hw, -hw)
+    shape.lineTo(hw - ch, -hw)
+    shape.lineTo(hw, -hw + ch)
+    shape.lineTo(hw, hw - ch)
+    shape.lineTo(hw - ch, hw)
+    shape.lineTo(-hw, hw)
+    shape.closePath()
+    const g = new THREE.ExtrudeGeometry(shape, { depth: innerSleeve.thickness, bevelEnabled: false })
+    g.translate(0, 0, -innerSleeve.thickness / 2)
+    return g
+  }, [innerSleeve])
 
   // The groove band painted once into a texture: fine concentric circles from
   // the lead-in edge down to the dead wax, so the playing surface reads as
@@ -85,7 +102,7 @@ function VinylRecordImpl({
     canvas.height = size
     const ctx = canvas.getContext('2d')!
     const c = size / 2
-    const rOut = c * 0.995
+    const rOut = c * 0.99
     const rIn = c * (disc.deadWaxRadius / disc.radius)
     for (let i = 0; i < 110; i++) {
       const r = rIn + ((rOut - rIn) * i) / 109
@@ -101,7 +118,6 @@ function VinylRecordImpl({
     texture.anisotropy = 4
     return texture
   }, [disc])
-  React.useEffect(() => () => grooveTexture?.dispose(), [grooveTexture])
 
   // The groove band itself. Each vertex carries a tangent pointing out along
   // its radius, which is the direction anisotropic shading smears a highlight
@@ -110,7 +126,7 @@ function VinylRecordImpl({
   // A vertex attribute rather than tangents derived from UVs, which are
   // constant over a triangle and showed the ring's 96 segments as spokes.
   const grooveGeometry = React.useMemo(() => {
-    const geometry = new THREE.RingGeometry(disc.deadWaxRadius, disc.radius * 0.995, 96, 1)
+    const geometry = new THREE.RingGeometry(disc.deadWaxRadius, disc.radius * 0.988, 96, 1)
     const position = geometry.getAttribute('position')
     const tangents = new Float32Array(position.count * 4)
     for (let i = 0; i < position.count; i++) {
@@ -122,7 +138,6 @@ function VinylRecordImpl({
     geometry.setAttribute('tangent', new THREE.BufferAttribute(tangents, 4))
     return geometry
   }, [disc.deadWaxRadius, disc.radius])
-  React.useEffect(() => () => grooveGeometry.dispose(), [grooveGeometry])
 
   // Disc slides out to the right, far enough that the whole label is clear
   // of the jacket edge (two CSS3D layers can't depth-sort against each
@@ -145,7 +160,13 @@ function VinylRecordImpl({
     })
     return { ...surface, screenStyle: { ...surface.screenStyle, ...spindleMask } }
   }
-  const stock = { color, metalness: 0, roughness: 0.75 }
+  const stock = {
+    color,
+    metalness: 0,
+    roughness: 0.72,
+    normalMap: grainNormal(FIBRE, 2.2),
+    normalScale: 0.14,
+  }
 
   // The spindle hole is a real hole: bored through the disc, out of the paper
   // label, out of the live label's DOM, and out of the depth mask that clears
@@ -163,7 +184,6 @@ function VinylRecordImpl({
     shape.holes.push(new THREE.Path().absarc(0, 0, disc.spindleRadius + inset, 0, Math.PI * 2, true))
     return new THREE.ShapeGeometry(shape, 64)
   }, [disc.labelRadius, disc.spindleRadius])
-  React.useEffect(() => () => labelOccluder.dispose(), [labelOccluder])
 
   // The disc itself, bored through the middle.
   const discGeometry = React.useMemo(() => {
@@ -177,11 +197,33 @@ function VinylRecordImpl({
     geometry.translate(0, 0, -disc.thickness / 2)
     return geometry
   }, [disc.radius, disc.spindleRadius, disc.thickness])
-  React.useEffect(() => () => discGeometry.dispose(), [discGeometry])
+
+  React.useEffect(() => {
+    return () => {
+      boardGeometry.dispose()
+      innerSleeveGeometry.dispose()
+      grooveTexture?.dispose()
+      grooveGeometry.dispose()
+      labelOccluder.dispose()
+      discGeometry.dispose()
+    }
+  }, [boardGeometry, innerSleeveGeometry, grooveTexture, grooveGeometry, labelOccluder, discGeometry])
 
   // Both playing faces carry the same pressing details, mirrored.
   const discFace = (s: 1 | -1) => (
     <group key={s} rotation-y={s === 1 ? 0 : Math.PI}>
+      {/* smooth glossy outer lead-in rim & subtle groove-guard lip (kept strictly
+          inside the hollow jacket slot so it never touches the outer cover board) */}
+      <mesh position-z={disc.thickness / 2 + 0.0008}>
+        <ringGeometry args={[disc.radius * 0.985, disc.radius, 96]} />
+        <meshPhysicalMaterial
+          color={vinylColor}
+          metalness={0.04}
+          roughness={0.07}
+          clearcoat={1}
+          clearcoatRoughness={0.05}
+        />
+      </mesh>
       {/* the grooved playing surface, lead-in to dead wax */}
       <mesh geometry={grooveGeometry} position-z={disc.thickness / 2 + 0.0006}>
         <meshPhysicalMaterial
@@ -194,20 +236,37 @@ function VinylRecordImpl({
       </mesh>
       {grooveTexture && (
         <mesh position-z={disc.thickness / 2 + 0.001}>
-          <ringGeometry args={[disc.deadWaxRadius, disc.radius * 0.995, 96]} />
+          <ringGeometry args={[disc.deadWaxRadius, disc.radius * 0.988, 96]} />
           <meshBasicMaterial map={grooveTexture} transparent opacity={0.55} depthWrite={false} />
         </mesh>
       )}
-      {/* dead wax - the smooth matte annulus between grooves and label,
-          flat ON the face like the real pressing */}
+      {/* dead wax: mirror-gloss ungrooved run-out PVC annulus between the
+          satin micro-grooves and the paper center label */}
       <mesh position-z={disc.thickness / 2 + 0.0012}>
-        <ringGeometry args={[disc.labelRadius + 0.004, disc.deadWaxRadius, 96]} />
-        <meshPhysicalMaterial color={vinylColor} metalness={0.05} roughness={0.5} />
+        <ringGeometry args={[disc.labelRadius + 0.003, disc.deadWaxRadius, 96]} />
+        <meshPhysicalMaterial
+          color={vinylColor}
+          metalness={0.04}
+          roughness={0.06}
+          clearcoat={1}
+          clearcoatRoughness={0.05}
+        />
       </mesh>
-      {/* paper label - the physical print under the (optional) live design */}
+      {/* paper label - the physical print under the (optional) live design,
+          with the classic subtle stamper pressing-ring indentation */}
       <mesh position-z={disc.thickness / 2 + 0.0015}>
         <ringGeometry args={[disc.spindleRadius, disc.labelRadius, 64]} />
-        <meshPhysicalMaterial color="#e7e1d3" metalness={0} roughness={0.85} />
+        <meshPhysicalMaterial
+          color="#e7e1d3"
+          metalness={0}
+          roughness={0.86}
+          normalMap={grainNormal(FIBRE, 1.8)}
+          normalScale={0.14}
+        />
+      </mesh>
+      <mesh position-z={disc.thickness / 2 + 0.0018}>
+        <ringGeometry args={[disc.labelRadius * 0.325, disc.labelRadius * 0.355, 64]} />
+        <meshPhysicalMaterial color="#d4cdbc" metalness={0} roughness={0.82} />
       </mesh>
     </group>
   )
@@ -263,17 +322,24 @@ function VinylRecordImpl({
           </DeviceScreen>
         )}
 
-        {/* white paper inner sleeve in the slot behind the disc, peeking out
-            of the jacket mouth */}
-        <mesh position={[0.08, 0, discZ - disc.thickness / 2 - innerSleeve.thickness / 2 - 0.001]}>
-          <boxGeometry args={[innerSleeve.size, innerSleeve.size, innerSleeve.thickness]} />
-          <meshPhysicalMaterial color="#fdfdfa" metalness={0} roughness={0.95} />
+        {/* chamfered white paper inner sleeve in the slot behind the disc */}
+        <mesh
+          geometry={innerSleeveGeometry}
+          position={[0.08, 0, discZ - disc.thickness / 2 - innerSleeve.thickness / 2 - 0.001]}
+        >
+          <meshPhysicalMaterial
+            color="#fdfdfa"
+            metalness={0}
+            roughness={0.94}
+            normalMap={grainNormal(FIBRE, 2.5)}
+            normalScale={0.14}
+          />
         </mesh>
 
         {/* the disc, sliding out of the slot */}
         <group position={[discX, 0, discZ]}>
           <mesh geometry={discGeometry}>
-            <meshPhysicalMaterial color={vinylColor} metalness={0.1} roughness={0.32} clearcoat={1} clearcoatRoughness={0.25} />
+            <meshPhysicalMaterial color={vinylColor} metalness={0.08} roughness={0.28} clearcoat={1} clearcoatRoughness={0.2} />
           </mesh>
 
           {discFace(1)}

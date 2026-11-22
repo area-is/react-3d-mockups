@@ -26,7 +26,7 @@ import {
 } from '../../screen/status-bar'
 import { createLogoGeometry } from '../logos'
 import { createWordmarkTexture } from '../wordmark'
-import { FlashModule, LensRing, SensorWindow, UsbC, cutGeometry, stadiumCutter, USB_CUT_DEPTH } from '../details'
+import { FlashModule, LensRing, SensorWindow, UsbC, cutGeometry, smoothShaded, stadiumCutter, USB_CUT_DEPTH } from '../details'
 import { collectSlots, createSlots, resolveSurface, type SurfaceProps } from '../../slots'
 
 type GroupProps = ThreeElements['group']
@@ -164,14 +164,16 @@ function TabletBody({
       rearCamera.size - bevel * 2,
       rearCamera.radius - bevel
     )
-    return new THREE.ExtrudeGeometry(shape, {
-      depth: 0.02,
-      bevelEnabled: true,
-      bevelThickness: bevel,
-      bevelSize: bevel,
-      bevelSegments: 3,
-      curveSegments: 16,
-    })
+    return smoothShaded(
+      new THREE.ExtrudeGeometry(shape, {
+        depth: 0.02,
+        bevelEnabled: true,
+        bevelThickness: bevel,
+        bevelSize: bevel,
+        bevelSegments: 3,
+        curveSegments: 16,
+      })
+    )
   }, [rearCamera])
 
   // Brand mark on the back: real vector geometry from the SVG. The retail
@@ -364,37 +366,22 @@ function TabletBody({
           </>
         )}
 
-        {/* rear camera - Galaxy Tab floating rings + flash dot */}
-        {rearCamera.style === 'rings' && (
-          <>
-            {rearCamera.rings.map(({ x, y, r }, i) => (
-              <group key={i} position={[x, y, backZ]}>
-                {/* protruding ring - dark gunmetal with a polished chamfer,
-                    clearly darker than the body on both colorways */}
-                <mesh rotation-x={Math.PI / 2} position-z={-0.016}>
-                  <cylinderGeometry args={[r, r, 0.05, 40]} />
-                  <meshPhysicalMaterial
-                    color={`#${new THREE.Color(color).lerp(new THREE.Color('#0c0d10'), 0.55).getHexString()}`}
-                    metalness={0.9}
-                    roughness={0.22}
-                  />
-                </mesh>
-                <mesh rotation-x={Math.PI / 2} position-z={-0.042}>
-                  <cylinderGeometry args={[r * 0.84, r * 0.84, 0.008, 40]} />
-                  <meshPhysicalMaterial color="#05070d" metalness={0.2} roughness={0.12} clearcoat={1} envMapIntensity={0.15} />
-                </mesh>
-                <mesh rotation-x={Math.PI / 2} position-z={-0.048}>
-                  <cylinderGeometry args={[r * 0.4, r * 0.4, 0.008, 32]} />
-                  <meshPhysicalMaterial color="#0c1526" metalness={0.4} roughness={0.12} clearcoat={1} envMapIntensity={0.5} />
-                </mesh>
+        {/* rear camera - Galaxy Tab floating machined lens rings + Fresnel flash */}
+        {rearCamera.style === 'rings' && (() => {
+          const ringColor = `#${new THREE.Color(color).lerp(new THREE.Color('#0c0d10'), 0.55).getHexString()}`
+          return (
+            <>
+              {rearCamera.rings.map(({ x, y, r }, i) => (
+                <group key={i} position={[x, y, backZ]}>
+                  <LensRing r={r} proud={0.044} seat={0.02} frameColor={ringColor} pupil={0.42} />
+                </group>
+              ))}
+              <group position={[rearCamera.flash.x, rearCamera.flash.y, backZ - 0.002]}>
+                <FlashModule r={0.034} fresnel />
               </group>
-            ))}
-            <mesh rotation-x={Math.PI / 2} position={[rearCamera.flash.x, rearCamera.flash.y, backZ - 0.008]}>
-              <cylinderGeometry args={[0.034, 0.034, 0.014, 24]} />
-              <meshPhysicalMaterial color="#efe9da" emissive="#fff3d6" emissiveIntensity={0.2} roughness={0.4} />
-            </mesh>
-          </>
-        )}
+            </>
+          )
+        })()}
 
         {/* brand mark on the back - Apple's glyph centered upright, or the
             SAMSUNG wordmark near the corner diagonal from the cameras, laid

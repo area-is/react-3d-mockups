@@ -8,6 +8,7 @@ import {
   magazineSpec,
   type MagazineSize,
   SHEETS,
+  createSurfaceSheenMaterial,
   grainMap,
   grainNormal,
   roundedRectShape,
@@ -38,9 +39,9 @@ export interface MagazineProps extends Omit<GroupProps, 'children' | 'color'>, S
   /** Back cover color (the unprinted default is a light stock gray). */
   backColor?: string
   /**
-   * Glossy cover stock: a soft diagonal sheen over the cover art and a
-   * clearcoat on the spine and back. Off by default - the default stock
-   * is matte paper, flat under any light.
+   * Glossy cover stock: physically-lit studio reflections sliding across the
+   * cover art as it turns, plus a clearcoat on the spine and back. Off by
+   * default - the default stock is matte paper, flat under any light.
    */
   glossy?: boolean
 }
@@ -48,7 +49,7 @@ export interface MagazineProps extends Omit<GroupProps, 'children' | 'color'>, S
 /**
  * A procedurally built perfect-bound magazine: a thin letter-trim page block
  * with visible paper edges, a flat glued spine, and live full-bleed front
- * and back covers on matte stock (opt into `glossy` for a sheen). No 3D
+ * and back covers on matte stock (opt into `glossy` for a coated sheen). No 3D
  * asset files are loaded.
  *
  * Must be rendered inside a react-three-fiber `<Canvas>` (or `<MockupCanvas>`).
@@ -85,24 +86,10 @@ function MagazineImpl({
   // (rough, no clearcoat - flat under any light, like uncoated paper),
   // or the coated gloss look when `glossy` is on.
   const coverStockMaterial = glossy ? (
-    <meshPhysicalMaterial color={backColor} metalness={0} roughness={0.35} clearcoat={0.5} />
+    <meshPhysicalMaterial color={backColor} metalness={0} roughness={0.32} clearcoat={0.55} />
   ) : (
     <meshPhysicalMaterial color={backColor} metalness={0} roughness={0.72} />
   )
-
-  const glossOverlay = glossy ? (
-    <div
-      aria-hidden
-      style={{
-        position: 'absolute',
-        inset: 0,
-        pointerEvents: 'none',
-        zIndex: 2147483647,
-        background:
-          'linear-gradient(112deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.04) 24%, rgba(255,255,255,0) 40%, rgba(255,255,255,0) 72%, rgba(255,255,255,0.05) 100%)',
-      }}
-    />
-  ) : undefined
 
   const backGeometry = React.useMemo(
     () =>
@@ -111,6 +98,16 @@ function MagazineImpl({
         12
       ),
     [body]
+  )
+
+  const coverSheenGeometry = React.useMemo(
+    () => new THREE.ShapeGeometry(roundedRectShape(cover.width, cover.height, cover.radius), 12),
+    [cover]
+  )
+
+  const glossSheen = React.useMemo(
+    () => (glossy ? createSurfaceSheenMaterial({ roughness: 0.14, envMapIntensity: 0.92 }) : null),
+    [glossy]
   )
 
   // the trimmed block's three open edges show their leaves; the cuts are
@@ -122,9 +119,11 @@ function MagazineImpl({
   React.useEffect(
     () => () => {
       backGeometry.dispose()
+      coverSheenGeometry.dispose()
+      glossSheen?.dispose()
       blockGeometry.dispose()
     },
-    [backGeometry, blockGeometry]
+    [backGeometry, coverSheenGeometry, glossSheen, blockGeometry]
   )
 
   const surfaceDefaults = {
@@ -162,6 +161,19 @@ function MagazineImpl({
         {coverStockMaterial}
       </mesh>
 
+      {/* physically-lit coated gloss sheen over the printed covers when glossy */}
+      {glossSheen && (
+        <mesh geometry={coverSheenGeometry} material={glossSheen} position-z={body.thickness / 2 + 0.0055} />
+      )}
+      {glossSheen && regions.back != null && (
+        <mesh
+          geometry={coverSheenGeometry}
+          material={glossSheen}
+          position-z={-body.thickness / 2 - 0.0055}
+          rotation={[0, Math.PI, 0]}
+        />
+      )}
+
       {/* the live cover: real DOM, CSS3D-transformed onto the front */}
       <DeviceScreen
         {...resolveSurface(regions.cover, surfaceDefaults)}
@@ -169,7 +181,6 @@ function MagazineImpl({
         height={cover.height}
         radius={cover.radius}
         position={[0, 0, body.thickness / 2 + 0.004]}
-        overlay={glossOverlay}
       >
         {regions.cover?.children}
       </DeviceScreen>
@@ -183,7 +194,6 @@ function MagazineImpl({
           radius={cover.radius}
           position={[0, 0, -body.thickness / 2 - 0.004]}
           rotation={[0, Math.PI, 0]}
-          overlay={glossOverlay}
         >
           {regions.back.children}
         </DeviceScreen>
@@ -205,7 +215,6 @@ function MagazineImpl({
           radius={0.006}
           position={[-body.width / 2 - 0.01, 0, 0]}
           rotation={[0, -Math.PI / 2, -Math.PI / 2]}
-          overlay={glossOverlay}
         >
           {regions.spine.children}
         </DeviceScreen>

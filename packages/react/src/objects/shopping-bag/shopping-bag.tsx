@@ -2,6 +2,7 @@ import * as React from 'react'
 import * as THREE from 'three'
 import type { ThreeElements } from '@react-three/fiber'
 import {
+  CORD,
   FIBRE,
   SHOPPING_BAG,
   SHOPPING_BAG_REGIONS,
@@ -42,10 +43,10 @@ export interface ShoppingBagProps extends Omit<GroupProps, 'children' | 'color'>
  * A procedurally built kraft shopping bag, hollow like the real thing: four
  * walls and a floor around an open rectangular mouth, side gussets creasing
  * inward at the mouth and folding flat toward the square bottom, the
- * envelope fold showing on the underside, and twisted-rope handles arcing
- * over the rim to glued reinforcement patches inside. The front and back
- * faces are live DOM, full bleed to the top edge. No 3D asset files are
- * loaded.
+ * envelope fold showing on the underside, and constant-section twisted-paper
+ * rope handles arcing over the rim to glued reinforcement patches inside. The
+ * front and back faces are live DOM, full bleed to the top edge. No 3D asset
+ * files are loaded.
  *
  * Must be rendered inside a react-three-fiber `<Canvas>` (or `<MockupCanvas>`).
  *
@@ -126,7 +127,24 @@ function ShoppingBagImpl({
     geometry.computeVertexNormals()
     return geometry
   }, [body, wall, gusset])
-  React.useEffect(() => () => gussetGeometry.dispose(), [gussetGeometry])
+
+  // Constant-section swept twisted-rope arch handle: replaces the old
+  // non-uniformly scaled torus (which squashed the circular rope section)
+  // with one continuous TubeGeometry from glued anchor up over the rim and back.
+  const cordDrop = handle.radius * 0.4
+  const handleGeometry = React.useMemo(() => {
+    const r = handle.radius
+    const apexY = r * handle.rise
+    const pts: THREE.Vector3[] = [new THREE.Vector3(-r, -cordDrop, 0)]
+    const archSteps = 20
+    for (let i = 0; i <= archSteps; i++) {
+      const a = Math.PI - (i / archSteps) * Math.PI
+      pts.push(new THREE.Vector3(Math.cos(a) * r, Math.sin(a) * apexY, 0))
+    }
+    pts.push(new THREE.Vector3(r, -cordDrop, 0))
+    const curve = new THREE.CatmullRomCurve3(pts)
+    return new THREE.TubeGeometry(curve, 56, handle.tube, 12, false)
+  }, [handle.radius, handle.rise, handle.tube, cordDrop])
 
   // The envelope fold on the underside, painted once: diagonal creases from
   // each corner and the glued outer flap's edges, as a white-based map so
@@ -175,7 +193,14 @@ function ShoppingBagImpl({
     texture.anisotropy = 4
     return texture
   }, [body])
-  React.useEffect(() => () => bottomTexture?.dispose(), [bottomTexture])
+
+  React.useEffect(() => {
+    return () => {
+      gussetGeometry.dispose()
+      handleGeometry.dispose()
+      bottomTexture?.dispose()
+    }
+  }, [gussetGeometry, handleGeometry, bottomTexture])
 
   const surfaceDefaults = {
     surfaceBackground,
@@ -191,13 +216,20 @@ function ShoppingBagImpl({
   }
 
   // handle hardware hangs from the rim in proportion to the handle itself
-  const cordDrop = handle.radius * 0.4
   const patchDrop = handle.radius * 0.31
   // The cords run down INSIDE the wall, clear of it by their own radius, and
-  // the patch is glued over them. They were set 0.03 in on a 0.046 cord, so
-  // each one came through the board and drew a dark line down the outside of
-  // an unprinted back - and stood in front of the patch that should cover it.
+  // the patch is glued over them.
   const cordInset = handle.tube + 0.004
+
+  // Twisted 3-ply paper-cord finish tiled along the swept tube's length (`u`).
+  const cordMaterial = {
+    color: handleColor,
+    metalness: 0,
+    roughness: 0.86,
+    map: grainTint(CORD, handleColor, 16, 1),
+    normalMap: grainNormal(CORD, 16, 1),
+    normalScale: 1.05,
+  }
 
   return (
     <group {...groupProps}>
@@ -210,6 +242,14 @@ function ShoppingBagImpl({
         <boxGeometry args={[body.width, body.height, wall]} />
         <meshPhysicalMaterial {...kraft(body.width, body.height)} />
       </mesh>
+
+      {/* subtle folded turn-top mouth turnover strips inside the front/back walls */}
+      {([1, -1] as const).map((s) => (
+        <mesh key={`rim${s}`} position={[0, body.height / 2 - 0.055, s * (body.depth / 2 - wall - 0.003)]}>
+          <boxGeometry args={[body.width - wall * 2.4, 0.11, 0.006]} />
+          <meshPhysicalMaterial {...kraft(body.width, 0.11)} roughness={0.9} />
+        </mesh>
+      ))}
 
       {/* side gussets - creased at the mouth, flat at the base */}
       <mesh geometry={gussetGeometry}>
@@ -230,23 +270,23 @@ function ShoppingBagImpl({
         </mesh>
       )}
 
-      {/* twisted-rope handles over the rim, with glued patches inside */}
+      {/* twisted-rope handles over the rim, with glued kraft patches inside */}
       {([1, -1] as const).map((s) => (
         <group key={s} position={[0, body.height / 2, s * (body.depth / 2 - wall - cordInset)]}>
-          <mesh scale={[1, handle.rise, 1]}>
-            <torusGeometry args={[handle.radius, handle.tube, 10, 40, Math.PI]} />
-            <meshPhysicalMaterial color={handleColor} metalness={0} roughness={0.8} />
+          <mesh geometry={handleGeometry}>
+            <meshPhysicalMaterial {...cordMaterial} />
           </mesh>
-          {([1, -1] as const).map((x) => (
-            <mesh key={x} position={[x * handle.radius, -cordDrop / 2, 0]}>
-              <cylinderGeometry args={[handle.tube, handle.tube, cordDrop, 10]} />
-              <meshPhysicalMaterial color={handleColor} metalness={0} roughness={0.8} />
-            </mesh>
-          ))}
           {([1, -1] as const).map((x) => (
             <mesh key={`p${x}`} position={[x * handle.radius, -patchDrop, -s * (handle.tube + 0.003)]} rotation-y={s === 1 ? Math.PI : 0}>
               <planeGeometry args={[handle.patch.width, handle.patch.height]} />
-              <meshPhysicalMaterial color="#a67f52" metalness={0} roughness={0.9} />
+              <meshPhysicalMaterial
+                color="#a67f52"
+                metalness={0}
+                roughness={0.9}
+                map={grainTint(FIBRE, '#a67f52', 0.8, 0.8)}
+                normalMap={grainNormal(FIBRE, 0.8, 0.8)}
+                normalScale={0.2}
+              />
             </mesh>
           ))}
         </group>
