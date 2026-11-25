@@ -179,9 +179,10 @@
 }
 
 .pk-eyebrow {
-  margin: 0;
-  font-size: 12px;
-  font-weight: 600;
+  /* the column's 16px gap, less 8px: the kicker sits close to the title */
+  margin: 0 0 -8px;
+  font-size: 15px;
+  font-weight: 500;
   letter-spacing: 0.02em;
   color: var(--pk-accent-text);
 }

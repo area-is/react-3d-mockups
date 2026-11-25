@@ -196,7 +196,7 @@
 }
 
 .md-match-head p,
-.md-pass-copy > p {
+.md-pass-copy > p:not(.md-eyebrow) {
   margin: 0 0 24px;
   font-size: 16px;
   line-height: 1.55;
@@ -300,9 +300,9 @@
 }
 
 .md-eyebrow {
-  margin: 0 0 12px;
-  font-size: 14px;
-  font-weight: 600;
+  margin: 0 0 8px;
+  font-size: 15px;
+  font-weight: 500;
   letter-spacing: 0;
   color: var(--md-gold);
 }

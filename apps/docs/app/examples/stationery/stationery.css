@@ -99,9 +99,9 @@
 }
 
 .am-eyebrow {
-  margin: 0 0 16px;
-  font-size: 13px;
-  font-weight: 600;
+  margin: 0 0 8px;
+  font-size: 15px;
+  font-weight: 500;
   letter-spacing: 0.02em;
   color: color-mix(in srgb, var(--am-accent) 50%, var(--am-text));
   transition: color 0.4s ease;

@@ -95,9 +95,9 @@
 }
 
 .at-eyebrow {
-  margin: 0 0 16px;
-  font-size: 14px;
-  font-weight: 600;
+  margin: 0 0 8px;
+  font-size: 15px;
+  font-weight: 500;
   letter-spacing: 0;
   color: var(--at-red);
 }
