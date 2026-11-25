@@ -585,7 +585,7 @@ code {
 }
 
 .accent-link {
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 600;
   color: var(--accent);
 }
@@ -1504,7 +1504,7 @@ code {
   font-size: clamp(19px, 2vw, 24px);
   font-weight: 600;
   letter-spacing: -0.025em;
-  margin: 9px 0 9px;
+  margin: 9px 0 14px;
 }
 
 .features p {
