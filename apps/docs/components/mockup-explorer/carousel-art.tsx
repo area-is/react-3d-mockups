@@ -7,7 +7,7 @@ import {
   SwissDialA,
   SwissEpicentre,
   SwissField,
-  SwissRaster,
+  HalftonePoster,
   SwissRhythm,
   SwissRotation,
 } from '../screens/swiss-art'
@@ -125,7 +125,7 @@ export type CarouselFaces = Readonly<Record<string, string>>
 export const CAROUSEL_ART: Readonly<Record<string, CarouselFaces>> = {
   // Devices carry one region, `screen`.
   galaxy: { screen: 'SwissRotation' },
-  iphone: { screen: 'SwissRaster' },
+  iphone: { screen: 'HalftonePoster' },
   fold: { screen: 'Newspaper' },
   flip: { screen: 'SwissField' },
   laptop: { screen: 'SwissSite' },
@@ -233,7 +233,7 @@ export interface ArtPlacement {
  */
 const ART: Readonly<Record<string, (finish: string, at: ArtPlacement) => ReactNode>> = {
   SwissRotation: () => <SwissRotation />,
-  SwissRaster: () => <SwissRaster />,
+  HalftonePoster: () => <HalftonePoster />,
   SwissField: () => <SwissField />,
   SwissEpicentre: () => <SwissEpicentre />,
   SwissChecker: () => <SwissChecker />,

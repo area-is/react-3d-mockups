@@ -544,7 +544,7 @@ export const SwissRotation = () => (
   />
 )
 
-export const SwissRaster = () => (
+export const HalftonePoster = () => (
   <SwissStack
     pattern={halftone}
     live

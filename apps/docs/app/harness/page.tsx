@@ -55,7 +55,7 @@ import {
 import { carouselArtNode } from '@/components/mockup-explorer/carousel-art'
 import { BillboardAdArt, BusAdArt } from '@/components/screens/print-art'
 import { SwissSite } from '@/components/screens/device-apps'
-import { SwissRaster } from '@/components/screens/swiss-art'
+import { HalftonePoster } from '@/components/screens/swiss-art'
 
 /**
  * Mockups posed straight from their own framing - no per-device wiring, so
@@ -622,7 +622,7 @@ function HarnessScene() {
           <SwissSite />
         </Laptop>
         <IPhone variant="pro" color="deepblue" position={[2.05, -0.35, 0.9]} rotation={[rx, ry - 0.42, 0]} scale={0.62}>
-          <SwissRaster />
+          <HalftonePoster />
         </IPhone>
       </MockupCanvas>
     )

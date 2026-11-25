@@ -73,7 +73,7 @@ import {
   SwissDialA,
   SwissEpicentre,
   SwissField,
-  SwissRaster,
+  HalftonePoster,
   SwissRhythm,
   SwissRotation,
 } from '../screens/swiss-art'
@@ -390,7 +390,7 @@ const DEVICES: Entry[] = [
     statusBarInk: '#efede6',
     res: pxRes('iphone', { variant: 'pro' }),
     colorways: IPHONE_COLORWAYS.pro,
-    content: () => <SwissRaster />,
+    content: () => <HalftonePoster />,
     render: ({ color, screen, surface, surfaceStyle, statusBar, resolution }) => (
       <IPhone variant="pro" color={color} surfaceBackground={surface} surfaceStyle={surfaceStyle} resolution={resolution} statusBar={statusBar}>
         {screen}
