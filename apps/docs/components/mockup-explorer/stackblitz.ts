@@ -152,7 +152,7 @@ export default function App() {
 }
 `
 
-/** `import { SwissRotation } from './swiss-art'` - a screen from this site. */
+/** `import { RotationBackground } from './swiss-art'` - a screen from this site. */
 const LOCAL_IMPORT = /^import \{ ([^}]+) \} from '\.[^']*'\n/gm
 
 /**

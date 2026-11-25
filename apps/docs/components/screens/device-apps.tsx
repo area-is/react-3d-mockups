@@ -120,7 +120,7 @@ const SITE_MUTED = '#6b6963'
  * would. The hero pattern is live - it reseeds itself - because this is a
  * screen and the page is here to say so.
  */
-export function SwissSite() {
+export function WebsiteBackground() {
   const cards: [typeof damier, string, string, string, string, string][] = [
     [damier, 'kunsthalle', 'Kunsthalle Basel', 'Identity system · 2026', '#e6f0ee', '#0f8b8d'],
     [ortho, 'meridian', 'Meridian Transit', 'Wayfinding · 2025', '#f1e6d8', '#ff6a1a'],

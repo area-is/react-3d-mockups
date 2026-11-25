@@ -359,7 +359,7 @@ export function Sheet({ tone, style, children }: { tone: Tone; style?: CSSProper
 /*  Layouts                                                            */
 /* ------------------------------------------------------------------ */
 
-export interface SwissProps {
+export interface BackgroundProps {
   pattern: PatternDefinition
   /** Pinned for a printed face; a live one reads the shared clock instead. */
   seed?: string
@@ -387,7 +387,7 @@ export interface SwissProps {
  * Portrait sheet: colophon at the top, the picture in the middle, the type
  * block on the baseline. The classic Zurich concert bill.
  */
-export function SwissStack({
+export function BackgroundStack({
   pattern,
   seed,
   live,
@@ -399,7 +399,7 @@ export function SwissStack({
   kicker,
   title,
   meta,
-}: SwissProps) {
+}: BackgroundProps) {
   const t = material ? materialTone(material, accent) : TONES[tone]
   return (
     <Sheet
@@ -432,7 +432,7 @@ export function SwissStack({
  * Landscape sheet: the type takes the left third and the picture the rest, so
  * a wide face reads as two columns rather than as a stretched portrait.
  */
-export function SwissSplit({
+export function BackgroundSplit({
   pattern,
   seed,
   live,
@@ -444,7 +444,7 @@ export function SwissSplit({
   kicker,
   title,
   meta,
-}: SwissProps) {
+}: BackgroundProps) {
   const t = material ? materialTone(material, accent) : TONES[tone]
   return (
     <div style={{ ...sheet(t), flexDirection: 'row' }}>
@@ -476,7 +476,7 @@ export function SwissSplit({
  * it gets one coarse pattern and one number - anything with a hierarchy in it
  * would be mush at that size.
  */
-export function SwissDial({
+export function BackgroundDial({
   pattern,
   seed,
   live,
@@ -486,7 +486,7 @@ export function SwissDial({
   grid = '2x3',
   kicker,
   title,
-}: Omit<SwissProps, 'index' | 'meta'> & { index?: string; meta?: string }) {
+}: Omit<BackgroundProps, 'index' | 'meta'> & { index?: string; meta?: string }) {
   const t = material ? materialTone(material, accent) : TONES[tone]
   return (
     <div style={{ ...sheet(t), position: 'relative', alignItems: 'flex-end' }}>
@@ -531,8 +531,8 @@ export function SwissDial({
  * real apps (`device-apps`) - a watch face, a studio's website, a newspaper.
  */
 
-export const SwissRotation = () => (
-  <SwissStack
+export const RotationBackground = () => (
+  <BackgroundStack
     pattern={gyre}
     live
     tone="midnight"
@@ -544,8 +544,8 @@ export const SwissRotation = () => (
   />
 )
 
-export const HalftonePoster = () => (
-  <SwissStack
+export const HalftoneBackground = () => (
+  <BackgroundStack
     pattern={halftone}
     live
     tone="ember"
@@ -557,8 +557,8 @@ export const HalftonePoster = () => (
   />
 )
 
-export const SwissField = () => (
-  <SwissStack
+export const LineFieldBackground = () => (
+  <BackgroundStack
     pattern={dipole}
     live
     tone="moss"
@@ -570,8 +570,8 @@ export const SwissField = () => (
   />
 )
 
-export const SwissEpicentre = () => (
-  <SwissStack
+export const EpicentreBackground = () => (
+  <BackgroundStack
     pattern={epicentre}
     live
     tone="plum"
@@ -583,8 +583,8 @@ export const SwissEpicentre = () => (
   />
 )
 
-export const SwissChecker = () => (
-  <SwissStack
+export const CheckerBackground = () => (
+  <BackgroundStack
     pattern={damier}
     live
     tone="sea"
@@ -596,12 +596,12 @@ export const SwissChecker = () => (
   />
 )
 
-export const SwissDialA = () => (
-  <SwissDial pattern={gyre} live tone="electric" grid="4x6" kicker="Zürich" title="9:41" />
+export const WatchDialBackground = () => (
+  <BackgroundDial pattern={gyre} live tone="electric" grid="4x6" kicker="Zürich" title="9:41" />
 )
 
-export const SwissRhythm = () => (
-  <SwissSplit
+export const RhythmBackground = () => (
+  <BackgroundSplit
     pattern={chase}
     live
     tone="graphite"
@@ -613,8 +613,8 @@ export const SwissRhythm = () => (
   />
 )
 
-export const SwissBill = () => (
-  <SwissStack
+export const PrintedFieldBackground = () => (
+  <BackgroundStack
     pattern={dipole}
     seed="poster-bill"
     tone="ultramarine"

@@ -2,7 +2,7 @@ import * as React from 'react'
 import { useCurrentFrame, useVideoConfig } from 'remotion'
 import { GalaxyMockup } from 'react-3d-mockups'
 import { gyre } from 'tabbied/patterns'
-import { SwissStack } from '@/components/screens/swiss-art'
+import { BackgroundStack } from '@/components/screens/swiss-art'
 import { useStage } from '../../campaigns/kit'
 import { easeInOut, tween, type Vec3 } from '../../reel/motion'
 import { BRAND, SANS } from '../brand'
@@ -57,7 +57,7 @@ export function OneComponentShot() {
       />
       <div style={{ position: 'absolute', left: 900 * u, top: 20 * u, width: 980 * u, height: 1040 * u }}>
         <GalaxyMockup {...stage} variant="s26" color="icyblue" statusBar={{ color: '#efede6' }} rotation={rotation}>
-          <SwissStack pattern={gyre} seed="promo-rotation" tone="midnight" grid="6x9" index="01" kicker="Rotation" title={'Slow\nturns'} meta="Neue Grafik · Zürich" />
+          <BackgroundStack pattern={gyre} seed="promo-rotation" tone="midnight" grid="6x9" index="01" kicker="Rotation" title={'Slow\nturns'} meta="Neue Grafik · Zürich" />
         </GalaxyMockup>
       </div>
       <div style={{ position: 'absolute', left: 110 * u, top: 140 * u }}>

@@ -54,8 +54,8 @@ import {
 } from 'react-3d-mockups'
 import { carouselArtNode } from '@/components/mockup-explorer/carousel-art'
 import { BillboardAdArt, BusAdArt } from '@/components/screens/print-art'
-import { SwissSite } from '@/components/screens/device-apps'
-import { HalftonePoster } from '@/components/screens/swiss-art'
+import { WebsiteBackground } from '@/components/screens/device-apps'
+import { HalftoneBackground } from '@/components/screens/swiss-art'
 
 /**
  * Mockups posed straight from their own framing - no per-device wiring, so
@@ -213,7 +213,7 @@ function regionProbe(Mockup: object, measuredAt: Record<string, unknown> = {}): 
  *                                                  (default gradient; `context` reports
  *                                                  whether React context reaches the glass)
  *   art         artwork for `screen=art`: any piece the carousel stages
- *               (SwissSite, CartonFront, …) or BusAdArt | BillboardAdArt;
+ *               (WebsiteBackground, CartonFront, …) or BusAdArt | BillboardAdArt;
  *               printed pieces take `color` as their stock
  *   device      …also `composed`: a laptop and a phone in ONE canvas, the
  *               home page's "Composable by design" picture
@@ -619,10 +619,10 @@ function HarnessScene() {
     return (
       <MockupCanvas controls={controls} camera={{ position: [0, cy, dist], fov: 40 }} shadows={shadows}>
         <Laptop variant="air13" color="midnight" position={[-0.55, 0.05, -0.6]} rotation={[rx, ry + 0.32, 0]}>
-          <SwissSite />
+          <WebsiteBackground />
         </Laptop>
         <IPhone variant="pro" color="deepblue" position={[2.05, -0.35, 0.9]} rotation={[rx, ry - 0.42, 0]} scale={0.62}>
-          <HalftonePoster />
+          <HalftoneBackground />
         </IPhone>
       </MockupCanvas>
     )

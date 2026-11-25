@@ -2,18 +2,18 @@
 
 import type { ReactNode } from 'react'
 import {
-  SwissBill,
-  SwissChecker,
-  SwissDialA,
-  SwissEpicentre,
-  SwissField,
-  HalftonePoster,
-  SwissRhythm,
-  SwissRotation,
+  PrintedFieldBackground,
+  CheckerBackground,
+  WatchDialBackground,
+  EpicentreBackground,
+  LineFieldBackground,
+  HalftoneBackground,
+  RhythmBackground,
+  RotationBackground,
 } from '../screens/swiss-art'
 import { JacketBack, JacketCover, JacketSpine } from '../screens/book-jacket'
 import { SleeveBack, SleeveCover, SleeveLabelA, SleeveLabelB } from '../screens/record-sleeve'
-import { Newspaper, SwissSite, WatchFace } from '../screens/device-apps'
+import { Newspaper, WebsiteBackground, WatchFace } from '../screens/device-apps'
 import { CartonBack, CartonFacts, CartonFront, CartonRoof, CartonRoofBack, CartonStory } from '../screens/carton-art'
 import {
   BagBack,
@@ -124,16 +124,16 @@ export type CarouselFaces = Readonly<Record<string, string>>
 
 export const CAROUSEL_ART: Readonly<Record<string, CarouselFaces>> = {
   // Devices carry one region, `screen`.
-  galaxy: { screen: 'SwissRotation' },
-  iphone: { screen: 'HalftonePoster' },
+  galaxy: { screen: 'RotationBackground' },
+  iphone: { screen: 'HalftoneBackground' },
   fold: { screen: 'Newspaper' },
-  flip: { screen: 'SwissField' },
-  laptop: { screen: 'SwissSite' },
-  ipad: { screen: 'SwissEpicentre' },
-  galaxyTab: { screen: 'SwissChecker' },
-  appleWatch: { screen: 'SwissDialA' },
+  flip: { screen: 'LineFieldBackground' },
+  laptop: { screen: 'WebsiteBackground' },
+  ipad: { screen: 'EpicentreBackground' },
+  galaxyTab: { screen: 'CheckerBackground' },
+  appleWatch: { screen: 'WatchDialBackground' },
   galaxyWatch: { screen: 'WatchFace' },
-  studioDisplay: { screen: 'SwissRhythm' },
+  studioDisplay: { screen: 'RhythmBackground' },
 
   // Print objects carry as many faces as the thing has.
   book: { cover: 'JacketCover', spine: 'JacketSpine', back: 'JacketBack' },
@@ -168,7 +168,7 @@ export const CAROUSEL_ART: Readonly<Record<string, CarouselFaces>> = {
     bottom: 'MailerBottom',
   },
   shoppingBag: { front: 'BagFront', back: 'BagBack' },
-  posterFrame: { poster: 'SwissBill' },
+  posterFrame: { poster: 'PrintedFieldBackground' },
   billboard: { face: 'BillboardAdArt' },
   aFrameSign: { front: 'ChalkMenuArt', back: 'ChalkHoursArt' },
   bus: { curbSide: 'SunpeelSide', streetSide: 'SunpeelSide', rear: 'SunpeelRear', destinationSign: 'SunpeelRoute' },
@@ -232,17 +232,17 @@ export interface ArtPlacement {
  * the carousel makes.
  */
 const ART: Readonly<Record<string, (finish: string, at: ArtPlacement) => ReactNode>> = {
-  SwissRotation: () => <SwissRotation />,
-  HalftonePoster: () => <HalftonePoster />,
-  SwissField: () => <SwissField />,
-  SwissEpicentre: () => <SwissEpicentre />,
-  SwissChecker: () => <SwissChecker />,
-  SwissDialA: () => <SwissDialA />,
-  SwissRhythm: () => <SwissRhythm />,
-  SwissBill: () => <SwissBill />,
+  RotationBackground: () => <RotationBackground />,
+  HalftoneBackground: () => <HalftoneBackground />,
+  LineFieldBackground: () => <LineFieldBackground />,
+  EpicentreBackground: () => <EpicentreBackground />,
+  CheckerBackground: () => <CheckerBackground />,
+  WatchDialBackground: () => <WatchDialBackground />,
+  RhythmBackground: () => <RhythmBackground />,
+  PrintedFieldBackground: () => <PrintedFieldBackground />,
   BillboardAdArt: () => <BillboardAdArt />,
   Newspaper: () => <Newspaper />,
-  SwissSite: () => <SwissSite />,
+  WebsiteBackground: () => <WebsiteBackground />,
   WatchFace: () => <WatchFace />,
 
   JacketCover: (finish) => <JacketCover cloth={finish} />,
