@@ -70,21 +70,24 @@ const STRUCTURED_DATA = {
  * quality, transparent background), trimmed and saved at three times the
  * size they are shown.
  *
- * The pictures are renders of the real mockups, made by
- * `scripts/generate-feature-shots.mjs` (`npm run features`), not live canvases:
- * four more WebGL contexts to illustrate four sentences would cost the page
- * more than the carousel above them does. `width` and `height` are the files'
- * own, so the browser reserves each one's box before it loads.
+ * The pictures are pen drawings in white ink, made by the same model with
+ * `scripts/generate-feature-art.py` - the marks' style at the detail of an
+ * engraving. They replaced renders of the real mockups
+ * (`scripts/generate-feature-shots.mjs`, `npm run features`, still in
+ * public/features). Either way not live canvases: four more WebGL contexts to
+ * illustrate four sentences would cost the page more than the carousel above
+ * them does. `width` and `height` are the files' own, so the browser reserves
+ * each one's box before it loads.
  */
 const FEATURES = [
   {
     title: 'Rendering',
     mark: { src: '/features/line-rendering.webp', width: 197, height: 216 },
     image: {
-      src: '/features/rendering.webp',
-      width: 485,
-      height: 720,
-      alt: 'The back of an iPhone 17 Pro mockup in Cosmic Orange, showing its camera plateau',
+      src: '/features/pen-rendering.webp',
+      width: 940,
+      height: 1000,
+      alt: 'A pen drawing of the back of a phone, its camera plateau lit by a studio softbox',
     },
     body: (
       <>
@@ -98,10 +101,10 @@ const FEATURES = [
     title: 'Live screen content',
     mark: { src: '/features/line-live-screen.webp', width: 279, height: 216 },
     image: {
-      src: '/features/surface.webp',
-      width: 1040,
-      height: 712,
-      alt: 'A MacBook Air mockup with a studio website on its screen',
+      src: '/features/pen-live-screen.webp',
+      width: 1000,
+      height: 740,
+      alt: 'A pen drawing of a laptop showing a website with a video player on its screen',
     },
     body: (
       <>
@@ -116,10 +119,10 @@ const FEATURES = [
     title: 'Procedural objects',
     mark: { src: '/features/line-procedural.webp', width: 171, height: 216 },
     image: {
-      src: '/features/procedural.webp',
-      width: 1040,
-      height: 303,
-      alt: 'A city bus mockup with a printed side advert and a lit destination sign',
+      src: '/features/pen-procedural.webp',
+      width: 1000,
+      height: 385,
+      alt: 'A pen drawing of a city bus with a blank side advert panel, over construction lines',
     },
     body: (
       <>
@@ -132,10 +135,10 @@ const FEATURES = [
     title: 'Composable',
     mark: { src: '/features/line-composable.webp', width: 360, height: 216 },
     image: {
-      src: '/features/composable.webp',
-      width: 1040,
-      height: 601,
-      alt: 'A MacBook Air and an iPhone composed in one scene, each with its own screen',
+      src: '/features/pen-composable.webp',
+      width: 1000,
+      height: 706,
+      alt: 'A pen drawing of a laptop and a phone side by side, joined by dotted guide lines',
     },
     body: (
       <>
