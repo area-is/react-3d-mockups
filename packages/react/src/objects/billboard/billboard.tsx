@@ -20,10 +20,14 @@ export interface BillboardProps extends Omit<GroupProps, 'children' | 'color'>, 
 
 /**
  * A procedurally built highway bulletin: a 14' x 48' live face in a framed
- * steel panel with structural rear ribs and cross-bracing, monopole column on
- * a bolted concrete footing with gusset plates, galvanized maintenance catwalk
- * with knee brackets and end rails, fixed access ladder, and cantilevered LED
- * floodlights along the walkway. No 3D asset files are loaded.
+ * steel panel with rear stringers and a torsion tube, monopole column on a
+ * concrete footing, galvanized maintenance catwalk with end rails, fixed
+ * access ladder, and LED floodlights on arms along the walkway. No 3D asset
+ * files are loaded.
+ *
+ * Detailed enough to read as a real structure up close, but kept to the
+ * members you see from a viewing distance - no bolts, gussets or bracing -
+ * so the face stays the subject.
  *
  * The group origin is the face center; the ground sits
  * `BILLBOARD.standHeight` below it. Must be rendered inside a
@@ -124,12 +128,11 @@ function BillboardImpl({
       {Array.from({ length: 13 }, (_, i) => (
         <mesh key={i} position={[(i - 6) * (apron.width / 13.4), apronCenterY, apron.depth / 2 - 0.028]}>
           <boxGeometry args={[0.022, apron.height - 0.06, 0.022]} />
-          <meshPhysicalMaterial {...galvanized} />
+          <meshPhysicalMaterial {...steel} roughness={0.6} />
         </mesh>
       ))}
 
-      {/* monopole column terminating cleanly inside its bolted steel base plate,
-          triangular welded gussets, and concrete foundation plinth */}
+      {/* monopole column ending in its steel base plate on a concrete plinth */}
       <mesh position={[0, poleCenterY, poleZ]}>
         <cylinderGeometry args={[pole.radius, pole.radius, poleHeight, 24]} />
         <meshPhysicalMaterial {...steel} />
@@ -143,48 +146,20 @@ function BillboardImpl({
         <cylinderGeometry args={[pole.collarRadius + 0.05, pole.collarRadius + 0.07, 0.1, 24]} />
         <meshPhysicalMaterial {...concrete} />
       </mesh>
-      {/* bolted steel base flange plate */}
+      {/* steel base flange plate */}
       <mesh position={[0, groundY + 0.118, poleZ]}>
         <cylinderGeometry args={[pole.collarRadius + 0.025, pole.collarRadius + 0.025, 0.036, 24]} />
         <meshPhysicalMaterial {...steel} roughness={0.48} />
       </mesh>
-      {/* 8 galvanized hex anchor bolts around the base flange */}
-      {Array.from({ length: 8 }, (_, i) => {
-        const a = (i / 8) * Math.PI * 2 + Math.PI / 8
-        const r = pole.collarRadius - 0.01
-        return (
-          <mesh key={i} position={[Math.cos(a) * r, groundY + 0.145, poleZ + Math.sin(a) * r]}>
-            <cylinderGeometry args={[0.015, 0.015, 0.022, 6]} />
-            <meshPhysicalMaterial {...galvanized} />
-          </mesh>
-        )
-      })}
-      {/* 4 welded steel gusset stiffeners bracing column to base flange */}
-      {[0, Math.PI / 2, Math.PI, (3 * Math.PI) / 2].map((a) => (
-        <mesh
-          key={a}
-          position={[Math.cos(a) * (pole.radius + 0.028), groundY + 0.21, poleZ + Math.sin(a) * (pole.radius + 0.028)]}
-          rotation-y={-a}
-        >
-          <boxGeometry args={[0.065, 0.16, 0.018]} />
-          <meshPhysicalMaterial {...steel} />
-        </mesh>
-      ))}
 
-      {/* maintenance catwalk hung off the apron front: galvanized deck,
-          guardrails with end returns, and cantilevered knee brackets */}
+      {/* maintenance catwalk hung off the apron front: galvanized deck and
+          guardrails with end returns */}
       <group position={[0, catwalkY, catwalkZ]}>
-        {/* walkway deck with longitudinal rib texture */}
+        {/* walkway deck */}
         <mesh>
           <boxGeometry args={[catwalk.width, catwalk.thickness, catwalk.depth]} />
           <meshPhysicalMaterial {...galvanized} roughness={0.46} />
         </mesh>
-        {[-0.08, 0, 0.08].map((dz) => (
-          <mesh key={dz} position={[0, catwalk.thickness / 2 + 0.004, dz]}>
-            <boxGeometry args={[catwalk.width - 0.04, 0.008, 0.025]} />
-            <meshPhysicalMaterial {...steel} roughness={0.55} />
-          </mesh>
-        ))}
         {/* front top rail + mid rail */}
         <mesh position={[0, catwalk.railHeight, catwalk.depth / 2 - 0.02]}>
           <boxGeometry args={[catwalk.width, 0.026, 0.026]} />
@@ -207,38 +182,30 @@ function BillboardImpl({
             </mesh>
           </group>
         ))}
-        {/* guardrail stanchions + underside angled steel knee brackets */}
-        {Array.from({ length: catwalk.posts }, (_, i) => {
-          const px = (i - (catwalk.posts - 1) / 2) * ((catwalk.width - 0.1) / (catwalk.posts - 1))
-          return (
-            <group key={i} position-x={px}>
-              <mesh position={[0, catwalk.railHeight / 2, catwalk.depth / 2 - 0.02]}>
-                <boxGeometry args={[0.024, catwalk.railHeight, 0.024]} />
-                <meshPhysicalMaterial {...galvanized} />
-              </mesh>
-              {/* angled knee bracket supporting the catwalk from the apron */}
-              <mesh position={[0, -0.095, -0.02]} rotation-x={0.62}>
-                <boxGeometry args={[0.03, 0.028, 0.34]} />
-                <meshPhysicalMaterial {...steel} />
-              </mesh>
-            </group>
-          )
-        })}
+        {/* guardrail stanchions */}
+        {Array.from({ length: catwalk.posts }, (_, i) => (
+          <mesh
+            key={i}
+            position={[
+              (i - (catwalk.posts - 1) / 2) * ((catwalk.width - 0.1) / (catwalk.posts - 1)),
+              catwalk.railHeight / 2,
+              catwalk.depth / 2 - 0.02,
+            ]}
+          >
+            <boxGeometry args={[0.024, catwalk.railHeight, 0.024]} />
+            <meshPhysicalMaterial {...galvanized} />
+          </mesh>
+        ))}
       </group>
 
-      {/* cantilevered hooded rectangular LED floodlights projecting out from
-          the catwalk and aimed back up at the bulletin face */}
+      {/* LED floodlights on arms out from the catwalk, aimed back up at the
+          face - bulletins are bottom-lit from the walkway, not top-lit */}
       {Array.from({ length: lights.count }, (_, i) => {
         const x = (i - (lights.count - 1) / 2) * (face.width / lights.count) * 0.84
         const fixtureZ = apron.depth / 2 - 0.04 + catwalk.depth
         const armReach = 0.36
         return (
           <group key={i} position={[x, catwalkY - 0.01, fixtureZ]}>
-            {/* clamp collar on catwalk edge */}
-            <mesh position={[0, 0.01, -0.02]}>
-              <boxGeometry args={[0.055, 0.06, 0.055]} />
-              <meshPhysicalMaterial {...steel} />
-            </mesh>
             {/* horizontal galvanized steel extension arm */}
             <mesh position={[0, 0.01, armReach / 2]}>
               <boxGeometry args={[0.028, 0.028, armReach]} />
@@ -264,50 +231,19 @@ function BillboardImpl({
         )
       })}
 
-      {/* rear structural steelwork: heavy horizontal torsion tube, vertical
-          panel stringer ribs, upper/lower tie beams, and diagonal struts */}
-      <group>
-        {/* heavy horizontal torsion tube behind the apron */}
-        <mesh rotation-z={Math.PI / 2} position={[0, apronCenterY, torsionZ]}>
-          <cylinderGeometry args={[pole.radius * 0.74, pole.radius * 0.74, panel.width * 0.78, 20]} />
-          <meshPhysicalMaterial {...steel} roughness={0.48} />
+      {/* rear steelwork: the torsion tube the pole tees into, and four
+          stringers up the back of the panel, painted like the panel so they
+          read as relief rather than stripes */}
+      <mesh rotation-z={Math.PI / 2} position={[0, apronCenterY, torsionZ]}>
+        <cylinderGeometry args={[pole.radius * 0.74, pole.radius * 0.74, panel.width * 0.78, 20]} />
+        <meshPhysicalMaterial {...steel} roughness={0.48} />
+      </mesh>
+      {[-1.5, -0.5, 0.5, 1.5].map((k) => (
+        <mesh key={k} position={[k * panel.width * 0.22, -0.08, -panel.depth / 2 - 0.03]}>
+          <boxGeometry args={[0.055, panel.height + 0.16, 0.06]} />
+          <meshPhysicalMaterial {...steel} roughness={0.5} />
         </mesh>
-        {/* end cap flanges on the torsion tube */}
-        {([1, -1] as const).map((s) => (
-          <mesh key={s} rotation-z={Math.PI / 2} position={[s * panel.width * 0.39, apronCenterY, torsionZ]}>
-            <cylinderGeometry args={[pole.radius * 0.82, pole.radius * 0.82, 0.03, 20]} />
-            <meshPhysicalMaterial {...galvanized} />
-          </mesh>
-        ))}
-        {/* 7 vertical structural steel stringer ribs running up the rear panel */}
-        {Array.from({ length: 7 }, (_, i) => {
-          const rx = (i - 3) * (panel.width * 0.145)
-          return (
-            <mesh key={i} position={[rx, -0.08, -panel.depth / 2 - 0.042]}>
-              <boxGeometry args={[0.055, panel.height + 0.16, 0.075]} />
-              <meshPhysicalMaterial {...galvanized} roughness={0.48} />
-            </mesh>
-          )
-        })}
-        {/* two horizontal rear tie beams linking the vertical stringers */}
-        {[-0.42, 0.44].map((by) => (
-          <mesh key={by} position={[0, by, -panel.depth / 2 - 0.068]}>
-            <boxGeometry args={[panel.width * 0.9, 0.06, 0.05]} />
-            <meshPhysicalMaterial {...steel} roughness={0.46} />
-          </mesh>
-        ))}
-        {/* angled steel diagonal bracing struts from torsion tube up to the rear beam */}
-        {[-1.55, -0.58, 0.58, 1.55].map((bx) => (
-          <mesh
-            key={bx}
-            position={[bx, (apronCenterY + 0.44) / 2, (torsionZ - panel.depth / 2 - 0.068) / 2]}
-            rotation-x={Math.atan2(-panel.depth / 2 - 0.068 - torsionZ, 0.44 - apronCenterY)}
-          >
-            <boxGeometry args={[0.045, Math.hypot(0.44 - apronCenterY, -panel.depth / 2 - 0.068 - torsionZ), 0.045]} />
-            <meshPhysicalMaterial {...galvanized} />
-          </mesh>
-        ))}
-      </group>
+      ))}
 
       {/* fixed access ladder up the rear of the pole, bolted on with
           standoff brackets - a fixed ladder is held clear of the structure
