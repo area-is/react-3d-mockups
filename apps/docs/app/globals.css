@@ -1080,9 +1080,9 @@ code {
 /*
  * The stage's toolbar: autoplay's toggle and the copy-code button side by
  * side, centred under the stage they act on. Set in Inter and in sentence
- * case like the readout above the stage. No capsule, no outline and no fill:
- * two labels and a hairline between them, and a label comes up to the text's
- * colour on hover.
+ * case like the readout above the stage. No capsule, no outline, no fill and
+ * no rule between them: two labels set apart by their own padding, and a
+ * label comes up to the text's colour on hover.
  */
 .carousel-tools {
   display: inline-flex;
@@ -1169,14 +1169,6 @@ code {
   to {
     transform: scaleX(0);
   }
-}
-
-.carousel-tools-rule {
-  width: 1px;
-  height: 16px;
-  margin: 0 2px;
-  background: rgba(255, 255, 255, 0.1);
-  flex: none;
 }
 
 /*
@@ -1517,7 +1509,7 @@ code {
 
 .features p {
   color: var(--muted);
-  font-size: clamp(14px, 1.2vw, 17px);
+  font-size: 16px;
   line-height: 1.6;
   margin: 0;
   max-width: 62ch;
@@ -1601,7 +1593,7 @@ code {
 
 .film-copy p {
   color: var(--muted);
-  font-size: 14px;
+  font-size: 16px;
   max-width: 62ch;
   margin: 0;
   text-wrap: pretty;
@@ -1715,7 +1707,7 @@ code {
 
 .quickstart-copy p {
   color: var(--muted);
-  font-size: 14px;
+  font-size: 16px;
   max-width: 44ch;
   margin: 0 0 18px;
   text-wrap: pretty;
@@ -1849,41 +1841,26 @@ code {
 /* ------------------------------------------------------------------ */
 
 /*
- * The docs' Gallery (components/model-gallery.tsx), on the quick start's
- * column. Its stylesheet reads fumadocs' colour variables, which the site
- * does not load, so the section maps the site's palette onto the ones it
- * uses.
+ * The docs' Gallery (components/model-gallery.tsx) without its controls, on
+ * the quick start's column. Its stylesheet reads fumadocs' colour variables,
+ * which the site does not load, so the section maps the site's palette onto
+ * the ones the grid uses.
  */
 .home-gallery {
   --color-fd-foreground: var(--text);
   --color-fd-muted-foreground: var(--muted);
-  --color-fd-accent: rgba(255, 255, 255, 0.07);
-  --color-fd-primary: var(--accent);
   --color-fd-ring: var(--accent-2);
   max-width: 1080px;
   margin: 0 auto;
   padding: clamp(40px, 6.3vw, 65px) clamp(14px, 3.6vw, 43px) 0;
 }
 
-.home-gallery-copy h2 {
-  margin: 0 0 9px;
-}
-
-.home-gallery-copy p {
-  color: var(--muted);
-  font-size: 14px;
-  max-width: 62ch;
+.home-gallery h2 {
   margin: 0;
-  text-wrap: pretty;
 }
 
 .home-gallery .model-gallery {
   margin: 22px 0 0;
-}
-
-/* The docs reset buttons' font through Tailwind; the site does not. */
-.home-gallery .model-gallery-chip {
-  font-family: inherit;
 }
 
 /* ------------------------------------------------------------------ */

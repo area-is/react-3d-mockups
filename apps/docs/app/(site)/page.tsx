@@ -205,24 +205,19 @@ function QuickStart() {
 }
 
 /**
- * Every model, under the quick start: the docs' Gallery component, so the
- * filters, the older-models switch and the links to each model's page work
- * as they do there. Its thumbnails are pre-rendered images, so the section
- * adds no WebGL to the page. The lifecycle provider tells it which models a
- * newer one has replaced, as the docs layout does for the docs.
+ * Every model, under the quick start: the docs' Gallery component without its
+ * filters, count or older-models switch - the newest model of each line as a
+ * plain grid, each linking to its page. The thumbnails are pre-rendered
+ * images, so the section adds no WebGL to the page. The lifecycle provider
+ * tells it which models a newer one has replaced, as the docs layout does for
+ * the docs.
  */
 function Gallery() {
   return (
     <section className="home-gallery" aria-labelledby="gallery-title">
-      <div className="home-gallery-copy">
-        <h2 id="gallery-title">Gallery</h2>
-        <p>
-          {MODEL_COUNT} models - phones, tablets, laptops, watches, print, packaging and more. Pick
-          one for its component, props and a live preview.
-        </p>
-      </div>
+      <h2 id="gallery-title">Gallery</h2>
       <ModelLifecycleProvider value={OLDER_MODELS}>
-        <ModelGallery />
+        <ModelGallery controls={false} />
       </ModelLifecycleProvider>
     </section>
   )

@@ -1702,20 +1702,17 @@ export default function CarouselScene() {
             ) : null}
           </button>
           {code ? (
-            <>
-              <span className="carousel-tools-rule" aria-hidden />
-              <button
-                type="button"
-                className="carousel-tool"
-                data-done={copied}
-                onClick={copyCode}
-                title="Copy the JSX for this mockup"
-                aria-label={copied ? 'Code copied' : `Copy the code for this ${nameOf(entry)}`}
-              >
-                {copied ? <Check size={15} strokeWidth={2.2} aria-hidden /> : <CodeXml size={15} strokeWidth={2} aria-hidden />}
-                <span>{copied ? 'Copied' : 'Copy code'}</span>
-              </button>
-            </>
+            <button
+              type="button"
+              className="carousel-tool"
+              data-done={copied}
+              onClick={copyCode}
+              title="Copy the JSX for this mockup"
+              aria-label={copied ? 'Code copied' : `Copy the code for this ${nameOf(entry)}`}
+            >
+              {copied ? <Check size={15} strokeWidth={2.2} aria-hidden /> : <CodeXml size={15} strokeWidth={2} aria-hidden />}
+              <span>{copied ? 'Copied' : 'Copy code'}</span>
+            </button>
           ) : null}
         </div>
         {/* The one hint - there used to be a "Drag to rotate" badge on the

@@ -39,8 +39,12 @@ const STATUS_NOTE = { current: '', superseded: ' · Older model', deprecated: ' 
  * is ticked. What is older comes from the library's own lineup (see
  * lib/model-lifecycle.ts), so this page and the sidebar agree on it. The chip
  * counts follow the switch: they count what pressing the chip would show.
+ *
+ * `controls={false}` drops the chips, the count and the switch, leaving the
+ * newest model of each line as a plain grid - the home page's version, where
+ * the gallery is something to look at, not to search.
  */
-export function ModelGallery() {
+export function ModelGallery({ controls = true }: { controls?: boolean }) {
   const [kind, setKind] = useState<string | null>(null)
   const [showOlder, setShowOlder] = useState(false)
   const labelId = useId()
@@ -61,42 +65,46 @@ export function ModelGallery() {
 
   return (
     <div className="model-gallery not-prose">
-      <div className="model-gallery-chips" role="group" aria-labelledby={labelId}>
-        <span id={labelId} className="model-gallery-chips-label">
-          Filter by kind
-        </span>
-        <button
-          type="button"
-          className="model-gallery-chip"
-          aria-pressed={kind === null}
-          onClick={() => setKind(null)}
-        >
-          All <span className="model-gallery-chip-count">{pool.length}</span>
-        </button>
-        {KINDS.map((k) => (
-          <button
-            key={k}
-            type="button"
-            className="model-gallery-chip"
-            aria-pressed={kind === k}
-            onClick={() => setKind(kind === k ? null : k)}
-          >
-            {k} <span className="model-gallery-chip-count">{count(k)}</span>
-          </button>
-        ))}
-      </div>
+      {controls && (
+        <>
+          <div className="model-gallery-chips" role="group" aria-labelledby={labelId}>
+            <span id={labelId} className="model-gallery-chips-label">
+              Filter by kind
+            </span>
+            <button
+              type="button"
+              className="model-gallery-chip"
+              aria-pressed={kind === null}
+              onClick={() => setKind(null)}
+            >
+              All <span className="model-gallery-chip-count">{pool.length}</span>
+            </button>
+            {KINDS.map((k) => (
+              <button
+                key={k}
+                type="button"
+                className="model-gallery-chip"
+                aria-pressed={kind === k}
+                onClick={() => setKind(kind === k ? null : k)}
+              >
+                {k} <span className="model-gallery-chip-count">{count(k)}</span>
+              </button>
+            ))}
+          </div>
 
-      <div className="model-gallery-bar">
-        <p className="model-gallery-status" aria-live="polite">
-          {status}
-        </p>
-        {olderCount > 0 && (
-          <label className="model-gallery-older">
-            <input type="checkbox" checked={showOlder} onChange={(e) => setShowOlder(e.currentTarget.checked)} />
-            Show older models <span className="model-gallery-chip-count">{olderCount}</span>
-          </label>
-        )}
-      </div>
+          <div className="model-gallery-bar">
+            <p className="model-gallery-status" aria-live="polite">
+              {status}
+            </p>
+            {olderCount > 0 && (
+              <label className="model-gallery-older">
+                <input type="checkbox" checked={showOlder} onChange={(e) => setShowOlder(e.currentTarget.checked)} />
+                Show older models <span className="model-gallery-chip-count">{olderCount}</span>
+              </label>
+            )}
+          </div>
+        </>
+      )}
 
       <ul className="model-gallery-grid">
         {shown.map((m) => (
