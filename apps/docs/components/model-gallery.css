@@ -118,12 +118,36 @@
   user-select: none;
 }
 
+/* A drawn box rather than the system one: no border, a faint fill like the
+   chips' hover, and the accent with a white tick once checked. */
 .model-gallery-older input {
-  width: 16px;
-  height: 16px;
+  appearance: none;
+  flex: none;
+  width: 14px;
+  height: 14px;
   margin: 0;
-  accent-color: var(--color-fd-primary);
+  border: 0;
+  border-radius: 4px;
+  background: color-mix(in oklab, var(--color-fd-foreground) 12%, transparent) center / 10px 10px no-repeat;
   cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.model-gallery-older:hover input {
+  background-color: color-mix(in oklab, var(--color-fd-foreground) 20%, transparent);
+}
+
+.model-gallery-older input:checked {
+  background-color: var(--color-fd-primary);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10' fill='none' stroke='white' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M2 5.2 4.1 7.2 8 2.8'/%3E%3C/svg%3E");
+}
+
+/* Forced colours drop backgrounds, which is all this box is drawn with -
+   so hand it back to the system checkbox there. */
+@media (forced-colors: active) {
+  .model-gallery-older input {
+    appearance: auto;
+  }
 }
 
 .model-gallery-older input:focus-visible {
@@ -227,7 +251,8 @@
   .model-gallery-chip,
   .model-gallery-thumb,
   .model-gallery-thumb img,
-  .model-gallery-label {
+  .model-gallery-label,
+  .model-gallery-older input {
     transition: none;
   }
 }
