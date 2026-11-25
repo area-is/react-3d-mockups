@@ -3,6 +3,9 @@ import Link from 'next/link'
 import { ArrowRight, LayoutGrid } from 'lucide-react'
 import { highlight } from 'fumadocs-core/highlight'
 import { HeroCarousel } from '@/components/hero-carousel'
+import { ModelGallery } from '@/components/model-gallery'
+import { ModelLifecycleProvider } from '@/components/model-lifecycle'
+import { OLDER_MODELS } from '@/lib/model-lifecycle'
 import { DEVICES, OBJECTS } from '@/lib/mockup-catalog.mjs'
 import { asset } from '@/lib/base-path.mjs'
 import {
@@ -201,6 +204,30 @@ function QuickStart() {
   )
 }
 
+/**
+ * Every model, under the quick start: the docs' Gallery component, so the
+ * filters, the older-models switch and the links to each model's page work
+ * as they do there. Its thumbnails are pre-rendered images, so the section
+ * adds no WebGL to the page. The lifecycle provider tells it which models a
+ * newer one has replaced, as the docs layout does for the docs.
+ */
+function Gallery() {
+  return (
+    <section className="home-gallery" aria-labelledby="gallery-title">
+      <div className="home-gallery-copy">
+        <h2 id="gallery-title">Gallery</h2>
+        <p>
+          {MODEL_COUNT} models - phones, tablets, laptops, watches, print, packaging and more. Pick
+          one for its component, props and a live preview.
+        </p>
+      </div>
+      <ModelLifecycleProvider value={OLDER_MODELS}>
+        <ModelGallery />
+      </ModelLifecycleProvider>
+    </section>
+  )
+}
+
 /** The film, from R2 (`app/media/[name]/route.ts`), and its poster, a static asset. */
 const FILM = { src: '/media/react-3d-mockups.mp4', poster: '/promo/react-3d-mockups-poster.webp' }
 
@@ -266,6 +293,8 @@ export default function HomePage() {
       <HeroCarousel />
 
       <QuickStart />
+
+      <Gallery />
 
       <Film />
 

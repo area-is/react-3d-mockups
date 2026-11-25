@@ -1,0 +1,233 @@
+/*
+ * The model gallery (components/model-gallery.tsx), imported by the
+ * component, so it looks the same wherever it is placed: the Gallery docs
+ * page and the home page.
+ *
+ * The sidebar grid's thumbnails, grown up: no card around them, just a
+ * faint dot field behind each model, with the kind under the name and
+ * filter chips above.
+ *
+ * Colours come from fumadocs' variables (`--color-fd-*`). The docs define
+ * them; the marketing site, which does not load fumadocs, maps its own
+ * palette onto the ones used here (see `.home-gallery` in globals.css).
+ */
+
+/* Registered so the dots' colour can fade (they firm up on hover);
+   unregistered, a custom property only snaps. The docs' other stages
+   register the same property in docs.css. */
+@property --dot-ground {
+  syntax: '<color>';
+  inherits: false;
+  initial-value: transparent;
+}
+
+.model-gallery {
+  margin: 1.5rem 0 2rem;
+}
+
+.model-gallery-chips {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.model-gallery-chips-label {
+  width: 100%;
+  margin-bottom: 2px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--color-fd-muted-foreground);
+}
+
+/* Borderless pills, like the tiles below them: plain text at rest, a soft
+   fill on hover, and a green tint for the kind that is showing. */
+.model-gallery-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 32px;
+  padding: 4px 12px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--color-fd-muted-foreground);
+  font-size: 13px;
+  line-height: 1.2;
+  cursor: pointer;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease;
+}
+
+.model-gallery-chip:hover {
+  background: var(--color-fd-accent);
+  color: var(--color-fd-foreground);
+}
+
+.model-gallery-chip[aria-pressed='true'] {
+  background: color-mix(in oklab, var(--color-fd-primary) 14%, transparent);
+  color: var(--color-fd-foreground);
+}
+
+/* Forced colours drop backgrounds, which is all that marks the pressed
+   pill now - so outline it there instead. */
+@media (forced-colors: active) {
+  .model-gallery-chip[aria-pressed='true'] {
+    outline: 1px solid Highlight;
+  }
+}
+
+.model-gallery-chip:focus-visible,
+.model-gallery-card:focus-visible {
+  outline: 2px solid var(--color-fd-ring);
+  outline-offset: 2px;
+}
+
+.model-gallery-chip-count {
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-fd-muted-foreground);
+}
+
+/* The live count on the left, the older-models switch on the right; they
+   stack on a phone. */
+.model-gallery-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px 16px;
+  margin: 14px 0 10px;
+}
+
+.model-gallery-status {
+  margin: 0;
+  font-size: 13px;
+  color: var(--color-fd-muted-foreground);
+}
+
+.model-gallery-older {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 32px;
+  font-size: 13px;
+  color: var(--color-fd-foreground);
+  cursor: pointer;
+  user-select: none;
+}
+
+.model-gallery-older input {
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  accent-color: var(--color-fd-primary);
+  cursor: pointer;
+}
+
+.model-gallery-older input:focus-visible {
+  outline: 2px solid var(--color-fd-ring);
+  outline-offset: 2px;
+}
+
+.model-gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 20px 14px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.model-gallery-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  border-radius: 10px;
+  color: inherit;
+  text-decoration: none;
+}
+
+/* The dotted ground (see the top of this file) stands in for the card; it
+   firms up a little on hover in place of the old card's fill. */
+.model-gallery-thumb {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 1;
+  margin-bottom: 8px;
+  border-radius: 10px;
+  transition: --dot-ground 0.15s ease;
+}
+
+.model-gallery-card:hover .model-gallery-thumb {
+  --dot-ground: color-mix(in oklab, var(--color-fd-foreground) 18%, transparent);
+}
+
+/* The model a little inside its tile, so the dots show round it on every
+   side and a wide object - a laptop, a bus - does not run to the edges. */
+.model-gallery-thumb img {
+  display: block;
+  width: 84%;
+  height: 84%;
+  object-fit: contain;
+}
+
+/* Older models in gray once "Show older models" brings them in - the same
+   treatment as the sidebar's older tiles, so the two read alike. */
+.model-gallery-card[data-older] .model-gallery-thumb img {
+  filter: grayscale(1);
+  opacity: 0.7;
+  transition: opacity 0.15s ease;
+}
+
+.model-gallery-card[data-older]:hover .model-gallery-thumb img {
+  opacity: 1;
+}
+
+.model-gallery-label {
+  padding: 0 2px;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.3;
+  color: var(--color-fd-foreground);
+  text-decoration: underline 1px transparent;
+  text-underline-offset: 3px;
+  transition: text-decoration-color 0.15s ease;
+}
+
+.model-gallery-card:hover .model-gallery-label {
+  text-decoration-color: currentColor;
+}
+
+.model-gallery-kind {
+  margin-top: 2px;
+  padding: 0 2px;
+  font-size: 12px;
+  color: var(--color-fd-muted-foreground);
+}
+
+@media (max-width: 420px) {
+  .model-gallery-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px 10px;
+  }
+}
+
+/* The docs' dotted ground (see docs.css): 1px dots 14px apart, centred,
+   faint enough to read as texture rather than a box. */
+.model-gallery-thumb {
+  --dot-ground: color-mix(in oklab, var(--color-fd-foreground) 9%, transparent);
+  background-image: radial-gradient(circle, var(--dot-ground) 1px, transparent 1.5px);
+  background-size: 14px 14px;
+  background-position: center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .model-gallery-chip,
+  .model-gallery-thumb,
+  .model-gallery-thumb img,
+  .model-gallery-label {
+    transition: none;
+  }
+}

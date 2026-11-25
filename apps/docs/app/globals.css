@@ -1845,6 +1845,48 @@ code {
 }
 
 /* ------------------------------------------------------------------ */
+/*  Gallery                                                            */
+/* ------------------------------------------------------------------ */
+
+/*
+ * The docs' Gallery (components/model-gallery.tsx), on the quick start's
+ * column. Its stylesheet reads fumadocs' colour variables, which the site
+ * does not load, so the section maps the site's palette onto the ones it
+ * uses.
+ */
+.home-gallery {
+  --color-fd-foreground: var(--text);
+  --color-fd-muted-foreground: var(--muted);
+  --color-fd-accent: rgba(255, 255, 255, 0.07);
+  --color-fd-primary: var(--accent);
+  --color-fd-ring: var(--accent-2);
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: clamp(40px, 6.3vw, 65px) clamp(14px, 3.6vw, 43px) 0;
+}
+
+.home-gallery-copy h2 {
+  margin: 0 0 9px;
+}
+
+.home-gallery-copy p {
+  color: var(--muted);
+  font-size: 14px;
+  max-width: 62ch;
+  margin: 0;
+  text-wrap: pretty;
+}
+
+.home-gallery .model-gallery {
+  margin: 22px 0 0;
+}
+
+/* The docs reset buttons' font through Tailwind; the site does not. */
+.home-gallery .model-gallery-chip {
+  font-family: inherit;
+}
+
+/* ------------------------------------------------------------------ */
 /*  Keyframes                                                          */
 /* ------------------------------------------------------------------ */
 

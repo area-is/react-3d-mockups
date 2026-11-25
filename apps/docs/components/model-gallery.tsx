@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { useId, useState } from 'react'
 import { CATEGORIES, DEVICES, OBJECTS } from '@/lib/mockup-catalog.mjs'
 import { useModelStatus } from '@/components/model-lifecycle'
+import './model-gallery.css'
 
 interface CatalogEntry {
   id: string
@@ -21,7 +22,7 @@ const STATUS_NOTE = { current: '', superseded: ' · Older model', deprecated: ' 
 
 /**
  * Every model in the library as a thumbnail grid, filtered by kind - the
- * Gallery docs page.
+ * Gallery docs page, and the home page under the quick start.
  *
  * The thumbnails are the pre-rendered shots the sidebar uses
  * (scripts/generate-thumbs.mjs), so the page costs no WebGL at all: a plain
