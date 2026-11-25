@@ -3,7 +3,7 @@ import { useCurrentFrame, useVideoConfig } from 'remotion'
 import { AppleWatch, Flip, FoldMockup, Galaxy, IPhone, IPhoneMockup, Laptop, MockupCanvas, mockupInfo, type MockupKind } from 'react-3d-mockups'
 import { floatPose } from 'react-3d-mockups/core'
 import { bauhaus, dipole, halftone, sunray } from 'tabbied/patterns'
-import { BackgroundStack } from '@/components/screens/swiss-art'
+import { SampleGraphicsStack } from '@/components/screens/swiss-art'
 import { Newspaper } from '@/components/screens/device-apps'
 import { Dashboard, INK, MobileApp, WatchFace, type LedgerState } from '@/app/examples/ledger/ledger-screens'
 import { QUICK_ADDS, SEED_TRANSACTIONS, addTransaction, summarize, type Tx } from '@/app/examples/ledger/ledger-data'
@@ -249,16 +249,16 @@ export function PhonesClip() {
         label="Four phone mockups turning side by side"
       >
         <IPhone variant="pro" color="cosmicorange" statusBar={LIGHT_BAR} {...poses[0]!} scale={trueSize('iphone')}>
-          <BackgroundStack pattern={halftone} seed="clip-raster" tone="ember" grid="6x9" index="02" kicker="Raster" title={'Half\ntone'} meta="Plate 02 · 175 lpi" />
+          <SampleGraphicsStack pattern={halftone} seed="clip-raster" tone="ember" grid="6x9" index="02" kicker="Raster" title={'Half\ntone'} meta="Plate 02 · 175 lpi" />
         </IPhone>
         <Galaxy variant="s26ultra" color="titaniumsilverblue" statusBar={DARK_BAR} {...poses[1]!} scale={trueSize('galaxy')}>
-          <BackgroundStack pattern={bauhaus} seed="clip-bauhaus" tone="cobalt" grid="6x9" index="03" kicker="Bauhaus" title={'Prime\nshapes'} meta="Dessau · 1925" />
+          <SampleGraphicsStack pattern={bauhaus} seed="clip-bauhaus" tone="cobalt" grid="6x9" index="03" kicker="Bauhaus" title={'Prime\nshapes'} meta="Dessau · 1925" />
         </Galaxy>
         <Flip variant="flip7" openAngle={180} color="mint" statusBar={LIGHT_BAR} {...poses[2]!} scale={trueSize('flip')}>
-          <BackgroundStack pattern={dipole} seed="clip-field" tone="moss" grid="8x12" index="04" kicker="Feld" title={'Line\nfield'} meta="Studies in radiance" />
+          <SampleGraphicsStack pattern={dipole} seed="clip-field" tone="moss" grid="8x12" index="04" kicker="Feld" title={'Line\nfield'} meta="Studies in radiance" />
         </Flip>
         <IPhone variant="air" color="skyblue" statusBar={DARK_BAR} {...poses[3]!} scale={trueSize('iphone')}>
-          <BackgroundStack pattern={sunray} seed="clip-sunray" tone="tangerine" grid="6x9" index="05" kicker="Strahl" title={'Sun\nrays'} meta="Plate 05 · Offset" />
+          <SampleGraphicsStack pattern={sunray} seed="clip-sunray" tone="tangerine" grid="6x9" index="05" kicker="Strahl" title={'Sun\nrays'} meta="Plate 05 · Offset" />
         </IPhone>
       </MockupCanvas>
     </Clip>

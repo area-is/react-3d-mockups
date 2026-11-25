@@ -25,7 +25,7 @@ import {
   type MockupKind,
 } from 'react-3d-mockups'
 import { bauhaus, chase, damier, dipole, epicentre, gyre, halftone, moire, radiance, sunray } from 'tabbied/patterns'
-import { BackgroundDial, BackgroundSplit, BackgroundStack } from '@/components/screens/swiss-art'
+import { SampleGraphicsDial, SampleGraphicsSplit, SampleGraphicsStack } from '@/components/screens/swiss-art'
 import { Newspaper, WatchFace } from '@/components/screens/device-apps'
 import { BillboardAdArt } from '@/components/screens/print-art'
 import { TVHome } from '@/app/examples/stream/stream-art'
@@ -100,7 +100,7 @@ const CATEGORIES: Category[] = [
         yaw: 0.42,
         render: (rotation) => (
           <IPhone variant="pro" color="cosmicorange" statusBar={LIGHT_BAR} rotation={rotation} scale={size('iphone')}>
-            <BackgroundStack pattern={halftone} seed="promo-raster" tone="ember" grid="6x9" index="02" kicker="Raster" title={'Half\ntone'} meta="Plate 02 · 175 lpi" />
+            <SampleGraphicsStack pattern={halftone} seed="promo-raster" tone="ember" grid="6x9" index="02" kicker="Raster" title={'Half\ntone'} meta="Plate 02 · 175 lpi" />
           </IPhone>
         ),
       },
@@ -109,7 +109,7 @@ const CATEGORIES: Category[] = [
         yaw: 0,
         render: (rotation) => (
           <Galaxy variant="s26ultra" color="titaniumsilverblue" statusBar={DARK_BAR} rotation={rotation} scale={size('galaxy')}>
-            <BackgroundStack pattern={bauhaus} seed="promo-bauhaus" tone="cobalt" grid="6x9" index="03" kicker="Bauhaus" title={'Prime\nshapes'} meta="Dessau · 1925" />
+            <SampleGraphicsStack pattern={bauhaus} seed="promo-bauhaus" tone="cobalt" grid="6x9" index="03" kicker="Bauhaus" title={'Prime\nshapes'} meta="Dessau · 1925" />
           </Galaxy>
         ),
       },
@@ -118,7 +118,7 @@ const CATEGORIES: Category[] = [
         yaw: -0.42,
         render: (rotation) => (
           <IPhone variant="air" color="skyblue" statusBar={DARK_BAR} rotation={rotation} scale={size('iphone')}>
-            <BackgroundStack pattern={sunray} seed="promo-sunray" tone="tangerine" grid="6x9" index="05" kicker="Strahl" title={'Sun\nrays'} meta="Plate 05 · Offset" />
+            <SampleGraphicsStack pattern={sunray} seed="promo-sunray" tone="tangerine" grid="6x9" index="05" kicker="Strahl" title={'Sun\nrays'} meta="Plate 05 · Offset" />
           </IPhone>
         ),
       },
@@ -142,7 +142,7 @@ const CATEGORIES: Category[] = [
         yaw: -0.36,
         render: (rotation) => (
           <Flip variant="flip7" openAngle={150} color="mint" statusBar={LIGHT_BAR} rotation={rotation} scale={size('flip')}>
-            <BackgroundStack pattern={dipole} seed="promo-field" tone="moss" grid="8x12" index="04" kicker="Feld" title={'Line\nfield'} meta="Studies in radiance" />
+            <SampleGraphicsStack pattern={dipole} seed="promo-field" tone="moss" grid="8x12" index="04" kicker="Feld" title={'Line\nfield'} meta="Studies in radiance" />
           </Flip>
         ),
       },
@@ -157,7 +157,7 @@ const CATEGORIES: Category[] = [
         yaw: 0.38,
         render: (rotation) => (
           <Laptop variant="air13" color="midnight" rotation={rotation} scale={size('laptop')}>
-            <BackgroundSplit pattern={moire} seed="promo-moire" tone="midnight" grid="6x9" index="09" kicker="Moiré" title={'Inter\nference'} meta="Kunstgewerbemuseum" />
+            <SampleGraphicsSplit pattern={moire} seed="promo-moire" tone="midnight" grid="6x9" index="09" kicker="Moiré" title={'Inter\nference'} meta="Kunstgewerbemuseum" />
           </Laptop>
         ),
       },
@@ -166,7 +166,7 @@ const CATEGORIES: Category[] = [
         yaw: 0,
         render: (rotation) => (
           <IPad variant="ipadpro13" color="silver" statusBar={LIGHT_BAR} rotation={rotation} scale={size('ipad')}>
-            <BackgroundStack pattern={epicentre} seed="promo-epicentre" tone="plum" grid="6x9" index="06" kicker="Zentrum" title={'Point\nsource'} meta="Kunsthalle · Saal 4" />
+            <SampleGraphicsStack pattern={epicentre} seed="promo-epicentre" tone="plum" grid="6x9" index="06" kicker="Zentrum" title={'Point\nsource'} meta="Kunsthalle · Saal 4" />
           </IPad>
         ),
       },
@@ -175,7 +175,7 @@ const CATEGORIES: Category[] = [
         yaw: -0.38,
         render: (rotation) => (
           <GalaxyTab variant="tabs11" color="gray" statusBar={DARK_BAR} rotation={rotation} scale={size('galaxyTab')}>
-            <BackgroundStack pattern={damier} seed="promo-damier" tone="sea" grid="6x9" index="07" kicker="Damier" title={'Black\nwhite'} meta="Positive & negative" />
+            <SampleGraphicsStack pattern={damier} seed="promo-damier" tone="sea" grid="6x9" index="07" kicker="Damier" title={'Black\nwhite'} meta="Positive & negative" />
           </GalaxyTab>
         ),
       },
@@ -190,7 +190,7 @@ const CATEGORIES: Category[] = [
         yaw: 0.4,
         render: (rotation) => (
           <AppleWatch variant="ultra4" color="natural" rotation={rotation} scale={size('appleWatch')}>
-            <BackgroundDial pattern={gyre} seed="promo-dial" tone="electric" grid="4x6" kicker="Zürich" title="9:41" />
+            <SampleGraphicsDial pattern={gyre} seed="promo-dial" tone="electric" grid="4x6" kicker="Zürich" title="9:41" />
           </AppleWatch>
         ),
       },
@@ -208,7 +208,7 @@ const CATEGORIES: Category[] = [
         yaw: -0.4,
         render: (rotation) => (
           <AppleWatch variant="series11" color="rosegold" rotation={rotation} scale={size('appleWatch')}>
-            <BackgroundDial pattern={radiance} seed="promo-dial-b" tone="terracotta" grid="4x6" kicker="Basel" title="10:09" />
+            <SampleGraphicsDial pattern={radiance} seed="promo-dial-b" tone="terracotta" grid="4x6" kicker="Basel" title="10:09" />
           </AppleWatch>
         ),
       },
@@ -225,7 +225,7 @@ const CATEGORIES: Category[] = [
         yaw: 0.32,
         render: (rotation) => (
           <StudioDisplay rotation={rotation} scale={size('studioDisplay')}>
-            <BackgroundSplit pattern={chase} seed="promo-rhythm" tone="graphite" grid="6x9" index="08" kicker="Rhythmus" title={'Bar\nafter bar'} meta="Typografische Monatsblätter" />
+            <SampleGraphicsSplit pattern={chase} seed="promo-rhythm" tone="graphite" grid="6x9" index="08" kicker="Rhythmus" title={'Bar\nafter bar'} meta="Typografische Monatsblätter" />
           </StudioDisplay>
         ),
       },

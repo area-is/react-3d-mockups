@@ -458,7 +458,7 @@ const REGION_OF = (slot: string) => slot.charAt(0).toLowerCase() + slot.slice(1)
  * layout uses, the palette it indexes - file by file, in reading order.
  *
  * All of it rather than the component alone, because most of these pieces are
- * one call to something shared - the watch face is a single `<BackgroundDial …/>`.
+ * one call to something shared - the watch face is a single `<SampleGraphicsDial …/>`.
  * A panel that printed the piece by itself named the thing and then showed
  * none of it, leaving the reader to guess at everything doing the work.
  *

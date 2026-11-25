@@ -359,7 +359,7 @@ export function Sheet({ tone, style, children }: { tone: Tone; style?: CSSProper
 /*  Layouts                                                            */
 /* ------------------------------------------------------------------ */
 
-export interface BackgroundProps {
+export interface SampleGraphicsProps {
   pattern: PatternDefinition
   /** Pinned for a printed face; a live one reads the shared clock instead. */
   seed?: string
@@ -387,7 +387,7 @@ export interface BackgroundProps {
  * Portrait sheet: colophon at the top, the picture in the middle, the type
  * block on the baseline. The classic Zurich concert bill.
  */
-export function BackgroundStack({
+export function SampleGraphicsStack({
   pattern,
   seed,
   live,
@@ -399,7 +399,7 @@ export function BackgroundStack({
   kicker,
   title,
   meta,
-}: BackgroundProps) {
+}: SampleGraphicsProps) {
   const t = material ? materialTone(material, accent) : TONES[tone]
   return (
     <Sheet
@@ -432,7 +432,7 @@ export function BackgroundStack({
  * Landscape sheet: the type takes the left third and the picture the rest, so
  * a wide face reads as two columns rather than as a stretched portrait.
  */
-export function BackgroundSplit({
+export function SampleGraphicsSplit({
   pattern,
   seed,
   live,
@@ -444,7 +444,7 @@ export function BackgroundSplit({
   kicker,
   title,
   meta,
-}: BackgroundProps) {
+}: SampleGraphicsProps) {
   const t = material ? materialTone(material, accent) : TONES[tone]
   return (
     <div style={{ ...sheet(t), flexDirection: 'row' }}>
@@ -476,7 +476,7 @@ export function BackgroundSplit({
  * it gets one coarse pattern and one number - anything with a hierarchy in it
  * would be mush at that size.
  */
-export function BackgroundDial({
+export function SampleGraphicsDial({
   pattern,
   seed,
   live,
@@ -486,7 +486,7 @@ export function BackgroundDial({
   grid = '2x3',
   kicker,
   title,
-}: Omit<BackgroundProps, 'index' | 'meta'> & { index?: string; meta?: string }) {
+}: Omit<SampleGraphicsProps, 'index' | 'meta'> & { index?: string; meta?: string }) {
   const t = material ? materialTone(material, accent) : TONES[tone]
   return (
     <div style={{ ...sheet(t), position: 'relative', alignItems: 'flex-end' }}>
@@ -531,8 +531,8 @@ export function BackgroundDial({
  * real apps (`device-apps`) - a watch face, a studio's website, a newspaper.
  */
 
-export const RotationBackground = () => (
-  <BackgroundStack
+export const SampleRotationGraphics = () => (
+  <SampleGraphicsStack
     pattern={gyre}
     live
     tone="midnight"
@@ -544,8 +544,8 @@ export const RotationBackground = () => (
   />
 )
 
-export const HalftoneBackground = () => (
-  <BackgroundStack
+export const SampleHalftoneGraphics = () => (
+  <SampleGraphicsStack
     pattern={halftone}
     live
     tone="ember"
@@ -557,8 +557,8 @@ export const HalftoneBackground = () => (
   />
 )
 
-export const LineFieldBackground = () => (
-  <BackgroundStack
+export const SampleLineFieldGraphics = () => (
+  <SampleGraphicsStack
     pattern={dipole}
     live
     tone="moss"
@@ -570,8 +570,8 @@ export const LineFieldBackground = () => (
   />
 )
 
-export const EpicentreBackground = () => (
-  <BackgroundStack
+export const SampleEpicentreGraphics = () => (
+  <SampleGraphicsStack
     pattern={epicentre}
     live
     tone="plum"
@@ -583,8 +583,8 @@ export const EpicentreBackground = () => (
   />
 )
 
-export const CheckerBackground = () => (
-  <BackgroundStack
+export const SampleCheckerGraphics = () => (
+  <SampleGraphicsStack
     pattern={damier}
     live
     tone="sea"
@@ -596,12 +596,12 @@ export const CheckerBackground = () => (
   />
 )
 
-export const WatchDialBackground = () => (
-  <BackgroundDial pattern={gyre} live tone="electric" grid="4x6" kicker="Zürich" title="9:41" />
+export const SampleWatchDialGraphics = () => (
+  <SampleGraphicsDial pattern={gyre} live tone="electric" grid="4x6" kicker="Zürich" title="9:41" />
 )
 
-export const RhythmBackground = () => (
-  <BackgroundSplit
+export const SampleRhythmGraphics = () => (
+  <SampleGraphicsSplit
     pattern={chase}
     live
     tone="graphite"
@@ -613,8 +613,8 @@ export const RhythmBackground = () => (
   />
 )
 
-export const PrintedFieldBackground = () => (
-  <BackgroundStack
+export const SamplePrintedFieldGraphics = () => (
+  <SampleGraphicsStack
     pattern={dipole}
     seed="poster-bill"
     tone="ultramarine"

@@ -97,7 +97,7 @@ npx wrangler r2 object put react-3d-mockups-media/react-3d-mockups.mp4 --remote 
 - **Patterns hold one seed a shot.** On the site the device screens reseed
   their patterns on the wall clock, which a render cannot share, and a reseed
   morphs the cells through CSS transitions on the browser's clock. The film
-  builds the same posters from `BackgroundStack`, `BackgroundDial` and `BackgroundSplit` with
+  builds the same posters from `SampleGraphicsStack`, `SampleGraphicsDial` and `SampleGraphicsSplit` with
   a pinned seed, and skips the one screen that only comes live (the studio
   site on the carousel's laptop). `useDoodlesDrawn` holds a shot's first
   frame until every pattern on the page has drawn: Tabbied paints
