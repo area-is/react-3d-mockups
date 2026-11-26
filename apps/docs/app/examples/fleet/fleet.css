@@ -143,10 +143,12 @@
 }
 
 /* Wide and definite: a 53 ft trailer needs the width, and the canvas needs
-   a height to size against. */
+   a height to size against - but no more than it fills, or the empty space
+   over it reads as a gap under the hero. The camera's field of view narrows
+   with the height (fleet-scenes.tsx), so the trailer keeps its size. */
 .fl-trailer-stage {
   position: relative;
-  height: min(66vh, 640px);
+  height: min(48vh, 465px);
   overflow: clip;
 }
 

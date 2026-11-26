@@ -164,9 +164,12 @@
   padding: 0 32px;
 }
 
+/* No taller than the coach fills, or the space over it reads as a gap under
+   the hero; the camera's field of view narrows with the height
+   (matchday-scenes.tsx), so the coach keeps its size. */
 .md-coach-stage {
   position: relative;
-  height: min(66vh, 640px);
+  height: min(48vh, 465px);
   overflow: clip;
 }
 

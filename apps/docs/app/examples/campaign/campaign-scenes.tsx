@@ -62,7 +62,9 @@ export function BulletinScene() {
       surfaceBackground={NIGHT}
       rotation={[0, -0.2, 0]}
       position={narrow ? undefined : [0, -0.95, 0]}
-      camera={narrow ? undefined : { position: [0, 0.35, 6.6], fov: 36 }}
+      // fov 29.3 is the old 36 at the stage's new height (0.8 of the old):
+      // the board is as big as before, with less empty sky above it.
+      camera={narrow ? undefined : { position: [0, 0.35, 6.6], fov: 29.3 }}
       shadows={narrow}
     >
       <Bulletin />

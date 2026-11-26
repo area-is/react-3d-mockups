@@ -135,7 +135,11 @@
    than cutting the pole off on a line. */
 .cp-bulletin-stage {
   position: relative;
-  height: min(72vh, 720px);
+  /* As short as the bulletin needs: the camera's field of view narrows by
+     the same ratio (campaign-scenes.tsx), so the board keeps its size and
+     only the empty sky over it goes - which sat between the hero and the
+     board as a gap. */
+  height: min(58vh, 580px);
   overflow: clip;
   -webkit-mask-image: linear-gradient(to bottom, #000 78%, transparent);
   mask-image: linear-gradient(to bottom, #000 78%, transparent);
