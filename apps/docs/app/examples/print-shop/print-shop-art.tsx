@@ -12,15 +12,14 @@ import { mix } from '@/components/screens/sample-kit'
  *
  * Everything the configurator can change is an `Order` - a design, an ink
  * set, a sheet size, a frame, a mat, bordered or full bleed, and the seed
- * that picks the composition - and the artwork is a plain React component
+ * that fixes the composition - and the artwork is a plain React component
  * that renders an order. That is the whole trick of this example: the sheet
  * inside the 3D frame is real DOM, so a click on a swatch in the page
  * re-renders the print on the wall at the same moment, with no texture to
  * bake and nothing to re-upload.
  *
  * The pictures come from `tabbied`: every design is a generative pattern
- * with a fixed vocabulary of marks, and the seed is the composition. A
- * customer who does not like the arrangement shuffles until they do, and the
+ * with a fixed vocabulary of marks, and the seed is the composition. The
  * seed is printed on the sheet as the edition number, because it IS the
  * edition - the same seed reprints the same picture.
  */
@@ -138,14 +137,6 @@ export function find<T extends { id: string }>(list: readonly T[], id: string): 
 
 export function priceOf(order: Order): number {
   return find(SIZES, order.size).price + find(MATS, order.mat).price
-}
-
-/** Four characters, the way Tabbied's own share links spell a seed. */
-export function newSeed(): string {
-  const alphabet = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
-  let seed = ''
-  for (let i = 0; i < 4; i++) seed += alphabet[Math.floor(Math.random() * alphabet.length)]
-  return seed
 }
 
 /* ------------------------------------------------------------------ */

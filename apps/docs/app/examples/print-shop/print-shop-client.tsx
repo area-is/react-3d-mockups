@@ -3,7 +3,7 @@
 import { useRef, useState, type ReactNode } from 'react'
 import dynamic from 'next/dynamic'
 import Link from 'next/link'
-import { Download, Shuffle } from 'lucide-react'
+import { Download } from 'lucide-react'
 import { TabbiedPattern, type TabbiedPatternHandle } from 'tabbied/react'
 import { LazyScene } from '@/components/lazy-scene'
 import { SceneBoundary } from '@/components/scene-boundary'
@@ -16,7 +16,6 @@ import {
   MATS,
   SIZES,
   find,
-  newSeed,
   priceOf,
   type Order,
 } from './print-shop-art'
@@ -118,8 +117,7 @@ export function PrintShop() {
           <p className="ps-eyebrow">Made to order · Edition of one</p>
           <h1 className="ps-title">{design.name}</h1>
           <p className="ps-lede">
-            {design.blurb} Choose an ink set, shuffle the composition until it is the one, and we plot it on
-            310 gsm cotton rag and frame it by hand.
+            {design.blurb} Choose an ink set and we plot it on 310 gsm cotton rag and frame it by hand.
           </p>
 
           <Field label="Design">
@@ -217,16 +215,6 @@ export function PrintShop() {
                   {m.label}
                 </button>
               ))}
-            </div>
-          </Field>
-
-          <Field label="Composition" hint="the seed is the edition number">
-            <div className="ps-seed-row">
-              <code className="ps-seed">No. {order.seed}</code>
-              <button type="button" className="ps-shuffle" onClick={() => set({ seed: newSeed() })}>
-                <Shuffle size={16} strokeWidth={1.5} aria-hidden />
-                Shuffle
-              </button>
             </div>
           </Field>
 

@@ -453,45 +453,6 @@
   color: var(--ps-ink);
 }
 
-/* The seed and its shuffle. */
-.ps-seed-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-/* The site styles `code` as a green chip for the docs; this one is a field
-   in the shop's own ink. */
-.ps .ps-seed {
-  flex: 1;
-  padding: 8px 12px;
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--ps-ink);
-  background: rgba(255, 255, 255, 0.5);
-  border: 1.5px solid var(--ps-line);
-  border-radius: 6px;
-  white-space: nowrap;
-}
-
-.ps-shuffle {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 12px;
-  font-size: 13px;
-  font-weight: 600;
-  background: #fff;
-  border: 1.5px solid var(--ps-line-strong);
-  border-radius: 6px;
-  transition: border-color 0.15s ease;
-  white-space: nowrap;
-}
-
-.ps-shuffle:hover {
-  border-color: var(--ps-ink);
-}
-
 /* Price and the two actions. */
 .ps-buy {
   display: flex;
