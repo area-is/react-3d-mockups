@@ -110,7 +110,7 @@ export function PhoneScene() {
 
 export function ToteScene() {
   return (
-    <ShoppingBagMockup float color={BAG} surfaceBackground={BAG} handleColor="#2b2833" rotation={[0, 0.3, 0]}>
+    <ShoppingBagMockup float color={BAG} surfaceBackground={BAG} handleColor="#3b3743" rotation={[0, 0.3, 0]}>
       <Tote />
     </ShoppingBagMockup>
   )
