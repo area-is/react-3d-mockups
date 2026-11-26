@@ -144,7 +144,6 @@ code {
   background: rgba(8, 9, 12, 0.92);
   -webkit-backdrop-filter: blur(24px) saturate(140%);
   backdrop-filter: blur(24px) saturate(140%);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .header-inner {
@@ -647,8 +646,8 @@ code {
    is the next line on the page and it brings its own spacing. */
 .hero h1 {
   font-size: clamp(34px, 6.3vw, 68px);
-  font-weight: 600;
-  letter-spacing: -0.035em;
+  font-weight: 500;
+  letter-spacing: -0.032em;
   line-height: 1;
   margin: 0;
   /* The rotating noun changes the line's width as it types; wrapping would let
@@ -1566,14 +1565,12 @@ code {
   margin-left: -9px;
 }
 
-/* A little more room under the switch than under the file name, so the dot
-   marking the active manager clears the command below it. */
+/* A little more room under the switch than under the file name. */
 .quickstart-install .code-panel-head {
   margin-bottom: 6px;
 }
 
 .pm-switch-btn {
-  position: relative;
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -1594,25 +1591,13 @@ code {
   color: var(--text);
 }
 
-/* The manager showing is marked in the ink and a small accent dot centred
-   under its name - not a filled chip, and not an underline. */
+/* The manager showing is marked by its ink alone: full text colour against
+   the others' low one - no chip, underline or dot. */
 .pm-switch-btn[aria-pressed='true'] {
   color: var(--text);
 }
 
-.pm-switch-btn[aria-pressed='true']::after {
-  content: '';
-  position: absolute;
-  left: calc(50% + 10px);
-  bottom: -4px;
-  width: 4px;
-  height: 4px;
-  margin-left: -2px;
-  border-radius: 50%;
-  background: var(--accent);
-}
-
-/* Forced colours drop the dot's fill, which is all that marks the choice. */
+/* Forced colours flatten the two inks into one, so mark the choice there. */
 @media (forced-colors: active) {
   .pm-switch-btn[aria-pressed='true'] {
     text-decoration: underline;
@@ -1665,7 +1650,7 @@ code {
    the stylesheet rather than typed into the snippet. */
 .quickstart-install pre code::before {
   content: '$ ';
-  color: var(--accent);
+  color: var(--text);
 }
 
 /* ------------------------------------------------------------------ */
