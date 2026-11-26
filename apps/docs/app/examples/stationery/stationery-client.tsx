@@ -56,7 +56,7 @@ export function Stationery() {
   return (
     <main className="am" style={{ ['--am-accent' as string]: palette.accent, ['--am-ink' as string]: ink }}>
       <header className="am-top">
-        <span className="am-brand">Ampersand</span>
+        <Link href="/examples/stationery" className="am-brand">Ampersand</Link>
         <nav className="am-nav" aria-label="Site">
           <span>Suites</span>
           <span>Paper</span>

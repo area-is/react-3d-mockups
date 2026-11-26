@@ -49,6 +49,8 @@
 }
 
 .pk-brand {
+  /* A link home now; it keeps the header's ink rather than the page's link colour. */
+  color: inherit;
   display: inline-flex;
   align-items: center;
   gap: 8px;

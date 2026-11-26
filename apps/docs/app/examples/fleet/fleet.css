@@ -56,6 +56,8 @@
 }
 
 .fl-brand {
+  /* A link home now; it keeps the header's ink rather than the page's link colour. */
+  color: inherit;
   font-size: 22px;
   font-weight: 600;
   letter-spacing: -0.01em;

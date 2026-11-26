@@ -65,10 +65,10 @@ export function Ledger() {
   return (
     <main className="lg">
       <header className="lg-top">
-        <span className="lg-brand">
+        <Link href="/examples/ledger" className="lg-brand">
           <LedgerMark className="lg-brand-mark" />
           Ledger
-        </span>
+        </Link>
         <nav className="lg-nav" aria-label="Site">
           <span>Product</span>
           <span>Pricing</span>

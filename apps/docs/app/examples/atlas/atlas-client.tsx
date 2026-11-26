@@ -46,7 +46,7 @@ export function Atlas() {
   return (
     <main className="at">
       <header className="at-top">
-        <span className="at-brand">{MAG.name}</span>
+        <Link href="/examples/atlas" className="at-brand">{MAG.name}</Link>
         <nav className="at-nav" aria-label="Site">
           <span>Issues</span>
           <span>Stories</span>

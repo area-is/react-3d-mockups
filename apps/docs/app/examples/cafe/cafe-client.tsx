@@ -44,7 +44,7 @@ export function Cafe() {
   return (
     <main className="cf" style={{ ['--cf-paint' as string]: paint }}>
       <header className="cf-top">
-        <span className="cf-brand">{SHOP.name}</span>
+        <Link href="/examples/cafe" className="cf-brand">{SHOP.name}</Link>
         <nav className="cf-nav" aria-label="Site">
           <span>Menu</span>
           <span>Bakery</span>

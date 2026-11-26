@@ -25,7 +25,7 @@ export function Fleet() {
   return (
     <main className="fl" style={{ ['--fl-accent' as string]: livery.accent }}>
       <header className="fl-top">
-        <span className="fl-brand">{COMPANY.name}</span>
+        <Link href="/examples/fleet" className="fl-brand">{COMPANY.name}</Link>
         <nav className="fl-nav" aria-label="Site">
           <span>Services</span>
           <span>Network</span>

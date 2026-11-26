@@ -47,10 +47,10 @@ export function Stream() {
   return (
     <main className="st">
       <header className="st-top">
-        <span className="st-brand">
+        <Link href="/examples/stream" className="st-brand">
           <span className="st-brand-mark" aria-hidden />
           Prism
-        </span>
+        </Link>
         <nav className="st-nav" aria-label="Site">
           <span>Browse</span>
           <span>Live</span>

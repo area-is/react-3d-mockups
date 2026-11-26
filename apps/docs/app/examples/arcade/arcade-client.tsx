@@ -27,10 +27,10 @@ export function Arcade() {
   return (
     <main className="ar" style={{ ['--ar-sky' as string]: level.sky, ['--ar-lamp' as string]: level.lamp }}>
       <header className="ar-top">
-        <span className="ar-brand">
+        <Link href="/examples/arcade" className="ar-brand">
           <MothMark size="28px" color="currentColor" />
           {GAME.title}
-        </span>
+        </Link>
         <nav className="ar-nav" aria-label="Site">
           <span>The game</span>
           <span>Soundtrack</span>

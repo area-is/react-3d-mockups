@@ -63,10 +63,10 @@ export function Packaging() {
   return (
     <main className="pk">
       <header className="pk-top">
-        <span className="pk-brand">
+        <Link href="/examples/packaging" className="pk-brand">
           <span className="pk-brand-mark" aria-hidden />
           Carton &amp; Co
-        </span>
+        </Link>
         <nav className="pk-nav" aria-label="Site">
           <span className="is-active">Configure</span>
           <span>Materials</span>

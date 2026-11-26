@@ -85,10 +85,10 @@ export function PrintShop() {
   return (
     <main className="ps">
       <header className="ps-top">
-        <span className="ps-brand">
+        <Link href="/examples/print-shop" className="ps-brand">
           <span className="ps-brand-mark" aria-hidden />
           Grid Editions
-        </span>
+        </Link>
         <nav className="ps-nav" aria-label="Shop">
           <span className="ps-nav-link is-active">Prints</span>
           <span className="ps-nav-link">Editions</span>
