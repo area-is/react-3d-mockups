@@ -6,6 +6,8 @@ import { CopyButton } from './copy-button'
 export interface InstallOption {
   /** The package manager, which is also the switcher's label. */
   id: string
+  /** Its mark, beside the label. */
+  icon: ReactNode
   /** The command as typed, for the clipboard. */
   command: string
   /** The same command, highlighted on the server. */
@@ -37,6 +39,7 @@ export function InstallTabs({ options }: { options: InstallOption[] }) {
               aria-pressed={option.id === current.id}
               onClick={() => setSelected(option.id)}
             >
+              {option.icon}
               {option.id}
             </button>
           ))}
