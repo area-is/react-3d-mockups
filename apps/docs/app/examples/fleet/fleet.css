@@ -390,26 +390,6 @@
   color: var(--fl-muted);
 }
 
-/* ---- footer ------------------------------------------------------------ */
-
-.fl-foot {
-  display: flex;
-  justify-content: space-between;
-  gap: 20px;
-  flex-wrap: wrap;
-  max-width: 1240px;
-  margin: 0 auto;
-  padding: 24px 32px 36px;
-  border-top: 1px solid var(--fl-line);
-  font-size: 13px;
-  color: var(--fl-muted);
-}
-
-.fl-foot a {
-  font-weight: 600;
-  color: var(--fl-ink);
-}
-
 /* ---- narrower ------------------------------------------------------------ */
 
 @media (max-width: 1000px) {
@@ -439,8 +419,7 @@
   .fl-hero,
   .fl-trailer,
   .fl-van,
-  .fl-door,
-  .fl-foot {
+  .fl-door {
     padding-left: 20px;
     padding-right: 20px;
   }

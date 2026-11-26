@@ -199,11 +199,6 @@ export function Packaging() {
           <span className="pk-panel-price">From {eur(14)} each</span>
         </div>
       </section>
-
-      <footer className="pk-foot">
-        <span>Carton &amp; Co is a fictional supplier. The boxes are real geometry, rebuilt from millimetres as you move the sliders.</span>
-        <Link href="/docs">Read the react-3d-mockups docs →</Link>
-      </footer>
     </main>
   )
 }

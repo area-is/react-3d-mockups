@@ -422,26 +422,6 @@
   opacity: 0.75;
 }
 
-/* ---- footer ------------------------------------------------------------ */
-
-.ab-foot {
-  display: flex;
-  justify-content: space-between;
-  gap: 20px;
-  flex-wrap: wrap;
-  max-width: 1240px;
-  margin: 0 auto;
-  padding: 24px 32px 36px;
-  border-top: 1px solid var(--ab-line);
-  font-size: 13px;
-  color: var(--ab-muted);
-}
-
-.ab-foot a {
-  font-weight: 600;
-  color: var(--ab-text);
-}
-
 /* ---- narrower ------------------------------------------------------------ */
 
 @media (max-width: 1000px) {
@@ -472,8 +452,7 @@
   .ab-hero,
   .ab-wall,
   .ab-screens,
-  .ab-plans,
-  .ab-foot {
+  .ab-plans {
     padding-left: 20px;
     padding-right: 20px;
   }

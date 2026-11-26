@@ -149,11 +149,6 @@ export function Stream() {
           </div>
         ))}
       </section>
-
-      <footer className="st-foot">
-        <span>Prism is a fictional service and so are its shows. The four screens are live mockups sharing one featured title.</span>
-        <Link href="/docs">Read the react-3d-mockups docs →</Link>
-      </footer>
     </main>
   )
 }

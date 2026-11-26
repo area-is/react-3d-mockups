@@ -120,11 +120,6 @@ export function Arcade() {
           </article>
         </div>
       </section>
-
-      <footer className="ar-foot">
-        <span>Moth is a fictional game by a fictional studio. The one on the TV is a canvas, a handful of generated silhouettes and a moth, and it is actually running.</span>
-        <Link href="/docs/screen-content">What a screen can show →</Link>
-      </footer>
     </main>
   )
 }

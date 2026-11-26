@@ -321,32 +321,6 @@
   color: var(--at-muted);
 }
 
-/* ---- footer ------------------------------------------------------------ */
-
-.at-foot {
-  display: flex;
-  justify-content: space-between;
-  gap: 20px;
-  flex-wrap: wrap;
-  max-width: 1240px;
-  margin: 0 auto;
-  padding: 24px 32px 36px;
-  border-top: 1px solid var(--at-ink);
-  font-size: 13px;
-  line-height: 1.5;
-  color: var(--at-muted);
-}
-
-.at-foot span {
-  max-width: 640px;
-}
-
-.at-foot a {
-  font-weight: 600;
-  color: var(--at-ink);
-  white-space: nowrap;
-}
-
 /* ---- narrower ------------------------------------------------------------ */
 
 @media (max-width: 1000px) {
@@ -376,8 +350,7 @@
 
   .at-hero,
   .at-contents,
-  .at-shop,
-  .at-foot {
+  .at-shop {
     padding-left: 20px;
     padding-right: 20px;
   }

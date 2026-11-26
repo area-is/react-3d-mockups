@@ -553,26 +553,6 @@
   color: var(--pk-accent-text);
 }
 
-/* ---- footer ------------------------------------------------------------ */
-
-.pk-foot {
-  display: flex;
-  justify-content: space-between;
-  gap: 20px;
-  flex-wrap: wrap;
-  max-width: 1240px;
-  margin: 0 auto;
-  padding: 24px 32px 36px;
-  border-top: 1px solid var(--pk-line);
-  font-size: 13px;
-  color: var(--pk-muted);
-}
-
-.pk-foot a {
-  font-weight: 600;
-  color: var(--pk-ink);
-}
-
 /* ---- narrower ------------------------------------------------------------ */
 
 @media (max-width: 1000px) {
@@ -603,8 +583,7 @@
   }
 
   .pk-hero,
-  .pk-panel,
-  .pk-foot {
+  .pk-panel {
     padding-left: 20px;
     padding-right: 20px;
   }

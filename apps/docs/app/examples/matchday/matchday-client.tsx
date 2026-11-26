@@ -141,11 +141,6 @@ export function Matchday() {
           </div>
         </div>
       </section>
-
-      <footer className="md-foot">
-        <span>Alcântara FC is a fictional club. The coach, the broadcast, the watch and the pass are live mockups; the clock is the page&rsquo;s.</span>
-        <Link href="/docs">Read the react-3d-mockups docs →</Link>
-      </footer>
     </main>
   )
 }

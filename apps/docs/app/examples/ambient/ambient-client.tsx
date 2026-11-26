@@ -142,11 +142,6 @@ export function Ambient() {
           </div>
         ))}
       </section>
-
-      <footer className="ab-foot">
-        <span>Ambient is a fictional service. Every screen on this page is a live mockup redrawing a generative pattern.</span>
-        <Link href="/docs">Read the react-3d-mockups docs →</Link>
-      </footer>
     </main>
   )
 }

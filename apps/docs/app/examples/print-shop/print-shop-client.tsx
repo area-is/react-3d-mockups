@@ -7,7 +7,6 @@ import { Download, Shuffle } from 'lucide-react'
 import { TabbiedPattern, type TabbiedPatternHandle } from 'tabbied/react'
 import { LazyScene } from '@/components/lazy-scene'
 import { SceneBoundary } from '@/components/scene-boundary'
-import { TabbiedLink } from '../_shared/badge'
 import {
   BLEEDS,
   DEFAULT_ORDER,
@@ -290,13 +289,6 @@ export function PrintShop() {
           </article>
         </div>
       </section>
-
-      <footer className="ps-foot">
-        <span>
-          Grid Editions is a fictional shop. The prints are real: every one is a <TabbiedLink /> pattern rendered live.
-        </span>
-        <Link href="/docs">Read the react-3d-mockups docs →</Link>
-      </footer>
     </main>
   )
 }

@@ -337,26 +337,6 @@
   font-weight: 600;
 }
 
-/* ---- footer ------------------------------------------------------------ */
-
-.md-foot {
-  display: flex;
-  justify-content: space-between;
-  gap: 20px;
-  flex-wrap: wrap;
-  max-width: 1240px;
-  margin: 0 auto;
-  padding: 24px 32px 36px;
-  border-top: 1px solid var(--md-line);
-  font-size: 13px;
-  color: var(--muted);
-}
-
-.md-foot a {
-  font-weight: 600;
-  color: var(--text);
-}
-
 /* ---- narrower ------------------------------------------------------------ */
 
 @media (max-width: 1000px) {
@@ -386,8 +366,7 @@
   .md-hero,
   .md-coach,
   .md-match,
-  .md-pass,
-  .md-foot {
+  .md-pass {
     padding-left: 20px;
     padding-right: 20px;
   }

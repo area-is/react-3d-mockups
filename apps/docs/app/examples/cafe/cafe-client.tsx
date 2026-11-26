@@ -145,39 +145,6 @@ export function Cafe() {
           </div>
         </article>
       </section>
-
-      <footer className="cf-foot">
-        <div className="cf-foot-cols">
-          <span>
-            <strong>{SHOP.name}</strong>
-            <br />
-            {SHOP.address}
-            <br />
-            {SHOP.city}
-          </span>
-          <span>
-            <strong>Hours</strong>
-            <br />
-            {SHOP.hours.split(' · ').map((line) => (
-              <span key={line}>
-                {line}
-                <br />
-              </span>
-            ))}
-          </span>
-          <span>
-            <strong>Say hello</strong>
-            <br />
-            {SHOP.phone}
-            <br />
-            hello@ninefold.coffee
-          </span>
-        </div>
-        <div className="cf-foot-note">
-          <span>Ninefold is a fictional shop. The building, the board, the carton and the card are live mockups.</span>
-          <Link href="/docs">Read the react-3d-mockups docs →</Link>
-        </div>
-      </footer>
     </main>
   )
 }

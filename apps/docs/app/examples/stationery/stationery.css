@@ -349,26 +349,6 @@
   color: var(--am-muted);
 }
 
-/* ---- footer ------------------------------------------------------------ */
-
-.am-foot {
-  display: flex;
-  justify-content: space-between;
-  gap: 20px;
-  flex-wrap: wrap;
-  max-width: 1240px;
-  margin: 0 auto;
-  padding: 24px 32px 36px;
-  border-top: 1px solid var(--am-line);
-  font-size: 13px;
-  color: var(--am-muted);
-}
-
-.am-foot a {
-  font-weight: 600;
-  color: var(--am-text);
-}
-
 /* ---- narrower ------------------------------------------------------------ */
 
 @media (max-width: 1000px) {
@@ -392,8 +372,7 @@
   }
 
   .am-hero,
-  .am-builder,
-  .am-foot {
+  .am-builder {
     padding-left: 20px;
     padding-right: 20px;
   }

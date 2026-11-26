@@ -329,26 +329,6 @@
   color: rgba(242, 239, 230, 0.65);
 }
 
-/* ---- footer ------------------------------------------------------------ */
-
-.ar-foot {
-  display: flex;
-  justify-content: space-between;
-  gap: 20px;
-  flex-wrap: wrap;
-  max-width: 1240px;
-  margin: 0 auto;
-  padding: 24px 32px 36px;
-  border-top: 1px solid var(--ar-line);
-  font-size: 13px;
-  color: rgba(242, 239, 230, 0.65);
-}
-
-.ar-foot a {
-  font-weight: 600;
-  color: #fff;
-}
-
 /* ---- narrower ------------------------------------------------------------ */
 
 @media (max-width: 1000px) {
@@ -368,8 +348,7 @@
 
   .ar-hero,
   .ar-play,
-  .ar-shop,
-  .ar-foot {
+  .ar-shop {
     padding-left: 20px;
     padding-right: 20px;
   }

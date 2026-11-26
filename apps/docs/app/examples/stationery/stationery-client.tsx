@@ -167,11 +167,6 @@ export function Stationery() {
           </article>
         </div>
       </section>
-
-      <footer className="am-foot">
-        <span>Ampersand is a fictional studio. The four pieces are live mockups reading one set of fields.</span>
-        <Link href="/docs">Read the react-3d-mockups docs →</Link>
-      </footer>
     </main>
   )
 }

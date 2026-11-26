@@ -169,11 +169,6 @@ export function Ledger() {
           </div>
         ))}
       </section>
-
-      <footer className="lg-foot">
-        <span>Ledger is a fictional app. The three devices are one WebGL canvas, and the app on them is one React state.</span>
-        <Link href="/docs">Read the react-3d-mockups docs →</Link>
-      </footer>
     </main>
   )
 }

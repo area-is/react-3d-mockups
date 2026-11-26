@@ -132,11 +132,6 @@ export function Fleet() {
           </article>
         </div>
       </section>
-
-      <footer className="fl-foot">
-        <span>Northline is a fictional carrier. The trailer, the van, the box and the phone are live mockups wearing one component.</span>
-        <Link href="/docs">Read the react-3d-mockups docs →</Link>
-      </footer>
     </main>
   )
 }

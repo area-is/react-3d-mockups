@@ -86,11 +86,6 @@
   gap: 16px;
 }
 
-.ps-foot a[href^='https://tabbied.com'] {
-  font-weight: 600;
-  color: var(--ps-ink);
-}
-
 .ps-bag {
   font-size: 14px;
   font-weight: 600;
@@ -630,26 +625,6 @@
   color: var(--ps-muted);
 }
 
-/* ---- footer ------------------------------------------------------------ */
-
-.ps-foot {
-  display: flex;
-  justify-content: space-between;
-  gap: 20px;
-  flex-wrap: wrap;
-  max-width: 1240px;
-  margin: 0 auto;
-  padding: 24px 32px 36px;
-  border-top: 1px solid var(--ps-line);
-  font-size: 13px;
-  color: var(--ps-muted);
-}
-
-.ps-foot a {
-  font-weight: 600;
-  color: var(--ps-ink);
-}
-
 /* ---- narrower: one column, the wall on top ----------------------------- */
 
 @media (max-width: 1000px) {
@@ -688,8 +663,7 @@
   }
 
   .ps-hero,
-  .ps-also,
-  .ps-foot {
+  .ps-also {
     padding-left: 20px;
     padding-right: 20px;
   }
