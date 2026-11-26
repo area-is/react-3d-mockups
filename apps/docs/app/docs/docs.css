@@ -212,7 +212,7 @@
    title lines up with the text above it. The grid's gaps separate them,
    and the title takes the underline on hover. */
 .docs-cards {
-  gap: 1.5rem 2rem;
+  gap: 2.25rem 2rem;
   margin: 1.25rem 0;
 }
 
