@@ -334,13 +334,13 @@
 }
 
 .cp-piece-meta strong {
-  font-size: 15px;
+  font-size: 17px;
   font-weight: 600;
   letter-spacing: 0;
 }
 
 .cp-piece-meta span {
-  font-size: 14px;
+  font-size: 16px;
   line-height: 1.5;
   color: var(--muted);
 }
