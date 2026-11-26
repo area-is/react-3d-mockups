@@ -99,9 +99,9 @@
 }
 
 .am-eyebrow {
-  margin: 0 0 16px;
-  font-size: 13px;
-  font-weight: 600;
+  margin: 0 0 8px;
+  font-size: 15px;
+  font-weight: 500;
   letter-spacing: 0.02em;
   color: color-mix(in srgb, var(--am-accent) 50%, var(--am-text));
   transition: color 0.4s ease;
@@ -338,35 +338,15 @@
 }
 
 .am-piece-meta strong {
-  font-size: 15px;
+  font-size: 17px;
   font-weight: 600;
   letter-spacing: 0;
 }
 
 .am-piece-meta span {
-  font-size: 13px;
+  font-size: 16px;
   line-height: 1.5;
   color: var(--am-muted);
-}
-
-/* ---- footer ------------------------------------------------------------ */
-
-.am-foot {
-  display: flex;
-  justify-content: space-between;
-  gap: 20px;
-  flex-wrap: wrap;
-  max-width: 1240px;
-  margin: 0 auto;
-  padding: 24px 32px 36px;
-  border-top: 1px solid var(--am-line);
-  font-size: 13px;
-  color: var(--am-muted);
-}
-
-.am-foot a {
-  font-weight: 600;
-  color: var(--am-text);
 }
 
 /* ---- narrower ------------------------------------------------------------ */
@@ -392,8 +372,7 @@
   }
 
   .am-hero,
-  .am-builder,
-  .am-foot {
+  .am-builder {
     padding-left: 20px;
     padding-right: 20px;
   }

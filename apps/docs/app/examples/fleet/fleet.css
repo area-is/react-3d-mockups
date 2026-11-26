@@ -56,6 +56,8 @@
 }
 
 .fl-brand {
+  /* A link home now; it keeps the header's ink rather than the page's link colour. */
+  color: inherit;
   font-size: 22px;
   font-weight: 600;
   letter-spacing: -0.01em;
@@ -94,9 +96,9 @@
 }
 
 .fl-eyebrow {
-  margin: 0 0 16px;
-  font-size: 13px;
-  font-weight: 600;
+  margin: 0 0 8px;
+  font-size: 15px;
+  font-weight: 500;
   letter-spacing: 0.02em;
   color: var(--fl-accent-text);
   transition: color 0.3s ease;
@@ -143,10 +145,12 @@
 }
 
 /* Wide and definite: a 53 ft trailer needs the width, and the canvas needs
-   a height to size against. */
+   a height to size against - but no more than it fills, or the empty space
+   over it reads as a gap under the hero. The camera's field of view narrows
+   with the height (fleet-scenes.tsx), so the trailer keeps its size. */
 .fl-trailer-stage {
   position: relative;
-  height: min(66vh, 640px);
+  height: min(48vh, 465px);
   overflow: clip;
 }
 
@@ -377,35 +381,15 @@
 }
 
 .fl-card-copy strong {
-  font-size: 15px;
+  font-size: 17px;
   font-weight: 600;
   letter-spacing: 0;
 }
 
 .fl-card-copy span {
-  font-size: 14px;
+  font-size: 16px;
   line-height: 1.5;
   color: var(--fl-muted);
-}
-
-/* ---- footer ------------------------------------------------------------ */
-
-.fl-foot {
-  display: flex;
-  justify-content: space-between;
-  gap: 20px;
-  flex-wrap: wrap;
-  max-width: 1240px;
-  margin: 0 auto;
-  padding: 24px 32px 36px;
-  border-top: 1px solid var(--fl-line);
-  font-size: 13px;
-  color: var(--fl-muted);
-}
-
-.fl-foot a {
-  font-weight: 600;
-  color: var(--fl-ink);
 }
 
 /* ---- narrower ------------------------------------------------------------ */
@@ -437,8 +421,7 @@
   .fl-hero,
   .fl-trailer,
   .fl-van,
-  .fl-door,
-  .fl-foot {
+  .fl-door {
     padding-left: 20px;
     padding-right: 20px;
   }

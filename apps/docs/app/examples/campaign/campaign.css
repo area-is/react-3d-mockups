@@ -40,6 +40,8 @@
 }
 
 .cp-brand {
+  /* A link home now; it keeps the header's ink rather than the page's link colour. */
+  color: inherit;
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -67,8 +69,7 @@
   opacity: 0.5;
 }
 
-.cp-part a,
-.cp-credits a {
+.cp-part a {
   color: var(--text);
   border-bottom: 1px solid var(--cp-line);
 }
@@ -82,9 +83,9 @@
 }
 
 .cp-eyebrow {
-  margin: 0 0 16px;
-  font-size: 13px;
-  font-weight: 600;
+  margin: 0 0 8px;
+  font-size: 15px;
+  font-weight: 500;
   letter-spacing: 0.02em;
   color: var(--cp-acid);
 }
@@ -135,7 +136,11 @@
    than cutting the pole off on a line. */
 .cp-bulletin-stage {
   position: relative;
-  height: min(72vh, 720px);
+  /* As short as the bulletin needs: the camera's field of view narrows by
+     the same ratio (campaign-scenes.tsx), so the board keeps its size and
+     only the empty sky over it goes - which sat between the hero and the
+     board as a gap. */
+  height: min(58vh, 580px);
   overflow: clip;
   -webkit-mask-image: linear-gradient(to bottom, #000 78%, transparent);
   mask-image: linear-gradient(to bottom, #000 78%, transparent);
@@ -334,48 +339,15 @@
 }
 
 .cp-piece-meta strong {
-  font-size: 15px;
+  font-size: 17px;
   font-weight: 600;
   letter-spacing: 0;
 }
 
 .cp-piece-meta span {
-  font-size: 14px;
+  font-size: 16px;
   line-height: 1.5;
   color: var(--muted);
-}
-
-/* ---- footer ------------------------------------------------------------ */
-
-.cp-foot {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 24px;
-  flex-wrap: wrap;
-  max-width: 1240px;
-  margin: 0 auto;
-  padding: 24px 32px 40px;
-  border-top: 1px solid var(--cp-line);
-  font-size: 13px;
-  color: var(--muted);
-}
-
-.cp-credits {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px 24px;
-}
-
-.cp-credits strong {
-  margin-right: 8px;
-  font-weight: 600;
-  color: var(--text);
-}
-
-.cp-foot a {
-  font-weight: 600;
-  color: var(--text);
 }
 
 /* ---- narrower ------------------------------------------------------------ */
@@ -413,8 +385,7 @@
   .cp-hero,
   .cp-bulletin,
   .cp-system,
-  .cp-city,
-  .cp-foot {
+  .cp-city {
     padding-left: 20px;
     padding-right: 20px;
   }

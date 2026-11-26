@@ -27,8 +27,12 @@ export const INKS = [
   { name: 'Bone', hex: BONE, role: 'the type' },
 ] as const
 
-/** The black tote the merch prints on - its stock, not an ink. */
-export const BAG = '#141218'
+/**
+ * The black tote the merch prints on - its stock, not an ink. A washed,
+ * charcoal black rather than the night itself: at #141218 the bag all but
+ * vanished into the page behind it.
+ */
+export const BAG = '#2a2731'
 
 export const FESTIVAL = {
   name: 'Aperture',

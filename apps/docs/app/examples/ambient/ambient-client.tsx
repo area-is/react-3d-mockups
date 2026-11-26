@@ -26,10 +26,10 @@ export function Ambient() {
   return (
     <main className="ab" style={{ ['--ab-ground' as string]: channel.palette[0], ['--ab-ink' as string]: channel.palette[1] }}>
       <header className="ab-top">
-        <span className="ab-brand">
+        <Link href="/examples/ambient" className="ab-brand">
           <span className="ab-brand-mark" aria-hidden />
           Ambient
-        </span>
+        </Link>
         <nav className="ab-nav" aria-label="Site">
           <span>Channels</span>
           <span>Screens</span>
@@ -142,11 +142,6 @@ export function Ambient() {
           </div>
         ))}
       </section>
-
-      <footer className="ab-foot">
-        <span>Ambient is a fictional service. Every screen on this page is a live mockup redrawing a generative pattern.</span>
-        <Link href="/docs">Read the react-3d-mockups docs →</Link>
-      </footer>
     </main>
   )
 }

@@ -47,10 +47,10 @@ export function Stream() {
   return (
     <main className="st">
       <header className="st-top">
-        <span className="st-brand">
+        <Link href="/examples/stream" className="st-brand">
           <span className="st-brand-mark" aria-hidden />
           Prism
-        </span>
+        </Link>
         <nav className="st-nav" aria-label="Site">
           <span>Browse</span>
           <span>Live</span>
@@ -149,11 +149,6 @@ export function Stream() {
           </div>
         ))}
       </section>
-
-      <footer className="st-foot">
-        <span>Prism is a fictional service and so are its shows. The four screens are live mockups sharing one featured title.</span>
-        <Link href="/docs">Read the react-3d-mockups docs →</Link>
-      </footer>
     </main>
   )
 }

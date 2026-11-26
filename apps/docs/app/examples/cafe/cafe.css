@@ -97,9 +97,9 @@
 }
 
 .cf-eyebrow {
-  margin: 0 0 16px;
-  font-size: 13px;
-  font-weight: 600;
+  margin: 0 0 8px;
+  font-size: 15px;
+  font-weight: 500;
   letter-spacing: 0.02em;
   color: var(--cf-paint);
   transition: color 0.4s ease;
@@ -365,44 +365,6 @@
   transition: color 0.4s ease;
 }
 
-/* ---- footer ------------------------------------------------------------ */
-
-.cf-foot {
-  max-width: 1240px;
-  margin: 0 auto;
-  padding: 28px 32px 40px;
-  border-top: 1px solid var(--cf-line);
-  font-size: 14px;
-  line-height: 1.6;
-  color: var(--cf-muted);
-}
-
-.cf-foot-cols {
-  display: grid;
-  grid-template-columns: repeat(3, auto);
-  justify-content: start;
-  gap: 40px;
-  margin-bottom: 24px;
-}
-
-.cf-foot strong {
-  color: var(--cf-ink);
-  font-weight: 600;
-}
-
-.cf-foot-note {
-  display: flex;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 12px 24px;
-  font-size: 13px;
-}
-
-.cf-foot-note a {
-  font-weight: 600;
-  color: var(--cf-ink);
-}
-
 /* ---- narrower ------------------------------------------------------------ */
 
 @media (max-width: 1000px) {
@@ -437,8 +399,7 @@
   .cf-hero,
   .cf-shop,
   .cf-board,
-  .cf-goods,
-  .cf-foot {
+  .cf-goods {
     padding-left: 20px;
     padding-right: 20px;
   }
@@ -458,10 +419,5 @@
   .cf-board-stage,
   .cf-good-stage {
     height: 440px;
-  }
-
-  .cf-foot-cols {
-    grid-template-columns: 1fr;
-    gap: 16px;
   }
 }

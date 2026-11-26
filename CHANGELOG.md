@@ -87,6 +87,12 @@ breaking change can ship in a minor release, and is always listed under
 
 ### Changed
 
+- **`Billboard` has more structure, but stays simple.** The face sits in a
+  trimmed frame, the catwalk and its rails are galvanized against the painted
+  steel, the floodlights are LED heads on arms, the pole stands on a concrete
+  footing, and four stringers and the torsion tube give the back some relief.
+  There are no bolts, gussets or bracing: from any normal viewing distance
+  they were noise around the face.
 - **Print and packaging bodies have a surface, not just a colour.** Nine
   objects were lit as one flat colour wherever your design does not print,
   which is what gave them away as renders. They now carry procedural grain,

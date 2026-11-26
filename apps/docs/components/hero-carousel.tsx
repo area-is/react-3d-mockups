@@ -41,7 +41,6 @@ function CarouselPlaceholder() {
       <div className="carousel-foot">
         <div className="carousel-tools carousel-hold" aria-hidden>
           <span className="carousel-tool">Pause</span>
-          <span className="carousel-tools-rule" />
           <span className="carousel-tool">Copy code</span>
         </div>
         <p className="carousel-hint carousel-hold">

@@ -30,7 +30,7 @@ const SHOTS = [
   // camera island are - the side no flat mockup ever shows.
   { name: 'rendering', query: 'device=iphone&pvariant=pro&color=cosmicorange&ry=208&rx=10&screen=dark&shadows=1&dist=6.4' },
   // Any content on the surface: a whole site, live on the glass.
-  { name: 'surface', query: 'device=laptop&lvariant=air13&color=silver&ry=-26&rx=12&screen=art&art=SwissSite&shadows=1&dist=6.9' },
+  { name: 'surface', query: 'device=laptop&lvariant=air13&color=silver&ry=-26&rx=12&screen=art&art=SampleWebsite&shadows=1&dist=6.9' },
   // Procedural objects: a city bus, built from geometry, with its LED sign.
   // Street side, where the panel is clear of the doors.
   { name: 'procedural', query: 'device=bus&ry=208&rx=8&screen=art&art=BusAdArt&sign=42%20DOWNTOWN&shadows=1&dist=10.2' },

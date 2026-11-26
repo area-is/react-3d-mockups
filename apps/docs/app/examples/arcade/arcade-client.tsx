@@ -27,10 +27,10 @@ export function Arcade() {
   return (
     <main className="ar" style={{ ['--ar-sky' as string]: level.sky, ['--ar-lamp' as string]: level.lamp }}>
       <header className="ar-top">
-        <span className="ar-brand">
+        <Link href="/examples/arcade" className="ar-brand">
           <MothMark size="28px" color="currentColor" />
           {GAME.title}
-        </span>
+        </Link>
         <nav className="ar-nav" aria-label="Site">
           <span>The game</span>
           <span>Soundtrack</span>
@@ -120,11 +120,6 @@ export function Arcade() {
           </article>
         </div>
       </section>
-
-      <footer className="ar-foot">
-        <span>Moth is a fictional game by a fictional studio. The one on the TV is a canvas, a handful of generated silhouettes and a moth, and it is actually running.</span>
-        <Link href="/docs/screen-content">What a screen can show →</Link>
-      </footer>
     </main>
   )
 }

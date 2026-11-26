@@ -25,7 +25,7 @@ export function Fleet() {
   return (
     <main className="fl" style={{ ['--fl-accent' as string]: livery.accent }}>
       <header className="fl-top">
-        <span className="fl-brand">{COMPANY.name}</span>
+        <Link href="/examples/fleet" className="fl-brand">{COMPANY.name}</Link>
         <nav className="fl-nav" aria-label="Site">
           <span>Services</span>
           <span>Network</span>
@@ -132,11 +132,6 @@ export function Fleet() {
           </article>
         </div>
       </section>
-
-      <footer className="fl-foot">
-        <span>Northline is a fictional carrier. The trailer, the van, the box and the phone are live mockups wearing one component.</span>
-        <Link href="/docs">Read the react-3d-mockups docs →</Link>
-      </footer>
     </main>
   )
 }

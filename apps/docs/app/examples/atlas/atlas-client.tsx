@@ -46,7 +46,7 @@ export function Atlas() {
   return (
     <main className="at">
       <header className="at-top">
-        <span className="at-brand">{MAG.name}</span>
+        <Link href="/examples/atlas" className="at-brand">{MAG.name}</Link>
         <nav className="at-nav" aria-label="Site">
           <span>Issues</span>
           <span>Stories</span>
@@ -156,14 +156,6 @@ export function Atlas() {
           </article>
         </div>
       </section>
-
-      <footer className="at-foot">
-        <span>
-          Atlas is a fictional magazine. Its three photographs were generated with GPT Image 2.5 at low quality and
-          placed on the surfaces as plain images.
-        </span>
-        <Link href="/docs/images">How images work on a surface →</Link>
-      </footer>
     </main>
   )
 }

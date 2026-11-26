@@ -54,6 +54,8 @@
 }
 
 .at-brand {
+  /* A link home now; it keeps the header's ink rather than the page's link colour. */
+  color: inherit;
   font-size: 30px;
   font-weight: 600;
   letter-spacing: -0.01em;
@@ -95,9 +97,9 @@
 }
 
 .at-eyebrow {
-  margin: 0 0 16px;
-  font-size: 14px;
-  font-weight: 600;
+  margin: 0 0 8px;
+  font-size: 15px;
+  font-weight: 500;
   letter-spacing: 0;
   color: var(--at-red);
 }
@@ -321,32 +323,6 @@
   color: var(--at-muted);
 }
 
-/* ---- footer ------------------------------------------------------------ */
-
-.at-foot {
-  display: flex;
-  justify-content: space-between;
-  gap: 20px;
-  flex-wrap: wrap;
-  max-width: 1240px;
-  margin: 0 auto;
-  padding: 24px 32px 36px;
-  border-top: 1px solid var(--at-ink);
-  font-size: 13px;
-  line-height: 1.5;
-  color: var(--at-muted);
-}
-
-.at-foot span {
-  max-width: 640px;
-}
-
-.at-foot a {
-  font-weight: 600;
-  color: var(--at-ink);
-  white-space: nowrap;
-}
-
 /* ---- narrower ------------------------------------------------------------ */
 
 @media (max-width: 1000px) {
@@ -376,8 +352,7 @@
 
   .at-hero,
   .at-contents,
-  .at-shop,
-  .at-foot {
+  .at-shop {
     padding-left: 20px;
     padding-right: 20px;
   }

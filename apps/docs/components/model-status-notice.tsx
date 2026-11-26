@@ -1,8 +1,8 @@
 import { Fragment } from 'react'
 import Link from 'next/link'
-import { Callout } from 'fumadocs-ui/components/callout'
 import { DEVICES } from '@/lib/mockup-catalog.mjs'
 import type { ModelLifecycle } from '@/lib/model-lifecycle'
+import { Callout } from './callout'
 
 interface CatalogEntry {
   label: string

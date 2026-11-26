@@ -59,10 +59,10 @@ export default function CampaignExamplePage() {
   return (
     <main className="cp">
       <header className="cp-top">
-        <span className="cp-brand">
+        <Link href="/examples/campaign" className="cp-brand">
           <span className="cp-brand-mark" aria-hidden />
           Raster Studio
-        </span>
+        </Link>
         <span className="cp-crumb">
           Work <span aria-hidden>/</span> Aperture Festival 2026
         </span>
@@ -156,24 +156,6 @@ export default function CampaignExamplePage() {
           ))}
         </div>
       </section>
-
-      <footer className="cp-foot">
-        <div className="cp-credits">
-          <span>
-            <strong>Client</strong> Aperture Festival, a fiction
-          </span>
-          <span>
-            <strong>Identity</strong> Raster Studio, another
-          </span>
-          <span>
-            <strong>Patterns</strong> <TabbiedLink>tabbied</TabbiedLink>
-          </span>
-          <span>
-            <strong>Mockups</strong> react-3d-mockups
-          </span>
-        </div>
-        <Link href="/docs">Read the react-3d-mockups docs →</Link>
-      </footer>
     </main>
   )
 }

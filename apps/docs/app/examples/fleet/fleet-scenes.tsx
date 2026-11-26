@@ -29,7 +29,8 @@ export function TrailerScene({ livery }: { livery: Livery }) {
       skirtColor={livery.ink}
       surfaceBackground={livery.body}
       rotation={[0, -0.36, 0]}
-      camera={narrow ? undefined : { position: [0, 0.4, 7.2], fov: 40 }}
+      // fov 29.6 is the old 40 at the stage's new height (0.73 of the old).
+      camera={narrow ? undefined : { position: [0, 0.4, 7.2], fov: 29.6 }}
     >
       <SemiTrailerMockup.CurbSide>
         <Side livery={livery} seed="northline-curb" />

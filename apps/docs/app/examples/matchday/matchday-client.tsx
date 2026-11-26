@@ -40,10 +40,10 @@ export function Matchday() {
   return (
     <main className="md">
       <header className="md-top">
-        <span className="md-brand">
+        <Link href="/examples/matchday" className="md-brand">
           <Crest size={30} />
           {CLUB.name}
-        </span>
+        </Link>
         <nav className="md-nav" aria-label="Site">
           <span>Fixtures</span>
           <span>Tickets</span>
@@ -141,11 +141,6 @@ export function Matchday() {
           </div>
         </div>
       </section>
-
-      <footer className="md-foot">
-        <span>Alcântara FC is a fictional club. The coach, the broadcast, the watch and the pass are live mockups; the clock is the page&rsquo;s.</span>
-        <Link href="/docs">Read the react-3d-mockups docs →</Link>
-      </footer>
     </main>
   )
 }

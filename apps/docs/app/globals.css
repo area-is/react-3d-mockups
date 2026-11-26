@@ -144,7 +144,6 @@ code {
   background: rgba(8, 9, 12, 0.92);
   -webkit-backdrop-filter: blur(24px) saturate(140%);
   backdrop-filter: blur(24px) saturate(140%);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .header-inner {
@@ -585,9 +584,25 @@ code {
 }
 
 .accent-link {
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 600;
   color: var(--accent);
+  text-decoration: underline 1px transparent;
+  text-underline-offset: 4px;
+  transition: color 0.15s ease, text-decoration-color 0.15s ease;
+}
+
+/* A step lighter and an underline coming up under it: enough to answer the
+   pointer, not so much that the link jumps. */
+.accent-link:hover {
+  color: var(--accent-2);
+  text-decoration-color: color-mix(in srgb, var(--accent-2) 55%, transparent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .accent-link {
+    transition: none;
+  }
 }
 
 .eyebrow {
@@ -631,8 +646,8 @@ code {
    is the next line on the page and it brings its own spacing. */
 .hero h1 {
   font-size: clamp(34px, 6.3vw, 68px);
-  font-weight: 600;
-  letter-spacing: -0.035em;
+  font-weight: 500;
+  letter-spacing: -0.032em;
   line-height: 1;
   margin: 0;
   /* The rotating noun changes the line's width as it types; wrapping would let
@@ -1080,9 +1095,9 @@ code {
 /*
  * The stage's toolbar: autoplay's toggle and the copy-code button side by
  * side, centred under the stage they act on. Set in Inter and in sentence
- * case like the readout above the stage. No capsule, no outline and no fill:
- * two labels and a hairline between them, and a label comes up to the text's
- * colour on hover.
+ * case like the readout above the stage. No capsule, no outline, no fill and
+ * no rule between them: two labels set apart by their own padding, and a
+ * label comes up to the text's colour on hover.
  */
 .carousel-tools {
   display: inline-flex;
@@ -1169,14 +1184,6 @@ code {
   to {
     transform: scaleX(0);
   }
-}
-
-.carousel-tools-rule {
-  width: 1px;
-  height: 16px;
-  margin: 0 2px;
-  background: rgba(255, 255, 255, 0.1);
-  flex: none;
 }
 
 /*
@@ -1473,229 +1480,6 @@ code {
 }
 
 /* ------------------------------------------------------------------ */
-/*  Features                                                           */
-/* ------------------------------------------------------------------ */
-
-/*
- * Four claims, stacked - no rules, no cards, no boxes. The space between them
- * does the separating: a border around a paragraph adds a second, competing
- * rectangle to a page that is already one big rectangle of hardware.
- *
- * One column rather than four. Four made each claim a caption you skim past;
- * down the page they are paragraphs, and they can be set large enough to be
- * read. The measure is capped rather than the column: a claim runs to about
- * sixty characters and stops, leaving the rest of the width empty, which is
- * what keeps a full-bleed section from becoming a full-bleed line of text.
- */
-.features {
-  max-width: 1080px;
-  margin: 0 auto;
-  padding: clamp(36px, 5.4vw, 68px) clamp(14px, 3.6vw, 43px) 0;
-  display: flex;
-  flex-direction: column;
-  gap: clamp(27px, 3.6vw, 43px);
-}
-
-/* The line drawing over each claim is the only ornament: white strokes on
-   nothing, at a height the four share, so their tops and the headings under
-   them line up whatever each drawing's width. Dimmed a step so it sits under
-   the heading rather than competing with it. */
-.feature-mark {
-  display: block;
-  width: auto;
-  height: 72px;
-  margin-bottom: 14px;
-  opacity: 0.85;
-}
-
-.features h2 {
-  font-size: clamp(19px, 2vw, 24px);
-  font-weight: 600;
-  letter-spacing: -0.025em;
-  margin: 9px 0 9px;
-}
-
-.features p {
-  color: var(--muted);
-  font-size: clamp(14px, 1.2vw, 17px);
-  line-height: 1.6;
-  margin: 0;
-  max-width: 62ch;
-  text-wrap: pretty;
-}
-
-/*
- * Each claim beside a render of it: copy then picture on a phone, side by
- * side from a tablet up, alternating sides so the column of copy does not
- * run down one edge with the pictures stacked along the other.
- */
-.feature {
-  display: grid;
-  gap: 18px;
-  align-items: center;
-}
-
-/*
- * The picture's box is a fixed shape whatever the render's, so the four rows
- * line up and the page reserves the space before an image arrives. The
- * renders are cut out, so they sit on a faint pool of the accent rather than
- * in a frame.
- */
-.feature-figure {
-  position: relative;
-  margin: 0;
-  aspect-ratio: 16 / 10;
-  max-height: 330px;
-  background: radial-gradient(58% 52% at 50% 62%, rgba(49, 211, 34, 0.09), transparent 72%);
-}
-
-/* Out of flow, so the box alone sets the row's height: in flow, a tall render
-   stretched its row to its own height whatever the box asked for. */
-.feature-figure img {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  box-sizing: border-box;
-  padding: clamp(10px, 2vw, 22px);
-  object-fit: contain;
-}
-
-@media (min-width: 760px) {
-  .feature {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
-    gap: clamp(28px, 4.5vw, 64px);
-  }
-
-  .feature-figure {
-    aspect-ratio: 4 / 3;
-  }
-
-  .feature:nth-child(even) .feature-figure {
-    order: -1;
-  }
-}
-
-/* ------------------------------------------------------------------ */
-/*  The film                                                           */
-/* ------------------------------------------------------------------ */
-
-/*
- * The film under the quick start: a heading and a line beside each other
- * from a tablet up, the player full width under them. The player's box is
- * 16:9 before anything loads, so the page holds still when the poster and
- * the video arrive.
- */
-.film {
-  max-width: 1080px;
-  margin: 0 auto;
-  padding: clamp(40px, 6.3vw, 65px) clamp(14px, 3.6vw, 43px) 0;
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
-}
-
-.film-copy h2 {
-  margin: 0 0 9px;
-}
-
-.film-copy p {
-  color: var(--muted);
-  font-size: 14px;
-  max-width: 62ch;
-  margin: 0;
-  text-wrap: pretty;
-}
-
-/*
- * The player is framed so it reads as a screen, not as more page: the
- * poster is as dark as the background, and under a hairline border it
- * vanished into it. A lighter border, a green-tinted glow and a drop
- * shadow lift it off the page.
- */
-.film-player {
-  position: relative;
-  border-radius: 12px;
-  border: 1px solid var(--border-strong);
-  background: #08090c;
-  overflow: hidden;
-  box-shadow:
-    0 0 0 1px rgba(49, 211, 34, 0.08),
-    0 18px 50px -12px rgba(0, 0, 0, 0.7),
-    0 0 60px -10px rgba(49, 211, 34, 0.14);
-}
-
-.film-video {
-  display: block;
-  width: 100%;
-  height: auto;
-  aspect-ratio: 16 / 9;
-  background: #08090c;
-}
-
-/* The cover before the first play: the whole picture is the button. */
-.film-cover {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  border: 0;
-  padding: 0;
-  cursor: pointer;
-  color: var(--text);
-  font: inherit;
-  background: radial-gradient(circle at center, rgba(8, 9, 12, 0.15) 0%, rgba(8, 9, 12, 0.5) 100%);
-  transition: background 0.2s ease;
-}
-
-.film-play {
-  display: grid;
-  place-items: center;
-  width: clamp(60px, 9vw, 84px);
-  aspect-ratio: 1;
-  border-radius: 50%;
-  background: var(--grad);
-  color: var(--accent-ink);
-  box-shadow: 0 0 0 8px rgba(49, 211, 34, 0.16), 0 10px 30px rgba(0, 0, 0, 0.5);
-  transition: transform 0.15s ease, box-shadow 0.2s ease;
-}
-
-/* The triangle's weight sits left of its box; nudge it to look centred. */
-.film-play svg {
-  margin-left: 4px;
-}
-
-.film-cover-label {
-  font-family: var(--font-mono);
-  font-size: 13px;
-  padding: 4px 10px;
-  border-radius: 999px;
-  background: rgba(8, 9, 12, 0.7);
-  color: var(--text);
-}
-
-.film-cover:hover {
-  background: radial-gradient(circle at center, rgba(8, 9, 12, 0.05) 0%, rgba(8, 9, 12, 0.4) 100%);
-}
-
-.film-cover:hover .film-play {
-  transform: scale(1.06);
-  box-shadow: 0 0 0 12px rgba(49, 211, 34, 0.2), 0 10px 30px rgba(0, 0, 0, 0.5);
-}
-
-.film-cover:focus-visible {
-  outline: none;
-}
-
-.film-cover:focus-visible .film-play {
-  outline: 2px solid var(--accent-2);
-  outline-offset: 6px;
-}
-
-/* ------------------------------------------------------------------ */
 /*  Quick start                                                        */
 /* ------------------------------------------------------------------ */
 
@@ -1713,9 +1497,15 @@ code {
   margin: 0 0 13px;
 }
 
+/* The home page's section headings sit a weight under the site's default. */
+.quickstart-copy h2,
+.home-gallery h2 {
+  font-weight: 500;
+}
+
 .quickstart-copy p {
   color: var(--muted);
-  font-size: 14px;
+  font-size: 16px;
   max-width: 44ch;
   margin: 0 0 18px;
   text-wrap: pretty;
@@ -1756,9 +1546,17 @@ code {
 }
 
 .code-panel-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
   font-family: var(--font-mono);
   font-size: 13px;
   color: var(--text-low);
+}
+
+/* Brand marks beside the labels (_components/brand-icon.tsx), in their ink. */
+.brand-icon {
+  flex: none;
 }
 
 .pm-switch {
@@ -1767,7 +1565,15 @@ code {
   margin-left: -9px;
 }
 
+/* A little more room under the switch than under the file name. */
+.quickstart-install .code-panel-head {
+  margin-bottom: 6px;
+}
+
 .pm-switch-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   min-height: 30px;
   padding: 4px 9px;
   border: 0;
@@ -1785,14 +1591,17 @@ code {
   color: var(--text);
 }
 
-/* The manager showing is marked in the ink and a short accent rule under
-   it, the same mark the explorer's tabs use - not a filled chip. */
+/* The manager showing is marked by its ink alone: full text colour against
+   the others' low one - no chip, underline or dot. */
 .pm-switch-btn[aria-pressed='true'] {
   color: var(--text);
-  text-decoration: underline;
-  text-decoration-color: var(--accent);
-  text-decoration-thickness: 2px;
-  text-underline-offset: 7px;
+}
+
+/* Forced colours flatten the two inks into one, so mark the choice there. */
+@media (forced-colors: active) {
+  .pm-switch-btn[aria-pressed='true'] {
+    text-decoration: underline;
+  }
 }
 
 .pm-switch-btn:focus-visible {
@@ -1841,7 +1650,34 @@ code {
    the stylesheet rather than typed into the snippet. */
 .quickstart-install pre code::before {
   content: '$ ';
-  color: var(--accent);
+  color: var(--text);
+}
+
+/* ------------------------------------------------------------------ */
+/*  Gallery                                                            */
+/* ------------------------------------------------------------------ */
+
+/*
+ * The docs' Gallery (components/model-gallery.tsx) without its controls, on
+ * the quick start's column. Its stylesheet reads fumadocs' colour variables,
+ * which the site does not load, so the section maps the site's palette onto
+ * the ones the grid uses.
+ */
+.home-gallery {
+  --color-fd-foreground: var(--text);
+  --color-fd-muted-foreground: var(--muted);
+  --color-fd-ring: var(--accent-2);
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: clamp(40px, 6.3vw, 65px) clamp(14px, 3.6vw, 43px) 0;
+}
+
+.home-gallery h2 {
+  margin: 0;
+}
+
+.home-gallery .model-gallery {
+  margin: 22px 0 0;
 }
 
 /* ------------------------------------------------------------------ */

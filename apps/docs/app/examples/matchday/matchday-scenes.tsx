@@ -24,7 +24,8 @@ export function CoachScene() {
       surfaceBackground={CLUB.green}
       rotation={[0, -0.42, 0]}
       // A bus is long; its stock framing leaves it small on a wide stage.
-      camera={narrow ? undefined : { position: [0, 0.6, 7.4], fov: 40 }}
+      // fov 29.6 is the old 40 at the stage's new height (0.73 of the old).
+      camera={narrow ? undefined : { position: [0, 0.6, 7.4], fov: 29.6 }}
     >
       <BusMockup.CurbSide>
         <CoachSide doors />

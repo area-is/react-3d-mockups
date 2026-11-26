@@ -51,6 +51,8 @@
 }
 
 .ps-brand {
+  /* A link home now; it keeps the header's ink rather than the page's link colour. */
+  color: inherit;
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -84,11 +86,6 @@
   display: flex;
   align-items: center;
   gap: 16px;
-}
-
-.ps-foot a[href^='https://tabbied.com'] {
-  font-weight: 600;
-  color: var(--ps-ink);
 }
 
 .ps-bag {
@@ -197,9 +194,10 @@
 }
 
 .ps-eyebrow {
-  margin: 0;
-  font-size: 12px;
-  font-weight: 600;
+  /* the column's 16px gap, less 8px: the kicker sits close to the title */
+  margin: 0 0 -8px;
+  font-size: 15px;
+  font-weight: 500;
   letter-spacing: 0.02em;
   color: var(--ps-accent-text);
 }
@@ -455,45 +453,6 @@
   color: var(--ps-ink);
 }
 
-/* The seed and its shuffle. */
-.ps-seed-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-/* The site styles `code` as a green chip for the docs; this one is a field
-   in the shop's own ink. */
-.ps .ps-seed {
-  flex: 1;
-  padding: 8px 12px;
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--ps-ink);
-  background: rgba(255, 255, 255, 0.5);
-  border: 1.5px solid var(--ps-line);
-  border-radius: 6px;
-  white-space: nowrap;
-}
-
-.ps-shuffle {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 12px;
-  font-size: 13px;
-  font-weight: 600;
-  background: #fff;
-  border: 1.5px solid var(--ps-line-strong);
-  border-radius: 6px;
-  transition: border-color 0.15s ease;
-  white-space: nowrap;
-}
-
-.ps-shuffle:hover {
-  border-color: var(--ps-ink);
-}
-
 /* Price and the two actions. */
 .ps-buy {
   display: flex;
@@ -629,26 +588,6 @@
   color: var(--ps-muted);
 }
 
-/* ---- footer ------------------------------------------------------------ */
-
-.ps-foot {
-  display: flex;
-  justify-content: space-between;
-  gap: 20px;
-  flex-wrap: wrap;
-  max-width: 1240px;
-  margin: 0 auto;
-  padding: 24px 32px 36px;
-  border-top: 1px solid var(--ps-line);
-  font-size: 13px;
-  color: var(--ps-muted);
-}
-
-.ps-foot a {
-  font-weight: 600;
-  color: var(--ps-ink);
-}
-
 /* ---- narrower: one column, the wall on top ----------------------------- */
 
 @media (max-width: 1000px) {
@@ -687,8 +626,7 @@
   }
 
   .ps-hero,
-  .ps-also,
-  .ps-foot {
+  .ps-also {
     padding-left: 20px;
     padding-right: 20px;
   }

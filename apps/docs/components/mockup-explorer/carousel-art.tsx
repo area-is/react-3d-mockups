@@ -2,18 +2,18 @@
 
 import type { ReactNode } from 'react'
 import {
-  SwissBill,
-  SwissChecker,
-  SwissDialA,
-  SwissEpicentre,
-  SwissField,
-  SwissRaster,
-  SwissRhythm,
-  SwissRotation,
+  SamplePrintedFieldGraphics,
+  SampleCheckerGraphics,
+  SampleWatchDialGraphics,
+  SampleEpicentreGraphics,
+  SampleLineFieldGraphics,
+  SampleHalftoneGraphics,
+  SampleRhythmGraphics,
+  SampleRotationGraphics,
 } from '../screens/swiss-art'
 import { JacketBack, JacketCover, JacketSpine } from '../screens/book-jacket'
 import { SleeveBack, SleeveCover, SleeveLabelA, SleeveLabelB } from '../screens/record-sleeve'
-import { Newspaper, SwissSite, WatchFace } from '../screens/device-apps'
+import { Newspaper, SampleWebsite, WatchFace } from '../screens/device-apps'
 import { CartonBack, CartonFacts, CartonFront, CartonRoof, CartonRoofBack, CartonStory } from '../screens/carton-art'
 import {
   BagBack,
@@ -124,16 +124,16 @@ export type CarouselFaces = Readonly<Record<string, string>>
 
 export const CAROUSEL_ART: Readonly<Record<string, CarouselFaces>> = {
   // Devices carry one region, `screen`.
-  galaxy: { screen: 'SwissRotation' },
-  iphone: { screen: 'SwissRaster' },
+  galaxy: { screen: 'SampleRotationGraphics' },
+  iphone: { screen: 'SampleHalftoneGraphics' },
   fold: { screen: 'Newspaper' },
-  flip: { screen: 'SwissField' },
-  laptop: { screen: 'SwissSite' },
-  ipad: { screen: 'SwissEpicentre' },
-  galaxyTab: { screen: 'SwissChecker' },
-  appleWatch: { screen: 'SwissDialA' },
+  flip: { screen: 'SampleLineFieldGraphics' },
+  laptop: { screen: 'SampleWebsite' },
+  ipad: { screen: 'SampleEpicentreGraphics' },
+  galaxyTab: { screen: 'SampleCheckerGraphics' },
+  appleWatch: { screen: 'SampleWatchDialGraphics' },
   galaxyWatch: { screen: 'WatchFace' },
-  studioDisplay: { screen: 'SwissRhythm' },
+  studioDisplay: { screen: 'SampleRhythmGraphics' },
 
   // Print objects carry as many faces as the thing has.
   book: { cover: 'JacketCover', spine: 'JacketSpine', back: 'JacketBack' },
@@ -168,7 +168,7 @@ export const CAROUSEL_ART: Readonly<Record<string, CarouselFaces>> = {
     bottom: 'MailerBottom',
   },
   shoppingBag: { front: 'BagFront', back: 'BagBack' },
-  posterFrame: { poster: 'SwissBill' },
+  posterFrame: { poster: 'SamplePrintedFieldGraphics' },
   billboard: { face: 'BillboardAdArt' },
   aFrameSign: { front: 'ChalkMenuArt', back: 'ChalkHoursArt' },
   bus: { curbSide: 'SunpeelSide', streetSide: 'SunpeelSide', rear: 'SunpeelRear', destinationSign: 'SunpeelRoute' },
@@ -232,17 +232,17 @@ export interface ArtPlacement {
  * the carousel makes.
  */
 const ART: Readonly<Record<string, (finish: string, at: ArtPlacement) => ReactNode>> = {
-  SwissRotation: () => <SwissRotation />,
-  SwissRaster: () => <SwissRaster />,
-  SwissField: () => <SwissField />,
-  SwissEpicentre: () => <SwissEpicentre />,
-  SwissChecker: () => <SwissChecker />,
-  SwissDialA: () => <SwissDialA />,
-  SwissRhythm: () => <SwissRhythm />,
-  SwissBill: () => <SwissBill />,
+  SampleRotationGraphics: () => <SampleRotationGraphics />,
+  SampleHalftoneGraphics: () => <SampleHalftoneGraphics />,
+  SampleLineFieldGraphics: () => <SampleLineFieldGraphics />,
+  SampleEpicentreGraphics: () => <SampleEpicentreGraphics />,
+  SampleCheckerGraphics: () => <SampleCheckerGraphics />,
+  SampleWatchDialGraphics: () => <SampleWatchDialGraphics />,
+  SampleRhythmGraphics: () => <SampleRhythmGraphics />,
+  SamplePrintedFieldGraphics: () => <SamplePrintedFieldGraphics />,
   BillboardAdArt: () => <BillboardAdArt />,
   Newspaper: () => <Newspaper />,
-  SwissSite: () => <SwissSite />,
+  SampleWebsite: () => <SampleWebsite />,
   WatchFace: () => <WatchFace />,
 
   JacketCover: (finish) => <JacketCover cloth={finish} />,

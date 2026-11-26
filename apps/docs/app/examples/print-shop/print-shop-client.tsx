@@ -3,11 +3,10 @@
 import { useRef, useState, type ReactNode } from 'react'
 import dynamic from 'next/dynamic'
 import Link from 'next/link'
-import { Download, Shuffle } from 'lucide-react'
+import { Download } from 'lucide-react'
 import { TabbiedPattern, type TabbiedPatternHandle } from 'tabbied/react'
 import { LazyScene } from '@/components/lazy-scene'
 import { SceneBoundary } from '@/components/scene-boundary'
-import { TabbiedLink } from '../_shared/badge'
 import {
   BLEEDS,
   DEFAULT_ORDER,
@@ -17,7 +16,6 @@ import {
   MATS,
   SIZES,
   find,
-  newSeed,
   priceOf,
   type Order,
 } from './print-shop-art'
@@ -86,10 +84,10 @@ export function PrintShop() {
   return (
     <main className="ps">
       <header className="ps-top">
-        <span className="ps-brand">
+        <Link href="/examples/print-shop" className="ps-brand">
           <span className="ps-brand-mark" aria-hidden />
           Grid Editions
-        </span>
+        </Link>
         <nav className="ps-nav" aria-label="Shop">
           <span className="ps-nav-link is-active">Prints</span>
           <span className="ps-nav-link">Editions</span>
@@ -119,8 +117,7 @@ export function PrintShop() {
           <p className="ps-eyebrow">Made to order · Edition of one</p>
           <h1 className="ps-title">{design.name}</h1>
           <p className="ps-lede">
-            {design.blurb} Choose an ink set, shuffle the composition until it is the one, and we plot it on
-            310 gsm cotton rag and frame it by hand.
+            {design.blurb} Choose an ink set and we plot it on 310 gsm cotton rag and frame it by hand.
           </p>
 
           <Field label="Design">
@@ -221,16 +218,6 @@ export function PrintShop() {
             </div>
           </Field>
 
-          <Field label="Composition" hint="the seed is the edition number">
-            <div className="ps-seed-row">
-              <code className="ps-seed">No. {order.seed}</code>
-              <button type="button" className="ps-shuffle" onClick={() => set({ seed: newSeed() })}>
-                <Shuffle size={16} strokeWidth={1.5} aria-hidden />
-                Shuffle
-              </button>
-            </div>
-          </Field>
-
           <div className="ps-buy">
             <span className="ps-price">
               ${priceOf(order)}
@@ -290,13 +277,6 @@ export function PrintShop() {
           </article>
         </div>
       </section>
-
-      <footer className="ps-foot">
-        <span>
-          Grid Editions is a fictional shop. The prints are real: every one is a <TabbiedLink /> pattern rendered live.
-        </span>
-        <Link href="/docs">Read the react-3d-mockups docs →</Link>
-      </footer>
     </main>
   )
 }

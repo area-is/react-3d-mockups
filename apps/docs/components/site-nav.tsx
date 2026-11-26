@@ -25,10 +25,11 @@ function GitHubMark() {
  * to be `display: none` on narrow screens, which left phones with no way to
  * reach the docs or the examples at all; the sheet is what puts them back.
  *
- * The sheet leads with the three places most visitors are going - the docs,
- * the gallery of every model, the repo - and folds the twelve examples into
- * one disclosure. Listed flat they were a screen of brand names, and the docs
- * link was one row among thirteen.
+ * The sheet leads with the two places most visitors are going - the docs and
+ * the repo - and folds the twelve examples into one disclosure. Listed flat
+ * they were a screen of brand names, and the docs link was one row among
+ * thirteen. No Gallery link, here or in the row: the home page shows the
+ * gallery itself, under the quick start.
  */
 export function SiteNav() {
   const [open, setOpen] = useState(false)
@@ -71,9 +72,6 @@ export function SiteNav() {
         <Link href="/docs" className="nav-plain">
           Docs
         </Link>
-        <Link href="/docs/gallery" className="nav-plain">
-          Gallery
-        </Link>
         <ExamplesMenu />
       </span>
 
@@ -114,10 +112,6 @@ export function SiteNav() {
       <div className="nav-sheet" id="site-nav-sheet" hidden={!open}>
         <Link href="/docs" className="nav-sheet-link">
           Docs
-        </Link>
-        <Link href="/docs/gallery" className="nav-sheet-link">
-          Gallery
-          <span className="nav-sheet-note">all models</span>
         </Link>
         <a href={GITHUB_URL} target="_blank" rel="noreferrer" className="nav-sheet-link">
           GitHub

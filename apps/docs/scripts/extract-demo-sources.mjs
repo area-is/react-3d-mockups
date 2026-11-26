@@ -3,7 +3,7 @@
 // rather than a one-liner that defers to a component the reader cannot see.
 //
 // "Complete" is the point. The carousel's pieces are each one call to a shared
-// layout - `SwissDialA` is a single `<SwissDial …/>` - so printing the piece
+// layout - `SampleWatchDialGraphics` is a single `<SampleGraphicsDial …/>` - so printing the piece
 // alone told a reader the watch face exists and nothing about how it is built.
 // So this walks the import graph from each piece and collects every local
 // declaration it reaches: the layout, the helpers it calls, the palette it

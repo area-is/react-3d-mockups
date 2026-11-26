@@ -66,16 +66,16 @@ import {
 } from '../screens/package-art'
 import { BoxEnd, BoxSide, BoxTop } from '@/app/examples/fleet/fleet-art'
 import { LIVERIES } from '@/app/examples/fleet/fleet-data'
-import { Newspaper, SwissSite, WatchFace } from '../screens/device-apps'
+import { Newspaper, SampleWebsite, WatchFace } from '../screens/device-apps'
 import {
-  SwissBill,
-  SwissChecker,
-  SwissDialA,
-  SwissEpicentre,
-  SwissField,
-  SwissRaster,
-  SwissRhythm,
-  SwissRotation,
+  SamplePrintedFieldGraphics,
+  SampleCheckerGraphics,
+  SampleWatchDialGraphics,
+  SampleEpicentreGraphics,
+  SampleLineFieldGraphics,
+  SampleHalftoneGraphics,
+  SampleRhythmGraphics,
+  SampleRotationGraphics,
 } from '../screens/swiss-art'
 import { JacketBack, JacketCover, JacketSpine } from '../screens/book-jacket'
 import { SleeveBack, SleeveCover, SleeveLabelA, SleeveLabelB } from '../screens/record-sleeve'
@@ -378,7 +378,7 @@ const DEVICES: Entry[] = [
     statusBarInk: '#efede6',
     res: pxRes('galaxy', { variant: 's26' }),
     colorways: GALAXY_COLORWAYS.s26,
-    content: () => <SwissRotation />,
+    content: () => <SampleRotationGraphics />,
     render: ({ color, screen, surface, surfaceStyle, statusBar, resolution }) => (
       <Galaxy variant="s26" color={color} surfaceBackground={surface} surfaceStyle={surfaceStyle} resolution={resolution} statusBar={statusBar}>
         {screen}
@@ -390,7 +390,7 @@ const DEVICES: Entry[] = [
     statusBarInk: '#efede6',
     res: pxRes('iphone', { variant: 'pro' }),
     colorways: IPHONE_COLORWAYS.pro,
-    content: () => <SwissRaster />,
+    content: () => <SampleHalftoneGraphics />,
     render: ({ color, screen, surface, surfaceStyle, statusBar, resolution }) => (
       <IPhone variant="pro" color={color} surfaceBackground={surface} surfaceStyle={surfaceStyle} resolution={resolution} statusBar={statusBar}>
         {screen}
@@ -414,7 +414,7 @@ const DEVICES: Entry[] = [
     statusBarInk: '#efede6',
     res: pxRes('flip', { openAngle: CAROUSEL_OPEN_ANGLE }),
     colorways: FLIP_COLORWAYS.flip7,
-    content: () => <SwissField />,
+    content: () => <SampleLineFieldGraphics />,
     render: ({ color, screen, surface, surfaceStyle, statusBar, resolution }) => (
       <Flip openAngle={CAROUSEL_OPEN_ANGLE} color={color} surfaceBackground={surface} surfaceStyle={surfaceStyle} resolution={resolution} statusBar={statusBar}>
         {screen}
@@ -425,7 +425,7 @@ const DEVICES: Entry[] = [
     id: 'macbook-air-13',
     res: pxRes('laptop', { variant: 'air13' }),
     colorways: LAPTOP_COLORWAYS.air13,
-    content: () => <SwissSite />,
+    content: () => <SampleWebsite />,
     render: ({ color, screen, surface, surfaceStyle, resolution }) => (
       <Laptop variant="air13" color={color} surfaceBackground={surface} surfaceStyle={surfaceStyle} resolution={resolution}>
         {screen}
@@ -437,7 +437,7 @@ const DEVICES: Entry[] = [
     statusBarInk: '#efede6',
     res: pxRes('ipad', { variant: 'ipadpro13' }),
     colorways: IPAD_COLORWAYS.ipadpro13,
-    content: () => <SwissEpicentre />,
+    content: () => <SampleEpicentreGraphics />,
     render: ({ color, screen, surface, surfaceStyle, statusBar, resolution }) => (
       <IPad variant="ipadpro13" color={color} surfaceBackground={surface} surfaceStyle={surfaceStyle} resolution={resolution} statusBar={statusBar}>
         {screen}
@@ -449,7 +449,7 @@ const DEVICES: Entry[] = [
     statusBarInk: '#141414',
     res: pxRes('galaxyTab', { variant: 'tabs11' }),
     colorways: GALAXY_TAB_COLORWAYS.tabs11,
-    content: () => <SwissChecker />,
+    content: () => <SampleCheckerGraphics />,
     render: ({ color, screen, surface, surfaceStyle, statusBar, resolution }) => (
       <GalaxyTab variant="tabs11" color={color} surfaceBackground={surface} surfaceStyle={surfaceStyle} resolution={resolution} statusBar={statusBar}>
         {screen}
@@ -462,7 +462,7 @@ const DEVICES: Entry[] = [
     id: 'apple-watch-ultra-4',
     res: pxRes('appleWatch', { variant: 'ultra4' }),
     colorways: APPLE_WATCH_COLORWAYS.ultra4,
-    content: () => <SwissDialA />,
+    content: () => <SampleWatchDialGraphics />,
     render: ({ color, screen, surface, surfaceStyle, resolution }) => (
       <AppleWatch variant="ultra4" color={color} surfaceBackground={surface} surfaceStyle={surfaceStyle} resolution={resolution}>
         {screen}
@@ -480,7 +480,7 @@ const DEVICES: Entry[] = [
     id: 'studio-display',
     res: pxRes('studioDisplay'),
     colorways: STUDIO_DISPLAY_COLORWAYS,
-    content: () => <SwissRhythm />,
+    content: () => <SampleRhythmGraphics />,
     render: ({ color, screen, surface, surfaceStyle, resolution }) => <StudioDisplay color={color} surfaceBackground={surface} surfaceStyle={surfaceStyle} resolution={resolution}>{screen}</StudioDisplay>,
   },
 ]
@@ -693,7 +693,7 @@ const OBJECTS: Entry[] = [
       ['walnut', 'Walnut', '#5a3a25'],
       ['white', 'White', '#e9e7e2']
     ),
-    content: () => <SwissBill />,
+    content: () => <SamplePrintedFieldGraphics />,
     render: ({ color, screen, surface, surfaceStyle, resolution }) => (
       <PosterFrame color={color} surfaceBackground={surface} surfaceStyle={surfaceStyle} resolution={resolution}>
         {screen}
@@ -1702,20 +1702,17 @@ export default function CarouselScene() {
             ) : null}
           </button>
           {code ? (
-            <>
-              <span className="carousel-tools-rule" aria-hidden />
-              <button
-                type="button"
-                className="carousel-tool"
-                data-done={copied}
-                onClick={copyCode}
-                title="Copy the JSX for this mockup"
-                aria-label={copied ? 'Code copied' : `Copy the code for this ${nameOf(entry)}`}
-              >
-                {copied ? <Check size={15} strokeWidth={2.2} aria-hidden /> : <CodeXml size={15} strokeWidth={2} aria-hidden />}
-                <span>{copied ? 'Copied' : 'Copy code'}</span>
-              </button>
-            </>
+            <button
+              type="button"
+              className="carousel-tool"
+              data-done={copied}
+              onClick={copyCode}
+              title="Copy the JSX for this mockup"
+              aria-label={copied ? 'Code copied' : `Copy the code for this ${nameOf(entry)}`}
+            >
+              {copied ? <Check size={15} strokeWidth={2.2} aria-hidden /> : <CodeXml size={15} strokeWidth={2} aria-hidden />}
+              <span>{copied ? 'Copied' : 'Copy code'}</span>
+            </button>
           ) : null}
         </div>
         {/* The one hint - there used to be a "Drag to rotate" badge on the
